@@ -1,11 +1,11 @@
-package shoppingmall.ankim.domain.login.entity.socialLogin;
+package shoppingmall.ankim.domain.login.entity.member.socialLogin;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import shoppingmall.ankim.domain.login.entity.LoginType;
+import shoppingmall.ankim.domain.login.entity.member.LoginType;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
