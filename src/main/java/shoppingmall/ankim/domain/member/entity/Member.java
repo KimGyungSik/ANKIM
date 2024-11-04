@@ -1,9 +1,12 @@
 package shoppingmall.ankim.domain.member.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import org.hibernate.annotations.processing.Pattern;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,10 +14,11 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member", indexes = {
         @Index(name = "idx_member_uuid", columnList = "uuid")
 })
-public class Member {
+public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

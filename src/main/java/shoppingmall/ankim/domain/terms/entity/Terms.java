@@ -1,22 +1,26 @@
 package shoppingmall.ankim.domain.terms.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.util.List;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "terms")
-public class Terms {
+public class Terms extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
     @ManyToOne
-    @JoinColumn(name = "prents_no") // 부모 약관의 FK로 참조
+    @JoinColumn(name = "parents_no") // 부모 약관의 FK로 참조
     private Terms parentTerms;
 
     @Column(name = "code", length = 7)
