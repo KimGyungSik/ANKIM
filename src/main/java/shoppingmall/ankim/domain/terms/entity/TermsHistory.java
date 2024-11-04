@@ -15,7 +15,8 @@ public class TermsHistory {
     private TermsHistoryId id;
 
     @ManyToOne
-    @JoinColumn(name = "code", nullable = false)
+    @MapsId("code") // 복합 키 id의 code 필드와 매핑
+    @JoinColumn(name = "code", insertable = false, updatable = false, nullable = false)
     private Terms terms; // 약관 코드 (FK)
 
     @Column(name = "terms_yn", length = 1, nullable = false)
