@@ -31,4 +31,5 @@ public class TermsHistory {
     @Column(name = "agree_date", nullable = false)
     private LocalDateTime agreeDate = LocalDateTime.now(); // 동의 일자
 
+
 }
