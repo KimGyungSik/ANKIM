@@ -9,7 +9,10 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 public class AnkimApplication {
 
     public static void main(String[] args) {
+
         SpringApplication.run(AnkimApplication.class, args);
+
+        System.out.println("first PR");
     }
 
 }
