@@ -1,30 +1,17 @@
-package shoppingmall.ankim.domain.login.entity.loginHistory;
+package shoppingmall.ankim.domain.login.entity;
 
-
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
+import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import shoppingmall.ankim.domain.member.entity.Member;
-import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
 
-@Entity
-@Getter @Setter
+@Embeddable
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "login_attpt")
-public class LoginAttempt extends BaseEntity {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long no;
-
-    @ManyToOne
-    @JoinColumn(name = "mem_no", nullable = false)
-    private Member member;
-
+public class BaseLoginAttempt {
     @Column(name = "fail_cnt")
     private Integer failCount;
 
@@ -36,4 +23,11 @@ public class LoginAttempt extends BaseEntity {
 
     @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
     private String activeYn = "Y";
+
+    public BaseLoginAttempt(Integer failCount, LocalDateTime lastAttemptTime, LocalDateTime unlockTime, String activeYn) {
+        this.failCount = failCount;
+        this.lastAttemptTime = lastAttemptTime;
+        this.unlockTime = unlockTime;
+        this.activeYn = activeYn;
+    }
 }

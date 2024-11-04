@@ -30,6 +30,12 @@ public class MemberAddress extends BaseEntity {
         @Embedded
         private BaseAddress baseAddress;
 
+        @Column(name = "phone_num", length = 20, nullable = false)
+        private String phoneNumber;
+
+        @Column(name = "phone_emgcy", length = 20)
+        private String emergencyPhoneNumber;
+
         @Column(name = "addr_def", columnDefinition = "CHAR(1) DEFAULT 'N'")
         private String defaultAddressYn = "N";
 
