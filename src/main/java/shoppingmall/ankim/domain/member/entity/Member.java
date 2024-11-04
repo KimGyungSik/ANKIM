@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.member.entity;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import org.hibernate.annotations.processing.Pattern;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +11,9 @@ import java.util.UUID;
 
 @Entity
 @Getter @Setter
+@Table(name = "member", indexes = {
+        @Index(name = "idx_member_uuid", columnList = "uuid")
+})
 public class Member {
 
     @Id
@@ -17,6 +21,7 @@ public class Member {
     private Long no;
 
     @Column(nullable = false, columnDefinition = "BINARY(16)")
+/*    BINARY(16)으로 변환해주는 컨버터 필요    */
     private UUID uuid;
 
     @Column(nullable = false, length = 50, unique = true)
