@@ -1,16 +1,21 @@
-package shoppingmall.ankim.domain.login.entity;
+package shoppingmall.ankim.domain.login.entity.socialLogin;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shoppingmall.ankim.domain.login.entity.LoginType;
 import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "social_login")
-public class SocialLogin {
+public class SocialLogin extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,9 +39,9 @@ public class SocialLogin {
     private String activeYn = "Y";
 
     @Column(name = "reg_date", nullable = false)
-    private LocalDateTime regDate; // 등록일
+    private LocalDateTime regDate = LocalDateTime.now(); // 등록일
 
     @Column(name = "mod_date")
-    private LocalDateTime modDate; // 수정일
+    private LocalDateTime modDate = LocalDateTime.now(); // 수정일
 
 }

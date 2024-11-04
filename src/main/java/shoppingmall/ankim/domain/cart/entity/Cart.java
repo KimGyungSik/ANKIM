@@ -1,15 +1,19 @@
 package shoppingmall.ankim.domain.cart.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
 import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
-public class Cart {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Cart extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

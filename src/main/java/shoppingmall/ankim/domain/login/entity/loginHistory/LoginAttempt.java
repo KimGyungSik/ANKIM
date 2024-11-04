@@ -1,4 +1,5 @@
-package shoppingmall.ankim.domain.terms.entity;
+package shoppingmall.ankim.domain.login.entity.loginHistory;
+
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
@@ -13,27 +14,26 @@ import java.time.LocalDateTime;
 @Entity
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
-@Table(name = "terms_history")
-public class TermsHistory extends BaseEntity {
+@Table(name = "login_attpt")
+public class LoginAttempt extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "no")
     private Long no;
 
     @ManyToOne
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member;
 
-    @ManyToOne
-    @JoinColumn(name = "terms_no", nullable = false)
-    private Terms terms;
+    @Column(name = "fail_cnt")
+    private Integer failCount;
 
-    @Column(name = "terms_yn", length = 1, nullable = false)
-    private String termsYn = "N"; // 동의 여부
+    @Column(name = "last_attpt_time")
+    private LocalDateTime lastAttemptTime = LocalDateTime.now();
 
-    @Column(name = "agree_date", nullable = false)
-    private LocalDateTime agreeDate = LocalDateTime.now(); // 동의 일자
+    @Column(name = "unlock_time")
+    private LocalDateTime unlockTime;
 
-
+    @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
+    private String activeYn = "Y";
 }

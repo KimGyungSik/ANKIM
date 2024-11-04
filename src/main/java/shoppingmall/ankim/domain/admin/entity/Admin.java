@@ -1,14 +1,18 @@
 package shoppingmall.ankim.domain.admin.entity;
 
 import jakarta.persistence.*;
+import lombok.AccessLevel;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.Setter;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDate;
 
 @Entity
 @Getter @Setter
-public class Admin {
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+public class Admin extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
