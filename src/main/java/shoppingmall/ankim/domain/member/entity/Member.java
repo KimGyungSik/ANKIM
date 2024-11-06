@@ -22,41 +22,41 @@ public class Member extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long no;
+    private Long no; // PK 번호
 
     @Column(nullable = false, columnDefinition = "BINARY(16)")
-/*    BINARY(16)으로 변환해주는 컨버터 필요    */
+    /*    BINARY(16)으로 변환해주는 컨버터 필요    */
     private UUID uuid;
 
     @Column(nullable = false, length = 50, unique = true)
-    private String id;
+    private String id; // 아이디(이메일)
 
     @Column(nullable = false, length = 200)
-    private String pwd;
+    private String pwd; // 비밀번호
 
     @Column(nullable = false, length = 20)
-    private String name;
+    private String name; // 이름
 
-    @Column(nullable = false, length = 20)
-    private String phoneNum;
+    @Column(name = "phone_num", nullable = false, length = 20)
+    private String phoneNum; // 휴대전화번호
 
     @Column(nullable = false)
-    private LocalDate birth;
+    private LocalDate birth; // 생년월일
 
     @Column(nullable = false, length = 1)
-    private String gender;
+    private String gender; // 성별
 
     @Column(name = "join_date", nullable = false)
-    private LocalDateTime joinDate;
+    private LocalDateTime joinDate; // 가입일
 
     @Column(name = "first_ord_date")
-    private LocalDateTime firstOrderDate;
+    private LocalDateTime firstOrderDate; // 첫 주문일
 
     @Column
-    private Integer grade;
+    private Integer grade; // 회원 등급
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
-    private MemberStatus status = MemberStatus.ACTIVE;
+    private MemberStatus status;
 
 }
