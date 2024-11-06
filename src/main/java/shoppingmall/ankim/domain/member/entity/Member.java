@@ -1,11 +1,8 @@
 package shoppingmall.ankim.domain.member.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.processing.Pattern;
+import lombok.*;
+import shoppingmall.ankim.global.audit.Authority;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDate;
@@ -18,6 +15,7 @@ import java.util.UUID;
 @Table(name = "member", indexes = {
         @Index(name = "idx_member_uuid", columnList = "uuid")
 })
+@ToString(of = {"id", "name"})
 public class Member extends BaseEntity {
 
     @Id
@@ -59,4 +57,23 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private MemberStatus status;
 
+    @Transient
+    Authority authority;
+
+    @Builder
+    public Member(Long no, UUID uuid, String id, String pwd, String name, String phoneNum, LocalDate birth, String gender, LocalDateTime joinDate, LocalDateTime firstOrderDate, Integer grade, MemberStatus status, Authority authority) {
+        this.no = no;
+        this.uuid = uuid;
+        this.id = id;
+        this.pwd = pwd;
+        this.name = name;
+        this.phoneNum = phoneNum;
+        this.birth = birth;
+        this.gender = gender;
+        this.joinDate = joinDate;
+        this.firstOrderDate = firstOrderDate;
+        this.grade = grade;
+        this.status = status;
+        this.authority = authority;
+    }
 }
