@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.global.config.QuerydslConfig;
@@ -17,6 +18,7 @@ import static shoppingmall.ankim.domain.category.entity.CategoryLevel.*;
 
 
 @DataJpaTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 class CategoryRepositoryTest {
 

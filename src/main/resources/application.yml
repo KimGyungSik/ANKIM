@@ -9,7 +9,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-#    defer-datasource-initialization: true
+    defer-datasource-initialization: true
     open-in-view: true
   profiles:
     active:
@@ -20,4 +20,4 @@ spring:
   sql:
     init:
       data-locations: classpath*:data.sql
-      mode: never
+      mode: always
