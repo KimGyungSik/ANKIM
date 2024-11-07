@@ -1,44 +1,28 @@
 package shoppingmall.ankim.domain.category.dto;
 
 import lombok.Builder;
-import lombok.Getter;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import shoppingmall.ankim.domain.category.entity.Category;
+import shoppingmall.ankim.domain.category.entity.CategoryLevel;
 
 import java.util.ArrayList;
 import java.util.List;
+
+@Data
 @NoArgsConstructor
-@Getter
 public class CategoryResponse {
     private Long categoryNo;
     private Long parentNo;
-    private Long level;
+    private CategoryLevel level;
     private String name;
-    private List<CategoryResponse> childCategories;
+    private List<CategoryResponse> childCategories = new ArrayList<>(); // 빈 리스트로 초기화
 
     @Builder
-    public CategoryResponse(Long categoryNo, Long parentNo, Long level, String name) {
+    public CategoryResponse(Long categoryNo, Long parentNo, CategoryLevel level, String name, List<CategoryResponse> childCategories) {
         this.categoryNo = categoryNo;
         this.parentNo = parentNo;
         this.level = level;
         this.name = name;
-        this.childCategories = new ArrayList<>(); // 빈 배열로 초기화
-    }
-
-    public static CategoryResponse of(Category category){
-        return CategoryResponse.builder()
-                .categoryNo(category.getNo())
-                .parentNo(category.getParentNo())
-                .level(category.getLevel())
-                .name(category.getName())
-                .build();
-    }
-
-    public void addChildCategories(CategoryResponse categoryDto){
-        childCategories.add(categoryDto);
-    }
-
-    public void addChildCategories(List<CategoryResponse> categoryDto){
-        childCategories.addAll(categoryDto);
+        this.childCategories = childCategories != null ? childCategories : new ArrayList<>(); // null 방지
     }
 }
