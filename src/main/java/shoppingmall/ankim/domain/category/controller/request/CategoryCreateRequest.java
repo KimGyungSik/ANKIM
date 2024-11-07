@@ -13,7 +13,6 @@ import shoppingmall.ankim.domain.category.entity.CategoryLevel;
 public class CategoryCreateRequest {
 
     @NotBlank(message = "카테고리 이름은 필수 입력 값입니다.")
-    @Size(max = 50, message = "카테고리 이름은 50자 이하로 입력해야 합니다.")
     private String name;
 
     @NotNull(message = "카테고리 레벨은 필수 입력 값입니다.")
