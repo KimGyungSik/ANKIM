@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.category.service.response;
+package shoppingmall.ankim.domain.category.dto;
 
 import lombok.Builder;
 import lombok.Getter;
