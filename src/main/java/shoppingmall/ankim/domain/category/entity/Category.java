@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
+import shoppingmall.ankim.domain.category.exception.CategoryNameTooLongException;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
@@ -15,6 +16,7 @@ import java.util.stream.Collectors;
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
 import static java.util.stream.Collectors.toList;
+import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NAME_TOO_LONG;
 
 
 /**
@@ -33,11 +35,12 @@ import static java.util.stream.Collectors.toList;
 @Entity
 @Table(name = "category")
 public class Category extends BaseEntity {
+    private static final int NAME_MAX_LENGTH = 50;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @Column(length = 255)
+    @Column(length = 50)
     private String name;
 
     @Enumerated(EnumType.STRING)
@@ -53,7 +56,10 @@ public class Category extends BaseEntity {
 
     @Builder
     public Category(String name, List<Category> subCategories) {
-        this.name = name;
+        // 이름 길이 유효성 검사
+        if (name.length() > NAME_MAX_LENGTH) {
+            throw new CategoryNameTooLongException(CATEGORY_NAME_TOO_LONG);
+        }
         this.level = (subCategories != null && !subCategories.isEmpty()) ? CategoryLevel.MIDDLE : CategoryLevel.SUB;
 
         // 하위 카테고리 목록 설정 및 부모 관계 자동 설정
