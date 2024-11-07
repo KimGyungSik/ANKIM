@@ -10,6 +10,7 @@ import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
@@ -51,15 +52,16 @@ public class Category extends BaseEntity {
     private List<Category> subCategories = new ArrayList<>(); // 중분류가 갖는 소분류 목록
 
     @Builder
-    public Category(String name, Category parent) {
+    public Category(String name, List<Category> subCategories) {
         this.name = name;
-        this.parent = parent;
-        this.level = parent != null ? CategoryLevel.SUB  : CategoryLevel.MIDDLE;
-    }
+        this.level = (subCategories != null && !subCategories.isEmpty()) ? CategoryLevel.MIDDLE : CategoryLevel.SUB;
 
-    public void addSubCategories(Category child) {
-        this.subCategories.add(child);
-        child.parent = this;
+        // 하위 카테고리 목록 설정 및 부모 관계 자동 설정
+        if (subCategories != null) {
+            this.subCategories = subCategories.stream()
+                    .peek(child -> child.parent = this) // 각 하위 소분류의 parent를 현재 카테고리로 설정
+                    .collect(Collectors.toList());
+        }
     }
 
     public static List<Long> extractLowestCategoryIds(Category category) {
