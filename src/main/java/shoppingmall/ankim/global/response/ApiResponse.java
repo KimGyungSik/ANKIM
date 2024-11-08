@@ -41,6 +41,9 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T data) {
         return of(HttpStatus.OK, data);
     }
+    public static ApiResponse<Void> ok() {
+        return new ApiResponse<>(HttpStatus.OK, "Request succeeded", null, null);
+    }
 
     @Getter
     public static class FieldError {
