@@ -20,7 +20,7 @@ public class AdminLoginHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // 기본 키
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_no", nullable = false)
     private Admin admin;
 

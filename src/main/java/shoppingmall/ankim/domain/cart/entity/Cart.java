@@ -19,7 +19,7 @@ public class Cart extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // 자동 증가 ID
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member; // 회원 번호 (외래 키)
 

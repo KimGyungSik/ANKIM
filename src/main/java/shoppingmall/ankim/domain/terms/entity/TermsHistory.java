@@ -21,11 +21,11 @@ public class TermsHistory extends BaseEntity {
     @Column(name = "no")
     private Long no;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "terms_no", nullable = false)
     private Terms terms;
 

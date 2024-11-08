@@ -19,7 +19,7 @@ public class Terms extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "parents_no") // 부모 약관의 FK로 참조
     private Terms parentTerms;
 

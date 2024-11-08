@@ -21,7 +21,7 @@ public class AdminLoginAttempt extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_no", nullable = false)
     private Admin admin;
 

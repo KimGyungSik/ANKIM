@@ -25,11 +25,11 @@ public class Order extends BaseEntity {
     @Column(name = "ord_code", length = 19)
     private String ordCode;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "addr_no", nullable = false)
     private AdminAddress adminAddress;
 
