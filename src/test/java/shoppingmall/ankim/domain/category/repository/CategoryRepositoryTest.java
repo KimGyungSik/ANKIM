@@ -32,31 +32,38 @@ class CategoryRepositoryTest {
         Category sub1 = Category.builder()
                 .name("코트")
                 .build();
+
         Category sub2 = Category.builder()
                 .name("자켓")
                 .build();
+
         Category sub3 = Category.builder()
                 .name("가디건")
                 .build();
+
         Category sub4 = Category.builder()
                 .name("티셔츠")
                 .build();
+
         Category sub5 = Category.builder()
                 .name("블라우스")
                 .build();
+
         Category sub6 = Category.builder()
                 .name("니트")
                 .build();
+
         Category middle1 = Category.builder()
                 .name("아우터")
                 .subCategories(List.of(sub1,sub2,sub3))
                 .build();
+
         Category middle2 = Category.builder()
                 .name("상의")
                 .subCategories(List.of(sub4,sub5,sub6))
                 .build();
 
-        categoryRepository.saveAll(List.of(middle1, middle2, sub1, sub2, sub3, sub4, sub5, sub6));
+        categoryRepository.saveAll(List.of(middle1, middle2));
 
         // when
         List<CategoryResponse> allMiddleCategoriesWithSubCategories = categoryRepository.findAllMiddleCategoriesWithSubCategories();
@@ -78,6 +85,7 @@ class CategoryRepositoryTest {
                 );
     }
 
+
     @DisplayName("특정 중분류에 속한 모든 소분류를 조회할 수 있다")
     @Test
     void findSubCategoriesByMiddleCategoryId() {
@@ -85,42 +93,32 @@ class CategoryRepositoryTest {
         Category sub1 = Category.builder()
                 .name("코트")
                 .build();
+
         Category sub2 = Category.builder()
                 .name("자켓")
                 .build();
+
         Category sub3 = Category.builder()
                 .name("가디건")
                 .build();
-        Category sub4 = Category.builder()
-                .name("티셔츠")
-                .build();
-        Category sub5 = Category.builder()
-                .name("블라우스")
-                .build();
-        Category sub6 = Category.builder()
-                .name("니트")
-                .build();
+
         Category middle1 = Category.builder()
                 .name("아우터")
                 .subCategories(List.of(sub1,sub2,sub3))
                 .build();
-        Category middle2 = Category.builder()
-                .name("상의")
-                .subCategories(List.of(sub4,sub5,sub6))
-                .build();
 
-        categoryRepository.saveAll(List.of(middle1, middle2, sub1, sub2, sub3, sub4, sub5, sub6));
+        categoryRepository.saveAll(List.of(middle1, sub1, sub2, sub3));
 
         // when
-        List<CategoryResponse> result = categoryRepository.findSubCategoriesByMiddleCategoryId(1L);
+        List<CategoryResponse> result = categoryRepository.findSubCategoriesByMiddleCategoryId(middle1.getNo());
 
         // then
         assertThat(result).hasSize(3)
                 .extracting("parentNo", "level", "name", "childCategories")
                 .containsExactlyInAnyOrder(
-                        tuple(1L, SUB, "코트", List.of()),
-                        tuple(1L, SUB, "자켓", List.of()),
-                        tuple(1L, SUB, "가디건", List.of())
+                        tuple(middle1.getNo(), SUB, "코트", List.of()),
+                        tuple(middle1.getNo(), SUB, "자켓", List.of()),
+                        tuple(middle1.getNo(), SUB, "가디건", List.of())
                 );
     }
 
@@ -131,74 +129,36 @@ class CategoryRepositoryTest {
         Category sub1 = Category.builder()
                 .name("코트")
                 .build();
-        Category sub2 = Category.builder()
-                .name("자켓")
-                .build();
-        Category sub3 = Category.builder()
-                .name("가디건")
-                .build();
-        Category sub4 = Category.builder()
-                .name("티셔츠")
-                .build();
-        Category sub5 = Category.builder()
-                .name("블라우스")
-                .build();
-        Category sub6 = Category.builder()
-                .name("니트")
-                .build();
+
         Category middle1 = Category.builder()
                 .name("아우터")
-                .subCategories(List.of(sub1,sub2,sub3))
-                .build();
-        Category middle2 = Category.builder()
-                .name("상의")
-                .subCategories(List.of(sub4,sub5,sub6))
+                .subCategories(List.of(sub1))
                 .build();
 
-        categoryRepository.saveAll(List.of(middle1, middle2, sub1, sub2, sub3, sub4, sub5, sub6));
+        categoryRepository.saveAll(List.of(middle1, sub1));
 
         // when
-        Optional<CategoryResponse> middelCategory
-                = categoryRepository.findMiddleCategoryBySubCategoryId(sub6.getNo());
+        Optional<CategoryResponse> middleCategory = categoryRepository.findMiddleCategoryBySubCategoryId(sub1.getNo());
 
         // then
-        assertThat(middelCategory).isNotNull();
-        assertThat(middelCategory.get().getName()).isEqualTo("상의");
-        assertThat(middelCategory.get().getLevel()).isEqualTo(MIDDLE);
+        assertThat(middleCategory).isNotEmpty();
+        assertThat(middleCategory.get().getName()).isEqualTo("아우터");
+        assertThat(middleCategory.get().getLevel()).isEqualTo(MIDDLE);
     }
 
     @DisplayName("중분류만 조회할 수 있다")
     @Test
     void findMiddleCategories() {
         // given
-        Category sub1 = Category.builder()
-                .name("코트")
-                .build();
-        Category sub2 = Category.builder()
-                .name("자켓")
-                .build();
-        Category sub3 = Category.builder()
-                .name("가디건")
-                .build();
-        Category sub4 = Category.builder()
-                .name("티셔츠")
-                .build();
-        Category sub5 = Category.builder()
-                .name("블라우스")
-                .build();
-        Category sub6 = Category.builder()
-                .name("니트")
-                .build();
         Category middle1 = Category.builder()
                 .name("아우터")
-                .subCategories(List.of(sub1,sub2,sub3))
-                .build();
-        Category middle2 = Category.builder()
-                .name("상의")
-                .subCategories(List.of(sub4,sub5,sub6))
                 .build();
 
-        categoryRepository.saveAll(List.of(middle1, middle2, sub1, sub2, sub3, sub4, sub5, sub6));
+        Category middle2 = Category.builder()
+                .name("상의")
+                .build();
+
+        categoryRepository.saveAll(List.of(middle1, middle2));
 
         // when
         List<CategoryResponse> middleCategories = categoryRepository.findMiddleCategories();
@@ -211,6 +171,4 @@ class CategoryRepositoryTest {
                         tuple(middle2.getNo(), MIDDLE, "상의")
                 );
     }
-
-
 }
