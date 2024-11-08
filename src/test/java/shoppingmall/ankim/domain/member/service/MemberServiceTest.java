@@ -19,6 +19,5 @@ class MemberServiceTest {
     void emailCheckTest() {
         String email = "test@ankim.com";
         memberService.emailCheck(email);
-
     }
 }

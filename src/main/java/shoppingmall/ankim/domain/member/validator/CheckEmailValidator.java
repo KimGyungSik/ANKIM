@@ -4,7 +4,7 @@
 //import org.springframework.stereotype.Component;
 //import org.springframework.validation.Errors;
 //import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
-//import shoppingmall.ankim.domain.member.service.port.MemberRepository;
+//import shoppingmall.ankim.domain.member.repository.MemberRepository;
 //import shoppingmall.ankim.global.validator.AbstractValidator;
 //
 //@RequiredArgsConstructor

@@ -3,14 +3,20 @@ package shoppingmall.ankim.domain.email.service;
 import jakarta.mail.Address;
 import jakarta.mail.internet.InternetAddress;
 import jakarta.mail.internet.MimeMessage;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.Validation;
+import jakarta.validation.Validator;
+import jakarta.validation.ValidatorFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mail.javamail.JavaMailSender;
+import shoppingmall.ankim.domain.email.controller.request.MailRequest;
+
 import static org.mockito.Mockito.*;
+
+import java.util.Set;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -27,19 +33,24 @@ class MailServiceTest {
     @Mock
     private MimeMessage mimeMessage;
 
+    private Validator validator;
+
     @InjectMocks // 인터페이스 주입 X
     private MailServiceImpl mailService; // 모의 객체를 MailService에 주입
 
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this); // 모의 객체와 주입된 객체를 초기화
+        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+        validator = factory.getValidator(); // 유효성 검사 객체 생성
     }
+
     /*
     * 테스트 및 개발 순서
     * 1. 인증 번호 생성
     * 2. 이메일 발송하기 위해서 MimeMessage 객체 생성
     * 3. MimeMessage 객체를 통해서 이메일 전송
-    * 4. 인증번호 일치하는지 검증
+    * 4. 사용자가 입력한 인증번호가 일치하는지 검증
     * */
 
     @Test
@@ -60,12 +71,12 @@ class MailServiceTest {
     public void createMailTest() throws Exception {
         // given
         String email = "test@example.com";
-        String expectedSubject = "이메일 인증";
         String expectedSender = "admin@ankim.com";
+        String code = mailService.generateCode();
 
         // when
         when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
-        MimeMessage message = mailService.createMail(email);
+        MimeMessage message = mailService.createMail(email, code);
 
         // then: 각 설정 값 검증
         ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
@@ -80,25 +91,65 @@ class MailServiceTest {
     }
 
     @Test
-    @DisplayName("이메일 전송 기능 테스트")
+    @DisplayName("인증번호가 수신자 이메일에 잘 전송되는지 확인한다.")
     public void test3() throws Exception {
         // given
+        String email = "test@example.com";
+        String code = mailService.generateCode();
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
+        MimeMessage mimeMessage = mailService.createMail(email, code); // 이메일 객체 생성
 
         // when
+        mailService.sendMail(mimeMessage);
 
         // then
-
+        verify(javaMailSender, times(1)).send(mimeMessage); // JavaMailSender의 send 메서드가 호출되었는지 확인
     }
 
     @Test
-    @DisplayName("인증번호 검증 테스트")
-    public void test4() throws Exception {
+    @DisplayName("사용자가 입력한 인증번호가 서버의 생성된 인증번호와 일치하는 경우 일치한다는 메시지가 전달되는지 확인한다.")
+    public void verifyCodeSuccessTest() {
         // given
+        String email = "test@example.com";
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
+
+        String code = mailService.generateCode();
+
+        mailService.createMail(email, code); // 내부적으로 인증번호를 저장했다고 가정
+
+        MailRequest mailRequest = new MailRequest(email, code);
 
         // when
+        boolean isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
 
         // then
+        assertThat(isValid).isTrue();
+    }
 
+
+    @Test
+    @DisplayName("사용자가 입력한 인증번호가 서버의 생성된 인증번호와 일치하지 않는 경우 일치하지 않는다는 메시지가 전달되는지 확인한다.")
+    public void verifyCodeFailTest() {
+        // given
+        String email = "test@example.com";
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
+
+        String code = mailService.generateCode();
+        mailService.createMail(email, code); // 내부적으로 인증번호를 저장했다고 가정
+
+        MailRequest mailRequest = new MailRequest(email, "");
+
+        // 유효성 검사
+        Set<ConstraintViolation<MailRequest>> violations = validator.validate(mailRequest);
+
+        // when
+        boolean isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
+
+        // then
+        assertThat(violations).isNotEmpty(); // 유효성 검사 오류가 있는지 확인
+        assertThat(isValid).isFalse();     // 인증번호 검증 결과가 틀렸는지 확인
+
+        System.out.println("violations = " + violations);
     }
 
 }

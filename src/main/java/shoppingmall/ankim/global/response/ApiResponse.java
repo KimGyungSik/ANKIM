@@ -42,6 +42,10 @@ public class ApiResponse<T> {
         return of(HttpStatus.OK, data);
     }
 
+    public static <T> ApiResponse<T> ok(HttpStatus httpStatus, String message) {
+        return new ApiResponse<>(httpStatus, message, null, null);
+    }
+
     @Getter
     public static class FieldError {
         private String field;

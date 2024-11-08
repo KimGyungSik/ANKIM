@@ -1,0 +1,7 @@
+### 이메일 중복확인
+POST http://localhost:8080/members/email-check
+Content-Type: application/json
+
+{
+  "id": "test@example.com"
+}

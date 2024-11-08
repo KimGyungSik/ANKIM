@@ -5,10 +5,11 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import shoppingmall.ankim.global.exception.CustomLogicException;
-import shoppingmall.ankim.global.exception.ErrorCode;
+import shoppingmall.ankim.domain.email.exception.CannotSendMailException;
 
 import java.security.SecureRandom;
+import java.util.HashMap;
+import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.MAIL_SEND_FAIL;
 
@@ -23,6 +24,9 @@ public class MailServiceImpl implements MailService {
     private static final int CODE_LENGTH = 6;
     // 난수값 생성
     private static SecureRandom random = new SecureRandom();
+
+    // 임시로 생성된 인증번호를 저장
+    private final Map<String, String> verificationCodes = new HashMap<>();
 
     // JavaMailSender 주입
     public MailServiceImpl(JavaMailSender javaMailSender) {
@@ -42,20 +46,33 @@ public class MailServiceImpl implements MailService {
 
     // 이메일 메시지 생성
     @Override
-    public MimeMessage createMail(String email) {
+    public MimeMessage createMail(String email, String code) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
             helper.setFrom("admin@ankim.com"); // 보내는 사람
             helper.setTo(email); // 받는 사람
             helper.setSubject("이메일 인증");
-            String code = generateCode();
+            verificationCodes.put(email, code); // 생성된 인증번호 저장
             helper.setText("<h1>인증번호: " + code + "</h1>", true); // HTML 형식 메시지
         } catch (MessagingException e) {
-            throw new CustomLogicException(MAIL_SEND_FAIL);
+            throw new CannotSendMailException(MAIL_SEND_FAIL);
         }
 
         return message;
+    }
+
+    // 이메일 전송
+    @Override
+    public void sendMail(MimeMessage message) {
+        javaMailSender.send(message);
+    }
+
+    @Override
+    public boolean verifyCode(String email, String inputCode) {
+        String storedCode = verificationCodes.get(email);
+
+        return storedCode != null && storedCode.equals(inputCode);
     }
 
 
