@@ -3,8 +3,8 @@ package shoppingmall.ankim.domain.email.exception;
 import shoppingmall.ankim.global.exception.CustomLogicException;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
-public class CannotSendMailException extends CustomLogicException {
-    public CannotSendMailException(ErrorCode errorCode) {
+public class MailSendException extends CustomLogicException {
+    public MailSendException(ErrorCode errorCode) {
         super(errorCode);
     }
 }

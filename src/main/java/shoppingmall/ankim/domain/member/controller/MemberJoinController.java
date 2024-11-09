@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.member.controller;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -10,29 +11,23 @@ import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
 import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
+import shoppingmall.ankim.global.advice.GlobalExceptionAdvice;
+import shoppingmall.ankim.global.response.ApiResponse;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.MAIL_SEND_FAIL;
 import static shoppingmall.ankim.global.exception.ErrorCode.MISSING_REQUIRED_ID;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/member")
 public class MemberJoinController {
 
-    @Autowired
-    MemberService memberService;
+    private final MemberService memberService;
 
     @PostMapping("/email-check")
-    public ResponseEntity<String> existByEmail(@Valid @RequestBody MemberEmailRequest request, BindingResult bindingResult) {
-        // 이메일 형식 확인
-        if (bindingResult.hasErrors()) {
-            String errorMessage = bindingResult.getFieldError("id").getDefaultMessage();
-            return ResponseEntity.badRequest().body(errorMessage);
-        }
-
-        // 이메일 형식이 올바르면 중복 확인 로직으로 이동
+    public ApiResponse<String> existByEmail(@Valid @RequestBody MemberEmailRequest request) {
+        // 이메일 중복 확인 로직
         memberService.emailCheck(request.getId());
-
-        return ResponseEntity.ok("사용 가능한 이메일입니다.");
+        return ApiResponse.ok("사용 가능한 이메일입니다.");
     }
 
     @PostMapping("/email-next")
@@ -47,16 +42,14 @@ public class MemberJoinController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> registerMember(@Valid @RequestBody MemberRegisterRequest request, BindingResult bindingResult) {
+    public ApiResponse<String> registerMember(@Valid @RequestBody MemberRegisterRequest request, BindingResult bindingResult) {
         // Validation 검사
         if (bindingResult.hasErrors()) {
             // 오류 메시지 반환
         }
 
         // Validation 통과 후 비즈니스 로직 호출
-        return ResponseEntity.ok("");
+        return ApiResponse.ok("");
     }
-
-
 
 }

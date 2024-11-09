@@ -2,6 +2,8 @@ package shoppingmall.ankim.domain.email.controller;
 
 import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.Pattern;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.ui.Model;
@@ -12,15 +14,18 @@ import shoppingmall.ankim.domain.email.service.MailService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/mail")
 public class MailController {
 
-    @Autowired
-    private MailService mailService;
+    private final MailService mailService;
 
     // 메일 전송 요청 처리
     @PostMapping("/send")
-    public ApiResponse<String> sendMail(@RequestParam String email) {
+    public ApiResponse<String> sendMail(
+            @RequestParam("email")
+            @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+            String email) {
         String code = mailService.generateCode(); // 인증번호 생성
         MimeMessage mail = mailService.createMail(email, code); // 메일 생성
         mailService.sendMail(mail); // 메일 전송

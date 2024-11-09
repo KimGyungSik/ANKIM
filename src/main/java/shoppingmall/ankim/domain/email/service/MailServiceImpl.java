@@ -5,7 +5,7 @@ import jakarta.mail.internet.MimeMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import shoppingmall.ankim.domain.email.exception.CannotSendMailException;
+import shoppingmall.ankim.domain.email.exception.MailSendException;
 
 import java.security.SecureRandom;
 import java.util.HashMap;
@@ -56,7 +56,7 @@ public class MailServiceImpl implements MailService {
             verificationCodes.put(email, code); // 생성된 인증번호 저장
             helper.setText("<h1>인증번호: " + code + "</h1>", true); // HTML 형식 메시지
         } catch (MessagingException e) {
-            throw new CannotSendMailException(MAIL_SEND_FAIL);
+            throw new MailSendException(MAIL_SEND_FAIL);
         }
 
         return message;
