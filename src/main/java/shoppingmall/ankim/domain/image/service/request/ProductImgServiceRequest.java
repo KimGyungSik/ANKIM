@@ -9,13 +9,13 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ProductImgeServiceRequest {
+public class ProductImgServiceRequest {
     private List<MultipartFile> thumbnailImages;
 
     private List<MultipartFile> detailImages;
 
     @Builder
-    private ProductImgeServiceRequest(List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages) {
+    private ProductImgServiceRequest(List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages) {
         this.thumbnailImages = thumbnailImages;
         this.detailImages = detailImages;
     }

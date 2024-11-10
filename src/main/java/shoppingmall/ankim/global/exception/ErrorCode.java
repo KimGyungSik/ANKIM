@@ -15,7 +15,11 @@ public enum ErrorCode {
 
     // 상품 이미지
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일이 존재하지 않습니다."),
-    FILE_UPLOAD_FAIL(HttpStatus.NOT_FOUND, "파일 업로드에 실패하였습니다.");
+    FILE_UPLOAD_FAIL(HttpStatus.NOT_FOUND, "파일 업로드에 실패하였습니다."),
+    THUMBNAIL_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "썸네일 이미지는 최소 1개가 필요합니다."),
+    DETAIL_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "상세 이미지는 최소 1개가 필요합니다."),
+    IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 6장까지 업로드할 수 있습니다.");
+
 
     private final HttpStatus httpStatus;
 
