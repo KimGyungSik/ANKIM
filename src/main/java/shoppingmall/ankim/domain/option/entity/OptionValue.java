@@ -14,7 +14,7 @@ public class OptionValue {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "optg_no", nullable = false)
     private OptionGroup optionGroup;
 

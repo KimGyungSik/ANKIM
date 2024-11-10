@@ -21,3 +21,14 @@ spring:
     init:
       data-locations: classpath*:data.sql
       mode: always
+
+  servlet:
+    multipart:
+      maxFileSize: 20MB   # 파일 한 개당 최대 사이즈
+      maxRequestSize: 100MB  # 요청당 최대 파일 크기
+
+  # 상품 이미지 업로드 경로
+itemImgLocation: C:/shop/item
+
+  # 리소스 업로드 경로
+uploadPath: file:///C:/shop/

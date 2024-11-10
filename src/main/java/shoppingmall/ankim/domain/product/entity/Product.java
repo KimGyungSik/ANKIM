@@ -4,8 +4,14 @@ import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.category.entity.Category;
+import shoppingmall.ankim.domain.image.entity.ProductImg;
+import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.option.entity.OptionGroup;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -17,10 +23,24 @@ public class Product {
     private Long no;
 
     @Column(nullable = false)
-    private Long cateNo;
-
-    @Column(nullable = false)
     private Long admNo;
+
+    // 상품 : 카테고리 = N : 1
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_no", nullable = false)
+    private Category category;
+
+    // 이미지 리스트 필드 추가
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductImg> productImgs = new ArrayList<>();
+
+    // 품목 리스트 필드 추가
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Item> items = new ArrayList<>();
+
+    // 옵션 그룹 리스트 필드 추가
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<OptionGroup> optionGroups = new ArrayList<>();
 
     @Column(length = 255)
     private String name;
