@@ -1,25 +1,23 @@
 package shoppingmall.ankim.domain.image.dto;
 
 import jakarta.validation.constraints.NotEmpty;
-import jakarta.validation.constraints.Size;
 import lombok.Builder;
-import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
+import shoppingmall.ankim.domain.image.validation.ValidImageFile;
 
 import java.util.List;
 
-@Data
+@Getter
 @NoArgsConstructor
 public class ProductImgeRequest {
-    // 썸네일 이미지 리스트 (1장 필수)
     @NotEmpty(message = "썸네일 이미지는 필수입니다.")
-    @Size(max = 6, message = "썸네일 이미지는 최대 6장까지 업로드할 수 있습니다.")
+    @ValidImageFile
     private List<MultipartFile> thumbnailImages;
 
-    // 상세 이미지 리스트 (최대 6장)
-    @NotEmpty(message = "썸네일 이미지는 필수입니다.")
-    @Size(max = 6, message = "상세 이미지는 최대 6장까지 업로드할 수 있습니다.")
+    @NotEmpty(message = "상세 이미지는 필수입니다.")
+    @ValidImageFile
     private List<MultipartFile> detailImages;
 
     @Builder

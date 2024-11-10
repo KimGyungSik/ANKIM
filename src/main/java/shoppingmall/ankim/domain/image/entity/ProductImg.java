@@ -55,6 +55,13 @@ public class ProductImg {
                 .build();
     }
 
+    public static ProductImg init(String repimgYn, Integer ord) {
+        return ProductImg.builder()
+                .repimgYn(repimgYn)
+                .ord(ord)
+                .build();
+    }
+
     public void updateProductImg(String oriImgName, String imgName, String imgUrl) {
         this.oriImgName = oriImgName;
         this.imgName = imgName;
