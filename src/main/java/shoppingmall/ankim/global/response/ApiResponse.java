@@ -42,7 +42,7 @@ public class ApiResponse<T> {
         return of(HttpStatus.OK, data);
     }
     public static ApiResponse<Void> ok() {
-        return new ApiResponse<>(HttpStatus.OK, "Request succeeded", null, null);
+        return new ApiResponse<>(HttpStatus.OK, "OK", null, null);
     }
 
     @Getter
