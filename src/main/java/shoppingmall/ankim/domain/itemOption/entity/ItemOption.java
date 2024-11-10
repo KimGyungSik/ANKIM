@@ -1,12 +1,11 @@
 package shoppingmall.ankim.domain.itemOption.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.IdClass;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.option.entity.OptionValue;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -15,8 +14,12 @@ import lombok.NoArgsConstructor;
 @Table(name = "ItemOption")
 public class ItemOption {
     @Id
-    private Long itemNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "item_no", nullable = false)
+    private Item item;
 
     @Id
-    private Long optvNo;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "optv_no", nullable = false)
+    private OptionValue optionValue;
 }
