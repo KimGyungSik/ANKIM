@@ -22,5 +22,9 @@ spring:
     allow-bean-definition-overriding: true
   sql:
     init:
-      data-locations: classpath*:data.sql
+      data-locations: classpath*:terms.sql
       mode: always
+
+# 등급 기본값
+member:
+  default-grade: 50

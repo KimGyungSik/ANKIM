@@ -14,9 +14,9 @@ public class MemberController {
         return "main";
     }
 
-    @PostMapping("/join")
+    @GetMapping("/join")
     public String joinProcess(MemberRegisterRequest memberRegisterRequest) {
 
-        return "ok";
+        return "ok"; // 회원가입 페이지로 이동
     }
 }

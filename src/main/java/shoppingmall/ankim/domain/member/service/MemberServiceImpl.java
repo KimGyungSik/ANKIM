@@ -30,12 +30,18 @@ public class MemberServiceImpl implements MemberService {
 
     /*
     * 회원 가입 순서
-    * 1. View --- MemberRegisterRequest ---> Controller
-    * 2. Controller --- MemberRegisterServiceRequest ---> Service
-    * 3. 비밀번호 암호화
-    * 4. UUID 생성
-    * 5. Entity로 변환
-    * 6. insert
+    * 1. Member 엔티티 관련
+    *   1.1. View --- MemberRegisterRequest ---> Controller
+    *   1.2. Controller --- MemberRegisterServiceRequest ---> Service
+    *   1.3. 비밀번호 암호화
+    *   1.4. UUID 생성
+    *   1.5. Entity로 변환
+    *   1.6. Member 테이븡에 insert
+    * 2. Terms & TermsHistory 엔티티 관련
+    *   2.1. View --- TermsHistoryRegisterRequest ---> Controller
+    *   2.2. Controller --- TermsHistoryRegisterServiceRequest ---> Service
+    *   2.3. Entity로 변환
+    *   2.4. TermsHistory 테이블에 insert
     * */
     // 회원가입 로직
     public Boolean registerMember(MemberRegisterServiceRequest request) {

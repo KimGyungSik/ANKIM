@@ -2,6 +2,8 @@ package shoppingmall.ankim.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
+import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.global.audit.Authority;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
@@ -22,7 +24,8 @@ public class Member extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // PK 번호
 
-    @Column(nullable = false, columnDefinition = "BINARY(16)")
+    //    @Column(nullable = false, columnDefinition = "BINARY(16)")
+    @Column(columnDefinition = "BINARY(16)") // UUID 용량 줄이는 로직 추가를 위해 일단 null값 허용하도록 변경
     /*    BINARY(16)으로 변환해주는 컨버터 필요    */
     private UUID uuid;
 
@@ -50,19 +53,18 @@ public class Member extends BaseEntity {
     @Column(name = "first_ord_date")
     private LocalDateTime firstOrderDate; // 첫 주문일
 
-    @Column
+    @Column(nullable = false)
     private Integer grade; // 회원 등급
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private MemberStatus status;
 
-    @Transient
-    Authority authority;
+//    @Transient
+//    Authority authority;
 
     @Builder
-    public Member(Long no, UUID uuid, String id, String pwd, String name, String phoneNum, LocalDate birth, String gender, LocalDateTime joinDate, LocalDateTime firstOrderDate, Integer grade, MemberStatus status, Authority authority) {
-        this.no = no;
+    public Member(UUID uuid, String id, String pwd, String name, String phoneNum, LocalDate birth, String gender, LocalDateTime joinDate, Integer grade, MemberStatus status, Authority authority) {
         this.uuid = uuid;
         this.id = id;
         this.pwd = pwd;
@@ -71,9 +73,9 @@ public class Member extends BaseEntity {
         this.birth = birth;
         this.gender = gender;
         this.joinDate = joinDate;
-        this.firstOrderDate = firstOrderDate;
         this.grade = grade;
         this.status = status;
-        this.authority = authority;
+//        this.authority = authority;
     }
+
 }

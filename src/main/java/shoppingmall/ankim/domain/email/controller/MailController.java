@@ -23,7 +23,7 @@ public class MailController {
     // 메일 전송 요청 처리
     @PostMapping("/send")
     public ApiResponse<String> sendMail(
-            @RequestParam("email")
+            @RequestParam("id")
             @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
             String email) {
         String code = mailService.generateCode(); // 인증번호 생성

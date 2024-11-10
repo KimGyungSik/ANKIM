@@ -7,11 +7,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
+import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 
 import java.time.LocalDate;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class MemberRegisterRequest {
 
@@ -58,4 +58,17 @@ public class MemberRegisterRequest {
         this.birth = birth;
         this.gender = gender;
     }
+
+    // Service단 Reqeust로 변경
+    public MemberRegisterServiceRequest toServiceRequest() {
+        return MemberRegisterServiceRequest.builder()
+                .id(this.id)
+                .pwd(this.pwd)
+                .name(this.name)
+                .phoneNum(this.phoneNum)
+                .birth(this.birth)
+                .gender(this.gender)
+                .build();
+    }
+
 }

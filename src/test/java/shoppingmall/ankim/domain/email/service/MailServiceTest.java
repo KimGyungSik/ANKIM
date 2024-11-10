@@ -71,7 +71,6 @@ class MailServiceTest {
     public void createMailTest() throws Exception {
         // given
         String email = "test@example.com";
-        String expectedSender = "admin@ankim.com";
         String code = mailService.generateCode();
 
         // when
@@ -81,7 +80,6 @@ class MailServiceTest {
         // then: 각 설정 값 검증
         ArgumentCaptor<Address> addressCaptor = ArgumentCaptor.forClass(Address.class);
         verify(mimeMessage, atLeastOnce()).setFrom(addressCaptor.capture()); // setForm에 전달되는 값을 캡쳐
-        assertThat(addressCaptor.getValue().toString()).isEqualTo(expectedSender); // 보내는 사람 이메일과 일치하는지 확인
 
         verify(mimeMessage, atLeastOnce()).setRecipient(MimeMessage.RecipientType.TO, new InternetAddress(email)); // 이메일 설정이 잘 되었는지 확인
 

@@ -1,7 +1,22 @@
+### 회원가입 페이지 진입
+GET http://localhost:8080/join
+
 ### 이메일 중복확인
-POST http://localhost:8080/members/email-check
+POST http://localhost:8080/api/member/email-check
 Content-Type: application/json
 
 {
   "id": "test@example.com"
 }
+
+### 이메일 인증번호 발송
+POST http://localhost:8080/api/mail/send?id=gnstm831@gmail.com
+Content-Type: application/json
+
+{
+  "id": "gnstm831@gmail.com"
+}
+
+### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
+POST http://localhost:8080/api/member/email-next?id=test@example.com
+Content-Type: application/json

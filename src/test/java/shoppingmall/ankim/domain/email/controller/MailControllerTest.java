@@ -53,7 +53,7 @@ class MailControllerTest {
 
         // when, then
         mockMvc.perform(post("/api/mail/send")
-                        .param("email", email))
+                        .param("id", email))
                 .andExpect(status().isOk());
 
         // then
@@ -107,9 +107,9 @@ class MailControllerTest {
 
         // when, then
         mockMvc.perform(post("/api/mail/send")
-                        .param("email", email))
+                        .param("id", email))
                 .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("메일 전송에 실패했습니다."));
+                .andExpect(jsonPath("$.message").value("서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."));
     }
 
     @Test
@@ -128,7 +128,7 @@ class MailControllerTest {
 
         // when : 첫 번째로 인증번호 전송
         mockMvc.perform(post("/api/mail/send")
-                        .param("email", email))
+                        .param("id", email))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value("메일 전송 완료"));
 
@@ -138,7 +138,7 @@ class MailControllerTest {
 
         // when : 두 번째로 인증번호 전송 (재발급)
         mockMvc.perform(post("/api/mail/send")
-                        .param("email", email))
+                        .param("id", email))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value("메일 전송 완료"));
 
