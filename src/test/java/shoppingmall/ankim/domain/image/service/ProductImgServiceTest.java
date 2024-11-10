@@ -17,9 +17,39 @@ class ProductImgServiceTest {
     @MockBean
     FileService fileService;
 
-    @DisplayName("")
+    @DisplayName("썸네일 이미지와 상세 이미지를 저장할 수 있다.")
     @Test
-    void test() {
+    void createProductImgs() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @DisplayName("썸네일 이미지와 상세 이미지는 1장은 필수로 등록해야한다.")
+    @Test
+    void createProductImgsRequired() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @DisplayName("썸네일 이미지와 상세 이미지는 최대 6장까지 등록할 수 있다.")
+    @Test
+    void createProductImgsLimitExceeded() {
+        // given
+
+        // when
+
+        // then
+    }
+
+    @DisplayName("썸네일 이미지와 상세 이미지는 등록한 순서대로 이미지 순서가 정해진다.")
+    @Test
+    void createProductImgsOrder() {
         // given
 
         // when
