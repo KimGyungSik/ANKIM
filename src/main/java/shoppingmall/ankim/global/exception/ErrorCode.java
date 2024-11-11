@@ -18,7 +18,11 @@ public enum ErrorCode {
     FILE_UPLOAD_FAIL(HttpStatus.NOT_FOUND, "파일 업로드에 실패하였습니다."),
     THUMBNAIL_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "썸네일 이미지는 최소 1개가 필요합니다."),
     DETAIL_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "상세 이미지는 최소 1개가 필요합니다."),
-    IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 6장까지 업로드할 수 있습니다.");
+    IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 6장까지 업로드할 수 있습니다."),
+
+    // 옵션
+    DUPLICATE_OPTION_VALUE(HttpStatus.BAD_REQUEST, "옵션 값이 중복되었습니다"),
+    OPTION_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND,"옵션 항목을 찾을 수 없습니다." );
 
 
     private final HttpStatus httpStatus;

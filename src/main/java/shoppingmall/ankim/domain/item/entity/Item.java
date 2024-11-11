@@ -2,14 +2,19 @@ package shoppingmall.ankim.domain.item.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
+import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.entity.Product;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
+
+import static shoppingmall.ankim.domain.item.entity.ProductSellingStatus.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -29,24 +34,68 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOption> itemOptions = new ArrayList<>();
 
-    private String code;
+    private String code; // 품목코드
 
-    private String name;
+    private String name; // 품목명
 
     @Column(name = "add_price", precision = 10, scale = 2)
-    private BigDecimal addPrice;
+    private BigDecimal addPrice; // 추가금액
 
-    private Integer qty;
+    private Integer qty; // 재고량
 
     @Column(name = "saf_qty")
-    private Integer safQty;
+    private Integer safQty; // 안전재고량
 
-    @Column(name = "sell_st")
-    private String sellSt;
+    @Enumerated(EnumType.STRING)
+    private ProductSellingStatus sellingStatus; // 판매 상태
 
     @Column(name = "max_qty")
-    private Integer maxQty;
+    private Integer maxQty; // 최대 구매 수량
 
     @Column(name = "min_qty")
-    private Integer minQty;
+    private Integer minQty; // 최소 구매 수량
+
+    @Builder
+    private Item(Product product, List<OptionValue> optionValues, String code, String name, BigDecimal addPrice,
+                 Integer qty, Integer safQty, ProductSellingStatus sellingStatus, Integer maxQty, Integer minQty) {
+        this.product = product;
+        this.itemOptions = optionValues.stream()
+                .map(optionValue -> new ItemOption(this, optionValue))
+                .collect(Collectors.toList());
+        this.code = code;
+        this.name = name;
+        this.addPrice = addPrice;
+        this.qty = qty;
+        this.safQty = safQty;
+        this.sellingStatus = sellingStatus;
+        this.maxQty = maxQty;
+        this.minQty = minQty;
+    }
+
+    public static Item create(Product product,List<OptionValue> optionValues, String code, String name, BigDecimal addPrice,
+                              Integer qty, Integer safQty,Integer maxQty, Integer minQty) {
+        return Item.builder()
+                .sellingStatus(SELLING)
+                .product(product)
+                .optionValues(optionValues)
+                .code(code)
+                .name(name)
+                .addPrice(addPrice)
+                .qty(qty)
+                .safQty(safQty)
+                .maxQty(maxQty)
+                .minQty(minQty)
+                .build();
+    }
+
+    public boolean isQuantityLessThan(int qty) {
+        return this.qty < qty;
+    }
+
+    public void deductQuantity(int qty) {
+        if(isQuantityLessThan(qty)) {
+            throw new IllegalArgumentException("차감할 재고 수량이 없습니다."); // FIXME
+        }
+        this.qty -= qty;
+    }
 }

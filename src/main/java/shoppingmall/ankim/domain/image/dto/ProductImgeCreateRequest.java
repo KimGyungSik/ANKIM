@@ -9,9 +9,10 @@ import shoppingmall.ankim.domain.image.validation.ValidImageFile;
 
 import java.util.List;
 
+// TODO 상품 등록 시 필드 validator 테스트 진행해야함
 @Getter
 @NoArgsConstructor
-public class ProductImgeRequest {
+public class ProductImgeCreateRequest {
     @NotEmpty(message = "썸네일 이미지는 필수입니다.")
     @ValidImageFile
     private List<MultipartFile> thumbnailImages;
@@ -21,7 +22,7 @@ public class ProductImgeRequest {
     private List<MultipartFile> detailImages;
 
     @Builder
-    private ProductImgeRequest(List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages) {
+    private ProductImgeCreateRequest(List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages) {
         this.thumbnailImages = thumbnailImages;
         this.detailImages = detailImages;
     }

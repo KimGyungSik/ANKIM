@@ -11,7 +11,7 @@ import shoppingmall.ankim.domain.image.exception.FileUploadException;
 import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
-import shoppingmall.ankim.domain.image.service.request.ProductImgServiceRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 
 import java.io.IOException;
 import java.util.List;
@@ -31,7 +31,7 @@ public class ProductImgService {
     private final static String thumbnail = "Y";
     private final static String detail = "N";
 
-    public void createProductImgs(ProductImgServiceRequest request)  {
+    public void createProductImgs(ProductImgCreateServiceRequest request)  {
         validateImageCounts(request);
 
         saveImages(request.getThumbnailImages(), thumbnail);
@@ -39,7 +39,7 @@ public class ProductImgService {
     }
 
     // 이미지 개수 검사를 위한 메서드
-    private void validateImageCounts(ProductImgServiceRequest request) {
+    private void validateImageCounts(ProductImgCreateServiceRequest request) {
         // 썸네일 이미지 개수 검사
         if (request.getThumbnailImages() == null || request.getThumbnailImages().isEmpty()) {
             throw new ThumbnailImageRequiredException(THUMBNAIL_IMAGE_REQUIRED);

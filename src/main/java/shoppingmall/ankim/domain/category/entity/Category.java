@@ -32,7 +32,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NAME_TOO_LO
  */
 
 @Getter
-@Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "category")

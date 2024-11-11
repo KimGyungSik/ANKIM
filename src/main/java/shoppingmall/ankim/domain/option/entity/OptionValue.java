@@ -2,8 +2,14 @@ package shoppingmall.ankim.domain.option.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+
+/*
+ * 옵션 값 정책
+ * 원하는 그룹에 맞는 값 넣기 ex) 사이즈 -> small / 컬러 -> red, blue...
+ */
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +30,19 @@ public class OptionValue {
     @Column(length = 7)
     private String colorCode;
 
-    // Getters and Setters
+    @Builder
+    private OptionValue(OptionGroup optionGroup, String name, String colorCode) {
+        this.optionGroup = optionGroup;
+        this.name = name;
+        this.colorCode = colorCode;
+    }
+
+    public static OptionValue create(OptionGroup optionGroup, String name, String colorCode) {
+        return OptionValue.builder()
+                .optionGroup(optionGroup)
+                .name(name)
+                .colorCode(colorCode)
+                .build();
+    }
 }
 

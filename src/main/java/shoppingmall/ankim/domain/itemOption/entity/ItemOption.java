@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.itemOption.entity;
 
 import jakarta.persistence.*;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.item.entity.Item;
@@ -22,4 +23,9 @@ public class ItemOption {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "optv_no", nullable = false)
     private OptionValue optionValue;
+
+    public ItemOption(Item item, OptionValue optionValue) {
+        this.item = item;
+        this.optionValue = optionValue;
+    }
 }
