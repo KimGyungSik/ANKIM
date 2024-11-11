@@ -2,13 +2,11 @@ package shoppingmall.ankim.domain.image.service;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.BDDMockito;
 import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
@@ -16,7 +14,7 @@ import shoppingmall.ankim.domain.image.exception.DetailImageRequiredException;
 import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
-import shoppingmall.ankim.domain.image.service.request.ProductImgServiceRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -60,7 +58,7 @@ class ProductImgServiceTest {
                 "detail", "detail.jpg", "image/jpeg", "detail data".getBytes());
 
         // 이를 사용하여 ProductImgServiceRequest 객체를 생성합니다.
-        ProductImgServiceRequest request = ProductImgServiceRequest.builder()
+        ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))
                 .detailImages(List.of(detailImage))
                 .build();
@@ -83,12 +81,12 @@ class ProductImgServiceTest {
     @Test
     void createProductImgsRequired() {
         // given
-        ProductImgServiceRequest request = ProductImgServiceRequest.builder()
+        ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(Collections.emptyList()) // 썸네일 이미지가 없는 경우
                 .detailImages(List.of(detailImage))
                 .build();
 
-        ProductImgServiceRequest requestWithNoDetail = ProductImgServiceRequest.builder()
+        ProductImgCreateServiceRequest requestWithNoDetail = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))
                 .detailImages(Collections.emptyList()) // 상세 이미지가 없는 경우
                 .build();
@@ -109,7 +107,7 @@ class ProductImgServiceTest {
     void createProductImgsLimitExceeded() {
         // given
         List<MultipartFile> thumbnails = List.of(thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage); // 7개 이미지
-        ProductImgServiceRequest request = ProductImgServiceRequest.builder()
+        ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(thumbnails)
                 .detailImages(List.of(detailImage))
                 .build();
@@ -124,7 +122,7 @@ class ProductImgServiceTest {
     @Test
     void createProductImgsOrder() throws IOException {
         // given
-        ProductImgServiceRequest request = ProductImgServiceRequest.builder()
+        ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))
                 .detailImages(List.of(detailImage, detailImage)) // 2 detail images for ordering test
                 .build();

@@ -31,7 +31,7 @@ public class ProductImg {
     private Integer ord; // 이미지 순서
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "prod_no", nullable = true) // FIX
+    @JoinColumn(name = "prod_no", nullable = true) // FIXME 상품 생성시 주입
     private Product product;
 
     @Builder
