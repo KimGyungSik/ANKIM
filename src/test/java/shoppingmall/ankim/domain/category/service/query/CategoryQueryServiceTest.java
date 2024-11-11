@@ -27,7 +27,7 @@ class CategoryQueryServiceTest {
     void getSubCategoriesUnderMiddleCategory() {
         // given
         // when // then
-        assertThatThrownBy(() -> categoryQueryService.getSubCategoriesUnderMiddleCategory(1L))
+        assertThatThrownBy(() -> categoryQueryService.getSubCategoriesUnderMiddleCategory(10L))
                 .isInstanceOf(CategoryNotFoundException.class)
                 .hasMessage("카테고리를 찾을 수 없습니다.");
     }
