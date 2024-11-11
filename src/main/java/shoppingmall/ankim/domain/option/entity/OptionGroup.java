@@ -49,27 +49,16 @@ public class OptionGroup {
     private OptionGroup(String name, Product product, List<OptionValue> optionValues) {
         this.name = name;
         this.product = product;
-
-        // 중복 검사를 수행한 후 중복이 없을 경우에만 OptionValue 생성
-        Set<String> uniqueNames = new HashSet<>();
-        this.optionValues = optionValues.stream()
-                .peek(optionValue -> {
-                    if (!uniqueNames.add(optionValue.getName())) {
-                        throw new DuplicateOptionValueException(DUPLICATE_OPTION_VALUE);
-                    }
-                })
-                .map(optionValue -> OptionValue.create(this, optionValue.getName(), optionValue.getColorCode()))
-                .collect(Collectors.toList());
+        this.optionValues = optionValues != null ? optionValues : new ArrayList<>();
     }
 
-    public static OptionGroup create(String name, Product product, List<OptionValue> optionValues) {
+    public static OptionGroup create(String name, Product product) {
         return OptionGroup.builder()
                 .name(name)
                 .product(product)
-                .optionValues(optionValues)
                 .build();
     }
-    // TODO OptionValue 추가 메서드
+    // TODO OptionValue 추가 메서드 테스트 해야함
     public void addOptionValue(OptionValue optionValue) {
         boolean isDuplicate = optionValues.stream()
                 .anyMatch(existingValue -> existingValue.getName().equals(optionValue.getName()));

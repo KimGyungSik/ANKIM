@@ -2,6 +2,8 @@ package shoppingmall.ankim.domain.option.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
+import shoppingmall.ankim.domain.option.exception.InsufficientOptionValuesException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 
 
@@ -14,10 +16,13 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.exception.OptionGroupNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,22 +36,36 @@ public class OptionGroupService {
     private final OptionGroupRepository optionGroupRepository;
     private final ProductRepository productRepository;
 
-//    public OptionGroup createOptionGroup(Long productId, OptionGroupCreateRequest request) {
+    public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
         // Product 찾기
-//        Product product = productRepository.findById(productId);
-//                .orElseThrow(() -> new ProductNotFoundException(ErrorCode.PRODUCT_NOT_FOUND));
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
 
-        // OptionValue 목록 생성
-//        List<OptionValue> optionValues = request.getOptionValues().stream()
-//                .map(optValReq -> OptionValue.create(null, optValReq.getValueName(), optValReq.getColorCode()))
-//                .collect(Collectors.toList());
+        List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();
 
-        // OptionGroup 생성
-//        OptionGroup optionGroup = OptionGroup.create(request.getGroupName(), product, optionValues);
+        for (OptionGroupCreateServiceRequest request : requests) {
+            // OptionValue가 최소 1개 이상 존재하는지 확인
+            if (request.getOptionValues() == null || request.getOptionValues().isEmpty()) {
+                throw new InsufficientOptionValuesException(INSUFFICIENT_OPTION_VALUES);
+            }
 
-        // OptionGroup 저장
-//        return optionGroupRepository.save(optionGroup);
-//    }
+            // OptionGroup 생성
+            OptionGroup optionGroup = OptionGroup.create(request.getGroupName(), product);
+
+            // OptionValue 목록 생성 및 추가
+            request.getOptionValues().forEach(optValReq -> {
+                OptionValue optionValue = OptionValue.create(optionGroup, optValReq.getValueName(), optValReq.getColorCode());
+                optionGroup.addOptionValue(optionValue);
+            });
+
+            optionGroupRepository.save(optionGroup);
+            optionGroupResponses.add(OptionGroupResponse.of(optionGroup));
+        }
+
+        return optionGroupResponses;
+    }
+
+
 
     public OptionGroup getOptionGroup(Long optionGroupId) {
         return optionGroupRepository.findById(optionGroupId)
