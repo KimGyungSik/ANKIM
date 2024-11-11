@@ -21,7 +21,7 @@ class MemberServiceTest {
     MemberService memberService;
 
     @MockBean
-    private MemberRepository memberRepository;
+    MemberRepository memberRepository;
 
 
     @Test

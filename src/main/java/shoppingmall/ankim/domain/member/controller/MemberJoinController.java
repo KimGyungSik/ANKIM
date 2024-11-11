@@ -8,7 +8,7 @@ import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
 import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAggrement;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
@@ -32,7 +32,7 @@ public class MemberJoinController {
 
     // 약관 동의 후 다음 회원가입 절차로 넘어간다.
     @PostMapping("/terms-next")
-    public String nextRegisterEmail(@RequestBody List<TermsAggrement> termsAggrements, Model model) {
+    public String nextRegisterEmail(@RequestBody List<TermsAgreement> termsAgreements, Model model) {
 
         return "registerNext"; // 다음 입력 페이지 (예: registerNext.html) -> 작성 필요
     }

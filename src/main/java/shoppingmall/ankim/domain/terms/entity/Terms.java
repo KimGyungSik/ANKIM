@@ -1,10 +1,7 @@
 package shoppingmall.ankim.domain.terms.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
@@ -52,4 +49,15 @@ public class Terms extends BaseEntity {
     @Column(name = "active_yn", length = 1, nullable = false)
     private String activeYn; // 활성화 상태
 
+    @Builder
+    public Terms(Terms parentTerms, TermsCategory category, String name, String termsYn, String contents, String termsVersion, Integer level, String activeYn) {
+        this.parentTerms = parentTerms;
+        this.category = category;
+        this.name = name;
+        this.termsYn = termsYn;
+        this.contents = contents;
+        this.termsVersion = termsVersion;
+        this.level = level;
+        this.activeYn = activeYn;
+    }
 }

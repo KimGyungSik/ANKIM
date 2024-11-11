@@ -8,10 +8,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -20,6 +22,7 @@ import java.util.UUID;
 
 
 @DataJpaTest
+@Import(QuerydslConfig.class)
 @Transactional
 class MemberRepositoryTest {
 
