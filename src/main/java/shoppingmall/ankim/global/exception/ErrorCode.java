@@ -23,6 +23,7 @@ public enum ErrorCode {
     // 옵션
     DUPLICATE_OPTION_VALUE(HttpStatus.BAD_REQUEST, "옵션 값이 중복되었습니다"),
     OPTION_GROUP_NOT_FOUND(HttpStatus.NOT_FOUND,"옵션 항목을 찾을 수 없습니다." ),
+    OPTION_VALUE_NOT_FOUND(HttpStatus.NOT_FOUND,"옵션 값을 찾을 수 없습니다." ),
     INSUFFICIENT_OPTION_VALUES(HttpStatus.BAD_REQUEST, "옵션 그룹에는 최소 하나 이상의 옵션 값이 필요합니다."),
 
     // 상품

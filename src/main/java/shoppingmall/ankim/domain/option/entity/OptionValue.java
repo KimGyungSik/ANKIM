@@ -44,10 +44,5 @@ public class OptionValue {
                 .colorCode(colorCode)
                 .build();
     }
-
-    // 양방향 관계 설정
-    protected void setOptionGroup(OptionGroup optionGroup) {
-        this.optionGroup = optionGroup;
-    }
 }
 

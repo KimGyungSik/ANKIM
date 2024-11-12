@@ -58,7 +58,7 @@ public class OptionGroup {
                 .product(product)
                 .build();
     }
-    // TODO OptionValue 추가 메서드 테스트 해야함
+    //  OptionValue 추가 메서드
     public void addOptionValue(OptionValue optionValue) {
         boolean isDuplicate = optionValues.stream()
                 .anyMatch(existingValue -> existingValue.getName().equals(optionValue.getName()));
@@ -68,6 +68,9 @@ public class OptionGroup {
         }
 
         optionValues.add(optionValue);
+    }
+    public void removeOptionValue(OptionValue optionValue) {
+        this.optionValues.remove(optionValue);
     }
 }
 
