@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.category.entity.Category;
+import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.exception.DuplicateOptionValueException;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.global.exception.ErrorCode;
@@ -72,5 +73,21 @@ public class OptionGroup {
     public void removeOptionValue(OptionValue optionValue) {
         this.optionValues.remove(optionValue);
     }
+
+    // OptionGroupResponse를 OptionGroup 엔티티로 변환하는 메서드
+    public static OptionGroup fromResponse(OptionGroupResponse response, Product product) {
+        OptionGroup optionGroup = OptionGroup.builder()
+                .name(response.getGroupName())
+                .product(product)
+                .build();
+
+        List<OptionValue> optionValues = response.getOptionValueResponses().stream()
+                .map(optionValueResponse -> OptionValue.fromResponse(optionValueResponse, optionGroup))
+                .toList();
+        optionGroup.optionValues.addAll(optionValues);
+
+        return optionGroup;
+    }
+
 }
 

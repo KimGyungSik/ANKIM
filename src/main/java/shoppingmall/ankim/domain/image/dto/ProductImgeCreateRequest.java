@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.springframework.web.multipart.MultipartFile;
+import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 import shoppingmall.ankim.domain.image.validation.ValidImageFile;
 
 import java.util.List;
@@ -25,5 +26,11 @@ public class ProductImgeCreateRequest {
     private ProductImgeCreateRequest(List<MultipartFile> thumbnailImages, List<MultipartFile> detailImages) {
         this.thumbnailImages = thumbnailImages;
         this.detailImages = detailImages;
+    }
+    public ProductImgCreateServiceRequest toServiceRequest() {
+        return ProductImgCreateServiceRequest.builder()
+                .thumbnailImages(this.thumbnailImages)
+                .detailImages(this.detailImages)
+                .build();
     }
 }

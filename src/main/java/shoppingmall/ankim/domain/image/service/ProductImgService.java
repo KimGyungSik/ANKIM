@@ -12,6 +12,9 @@ import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
+import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,17 +29,26 @@ public class ProductImgService {
     private String itemImgLocation;
 
     private final ProductImgRepository productImgRepository;
+    private final ProductRepository productRepository;
     private final FileService fileService;
 
     private final static String thumbnail = "Y";
     private final static String detail = "N";
 
-    public void createProductImgs(ProductImgCreateServiceRequest request)  {
+    public void createProductImgs(Long productId, ProductImgCreateServiceRequest request)  {
+        Product product = getProduct(productId);
         validateImageCounts(request);
 
-        saveImages(request.getThumbnailImages(), thumbnail);
-        saveImages(request.getDetailImages(), detail);
+        saveImages(product, request.getThumbnailImages(), thumbnail);
+        saveImages(product, request.getDetailImages(), detail);
     }
+
+    // 상품 엔티티를 가져오기 위한 메서드
+    private Product getProduct(Long productId) {
+        return productRepository.findByIdWithOptionGroups(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    }
+
 
     // 이미지 개수 검사를 위한 메서드
     private void validateImageCounts(ProductImgCreateServiceRequest request) {
@@ -58,11 +70,14 @@ public class ProductImgService {
     }
 
     // 이미지 리스트 저장 메서드
-    private void saveImages(List<MultipartFile> images, String repimgYn)  {
+    private void saveImages(Product product, List<MultipartFile> images, String repimgYn)  {
         for (int i = 0; i < images.size(); i++) {
             MultipartFile imageFile = images.get(i);
-            ProductImg productImg = ProductImg.init(repimgYn, i + 1);
+            ProductImg productImg = ProductImg.init(product,repimgYn, i + 1);
             saveProductImg(productImg, imageFile);
+
+            // 상품에 이미지 추가
+            product.addProductImg(productImg);
         }
     }
 

@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.option.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
+import shoppingmall.ankim.domain.option.exception.DuplicateOptionGroupException;
 import shoppingmall.ankim.domain.option.exception.InsufficientOptionValuesException;
 import shoppingmall.ankim.domain.option.exception.OptionValueNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
@@ -42,12 +43,19 @@ public class OptionGroupService {
 
     public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
         // Product 찾기
-        Product product = productRepository.findById(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+        Product product = getProduct(productId);
 
         List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();
 
         for (OptionGroupCreateServiceRequest request : requests) {
+            // TODO 옵션 그룹 이름 중복 검사 테스트 추가해야함
+            boolean isDuplicate = product.getOptionGroups().stream()
+                    .anyMatch(existingGroup -> existingGroup.getName().equals(request.getGroupName()));
+
+            if (isDuplicate) {
+                throw new DuplicateOptionGroupException(DUPLICATE_OPTION_GROUP);
+            }
+
             // OptionValue가 최소 1개 이상 존재하는지 확인
             if (request.getOptionValues() == null || request.getOptionValues().isEmpty()) {
                 throw new InsufficientOptionValuesException(INSUFFICIENT_OPTION_VALUES);
@@ -62,11 +70,17 @@ public class OptionGroupService {
                 optionGroup.addOptionValue(optionValue);
             });
 
-            optionGroupRepository.save(optionGroup);
+//            optionGroupRepository.save(optionGroup);
+            product.addOptionGroup(optionGroup);
             optionGroupResponses.add(OptionGroupResponse.of(optionGroup));
         }
 
         return optionGroupResponses;
+    }
+
+    private Product getProduct(Long productId) {
+        return productRepository.findByIdWithOptionGroups(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 
 

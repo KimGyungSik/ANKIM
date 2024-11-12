@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
+import shoppingmall.ankim.domain.option.entity.OptionValue;
 
 import java.util.List;
 import java.util.stream.Collectors;
