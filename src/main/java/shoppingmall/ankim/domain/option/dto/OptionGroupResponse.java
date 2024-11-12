@@ -12,11 +12,13 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 public class OptionGroupResponse {
+    private Long optionGroupNo;
     private String groupName;
     private List<OptionValueResponse> optionValueResponses;
 
     @Builder
-    private OptionGroupResponse(String groupName, List<OptionValueResponse> optionValueResponses) {
+    private OptionGroupResponse(Long optionGroupNo,String groupName, List<OptionValueResponse> optionValueResponses) {
+        this.optionGroupNo = optionGroupNo;
         this.groupName = groupName;
         this.optionValueResponses = optionValueResponses;
     }
@@ -28,6 +30,7 @@ public class OptionGroupResponse {
                 .collect(Collectors.toList());
 
         return OptionGroupResponse.builder()
+                .optionGroupNo(optionGroup.getNo())
                 .groupName(optionGroup.getName())
                 .optionValueResponses(optionValueResponses)
                 .build();

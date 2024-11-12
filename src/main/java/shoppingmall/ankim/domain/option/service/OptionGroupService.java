@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.exception.InsufficientOptionValuesException;
+import shoppingmall.ankim.domain.option.exception.OptionValueNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 
 
@@ -16,7 +17,9 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.exception.OptionGroupNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
+import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
@@ -34,6 +37,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 public class OptionGroupService {
 
     private final OptionGroupRepository optionGroupRepository;
+    private final OptionValueRepository optionValueRepository;
     private final ProductRepository productRepository;
 
     public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
@@ -66,13 +70,13 @@ public class OptionGroupService {
     }
 
 
-
+    @Transactional(readOnly = true)
     public OptionGroup getOptionGroup(Long optionGroupId) {
         return optionGroupRepository.findById(optionGroupId)
                 .orElseThrow(() -> new OptionGroupNotFoundException(OPTION_GROUP_NOT_FOUND));
     }
 
-    public OptionGroup addOptionValue(Long optionGroupId, OptionValueCreateRequest optionValueRequest) {
+    public OptionGroupResponse addOptionValue(Long optionGroupId, OptionValueCreateServiceRequest optionValueRequest) {
         OptionGroup optionGroup = getOptionGroup(optionGroupId);
 
         OptionValue optionValue = OptionValue.create(optionGroup, optionValueRequest.getValueName(), optionValueRequest.getColorCode());
@@ -80,7 +84,7 @@ public class OptionGroupService {
         // OptionGroup에 새로운 OptionValue 추가 및 중복 검사
         optionGroup.addOptionValue(optionValue);
 
-        return optionGroupRepository.save(optionGroup);
+        return OptionGroupResponse.of(optionGroupRepository.save(optionGroup));
     }
 
     public void deleteOptionGroup(Long optionGroupId) {
@@ -88,6 +92,13 @@ public class OptionGroupService {
                 .orElseThrow(() -> new OptionGroupNotFoundException(OPTION_GROUP_NOT_FOUND));
 
         optionGroupRepository.delete(optionGroup);
+    }
+
+    public void deleteOptionValue(Long optionValueId) {
+        OptionValue optionValue = optionValueRepository.findOptionWithGroupById(optionValueId)
+                .orElseThrow(() -> new OptionValueNotFoundException(OPTION_VALUE_NOT_FOUND));
+
+        optionValue.getOptionGroup().removeOptionValue(optionValue);
     }
 }
 
