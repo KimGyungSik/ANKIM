@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
 
 /*
  * 옵션 값 정책
@@ -42,6 +43,13 @@ public class OptionValue {
                 .optionGroup(optionGroup)
                 .name(name)
                 .colorCode(colorCode)
+                .build();
+    }
+    public static OptionValue fromResponse(OptionValueResponse response, OptionGroup optionGroup) {
+        return OptionValue.builder()
+                .optionGroup(optionGroup)
+                .name(response.getValueName())
+                .colorCode(response.getColorCode())
                 .build();
     }
 }

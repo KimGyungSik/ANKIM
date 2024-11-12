@@ -8,13 +8,14 @@ import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static shoppingmall.ankim.domain.item.entity.ProductSellingStatus.*;
+import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -34,9 +35,9 @@ public class Item {
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOption> itemOptions = new ArrayList<>();
 
-    private String code; // 품목코드
+    private String code; // 품목코드 -> 상품코드 + 1 을 붙인 것
 
-    private String name; // 품목명
+    private String name; // 품목명 -> 옵션 그룹 + 옵션 값
 
     @Column(name = "add_price", precision = 10, scale = 2)
     private BigDecimal addPrice; // 추가금액

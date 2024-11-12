@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.item.entity;
+package shoppingmall.ankim.domain.product.entity;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

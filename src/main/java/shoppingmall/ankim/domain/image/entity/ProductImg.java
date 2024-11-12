@@ -55,10 +55,11 @@ public class ProductImg {
                 .build();
     }
 
-    public static ProductImg init(String repimgYn, Integer ord) {
+    public static ProductImg init(Product product,String repimgYn, Integer ord) {
         return ProductImg.builder()
                 .repimgYn(repimgYn)
                 .ord(ord)
+                .product(product)
                 .build();
     }
 
