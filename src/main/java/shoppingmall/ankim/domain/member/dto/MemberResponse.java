@@ -3,10 +3,12 @@ package shoppingmall.ankim.domain.member.dto;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 import shoppingmall.ankim.domain.member.entity.Member;
 
 @Data
 @NoArgsConstructor
+@ToString(of = {"name"})
 public class MemberResponse {
 
     private String name;

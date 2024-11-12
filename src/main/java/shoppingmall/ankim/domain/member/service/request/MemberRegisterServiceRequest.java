@@ -11,7 +11,7 @@ import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter @Setter
+@Getter
 @NoArgsConstructor
 public class MemberRegisterServiceRequest {
 
@@ -36,13 +36,14 @@ public class MemberRegisterServiceRequest {
     }
 
     // serviceRequest를 Member 엔티티로 변환해서 회원가입할 때 사용
-    public Member create() {
+    public Member create(String encodePwd) {
         return Member.builder()
 //                .uuid() // uuid 생성 로직 작성 후 값 넣기
                 .id(this.id)
-                .pwd(this.pwd)
+                .pwd(encodePwd)
                 .name(this.name)
                 .phoneNum(this.phoneNum)
+                .birth(this.birth)
                 .gender(this.gender)
                 .joinDate(LocalDateTime.now())
                 .grade(defaultGrade) // 구입금액이 없기 때문에 grade번호 50을 default

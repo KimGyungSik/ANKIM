@@ -13,6 +13,7 @@ import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.MAIL_SEND_FAIL;
 
@@ -33,7 +34,7 @@ public class MailServiceImpl implements MailService {
     private static SecureRandom random = new SecureRandom();
 
     // 임시로 생성된 인증번호를 저장
-    private final Map<String, String> verificationCodes = new HashMap<>();
+    private final Map<String, String> verificationCodes = new ConcurrentHashMap<>(); // 동시성 지원
 
     // JavaMailSender 주입
     public MailServiceImpl(JavaMailSender javaMailSender) {

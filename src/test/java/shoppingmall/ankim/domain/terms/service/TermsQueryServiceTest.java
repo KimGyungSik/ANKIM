@@ -39,8 +39,8 @@ class TermsQueryServiceTest {
         // given
         List<TermsAgreement> termsAgreements = new ArrayList<>();
         termsAgreements.add(TermsAgreement.builder()
-                .termNo(1L)
-                .termName("필수 약관")
+                .no(1L)
+                .name("필수 약관")
                 .termsYn("Y")
                 .agreeYn("N") // 필수 약관에 동의하지 않음
                 .level(2)
@@ -169,16 +169,16 @@ class TermsQueryServiceTest {
         // 동의 요청 생성
         List<TermsAgreement> termsAgreements = new ArrayList<>();
         termsAgreements.add(TermsAgreement.builder()
-                .termNo(subTerm1.getNo())  // 14세 이상 동의
-                .termName("만 14세 이상")
+                .no(subTerm1.getNo())  // 14세 이상 동의
+                .name("만 14세 이상")
                 .termsYn("Y")
                 .agreeYn("Y") // 약관 동의
                 .level(2)
                 .build()
         );
         termsAgreements.add(TermsAgreement.builder()
-                .termNo(subTerm2.getNo())  // 광고 수신 동의
-                .termName("광고 수신 동의")
+                .no(subTerm2.getNo())  // 광고 수신 동의
+                .name("광고 수신 동의")
                 .termsYn("N")
                 .agreeYn("Y") // 광고 수신 동의
                 .level(2)
@@ -259,16 +259,16 @@ class TermsQueryServiceTest {
         // 동의 요청 생성
         List<TermsAgreement> termsAgreements = new ArrayList<>();
         termsAgreements.add(TermsAgreement.builder()
-                .termNo(subTerm1.getNo())  // 14세 이상 동의
-                .termName("만 14세 이상")
+                .no(subTerm1.getNo())  // 14세 이상 동의
+                .name("만 14세 이상")
                 .termsYn("Y")
                 .agreeYn("N") // 약관 동의
                 .level(2)
                 .build()
         );
         termsAgreements.add(TermsAgreement.builder()
-                .termNo(subTerm2.getNo())  // 광고 수신 동의
-                .termName("광고 수신 동의")
+                .no(subTerm2.getNo())  // 광고 수신 동의
+                .name("광고 수신 동의")
                 .termsYn("N")
                 .agreeYn("Y") // 광고 수신 동의
                 .level(2)

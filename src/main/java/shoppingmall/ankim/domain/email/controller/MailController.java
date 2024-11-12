@@ -44,5 +44,4 @@ public class MailController {
         return isValid ? ApiResponse.ok("OK") : ApiResponse.ok(HttpStatus.OK, "FAIL");
     }
 
-
 }

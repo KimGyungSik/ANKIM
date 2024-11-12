@@ -24,13 +24,12 @@ public class TermsQueryServiceImpl implements TermsQueryService {
 
     private final TermsRepository termsRepository;
 
-    // 회원가입 약관을 전달한다.
+    // 회원가입 약관을 전달한다.(회원가입-약관동의 페이지)
     @Override
     public List<TermsJoinResponse> findJoinTerm() {
-        List<Terms> terms = termsRepository.findLevelSubTerms(TermsCategory.JOIN, 2, "Y");
-        List<TermsJoinResponse> responses = new ArrayList<>();
-        for (Terms term : terms) {
-            responses.add(TermsJoinResponse.of(term));
+        List<TermsJoinResponse> responses = termsRepository.findLevelSubTerms(TermsCategory.JOIN, 2, "Y");
+        if(responses.isEmpty()) {
+            responses = new ArrayList<>();
         }
         return responses;
     }
@@ -38,6 +37,8 @@ public class TermsQueryServiceImpl implements TermsQueryService {
     // 회원가입 필수 약관을 동의했는지 하지 않았는지 확인한다.
     @Override
     public List<TermsAgreement> validateAndAddSubTerms(List<TermsAgreement> termsAgreements) {
+        System.out.println("회원가입 필수 약관을 동의했는지 하지 않았는지 확인한다.");
+        System.out.println("동의한거 값 확인 : " + termsAgreements.size());
         // 필수 약관 동의 했는지 검증
         validateTerms(termsAgreements);
         // 하위 레벨이 있는 약관을 동의했는지 확인하고 리스트에 추가
@@ -47,6 +48,8 @@ public class TermsQueryServiceImpl implements TermsQueryService {
     // 필수 약관 동의 했는지 검증
     public void validateTerms(List<TermsAgreement> termsAgreements) {
         for (TermsAgreement aggrement : termsAgreements) {
+            System.out.println("aggrement.필수인지 = " + aggrement.getTermsYn());
+            System.out.println("aggrement.동의여부 = " + aggrement.getAgreeYn());
             if(aggrement.getTermsYn().equals("Y") && !aggrement.getAgreeYn().equals("Y")) {
                 throw new TermsMandatoryNotAgreeException(REQUIRED_TERMS_NOT_AGREED);
             }
@@ -59,7 +62,7 @@ public class TermsQueryServiceImpl implements TermsQueryService {
 
         for (TermsAgreement agreement : termsAgreements) {
             if (needsSubTerms(agreement)) {
-                List<TermsAgreement> subTerms = getSubTermsAsAgreements(agreement.getTermNo(), agreement.getLevel()+1);
+                List<TermsAgreement> subTerms = getSubTermsAsAgreements(agreement.getNo(), agreement.getLevel()+1);
                 updatedAgreements.addAll(subTerms);  // Set을 이용해 중복 약관을 추가하는 경우 자동 제거
             }
         }
@@ -77,8 +80,8 @@ public class TermsQueryServiceImpl implements TermsQueryService {
         List<TermsAgreement> subAgreements = new ArrayList<>();
         for (Terms subTerm : subTerms) {
             subAgreements.add(TermsAgreement.builder()
-                    .termNo(subTerm.getNo())
-                    .termName(subTerm.getName())
+                    .no(subTerm.getNo())
+                    .name(subTerm.getName())
                     .agreeYn("Y")
                     .level(subTerm.getLevel())
                     .termsYn(subTerm.getTermsYn())

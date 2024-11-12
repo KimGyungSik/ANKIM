@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>약관 동의</title>
+</head>
+<body>
+<h1>약관 동의</h1>
+<form action="/api/member/terms-next" method="post">
+    <div th:each="term : ${termsList}">
+        <div>
+            <!-- 약관 제목 -->
+            <h2 th:text="${term.name}">약관 제목</h2>
+
+            <!-- 약관 내용 -->
+            <p th:text="${term.contents}">약관 내용</p>
+
+            <!-- 동의 체크박스 -->
+            <label>
+                <input type="hidden" th:name="'termsAgreements[' + ${term.no} + '].agreed'" th:value="'N'"/>
+                <input type="checkbox" th:name="'termsAgreements[' + ${term.no} + '].agreed'" th:value="'Y'">
+                동의합니다
+            </label>
+        </div>
+        <hr/>
+    </div>
+
+    <!-- 다음 단계로 진행 버튼 -->
+    <button type="submit">다음</button>
+</form>
+</body>
+</html>

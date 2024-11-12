@@ -10,7 +10,6 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -43,6 +42,7 @@ class MemberTest {
     *   7.1. null 값인 경우
     * 8. 회원 상태
     *   8.1. null 값인 경우
+    * 9. 여러 값의 형식을 잘 못 입력했을 때
     * */
 
     @Test

@@ -1,8 +1,10 @@
 package shoppingmall.ankim.domain.terms.repository.query;
 
+import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
+import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.QTerms;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
@@ -31,12 +33,18 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
     }
 
     @Override
-    public List<Terms> findLevelSubTerms(TermsCategory category, Integer level, String activeYn) {
+    public List<TermsJoinResponse> findLevelSubTerms(TermsCategory category, Integer level, String activeYn) {
         QTerms terms = QTerms.terms;
 
         return queryFactory
-                .selectFrom(terms)
-                .leftJoin(terms.subTerms).fetchJoin()
+                .select(Projections.fields(TermsJoinResponse.class,
+                        terms.no,
+                        terms.name,
+                        terms.contents,
+                        terms.termsYn,
+                        terms.level))
+                .from(terms)
+//                .leftJoin(terms.subTerms)
                 .where(
                         terms.category.eq(category)
                                 .and(terms.activeYn.eq(activeYn))

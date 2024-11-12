@@ -2,13 +2,13 @@ package shoppingmall.ankim.domain.member.service.port;
 
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.annotation.Commit;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
@@ -17,13 +17,12 @@ import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.UUID;
+
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
 @DataJpaTest
 @Import(QuerydslConfig.class)
-@Transactional
 class MemberRepositoryTest {
 
     @Autowired
@@ -91,5 +90,32 @@ class MemberRepositoryTest {
 
         // then
         Assertions.assertThat(isExist).isTrue();
+    }
+
+    @Test
+    @DisplayName("회원 정보를 DB에 저장하고 조회할 수 있다.")
+    void saveAndFindMember() {
+        // given
+        Member member = Member.builder()
+                .id("test@example.com")
+                .pwd("ValidPassword123!")
+                .name("홍길동")
+                .phoneNum("010-1234-5678")
+                .birth(LocalDate.of(1990, 1, 1))
+                .gender("M")
+                .joinDate(LocalDateTime.now())
+                .grade(1)
+                .status(MemberStatus.ACTIVE)
+                .build();
+
+        // when
+        memberRepository.save(member);
+        Member savedMember = memberRepository.findByEmail(member.getId());
+
+        // then
+        assertThat(savedMember).isNotNull();
+        assertThat(savedMember.getId()).isEqualTo("test@example.com");
+        assertThat(savedMember.getName()).isEqualTo("홍길동");
+        assertThat(savedMember.getPhoneNum()).isEqualTo("010-1234-5678");
     }
 }

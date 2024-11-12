@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.repository.TermsRepository;
@@ -128,20 +129,20 @@ class TermsQueryRepositoryTest {
         Terms mainTerms = Terms.builder()
                 .name("회원가입 약관")
                 .category(category)
-                .contents("ANKIM 회원가입 약관")
-                .termsYn("N")
+                .contents("ANKIM 이용약관")
+                .termsYn("Y")
                 .termsVersion("v1")
                 .level(1)
                 .activeYn("Y")
                 .build();
         termsRepository.save(mainTerms);
 
-        // level 2 하위 약관 생성
+        // level 2 필수 약관 생성
         Terms subTerm1 = Terms.builder()
                 .parentTerms(mainTerms)
-                .name("만 14세 이상")
+                .name("만 14세 이상입니다")
                 .category(category)
-                .contents("만 14세 이상")
+                .contents("이 약관은 만 14세 이상임을 동의하는 내용입니다.")
                 .termsYn("Y")
                 .termsVersion("v1")
                 .level(2)
@@ -151,9 +152,9 @@ class TermsQueryRepositoryTest {
 
         Terms subTerm2 = Terms.builder()
                 .parentTerms(mainTerms)
-                .name("광고 수신 동의")
+                .name("이용약관 동의")
                 .category(category)
-                .contents("광고성 연락 수신 동의")
+                .contents("이 약관은 서비스 이용에 대한 동의를 포함합니다.")
                 .termsYn("Y")
                 .termsVersion("v1")
                 .level(2)
@@ -161,30 +162,73 @@ class TermsQueryRepositoryTest {
                 .build();
         termsRepository.save(subTerm2);
 
+        // level 2 선택 약관 생성
+        Terms subTerm3 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("마케팅 목적의 개인정보 수집 및 이용 동의")
+                .category(category)
+                .contents("마케팅 목적으로 개인정보를 수집 및 이용하는 것에 대한 동의입니다.")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm3);
+
+        Terms subTerm4 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("광고성 정보 수신 동의")
+                .category(category)
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm4);
+
         // level 3 하위 약관 생성
         Terms subSubTerm1 = Terms.builder()
-                .parentTerms(subTerm2)
+                .parentTerms(subTerm4)
                 .name("문자 수신 동의")
                 .category(category)
-                .contents("광고성 문자 수신 동의")
-                .termsYn("Y")
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
                 .termsVersion("v1")
                 .level(3)
                 .activeYn("Y")
                 .build();
         termsRepository.save(subSubTerm1);
 
+        Terms subSubTerm2 = Terms.builder()
+                .parentTerms(subTerm4)
+                .name("이메일 수신 동의")
+                .category(category)
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTerm2);
+
         em.flush();
         em.clear();
 
         // when
-        List<Terms> level2Terms = termsRepository.findLevelSubTerms(category, level, activeYn);
+        List<TermsJoinResponse> level2Terms = termsRepository.findLevelSubTerms(category, level, activeYn);
+        
+        for(TermsJoinResponse level2Term : level2Terms) {
+            System.out.println("level2Term.getName() = " + level2Term.getName());
+        }
 
         // then
         assertNotNull(level2Terms);
-        assertEquals(2, level2Terms.size()); // level 2 약관이 2개여야 함
-        assertEquals("만 14세 이상", level2Terms.get(0).getName());
-        assertEquals("광고 수신 동의", level2Terms.get(1).getName());
+        assertEquals(4, level2Terms.size()); // level 2 약관이 4개여야 함
+        assertEquals("만 14세 이상입니다", level2Terms.get(0).getName());
+        assertEquals("이용약관 동의", level2Terms.get(1).getName());
+        assertEquals("마케팅 목적의 개인정보 수집 및 이용 동의", level2Terms.get(2).getName());
+        assertEquals("광고성 정보 수신 동의", level2Terms.get(3).getName());
     }
 
     @Test

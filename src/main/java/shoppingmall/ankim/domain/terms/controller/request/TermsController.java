@@ -1,28 +1,39 @@
 package shoppingmall.ankim.domain.terms.controller.request;
 
+import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
+import java.util.ArrayList;
 import java.util.List;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/api/terms")
 public class TermsController {
 
     private final TermsQueryService termsQueryService;
+    private final HttpSession httpSession;
 
-    // 약관 동의 후 다음 이메일 입력 페이지로 이동
-    @PostMapping("/join")
+    @ModelAttribute("termsAgreements")
+    public List<TermsAgreement> termsAgreements() {
+        return new ArrayList<>(); // termsAgreements 리스트 초기화
+    }
+
+    // 이메일로 가입하기 누르는 경우 약관동의 페이지로 이동한다.
+    @GetMapping("/join")
     public String getJoinTerms(Model model) {
+        httpSession.removeAttribute("termsAgreements");  // 약관 동의 초기화
+
         List<TermsJoinResponse> termsList = termsQueryService.findJoinTerm();
+
         model.addAttribute("termsList", termsList);
 
-        return "registerEmail"; // 다음 입력 페이지 (예: registerEmail.html) -> 작성 필요
+        return "registerTerms"; // FIXME 약관 동의 페이지 작성
     }
 }

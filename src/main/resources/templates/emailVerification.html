@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>이메일 인증</title>
+</head>
+<body>
+<h1>이메일 인증</h1>
+<form th:action="@{/api/email/send}" method="post">
+    <label for="email">이메일:</label>
+    <input type="email" id="email" name="email" required>
+    <button type="submit">이메일 인증 발송</button>
+</form>
+
+<form th:action="@{/api/email/verify}" method="post">
+    <label for="code">인증번호:</label>
+    <input type="text" id="code" name="code" required>
+    <button type="submit">인증번호 확인</button>
+</form>
+
+<form th:action="@{/api/terms/join}" method="get">
+    <button type="submit">다음</button>
+</form>
+</body>
+</html>

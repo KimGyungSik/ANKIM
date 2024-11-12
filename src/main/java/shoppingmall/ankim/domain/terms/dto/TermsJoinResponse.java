@@ -11,15 +11,15 @@ import shoppingmall.ankim.domain.terms.entity.Terms;
 @NoArgsConstructor
 public class TermsJoinResponse {
 
-    private Long termNo; // 약관번호
+    private Long no; // 약관번호
     private String name; // 약관명
     private String contents; // 약관 내용
     private String termsYn; // 필수동의 여부(필수 Y, 선택 N)
     private Integer level; // 약관 레벨
 
     @Builder
-    public TermsJoinResponse(Long termNo, String name, String contents, String termsYn, Integer level) {
-        this.termNo = termNo;
+    public TermsJoinResponse(Long no, String name, String contents, String termsYn, Integer level) {
+        this.no = no;
         this.name = name;
         this.contents = contents;
         this.termsYn = termsYn;
@@ -28,7 +28,7 @@ public class TermsJoinResponse {
 
     public static TermsJoinResponse of(Terms terms) {
         return TermsJoinResponse.builder()
-                .termNo(terms.getNo())
+                .no(terms.getNo())
                 .name(terms.getName())
                 .contents(terms.getContents())
                 .termsYn(terms.getTermsYn())

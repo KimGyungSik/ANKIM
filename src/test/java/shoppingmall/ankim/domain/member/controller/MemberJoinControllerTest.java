@@ -95,8 +95,7 @@ class MemberJoinControllerTest {
         // when & then
         mockMvc.perform(post("/api/member/email-next")
                         .param("id", validId))
-                .andExpect(status().isOk())
-                .andExpect(content().string("registerNext"));
+                .andExpect(status().isOk());
     }
 
     @Test

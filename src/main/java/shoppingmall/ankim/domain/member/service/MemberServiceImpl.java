@@ -1,23 +1,26 @@
 package shoppingmall.ankim.domain.member.service;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
+import shoppingmall.ankim.domain.member.dto.MemberResponse;
+import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
-import shoppingmall.ankim.global.exception.ErrorCode;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.EMAIL_DUPLICATE;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
 
     private final MemberRepository memberRepository;
+    private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     private String verifiedEmailId; // 인증된 이메일 ID 저장
 
@@ -44,9 +47,14 @@ public class MemberServiceImpl implements MemberService {
     *   2.4. TermsHistory 테이블에 insert
     * */
     // 회원가입 로직
-    public Boolean registerMember(MemberRegisterServiceRequest request) {
+    public MemberResponse registerMember(MemberRegisterServiceRequest request) {
+        // 비밀번호 암호화
+        String encodePwd = bCryptPasswordEncoder.encode(request.getPwd());
 
-        // 성공적으로 저장했다면 true 반환
-        return true;
+        Member member = request.create(encodePwd);
+        memberRepository.save(member); // 회원가입
+
+        log.info("회원가입 완료");
+        return MemberResponse.of(member);
     }
 }
