@@ -186,16 +186,14 @@ class TermsQueryServiceTest {
         );
 
         // when
-        List<TermsAgreement> result = termsQueryService.validateAndAddSubTerms(termsAgreements);
+        List<Terms> result = termsQueryService.validateAndAddSubTerms(termsAgreements);
 
         // then
         assertThat(result)
                 .hasSize(3)
-                .extracting("termName", "agreeYn")
+                .extracting("name")
                 .containsExactlyInAnyOrder(
-                        tuple("만 14세 이상", "Y"),
-                        tuple("광고 수신 동의", "Y"),
-                        tuple("문자 수신 동의", "Y")
+                        "만 14세 이상", "광고 수신 동의", "문자 수신 동의"
                 );
     }
 

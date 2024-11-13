@@ -10,4 +10,5 @@ public interface TermsQueryRepository {
     List<Terms> findAllSubTermsRecursively(TermsCategory category, String activeYn);
     List<TermsJoinResponse> findLevelSubTerms(TermsCategory category, Integer level, String activeYn);
     List<Terms> findSubTermsForParent(Long parentNo, Integer level, String activeYn);
+    List<Terms> findSubTermsIncludingParent(Long parentNo, Integer level, String activeYn);
 }

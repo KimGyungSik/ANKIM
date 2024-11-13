@@ -1,12 +1,10 @@
 package shoppingmall.ankim.domain.termsHistory.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -30,14 +28,23 @@ public class TermsHistory extends BaseEntity {
     @JoinColumn(name = "terms_no", nullable = false)
     private Terms terms;
 
-    @Column(name = "terms_yn", length = 1, nullable = false)
-    private String termsYn; // 동의 여부
-
-    @Column(name = "terms_ver", length = 10, nullable = false)
-    private String termsVersion; // 약관 버전
+    @Column(name = "agree_yn", length = 1, nullable = false)
+    private String agreeYn; // 동의 여부
 
     @Column(name = "agree_date", nullable = false)
     private LocalDateTime agreeDate = LocalDateTime.now(); // 동의 일자
 
+    @Builder
+    public TermsHistory(Member member, Terms terms, String agreeYn, LocalDateTime agreeDate) {
+        this.member = member;
+        this.terms = terms;
+        this.agreeYn = agreeYn;
+        this.agreeDate = agreeDate;
+    }
 
+    public TermsHistory(Member member, Terms terms) {
+        this.member = member;
+        this.terms = terms;
+        this.agreeDate = LocalDateTime.now();
+    }
 }

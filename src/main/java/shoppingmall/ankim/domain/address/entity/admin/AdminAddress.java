@@ -10,7 +10,7 @@ import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "admin_addr")
 public class AdminAddress extends BaseEntity {

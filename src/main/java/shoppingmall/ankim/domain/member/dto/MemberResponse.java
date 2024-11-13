@@ -11,15 +11,18 @@ import shoppingmall.ankim.domain.member.entity.Member;
 @ToString(of = {"name"})
 public class MemberResponse {
 
+    private Long no;
     private String name;
 
     @Builder
-    public MemberResponse(String name) {
+    public MemberResponse(Long no, String name) {
+        this.no = no;
         this.name = name;
     }
 
     public static MemberResponse of(Member member) {
         return MemberResponse.builder()
+                .no(member.getNo())
                 .name(maskName(member.getName()))
                 .build();
     }

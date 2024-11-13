@@ -8,8 +8,11 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
+import shoppingmall.ankim.domain.terms.entity.Terms;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -38,9 +41,10 @@ class MemberServiceTest {
                 .birth(LocalDate.of(1990, 1, 1))
                 .gender("M")
                 .build();
+        List<Terms> terms = new ArrayList<>();
 
         // when
-        memberService.registerMember(request);
+        memberService.registerMember(request, terms);
 
         // then
         Member savedMember = memberRepository.findByEmail(request.getId());

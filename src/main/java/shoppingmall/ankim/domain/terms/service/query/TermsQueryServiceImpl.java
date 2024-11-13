@@ -36,9 +36,9 @@ public class TermsQueryServiceImpl implements TermsQueryService {
 
     // 회원가입 필수 약관을 동의했는지 하지 않았는지 확인한다.
     @Override
-    public List<TermsAgreement> validateAndAddSubTerms(List<TermsAgreement> termsAgreements) {
-        System.out.println("회원가입 필수 약관을 동의했는지 하지 않았는지 확인한다.");
-        System.out.println("동의한거 값 확인 : " + termsAgreements.size());
+    public List<Terms> validateAndAddSubTerms(List<TermsAgreement> termsAgreements) {
+//        System.out.println("회원가입 필수 약관을 동의했는지 하지 않았는지 확인한다.");
+//        System.out.println("동의한거 값 확인 : " + termsAgreements.size());
         // 필수 약관 동의 했는지 검증
         validateTerms(termsAgreements);
         // 하위 레벨이 있는 약관을 동의했는지 확인하고 리스트에 추가
@@ -48,25 +48,23 @@ public class TermsQueryServiceImpl implements TermsQueryService {
     // 필수 약관 동의 했는지 검증
     public void validateTerms(List<TermsAgreement> termsAgreements) {
         for (TermsAgreement aggrement : termsAgreements) {
-            System.out.println("aggrement.필수인지 = " + aggrement.getTermsYn());
-            System.out.println("aggrement.동의여부 = " + aggrement.getAgreeYn());
             if(aggrement.getTermsYn().equals("Y") && !aggrement.getAgreeYn().equals("Y")) {
                 throw new TermsMandatoryNotAgreeException(REQUIRED_TERMS_NOT_AGREED);
             }
         }
     }
 
-    // 하위 레벨 약관을 필요 시 추가
-    private List<TermsAgreement> addSubTermsIfNeeded(List<TermsAgreement> termsAgreements) {
-        Set<TermsAgreement> updatedAgreements = new LinkedHashSet<>(termsAgreements);
+    // Terms로 변환하여 하위 약관 추가
+    private List<Terms> addSubTermsIfNeeded(List<TermsAgreement> termsAgreements) {
+        List<Terms> allTerms = new ArrayList<>();
 
         for (TermsAgreement agreement : termsAgreements) {
             if (needsSubTerms(agreement)) {
-                List<TermsAgreement> subTerms = getSubTermsAsAgreements(agreement.getNo(), agreement.getLevel()+1);
-                updatedAgreements.addAll(subTerms);  // Set을 이용해 중복 약관을 추가하는 경우 자동 제거
+                // 선택한 약관 추가 및 하위 약관이 존재한다면 하위 약관을 포함하여 추가
+                allTerms.addAll(termsRepository.findSubTermsIncludingParent(agreement.getNo(), agreement.getLevel(), "Y"));
             }
         }
-        return new ArrayList<>(updatedAgreements);  // Set을 List로 변환하여 반환
+        return allTerms;
     }
 
     // 레벨2 약관이고 동의한 상태인지 확인

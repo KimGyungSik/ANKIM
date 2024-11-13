@@ -4,12 +4,18 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
+import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
+import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.audit.Authority;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter @Setter
@@ -60,11 +66,21 @@ public class Member extends BaseEntity {
     @Column(nullable = false)
     private MemberStatus status;
 
+    // 약관동의
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<TermsHistory> termsHistory = new ArrayList<>();
+
 //    @Transient
 //    Authority authority;
 
     @Builder
-    public Member(UUID uuid, String id, String pwd, String name, String phoneNum, LocalDate birth, String gender, LocalDateTime joinDate, Integer grade, MemberStatus status, Authority authority) {
+    public Member(UUID uuid, String id, String pwd, String name,
+                  String phoneNum, LocalDate birth, String gender,
+                  LocalDateTime joinDate, Integer grade,
+                  MemberStatus status, Authority authority,
+                  List<Terms> termsList,
+                  TermsAgreement termsAgreement
+    ) {
         this.uuid = uuid;
         this.id = id;
         this.pwd = pwd;
@@ -76,6 +92,11 @@ public class Member extends BaseEntity {
         this.grade = grade;
         this.status = status;
 //        this.authority = authority;
+        this.termsHistory = (termsList != null) ?
+                termsList.stream()
+                        .map(terms -> new TermsHistory(this, terms))
+                        .collect(Collectors.toList())
+                : new ArrayList<>();
     }
 
 }

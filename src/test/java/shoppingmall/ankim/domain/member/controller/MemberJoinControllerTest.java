@@ -12,6 +12,8 @@ import org.springframework.test.web.servlet.MockMvc;
 import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
+import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
+import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import static org.mockito.Mockito.*;
@@ -29,8 +31,14 @@ class MemberJoinControllerTest {
     @MockBean
     private MemberService memberService;
 
+    @MockBean
+    private TermsHistoryService termsHistoryService;
+
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private TermsQueryService termsQueryService;
 
     @Test
     @DisplayName("유효하지 않은 이메일 형식일 때 오류 메시지를 반환한다.")

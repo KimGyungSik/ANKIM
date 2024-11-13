@@ -339,4 +339,220 @@ class TermsQueryRepositoryTest {
                 );
     }
 
+    @Test
+    @DisplayName("특정 약관과 그 하위 약관을 포함하여 조회한다.")
+    void findTermsWithSubTermsIncludingParent() {
+        // given
+        TermsCategory category = TermsCategory.JOIN;
+        String active = "Y";
+
+        // 최상위 약관 생성
+        Terms mainTerms = Terms.builder()
+                .name("회원가입 약관")
+                .category(category)
+                .contents("ANKIM 회원가입 약관")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(1)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(mainTerms);
+
+        // 하위 약관 생성
+        Terms subTerm1 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("나이 약관")
+                .category(category)
+                .contents("나이 약관")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm1);
+
+        Terms sub1SubTerm1 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("만 14세 이상")
+                .category(category)
+                .contents("만 14세 이상")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub1SubTerm1);
+
+        Terms subTerm2 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("광고 수신 동의")
+                .category(category)
+                .contents("광고성 연락 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm2);
+
+        Terms sub2SubTerm1 = Terms.builder()
+                .parentTerms(subTerm2)
+                .name("문자 수신 동의")
+                .category(category)
+                .contents("광고성 문자 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub2SubTerm1);
+
+        Terms sub2SubTerm2 = Terms.builder()
+                .parentTerms(subTerm2)
+                .name("이메일 수신 동의")
+                .category(category)
+                .contents("광고성 이메일 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub2SubTerm2);
+
+        // 최상위 약관 생성
+        Terms mainTerms2 = Terms.builder()
+                .name("주문결제 약관")
+                .category(TermsCategory.ORDER)
+                .contents("ANKIM 주문결제 약관")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(1)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(mainTerms);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Terms> result = termsRepository.findSubTermsIncludingParent(subTerm2.getNo(), 2, active);
+
+        // then
+        assertNotNull(result);
+        assertThat(result).hasSize(3)
+                .extracting("no", "level", "name")
+                .containsExactlyInAnyOrder(
+                        tuple(subTerm2.getNo(), 2, "광고 수신 동의"),
+                        tuple(sub2SubTerm1.getNo(), 3, "문자 수신 동의"),
+                        tuple(sub2SubTerm2.getNo(), 3, "이메일 수신 동의")
+                );
+    }
+
+    @Test
+    @DisplayName("특정 약관에 하위약관이 없는 경우 특정 약관만 조회한다.")
+    void findTermsWithNotSubTermsIncludingParent() {
+        // given
+        TermsCategory category = TermsCategory.JOIN;
+        String active = "Y";
+
+        // 최상위 약관 생성
+        Terms mainTerms = Terms.builder()
+                .name("회원가입 약관")
+                .category(category)
+                .contents("ANKIM 회원가입 약관")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(1)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(mainTerms);
+
+        // 하위 약관 생성
+        Terms subTerm1 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("나이 약관")
+                .category(category)
+                .contents("나이 약관")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm1);
+
+        Terms sub1SubTerm1 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("만 14세 이상")
+                .category(category)
+                .contents("만 14세 이상")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub1SubTerm1);
+
+        Terms subTerm2 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("광고 수신 동의")
+                .category(category)
+                .contents("광고성 연락 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm2);
+
+        Terms sub2SubTerm1 = Terms.builder()
+                .parentTerms(subTerm2)
+                .name("문자 수신 동의")
+                .category(category)
+                .contents("광고성 문자 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub2SubTerm1);
+
+        Terms sub2SubTerm2 = Terms.builder()
+                .parentTerms(subTerm2)
+                .name("이메일 수신 동의")
+                .category(category)
+                .contents("광고성 이메일 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(sub2SubTerm2);
+
+        // 최상위 약관 생성
+        Terms mainTerms2 = Terms.builder()
+                .name("주문결제 약관")
+                .category(TermsCategory.ORDER)
+                .contents("ANKIM 주문결제 약관")
+                .termsYn("N")
+                .termsVersion("v1")
+                .level(1)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(mainTerms);
+
+        em.flush();
+        em.clear();
+
+        // when
+        List<Terms> result = termsRepository.findSubTermsIncludingParent(sub1SubTerm1.getNo(), 2, active);
+
+        // then
+        assertNotNull(result);
+        assertThat(result).hasSize(1)
+                .extracting("no", "level", "name")
+                .containsExactlyInAnyOrder(
+                        tuple(sub1SubTerm1.getNo(), 2, "만 14세 이상")
+                );
+    }
+
 }

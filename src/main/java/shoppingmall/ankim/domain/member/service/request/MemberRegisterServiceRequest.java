@@ -7,9 +7,11 @@ import lombok.Setter;
 import org.springframework.beans.factory.annotation.Value;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
+import shoppingmall.ankim.domain.termsHistory.service.request.TermsHistoryCreateServiceRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -25,14 +27,17 @@ public class MemberRegisterServiceRequest {
     @Value("${member.default-grade}")
     private int defaultGrade;
 
+    private List<TermsHistoryCreateServiceRequest> termsHistoryRequests;
+
     @Builder
-    public MemberRegisterServiceRequest(String id, String pwd, String name, String phoneNum, LocalDate birth, String gender) {
+    public MemberRegisterServiceRequest(String id, String pwd, String name, String phoneNum, LocalDate birth, String gender, List<TermsHistoryCreateServiceRequest> termsHistoryRequests) {
         this.id = id;
         this.pwd = pwd;
         this.name = name;
         this.phoneNum = phoneNum;
         this.birth = birth;
         this.gender = gender;
+        this.termsHistoryRequests = termsHistoryRequests;
     }
 
     // serviceRequest를 Member 엔티티로 변환해서 회원가입할 때 사용

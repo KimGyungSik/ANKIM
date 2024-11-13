@@ -11,7 +11,7 @@ import shoppingmall.ankim.global.audit.BaseEntity;
 
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "mem_addr")
 public class MemberAddress extends BaseEntity {

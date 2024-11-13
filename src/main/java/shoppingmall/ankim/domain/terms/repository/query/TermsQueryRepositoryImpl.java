@@ -68,4 +68,20 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
                 .orderBy(terms.level.asc())
                 .fetch();
     }
+
+    @Override
+    public List<Terms> findSubTermsIncludingParent(Long parentNo, Integer level, String activeYn) {
+        QTerms terms = QTerms.terms;
+
+        // 상위 약관과 하위 약관을 포함한 리스트를 반환
+        return queryFactory
+                .selectFrom(terms)
+                .where(
+                        terms.no.eq(parentNo).or(terms.parentTerms.no.eq(parentNo))
+                                .and(terms.activeYn.eq(activeYn))
+                                .and(terms.level.goe(level))  // 주어진 레벨 이상의 하위 약관만 조회
+                )
+                .orderBy(terms.level.asc())
+                .fetch();
+    }
 }
