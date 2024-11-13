@@ -27,7 +27,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NAME_TOO_LON
  */
 
 @Getter
-@NoArgsConstructor(access = AccessLevel.PUBLIC)
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "product")
 public class Product {
@@ -41,7 +41,7 @@ public class Product {
 
     // 상품 : 카테고리 = N : 1
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_no", nullable = false)
+    @JoinColumn(name = "category_no", nullable = true)
     private Category category;
 
     // 이미지 리스트 필드 추가
