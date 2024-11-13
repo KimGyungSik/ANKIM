@@ -39,7 +39,6 @@ public class OptionGroupService {
 
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
-    private final ProductRepository productRepository;
 
     public List<OptionGroupResponse> createOptionGroups(Product product, List<OptionGroupCreateServiceRequest> requests) {
         List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();

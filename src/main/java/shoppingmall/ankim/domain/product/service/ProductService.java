@@ -8,6 +8,7 @@ import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 import shoppingmall.ankim.domain.image.service.ProductImgService;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
+import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
@@ -17,6 +18,7 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -30,7 +32,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
-    private final ItemRepository itemRepository;
+    private final ItemService itemService;
 
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
         // 1. 카테고리 id로 카테고리 엔티티 가져오기
@@ -63,16 +65,20 @@ public class ProductService {
         // 3. 상품 이미지 생성
         productImgService.createProductImgs(savedProduct, request.getProductImages());
 
-        // 4. 옵션 그룹 생성
+        // 4. 옵션 그룹 생성 및 저장
+        List<OptionGroupResponse> optionGroups = new ArrayList<>();
         if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
-            optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
+            optionGroups = optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
         }
 
         // 5. 품목 생성
-//        itemService.createItemsForProduct(product, request);
+        List<OptionGroup> optionGroupEntities = new ArrayList<>();
+        for (OptionGroupResponse optionGroupResponse : optionGroups) {
+            OptionGroup savedOptionGroup = OptionGroup.fromResponse(optionGroupResponse, savedProduct);
+            optionGroupEntities.add(savedOptionGroup);
+        }
+        itemService.createItem(savedProduct, optionGroupEntities, request.getItems());
 
         return ProductResponse.of(savedProduct);
     }
-
-
 }

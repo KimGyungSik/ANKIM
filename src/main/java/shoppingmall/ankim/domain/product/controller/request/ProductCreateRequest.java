@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.image.dto.ProductImgeCreateRequest;
+import shoppingmall.ankim.domain.item.dto.ItemCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupCreateRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 
@@ -72,10 +73,12 @@ public class ProductCreateRequest {
     @NotNull(message = "상품 이미지는 필수 입력 값입니다.")
     private ProductImgeCreateRequest productImages; // 상품 이미지 리스트
 
+    private ItemCreateRequest items; // 품목 필수 필드
+
     @Builder
     private ProductCreateRequest(String name, String code, String desc, Integer discRate, Integer sellPrice, Integer origPrice, String optYn, String restockYn, Integer qty,
                                 String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
-                                String cauProd, String cauOrd, String cauShip,
+                                String cauProd, String cauOrd, String cauShip, ItemCreateRequest items,
                                 Long categoryNo, List<OptionGroupCreateRequest> optionGroups, ProductImgeCreateRequest productImages) {
         this.name = name;
         this.code = code;
@@ -97,6 +100,7 @@ public class ProductCreateRequest {
         this.categoryNo = categoryNo;
         this.optionGroups = optionGroups;
         this.productImages = productImages;
+        this.items = items;
     }
 
     public ProductCreateServiceRequest toServiceRequest() {
@@ -123,6 +127,7 @@ public class ProductCreateRequest {
                         .map(OptionGroupCreateRequest::toServiceRequest)
                         .toList())
                 .productImages(this.productImages.toServiceRequest())
+                .items(this.items.toServiceRequest())
                 .build();
     }
 }

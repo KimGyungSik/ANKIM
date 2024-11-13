@@ -40,7 +40,7 @@ public class Item {
     private String name; // 품목명 -> 옵션 그룹 + 옵션 값
 
     @Column(name = "add_price", precision = 10, scale = 2)
-    private BigDecimal addPrice; // 추가금액
+    private Integer addPrice; // 추가금액
 
     private Integer qty; // 재고량
 
@@ -57,12 +57,9 @@ public class Item {
     private Integer minQty; // 최소 구매 수량
 
     @Builder
-    private Item(Product product, List<OptionValue> optionValues, String code, String name, BigDecimal addPrice,
+    private Item(Product product, List<OptionValue> optionValues, String code, String name, Integer addPrice,
                  Integer qty, Integer safQty, ProductSellingStatus sellingStatus, Integer maxQty, Integer minQty) {
         this.product = product;
-        this.itemOptions = optionValues.stream()
-                .map(optionValue -> new ItemOption(this, optionValue))
-                .collect(Collectors.toList());
         this.code = code;
         this.name = name;
         this.addPrice = addPrice;
@@ -71,10 +68,18 @@ public class Item {
         this.sellingStatus = sellingStatus;
         this.maxQty = maxQty;
         this.minQty = minQty;
+        addItemOptions(optionValues); // ItemOption 관계 추가
     }
 
-    public static Item create(Product product,List<OptionValue> optionValues, String code, String name, BigDecimal addPrice,
-                              Integer qty, Integer safQty,Integer maxQty, Integer minQty) {
+    // 옵션 값에 따라 ItemOption을 생성하고 리스트에 추가
+    private void addItemOptions(List<OptionValue> optionValues) {
+        for (OptionValue optionValue : optionValues) {
+            this.itemOptions.add(new ItemOption(this, optionValue));
+        }
+    }
+
+    public static Item create(Product product, List<OptionValue> optionValues, String code, String name, Integer addPrice,
+                              Integer qty, Integer safQty, Integer maxQty, Integer minQty) {
         return Item.builder()
                 .sellingStatus(SELLING)
                 .product(product)
@@ -94,7 +99,7 @@ public class Item {
     }
 
     public void deductQuantity(int qty) {
-        if(isQuantityLessThan(qty)) {
+        if (isQuantityLessThan(qty)) {
             throw new IllegalArgumentException("차감할 재고 수량이 없습니다."); // FIXME
         }
         this.qty -= qty;
