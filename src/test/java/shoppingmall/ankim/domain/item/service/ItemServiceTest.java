@@ -23,12 +23,10 @@ import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
 class ItemServiceTest {
@@ -59,7 +57,10 @@ class ItemServiceTest {
     void createItemTest() {
         // given
         Product product = createProduct();
-        List<OptionGroup> optionGroups = createOptionGroup();
+        productRepository.save(product);
+
+        List<Long> optionGroupIds = createOptionGroupsAndReturnIds(product);
+        System.out.println("optionGroupIds = " + optionGroupIds);
 
         ItemCreateServiceRequest request = ItemCreateServiceRequest.builder()
                 .addPrice(500)
@@ -70,7 +71,7 @@ class ItemServiceTest {
                 .build();
 
         // when
-        List<ItemResponse> result = itemService.createItem(product, optionGroups, request);
+        List<ItemResponse> result = itemService.createItem(product.getNo(), optionGroupIds, request);
 
         // then
         // 옵션 값의 조합 수와 생성된 품목 수가 같은지 검증
@@ -120,54 +121,30 @@ class ItemServiceTest {
                 );
     }
 
+    private List<Long> createOptionGroupsAndReturnIds(Product product) {
+        OptionGroup colorGroup = optionGroupRepository.save(
+                OptionGroup.builder().name("컬러").product(product).build()
+        );
+        OptionGroup sizeGroup = optionGroupRepository.save(
+                OptionGroup.builder().name("사이즈").product(product).build()
+        );
 
-    private List<OptionGroup> createOptionGroup() {
-        // 1. OptionGroup을 먼저 저장하여 영속화
-        OptionGroup optionGroup = OptionGroup.builder()
-                .name("컬러")
-                .product(createProduct())
-                .build();
-        OptionGroup optionGroup2 = OptionGroup.builder()
-                .name("사이즈")
-                .product(createProduct())
-                .build();
-        optionGroup = optionGroupRepository.save(optionGroup);
-        optionGroup2 = optionGroupRepository.save(optionGroup2);
+        OptionValue blue = OptionValue.builder().optionGroup(colorGroup).name("Blue").colorCode("#0000FF").build();
+        OptionValue red = OptionValue.builder().optionGroup(colorGroup).name("Red").colorCode("#FF0000").build();
+        OptionValue large = OptionValue.builder().optionGroup(sizeGroup).name("large").build();
+        OptionValue small = OptionValue.builder().optionGroup(sizeGroup).name("small").build();
 
-        // 2. 영속화된 OptionGroup에 OptionValue 추가
-        OptionValue colorOption = OptionValue.builder()
-                .optionGroup(optionGroup)
-                .name("Blue")
-                .colorCode("#0000FF")
-                .build();
+        // 각 OptionGroup에 OptionValue 추가
+        colorGroup.addOptionValue(blue);
+        colorGroup.addOptionValue(red);
+        sizeGroup.addOptionValue(large);
+        sizeGroup.addOptionValue(small);
 
-        OptionValue colorOption2 = OptionValue.builder()
-                .optionGroup(optionGroup)
-                .name("Red")
-                .colorCode("#FF0000")
-                .build();
-        OptionValue sizeOption = OptionValue.builder()
-                .optionGroup(optionGroup2)
-                .name("large")
-                .colorCode(null)
-                .build();
+        // 영속성 저장
+        optionGroupRepository.save(colorGroup);
+        optionGroupRepository.save(sizeGroup);
 
-        OptionValue sizeOption2 = OptionValue.builder()
-                .optionGroup(optionGroup2)
-                .name("small")
-                .colorCode(null)
-                .build();
-
-        optionGroup.addOptionValue(colorOption);
-        optionGroup.addOptionValue(colorOption2);
-        optionGroup2.addOptionValue(sizeOption);
-        optionGroup2.addOptionValue(sizeOption2);
-
-        // 3. OptionGroup을 다시 저장하여 OptionValue도 영속화
-        optionGroupRepository.save(optionGroup);
-        optionGroupRepository.save(optionGroup2);
-
-        return List.of(optionGroup,optionGroup2);
+        return List.of(colorGroup.getNo(), sizeGroup.getNo());
     }
 
 
@@ -181,8 +158,8 @@ class ItemServiceTest {
     }
 
     private Product createProduct() {
-        return productRepository.save(Product.builder()
-                .category(createCategory())  // 가상의 Category 생성
+        return Product.builder()
+                .category(createCategory())
                 .name("테스트 상품")
                 .code("PROD123")
                 .desc("테스트 상품 설명")
@@ -200,6 +177,6 @@ class ItemServiceTest {
                 .cauProd("주의사항")
                 .cauOrd("주문 유의사항")
                 .cauShip("배송 유의사항")
-                .build());
+                .build();
     }
 }

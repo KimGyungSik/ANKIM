@@ -9,11 +9,16 @@ import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
+import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
+import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 
 @Service
 @Transactional
@@ -21,29 +26,33 @@ import java.util.stream.Collectors;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final ProductRepository productRepository;
+    private final OptionGroupRepository optionGroupRepository;
 
-    public List<ItemResponse> createItem(Product product, List<OptionGroup> optionGroups, ItemCreateServiceRequest request) {
+    public List<ItemResponse> createItem(Long productId, List<Long> optionGroupIds, ItemCreateServiceRequest request) {
+        // Product 조회
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+
+        // OptionGroup 목록 조회
+        List<OptionGroup> optionGroups = optionGroupRepository.findAllById(optionGroupIds);
+
+        // 조합 생성 및 Item 생성 로직
+        List<List<OptionValue>> optionCombinations = getOptionCombinations(optionGroups);
         List<ItemResponse> itemResponses = new ArrayList<>();
 
-        // 모든 옵션 그룹의 옵션 값 조합 생성
-        List<List<OptionValue>> optionCombinations = getOptionCombinations(optionGroups);
-
-        // 각 조합에 대해 Item을 생성
         for (int i = 0; i < optionCombinations.size(); i++) {
             List<OptionValue> optionCombination = optionCombinations.get(i);
 
-            // 1. 상품 코드에서 품목 수만큼 번호를 붙여서 고유 품목 코드를 생성
-            String itemCode = product.getCode() + "-" + (i + 1); // 예: PROD123-1, PROD123-2 등
-
-            // 2. 옵션 그룹과 옵션 값의 조합으로 품목명 생성
+            // `i + 1`을 이용하여 순차적으로 코드 생성
+            String itemCode = product.getCode() + "-" + (i + 1);
             String itemName = optionCombination.stream()
                     .map(optionValue -> optionValue.getOptionGroup().getName() + ": " + optionValue.getName())
-                    .collect(Collectors.joining(", ")); // 예: "컬러: Blue, 사이즈: large"
+                    .collect(Collectors.joining(", "));
 
-            // 3. 품목 엔티티 생성 및 저장
             Item item = Item.create(
                     product,
-                    optionCombination, // 옵션 값 조합 리스트 전달
+                    optionCombination,
                     itemCode,
                     itemName,
                     request.getAddPrice(),
@@ -53,9 +62,9 @@ public class ItemService {
                     request.getMinQty()
             );
 
-            Item savedItem = itemRepository.save(item); // 생성한 Item을 데이터베이스에 저장
-            product.addItem(savedItem); // Product 엔티티에 품목 추가
-            itemResponses.add(ItemResponse.of(savedItem)); // ItemResponse 리스트에 추가
+            Item savedItem = itemRepository.save(item);
+            product.addItem(savedItem); // `product`에 직접 추가하지 않고 itemCode는 `i` 기반으로
+            itemResponses.add(ItemResponse.of(savedItem));
         }
 
         return itemResponses;
@@ -72,7 +81,6 @@ public class ItemService {
             result.add(new ArrayList<>(current));
             return;
         }
-
         for (OptionValue optionValue : optionGroups.get(depth).getOptionValues()) {
             current.add(optionValue);
             createCombinations(optionGroups, depth + 1, current, result);

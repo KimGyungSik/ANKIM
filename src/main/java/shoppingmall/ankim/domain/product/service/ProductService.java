@@ -11,6 +11,7 @@ import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
+import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
@@ -32,6 +33,7 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
+    private final OptionGroupRepository optionGroupRepository;
     private final ItemService itemService;
 
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
@@ -66,18 +68,16 @@ public class ProductService {
         productImgService.createProductImgs(savedProduct, request.getProductImages());
 
         // 4. 옵션 그룹 생성 및 저장
-        List<OptionGroupResponse> optionGroups = new ArrayList<>();
+        List<Long> optionGroupIds = new ArrayList<>();
         if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
-            optionGroups = optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
+            List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
+            for (OptionGroupResponse optionGroupResponse : optionGroups) {
+                optionGroupIds.add(optionGroupResponse.getOptionGroupNo());
+            }
         }
 
-        // 5. 품목 생성
-        List<OptionGroup> optionGroupEntities = new ArrayList<>();
-        for (OptionGroupResponse optionGroupResponse : optionGroups) {
-            OptionGroup savedOptionGroup = OptionGroup.fromResponse(optionGroupResponse, savedProduct);
-            optionGroupEntities.add(savedOptionGroup);
-        }
-        itemService.createItem(savedProduct, optionGroupEntities, request.getItems());
+        // 5. 품목 생성 - optionGroupIds와 productId만 전달
+        itemService.createItem(savedProduct.getNo(), optionGroupIds, request.getItems());
 
         return ProductResponse.of(savedProduct);
     }
