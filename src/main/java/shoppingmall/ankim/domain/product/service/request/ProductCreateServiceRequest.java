@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 
 import java.util.List;
@@ -33,11 +34,12 @@ public class ProductCreateServiceRequest {
 
     private List<OptionGroupCreateServiceRequest> optionGroups; // 옵션 그룹 리스트
     private ProductImgCreateServiceRequest productImages; // 상품 이미지 리스트
+    private ItemCreateServiceRequest items;
 
     @Builder
     private ProductCreateServiceRequest(String name, String code, String desc, Integer discRate, Integer sellPrice, Integer origPrice, String optYn, String restockYn, Integer qty,
                                  String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
-                                 String cauProd, String cauOrd, String cauShip,
+                                 String cauProd, String cauOrd, String cauShip, ItemCreateServiceRequest items,
                                  Long categoryNo, List<OptionGroupCreateServiceRequest> optionGroups, ProductImgCreateServiceRequest productImages) {
         this.name = name;
         this.code = code;
@@ -59,5 +61,6 @@ public class ProductCreateServiceRequest {
         this.categoryNo = categoryNo;
         this.optionGroups = optionGroups;
         this.productImages = productImages;
+        this.items = items;
     }
 }

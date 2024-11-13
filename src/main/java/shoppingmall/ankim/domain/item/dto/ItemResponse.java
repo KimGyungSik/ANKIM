@@ -6,17 +6,15 @@ import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
-import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
 public class ItemResponse {
     private final Long itemId;
-    private final String productName;
     private final String code; // 품목코드
     private final String name; // 품목명
-    private final BigDecimal addPrice; // 추가금액
+    private final Integer addPrice; // 추가금액
     private final Integer qty; // 재고량
     private final Integer safQty; // 안전재고량
     private final ProductSellingStatus sellingStatus; // 판매 상태
@@ -25,10 +23,9 @@ public class ItemResponse {
     private final List<OptionValueResponse> optionValues; // 품목 옵션 리스트
 
     @Builder
-    private ItemResponse(Long itemId, String productName, String code, String name, BigDecimal addPrice, Integer qty, Integer safQty,
+    private ItemResponse(Long itemId, String code, String name, Integer addPrice, Integer qty, Integer safQty,
                          ProductSellingStatus sellingStatus, Integer maxQty, Integer minQty, List<OptionValueResponse> optionValues ) {
         this.itemId = itemId;
-        this.productName = productName;
         this.code = code;
         this.name = name;
         this.addPrice = addPrice;
@@ -43,7 +40,6 @@ public class ItemResponse {
     public static ItemResponse of(Item item) {
         return ItemResponse.builder()
                 .itemId(item.getNo())
-                .productName(item.getName())
                 .code(item.getCode())
                 .name(item.getName())
                 .addPrice(item.getAddPrice())
