@@ -58,20 +58,20 @@ public class ProductService {
                 request.getCauOrd(),
                 request.getCauShip()
         );
-        Product saveProduct = productRepository.save(product);
+        Product savedProduct = productRepository.save(product); // Product 먼저 저장
 
         // 3. 상품 이미지 생성
-        productImgService.createProductImgs(product.getNo(), request.getProductImages());
+        productImgService.createProductImgs(savedProduct, request.getProductImages());
 
         // 4. 옵션 그룹 생성
         if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
-            optionGroupService.createOptionGroups(product.getNo(), request.getOptionGroups());
+            optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
         }
 
         // 5. 품목 생성
 //        itemService.createItemsForProduct(product, request);
 
-        return ProductResponse.of(product);
+        return ProductResponse.of(savedProduct);
     }
 
 

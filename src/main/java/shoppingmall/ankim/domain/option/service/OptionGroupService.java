@@ -41,14 +41,10 @@ public class OptionGroupService {
     private final OptionValueRepository optionValueRepository;
     private final ProductRepository productRepository;
 
-    public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
-        // Product 찾기
-        Product product = getProduct(productId);
-
+    public List<OptionGroupResponse> createOptionGroups(Product product, List<OptionGroupCreateServiceRequest> requests) {
         List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();
 
         for (OptionGroupCreateServiceRequest request : requests) {
-            // TODO 옵션 그룹 이름 중복 검사 테스트 추가해야함
             boolean isDuplicate = product.getOptionGroups().stream()
                     .anyMatch(existingGroup -> existingGroup.getName().equals(request.getGroupName()));
 
@@ -70,19 +66,13 @@ public class OptionGroupService {
                 optionGroup.addOptionValue(optionValue);
             });
 
-//            optionGroupRepository.save(optionGroup);
             product.addOptionGroup(optionGroup);
-            optionGroupResponses.add(OptionGroupResponse.of(optionGroup));
+            OptionGroup saveOptionGroup = optionGroupRepository.save(optionGroup);
+            optionGroupResponses.add(OptionGroupResponse.of(saveOptionGroup));
         }
 
         return optionGroupResponses;
     }
-
-    private Product getProduct(Long productId) {
-        return productRepository.findByIdWithOptionGroups(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
-    }
-
 
     @Transactional(readOnly = true)
     public OptionGroup getOptionGroup(Long optionGroupId) {

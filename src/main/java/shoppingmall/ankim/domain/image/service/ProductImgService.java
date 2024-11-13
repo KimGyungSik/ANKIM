@@ -35,20 +35,12 @@ public class ProductImgService {
     private final static String thumbnail = "Y";
     private final static String detail = "N";
 
-    public void createProductImgs(Long productId, ProductImgCreateServiceRequest request)  {
-        Product product = getProduct(productId);
+    public void createProductImgs(Product product, ProductImgCreateServiceRequest request)  {
         validateImageCounts(request);
 
         saveImages(product, request.getThumbnailImages(), thumbnail);
         saveImages(product, request.getDetailImages(), detail);
     }
-
-    // 상품 엔티티를 가져오기 위한 메서드
-    private Product getProduct(Long productId) {
-        return productRepository.findByIdWithOptionGroups(productId)
-                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
-    }
-
 
     // 이미지 개수 검사를 위한 메서드
     private void validateImageCounts(ProductImgCreateServiceRequest request) {

@@ -15,6 +15,9 @@ import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.io.IOException;
 import java.util.Collections;
@@ -35,6 +38,9 @@ class ProductImgServiceTest {
     private ProductImgService productImgService;
 
     @Autowired
+    private ProductRepository productRepository;
+
+    @Autowired
     private ProductImgRepository productImgRepository;
 
     @MockBean
@@ -51,6 +57,8 @@ class ProductImgServiceTest {
     void createProductImgs() throws IOException {
 
         // given
+        Product product = createProduct();
+        productRepository.save(product);
         // MockMultipartFile을 통해 썸네일과 상세 이미지 데이터를 생성합니다.
         MultipartFile thumbnailImage = new MockMultipartFile(
                 "thumbnail", "thumbnail.jpg", "image/jpeg", "thumbnail data".getBytes());
@@ -69,7 +77,7 @@ class ProductImgServiceTest {
 
         // when
         // ProductImgService의 createProductImgs 메서드를 호출하여 저장을 테스트합니다.
-        productImgService.createProductImgs(request);
+        productImgService.createProductImgs(product,request);
 
         // then
         // uploadFile 메서드가 2번 호출되었는지 확인하고, 저장된 이미지 개수를 검증합니다.
@@ -81,6 +89,8 @@ class ProductImgServiceTest {
     @Test
     void createProductImgsRequired() {
         // given
+        Product product = createProduct();
+        productRepository.save(product);
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(Collections.emptyList()) // 썸네일 이미지가 없는 경우
                 .detailImages(List.of(detailImage))
@@ -92,12 +102,12 @@ class ProductImgServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> productImgService.createProductImgs(request))
+        assertThatThrownBy(() -> productImgService.createProductImgs(product,request))
                 .isInstanceOf(ThumbnailImageRequiredException.class)
                 .hasMessageContaining("썸네일 이미지는 최소 1개가 필요합니다.");
 
 
-        assertThatThrownBy(() -> productImgService.createProductImgs(requestWithNoDetail))
+        assertThatThrownBy(() -> productImgService.createProductImgs(product, requestWithNoDetail))
                 .isInstanceOf(DetailImageRequiredException.class)
                 .hasMessageContaining("상세 이미지는 최소 1개가 필요합니다.");
     }
@@ -106,6 +116,8 @@ class ProductImgServiceTest {
     @Test
     void createProductImgsLimitExceeded() {
         // given
+        Product product = createProduct();
+        productRepository.save(product);
         List<MultipartFile> thumbnails = List.of(thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage); // 7개 이미지
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(thumbnails)
@@ -113,7 +125,7 @@ class ProductImgServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> productImgService.createProductImgs(request))
+        assertThatThrownBy(() -> productImgService.createProductImgs(product, request))
                 .isInstanceOf(ImageLimitExceededException.class)
                 .hasMessageContaining("이미지는 최대 6장까지 업로드할 수 있습니다.");
     }
@@ -122,6 +134,8 @@ class ProductImgServiceTest {
     @Test
     void createProductImgsOrder() throws IOException {
         // given
+        Product product = createProduct();
+        productRepository.save(product);
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))
                 .detailImages(List.of(detailImage, detailImage)) // 2 detail images for ordering test
@@ -132,7 +146,7 @@ class ProductImgServiceTest {
                 .willReturn("test-image.jpg");
 
         // when
-        productImgService.createProductImgs(request);
+        productImgService.createProductImgs(product , request);
 
         // then
         List<ProductImg> savedImages = productImgRepository.findAll();
@@ -140,5 +154,11 @@ class ProductImgServiceTest {
         assertThat(savedImages.get(0).getOrd()).isEqualTo(1); // Thumbnail order
         assertThat(savedImages.get(1).getOrd()).isEqualTo(1); // Detail order 1
         assertThat(savedImages.get(2).getOrd()).isEqualTo(2); // Detail order 2
+    }
+
+    private Product createProduct() {
+        return Product.builder()
+                .name("Test Product")
+                .build();
     }
 }
