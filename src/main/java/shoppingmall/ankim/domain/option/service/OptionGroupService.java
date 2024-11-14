@@ -39,8 +39,10 @@ public class OptionGroupService {
 
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
+    private final ProductRepository productRepository;
 
-    public List<OptionGroupResponse> createOptionGroups(Product product, List<OptionGroupCreateServiceRequest> requests) {
+    public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
+        Product product = getProduct(productId);
         List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();
 
         for (OptionGroupCreateServiceRequest request : requests) {
@@ -71,6 +73,12 @@ public class OptionGroupService {
         }
 
         return optionGroupResponses;
+    }
+
+    private Product getProduct(Long productId) {
+        // Product 조회
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 
     @Transactional(readOnly = true)

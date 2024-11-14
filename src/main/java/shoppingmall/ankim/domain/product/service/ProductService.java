@@ -38,10 +38,35 @@ public class ProductService {
 
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
         // 1. 카테고리 id로 카테고리 엔티티 가져오기
-        Category category = categoryRepository.findById(request.getCategoryNo())
-                .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+        Category category = getCategory(request);
 
         // 2. 상품 생성
+        Product savedProduct = getProduct(request, category);
+
+        // 3. 상품 이미지 생성
+        productImgService.createProductImgs(savedProduct.getNo(), request.getProductImages());
+
+        // 4. 옵션 그룹 생성 및 저장
+        List<Long> optionGroupIds = getOptionGroupIds(request, savedProduct);
+
+        // 5. 품목 생성 - optionGroupIds와 productId만 전달
+        itemService.createItem(savedProduct.getNo(), optionGroupIds, request.getItems());
+
+        return ProductResponse.of(savedProduct);
+    }
+
+    private List<Long> getOptionGroupIds(ProductCreateServiceRequest request, Product savedProduct) {
+        List<Long> optionGroupIds = new ArrayList<>();
+        if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
+            List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(savedProduct.getNo(), request.getOptionGroups());
+            for (OptionGroupResponse optionGroupResponse : optionGroups) {
+                optionGroupIds.add(optionGroupResponse.getOptionGroupNo());
+            }
+        }
+        return optionGroupIds;
+    }
+
+    private Product getProduct(ProductCreateServiceRequest request, Category category) {
         Product product = Product.create(
                 category,
                 request.getName(),
@@ -62,23 +87,11 @@ public class ProductService {
                 request.getCauOrd(),
                 request.getCauShip()
         );
-        Product savedProduct = productRepository.save(product); // Product 먼저 저장
+        return productRepository.save(product);
+    }
 
-        // 3. 상품 이미지 생성
-        productImgService.createProductImgs(savedProduct, request.getProductImages());
-
-        // 4. 옵션 그룹 생성 및 저장
-        List<Long> optionGroupIds = new ArrayList<>();
-        if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
-            List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(savedProduct, request.getOptionGroups());
-            for (OptionGroupResponse optionGroupResponse : optionGroups) {
-                optionGroupIds.add(optionGroupResponse.getOptionGroupNo());
-            }
-        }
-
-        // 5. 품목 생성 - optionGroupIds와 productId만 전달
-        itemService.createItem(savedProduct.getNo(), optionGroupIds, request.getItems());
-
-        return ProductResponse.of(savedProduct);
+    private Category getCategory(ProductCreateServiceRequest request) {
+        return categoryRepository.findById(request.getCategoryNo())
+                .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
     }
 }

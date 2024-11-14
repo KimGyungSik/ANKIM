@@ -58,7 +58,7 @@ class ProductImgServiceTest {
 
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         // MockMultipartFile을 통해 썸네일과 상세 이미지 데이터를 생성합니다.
         MultipartFile thumbnailImage = new MockMultipartFile(
                 "thumbnail", "thumbnail.jpg", "image/jpeg", "thumbnail data".getBytes());
@@ -77,7 +77,7 @@ class ProductImgServiceTest {
 
         // when
         // ProductImgService의 createProductImgs 메서드를 호출하여 저장을 테스트합니다.
-        productImgService.createProductImgs(product,request);
+        productImgService.createProductImgs(save.getNo(),request);
 
         // then
         // uploadFile 메서드가 2번 호출되었는지 확인하고, 저장된 이미지 개수를 검증합니다.
@@ -90,7 +90,7 @@ class ProductImgServiceTest {
     void createProductImgsRequired() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(Collections.emptyList()) // 썸네일 이미지가 없는 경우
                 .detailImages(List.of(detailImage))
@@ -102,12 +102,12 @@ class ProductImgServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> productImgService.createProductImgs(product,request))
+        assertThatThrownBy(() -> productImgService.createProductImgs(save.getNo(),request))
                 .isInstanceOf(ThumbnailImageRequiredException.class)
                 .hasMessageContaining("썸네일 이미지는 최소 1개가 필요합니다.");
 
 
-        assertThatThrownBy(() -> productImgService.createProductImgs(product, requestWithNoDetail))
+        assertThatThrownBy(() -> productImgService.createProductImgs(save.getNo(), requestWithNoDetail))
                 .isInstanceOf(DetailImageRequiredException.class)
                 .hasMessageContaining("상세 이미지는 최소 1개가 필요합니다.");
     }
@@ -117,7 +117,7 @@ class ProductImgServiceTest {
     void createProductImgsLimitExceeded() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         List<MultipartFile> thumbnails = List.of(thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage, thumbnailImage); // 7개 이미지
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(thumbnails)
@@ -125,7 +125,7 @@ class ProductImgServiceTest {
                 .build();
 
         // when // then
-        assertThatThrownBy(() -> productImgService.createProductImgs(product, request))
+        assertThatThrownBy(() -> productImgService.createProductImgs(save.getNo(), request))
                 .isInstanceOf(ImageLimitExceededException.class)
                 .hasMessageContaining("이미지는 최대 6장까지 업로드할 수 있습니다.");
     }
@@ -135,7 +135,7 @@ class ProductImgServiceTest {
     void createProductImgsOrder() throws IOException {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))
                 .detailImages(List.of(detailImage, detailImage)) // 2 detail images for ordering test
@@ -146,7 +146,7 @@ class ProductImgServiceTest {
                 .willReturn("test-image.jpg");
 
         // when
-        productImgService.createProductImgs(product , request);
+        productImgService.createProductImgs(save.getNo() , request);
 
         // then
         List<ProductImg> savedImages = productImgRepository.findAll();

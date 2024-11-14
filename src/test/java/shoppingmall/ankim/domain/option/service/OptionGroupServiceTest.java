@@ -55,7 +55,7 @@ class OptionGroupServiceTest {
     void createOptionGroupsWithMultipleValues() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionValueCreateServiceRequest colorOption = OptionValueCreateServiceRequest.builder()
                 .valueName("Blue")
                 .colorCode("#0000FF")
@@ -76,7 +76,7 @@ class OptionGroupServiceTest {
                 .build();
 
         // when
-        List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(product, List.of(colorGroupRequest, sizeGroupRequest));
+        List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(save.getNo(), List.of(colorGroupRequest, sizeGroupRequest));
 
         // then
         assertThat(optionGroups).isNotNull();
@@ -110,14 +110,14 @@ class OptionGroupServiceTest {
     void createOptionGroupsWithoutOptionValue() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionGroupCreateServiceRequest request = OptionGroupCreateServiceRequest.builder()
                 .groupName("options")
                 .optionValues(List.of())
                 .build();
 
         // when & then
-        assertThrows(InsufficientOptionValuesException.class, () -> optionGroupService.createOptionGroups(product, List.of(request)));
+        assertThrows(InsufficientOptionValuesException.class, () -> optionGroupService.createOptionGroups(save.getNo(), List.of(request)));
 
         // Repository에 저장되지 않았는지 검증
         assertThat(optionGroupRepository.findAll()).isEmpty();
@@ -135,13 +135,13 @@ class OptionGroupServiceTest {
     void addOptionValueToOptionGroup() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionGroupCreateServiceRequest request = OptionGroupCreateServiceRequest.builder()
                 .groupName("컬러")
                 .optionValues(List.of(OptionValueCreateServiceRequest.builder().valueName("Red").build()))
                 .build();
 
-        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(product, List.of(request)).get(0);
+        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(save.getNo(), List.of(request)).get(0);
 
         OptionValueCreateServiceRequest newOptionValueRequest = OptionValueCreateServiceRequest.builder()
                 .valueName("Green")
@@ -170,13 +170,13 @@ class OptionGroupServiceTest {
     void deleteOptionGroup() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionGroupCreateServiceRequest request = OptionGroupCreateServiceRequest.builder()
                 .groupName("사이즈")
                 .optionValues(List.of(OptionValueCreateServiceRequest.builder().valueName("Small").build()))
                 .build();
 
-        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(product, List.of(request)).get(0);
+        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(save.getNo(), List.of(request)).get(0);
 
         // when
         optionGroupService.deleteOptionGroup(createdGroup.getOptionGroupNo());
@@ -190,13 +190,13 @@ class OptionGroupServiceTest {
     void deleteOptionValue() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionGroupCreateServiceRequest request = OptionGroupCreateServiceRequest.builder()
                 .groupName("컬러")
                 .optionValues(List.of(OptionValueCreateServiceRequest.builder().valueName("Blue").build()))
                 .build();
 
-        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(product, List.of(request)).get(0);
+        OptionGroupResponse createdGroup = optionGroupService.createOptionGroups(save.getNo(), List.of(request)).get(0);
 
         OptionGroup optionGroup = optionGroupRepository.findById(createdGroup.getOptionGroupNo()).orElseThrow();
         OptionValue optionValue = optionGroup.getOptionValues().get(0);
@@ -217,7 +217,7 @@ class OptionGroupServiceTest {
     void shouldThrowExceptionWhenOptionGroupNameIsDuplicate() {
         // given
         Product product = createProduct();
-        productRepository.save(product);
+        Product save = productRepository.save(product);
         OptionGroupCreateServiceRequest request1 = OptionGroupCreateServiceRequest.builder()
                 .groupName("색상")
                 .optionValues(List.of(OptionValueCreateServiceRequest.builder().valueName("Red").build()))
@@ -229,9 +229,9 @@ class OptionGroupServiceTest {
                 .build();
 
         // when & then
-        optionGroupService.createOptionGroups(product, List.of(request1)); // 첫 번째 요청은 성공
+        optionGroupService.createOptionGroups(save.getNo(), List.of(request1)); // 첫 번째 요청은 성공
         assertThatThrownBy(() ->
-                optionGroupService.createOptionGroups(product, List.of(request2)) // 두 번째 요청은 예외 발생
+                optionGroupService.createOptionGroups(save.getNo(), List.of(request2)) // 두 번째 요청은 예외 발생
         )
                 .isInstanceOf(DuplicateOptionGroupException.class)
                 .hasMessageContaining("옵션 항목이 중복되었습니다"); // 예외 메시지 확인
