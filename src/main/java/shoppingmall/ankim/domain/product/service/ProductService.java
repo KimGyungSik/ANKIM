@@ -33,7 +33,6 @@ public class ProductService {
     private final CategoryRepository categoryRepository;
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
-    private final OptionGroupRepository optionGroupRepository;
     private final ItemService itemService;
 
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
