@@ -11,9 +11,7 @@ import shoppingmall.ankim.domain.terms.repository.TermsRepository;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.ArrayList;
-import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Set;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.REQUIRED_TERMS_NOT_AGREED;
 
@@ -70,22 +68,6 @@ public class TermsQueryServiceImpl implements TermsQueryService {
     // 레벨2 약관이고 동의한 상태인지 확인
     private boolean needsSubTerms(TermsAgreement agreement) {
         return agreement.getAgreeYn().equals("Y") && agreement.getLevel().equals(2);
-    }
-
-    // 특정 부모 약관의 하위 레벨3 약관을 TermsAgreement 리스트로 반환
-    private List<TermsAgreement> getSubTermsAsAgreements(Long parentNo, Integer level) {
-        List<Terms> subTerms = termsRepository.findSubTermsForParent(parentNo, level, "Y");
-        List<TermsAgreement> subAgreements = new ArrayList<>();
-        for (Terms subTerm : subTerms) {
-            subAgreements.add(TermsAgreement.builder()
-                    .no(subTerm.getNo())
-                    .name(subTerm.getName())
-                    .agreeYn("Y")
-                    .level(subTerm.getLevel())
-                    .termsYn(subTerm.getTermsYn())
-                    .build());
-        }
-        return subAgreements;
     }
 
 }

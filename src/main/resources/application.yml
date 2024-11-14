@@ -27,7 +27,3 @@ spring:
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html
-
-# 등급 기본값
-member:
-  default-grade: 50

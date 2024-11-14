@@ -11,6 +11,9 @@ import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.terms.service.TermsService;
+import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.List;
 
@@ -21,6 +24,8 @@ import static shoppingmall.ankim.global.exception.ErrorCode.EMAIL_DUPLICATE;
 @Transactional
 @RequiredArgsConstructor
 public class MemberServiceImpl implements MemberService {
+
+    private final TermsQueryService termsQueryService;
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -50,11 +55,14 @@ public class MemberServiceImpl implements MemberService {
     *   2.4. TermsHistory 테이블에 insert
     * */
     // 회원가입 로직
-    public MemberResponse registerMember(MemberRegisterServiceRequest request, List<Terms> terms) {
+    public MemberResponse registerMember(MemberRegisterServiceRequest request, List<TermsAgreement> termsAgreements) {
+        // termsAgreements를 Terms로 변환
+        List<Terms> agreeTerms = termsQueryService.validateAndAddSubTerms(termsAgreements);
+
         // 비밀번호 암호화
         String encodePwd = bCryptPasswordEncoder.encode(request.getPwd());
 
-        Member member = request.create(encodePwd);
+        Member member = request.create(encodePwd, agreeTerms);
         memberRepository.save(member); // 회원가입과 동시에 TermsHistory도 저장!
 
         log.info("회원가입 완료");

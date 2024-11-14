@@ -60,7 +60,7 @@ public class Member extends BaseEntity {
     private LocalDateTime firstOrderDate; // 첫 주문일
 
     @Column(nullable = false)
-    private Integer grade; // 회원 등급
+    private Integer grade; // 회원 등급(기본 : 50 / GREEN)
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -78,8 +78,7 @@ public class Member extends BaseEntity {
                   String phoneNum, LocalDate birth, String gender,
                   LocalDateTime joinDate, Integer grade,
                   MemberStatus status, Authority authority,
-                  List<Terms> termsList,
-                  TermsAgreement termsAgreement
+                  List<Terms> termsList
     ) {
         this.uuid = uuid;
         this.id = id;
@@ -89,12 +88,14 @@ public class Member extends BaseEntity {
         this.birth = birth;
         this.gender = gender;
         this.joinDate = joinDate;
-        this.grade = grade;
+        this.grade = (grade == null || grade == 0) ? 50 : grade; // 기본 등급 설정
         this.status = status;
 //        this.authority = authority;
+
+        // termsList -> termsHistory 변환 및 설정
         this.termsHistory = (termsList != null) ?
                 termsList.stream()
-                        .map(terms -> new TermsHistory(this, terms))
+                        .map(terms -> new TermsHistory(this, terms, "Y", this.joinDate)) // agreeYn = "Y", agreeDate = joinDate
                         .collect(Collectors.toList())
                 : new ArrayList<>();
     }

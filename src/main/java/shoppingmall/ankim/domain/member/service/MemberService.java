@@ -2,7 +2,7 @@ package shoppingmall.ankim.domain.member.service;
 
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
-import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.List;
 
@@ -11,5 +11,5 @@ public interface MemberService {
     void emailCheck(String id);
 
     // 회원가입 로직
-    MemberResponse registerMember(MemberRegisterServiceRequest request, List<Terms> terms);
+    MemberResponse registerMember(MemberRegisterServiceRequest request, List<TermsAgreement> termsAgreements);
 }

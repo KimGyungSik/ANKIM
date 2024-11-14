@@ -32,7 +32,7 @@ public class TermsHistory extends BaseEntity {
     private String agreeYn; // 동의 여부
 
     @Column(name = "agree_date", nullable = false)
-    private LocalDateTime agreeDate = LocalDateTime.now(); // 동의 일자
+    private LocalDateTime agreeDate; // 동의 일자
 
     @Builder
     public TermsHistory(Member member, Terms terms, String agreeYn, LocalDateTime agreeDate) {
@@ -40,11 +40,5 @@ public class TermsHistory extends BaseEntity {
         this.terms = terms;
         this.agreeYn = agreeYn;
         this.agreeDate = agreeDate;
-    }
-
-    public TermsHistory(Member member, Terms terms) {
-        this.member = member;
-        this.terms = terms;
-        this.agreeDate = LocalDateTime.now();
     }
 }

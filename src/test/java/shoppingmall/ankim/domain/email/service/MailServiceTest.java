@@ -118,10 +118,10 @@ class MailServiceTest {
         MailRequest mailRequest = new MailRequest(email, code);
 
         // when
-        boolean isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
+        Count isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
 
         // then
-        assertThat(isValid).isTrue();
+        assertThat(isValid).isEqualTo(Count.SUCCESS);
     }
 
 
@@ -141,13 +141,63 @@ class MailServiceTest {
         Set<ConstraintViolation<MailRequest>> violations = validator.validate(mailRequest);
 
         // when
-        boolean isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
+        Count isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
 
         // then
         assertThat(violations).isNotEmpty(); // 유효성 검사 오류가 있는지 확인
-        assertThat(isValid).isFalse();     // 인증번호 검증 결과가 틀렸는지 확인
+        assertThat(isValid).isEqualTo(Count.FAIL);     // 인증번호 검증 결과가 틀렸는지 확인
 
         System.out.println("violations = " + violations);
+    }
+
+    @Test
+    @DisplayName("사용자가 인증번호를 3회 이상 잘못 입력한 경우 RETRY 메시지가 전달되는지 확인한다.")
+    public void verifyCodeRetryAfterThreeFailuresTest() {
+        // given
+        String email = "test@example.com";
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
+        String correctCode = mailService.generateCode();
+        mailService.createMail(email, correctCode); // 내부적으로 인증번호를 저장했다고 가정
+
+        // when: 3회 잘못된 인증번호 입력
+        for (int i = 0; i < 3; i++) {
+            mailService.verifyCode(email, "wrongCode");
+        }
+
+        // 4번째 실패 시 RETRY 응답
+        Count result = mailService.verifyCode(email, "wrongCode");
+
+        // then
+        assertThat(result).isEqualTo(Count.RETRY);
+    }
+
+    @Test
+    @DisplayName("3회 인증번호 틀린 후 새 인증번호 요청하고, 올바르게 입력하면 성공 메시지가 전달되는지 확인한다.")
+    public void verifyCodeAfterRetryWithNewCodeTest() {
+        // given
+        String email = "test@example.com";
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
+        String correctCode = mailService.generateCode();
+        mailService.createMail(email, correctCode); // 내부적으로 인증번호를 저장했다고 가정
+
+        // when: 3회 잘못된 인증번호 입력
+        for (int i = 0; i < 3; i++) {
+            mailService.verifyCode(email, "wrongCode");
+        }
+
+        Count result = mailService.verifyCode(email, "wrongCode");
+        assertThat(result).isEqualTo(Count.RETRY); // 성공 메시지가 반환되는지 확인
+
+        // when: 3회 실패 후 새로운 인증번호 발급 요청
+        String newCode = mailService.generateCode();
+        mailService.createMail(email, newCode); // 새로운 인증번호 생성 및 저장
+
+        // 새로운 인증번호로 성공적인 검증
+        Count newResult = mailService.verifyCode(email, newCode);
+        System.out.println("newResult = " + newResult);
+
+        // then
+        assertThat(newResult).isEqualTo(Count.SUCCESS); // 성공 메시지가 반환되는지 확인
     }
 
 }

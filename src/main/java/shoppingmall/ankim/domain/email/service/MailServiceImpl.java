@@ -11,7 +11,6 @@ import shoppingmall.ankim.domain.email.exception.MailSendException;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -35,6 +34,9 @@ public class MailServiceImpl implements MailService {
 
     // 임시로 생성된 인증번호를 저장
     private final Map<String, String> verificationCodes = new ConcurrentHashMap<>(); // 동시성 지원
+
+    // 실패 횟수를 저장
+    private final Map<String, Integer> failCounts = new ConcurrentHashMap<>();
 
     // JavaMailSender 주입
     public MailServiceImpl(JavaMailSender javaMailSender) {
@@ -62,11 +64,10 @@ public class MailServiceImpl implements MailService {
             helper.setTo(email); // 받는 사람
             helper.setSubject("Ankim 이메일 인증");
             verificationCodes.put(email, code); // 생성된 인증번호 저장
+            failCounts.put(email, 0); // 실패 횟수 초기화
             helper.setText("<h1>인증번호: " + code + "</h1>", true); // HTML 형식 메시지
-        } catch (MessagingException e) {
+        } catch (MessagingException | UnsupportedEncodingException e) {
             throw new MailSendException(MAIL_SEND_FAIL);
-        } catch (UnsupportedEncodingException e) {
-            throw new RuntimeException(e);
         }
 
         return message;
@@ -79,11 +80,22 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public boolean verifyCode(String email, String inputCode) {
+    public Count verifyCode(String email, String inputCode) {
         String storedCode = verificationCodes.get(email);
 
-        return storedCode != null && storedCode.equals(inputCode);
+        // 실패 횟수 초과 처리
+        if (failCounts.getOrDefault(email, 0) >= 3) {
+            return Count.RETRY; // 실패 횟수 3회 초과 시 "RETRY" 반환
+        }
+
+        if (storedCode != null && storedCode.equals(inputCode)) {
+            failCounts.remove(email); // 성공 시 실패 횟수 초기화
+            return Count.SUCCESS;
+        }
+
+        failCounts.put(email, failCounts.getOrDefault(email, 0) + 1);
+        return Count.FAIL;
     }
 
-
 }
+

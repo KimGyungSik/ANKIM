@@ -35,8 +35,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.MISSING_REQUIRED_ID;
 public class MemberJoinController {
 
     private final MemberService memberService;
-    private final TermsQueryService termsQueryService;
-    private final TermsHistoryService termsHistoryService;
 
     // 사용가능한 이메일인지 검증한다.(중복 확인)
     @PostMapping("/email-check")
@@ -51,8 +49,7 @@ public class MemberJoinController {
     @PostMapping("/terms-next")
     @ResponseBody
     public ApiResponse<String> nextRegisterEmail(@RequestBody List<TermsAgreement> termsAgreements, HttpSession session) {
-        List<Terms> agreeTerms = termsQueryService.validateAndAddSubTerms(termsAgreements);
-        session.setAttribute("termsAgreements", agreeTerms);
+        session.setAttribute("termsAgreements", termsAgreements);
 
         // 약관 동의한 내용(termsAgreements)을 세션에 저장
         return ApiResponse.ok("약관 동의를 완료했습니다."); // FIXME 이메일 인증 페이지 필요
@@ -77,13 +74,16 @@ public class MemberJoinController {
         // 약관동의 정보 - termsAgreements(세션에 저장되어 있음)에서 데이터 꺼내서 입력
 
         MemberRegisterServiceRequest serviceRequest = request.toServiceRequest(); // serviceRequest로 변환
-        List<Terms> termsAgreements = (List<Terms>) session.getAttribute("termsAgreements"); // 약관동의를 한 약관들 호출
+
+        List<TermsAgreement> termsAgreements = (List<TermsAgreement>) session.getAttribute("termsAgreements"); // 약관동의를 한 약관들 호출
+
         MemberResponse memberResponse = memberService.registerMember(serviceRequest, termsAgreements);
-
-
 
         // memberResponse를 회원가입 완료 페이지에 전달
         model.addAttribute("memberResponse", memberResponse);
+
+        // 회원가입이 완료된 후 세션에서 약관동의 정보 삭제
+        session.removeAttribute("termsAgreements");
 
         return "registerComplete"; // FIXME 회원가입 완료 페이지 작성 필요
     }

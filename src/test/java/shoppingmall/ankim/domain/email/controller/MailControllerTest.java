@@ -14,6 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.email.exception.MailSendException;
+import shoppingmall.ankim.domain.email.service.Count;
 import shoppingmall.ankim.domain.email.service.MailService;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -69,14 +70,14 @@ class MailControllerTest {
         when(mailService.generateCode()).thenReturn(code);
         MailRequest mailRequest = new MailRequest(email, code);
 
-        when(mailService.verifyCode(email, code)).thenReturn(true); // 성공 케이스로 설정
+        when(mailService.verifyCode(email, code)).thenReturn(Count.SUCCESS); // 성공 케이스로 설정
 
         // when, then
         mockMvc.perform(post("/api/mail/verify")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(mailRequest)))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.data").value("OK"));
+                .andExpect(jsonPath("$.message").value("SUCCESS"));
 
         // then
         verify(mailService, times(1)).verifyCode(email, code);
@@ -145,6 +146,68 @@ class MailControllerTest {
         // then : 메일 전송이 두 번 이루어졌는지, 각 코드가 제대로 설정되었는지 확인
         verify(mailService, times(2)).generateCode();
         verify(mailService, times(2)).sendMail(mimeMessage);
-
     }
+
+    @Test
+    @DisplayName("잘못된 인증번호 3회 시도 후, 새 인증번호 요청으로 인증 성공하는지 확인한다.")
+    public void resendAfterThreeFailuresThenSuccess() throws Exception {
+        // given: 이메일과 초기 인증번호 설정
+        String email = "test@example.com";
+        String initialCode = "123456";
+        String newCode = "654321";
+
+        // Mock 객체 설정
+        MimeMessage mimeMessage = mock(MimeMessage.class);
+
+        // given: 초기 인증번호 생성 및 이메일 전송 설정
+        when(mailService.generateCode()).thenReturn(initialCode);
+        when(mailService.createMail(email, initialCode)).thenReturn(mimeMessage);
+
+        // when: 이메일 전송 및 초기 인증번호 저장
+        mockMvc.perform(post("/api/mail/send")
+                        .param("id", email))
+                .andExpect(status().isOk());
+
+        // given: 인증번호 3회 틀리기 설정
+        when(mailService.verifyCode(email, "wrongCode")).thenReturn(Count.FAIL);
+
+        // when: 인증번호 3회 틀리기
+        for (int i = 0; i < 3; i++) {
+            mockMvc.perform(post("/api/mail/verify")
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .content(objectMapper.writeValueAsString(new MailRequest(email, "wrongCode"))))
+                    .andExpect(status().isOk())
+                    .andExpect(jsonPath("$.message").value("FAIL"));
+        }
+
+        // given: 3회 실패 후 "RETRY" 설정
+        when(mailService.verifyCode(email, "wrongCode")).thenReturn(Count.RETRY);
+
+        // when: 3회 실패 후 "RETRY" 반환 확인
+        mockMvc.perform(post("/api/mail/verify")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new MailRequest(email, "wrongCode"))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("RETRY"));
+
+        // given: 새로운 인증번호 생성 및 전송 설정
+        when(mailService.generateCode()).thenReturn(newCode);
+        when(mailService.createMail(email, newCode)).thenReturn(mimeMessage);
+
+        // when: 새로운 인증번호 전송
+        mockMvc.perform(post("/api/mail/send")
+                        .param("id", email))
+                .andExpect(status().isOk());
+
+        // given: 새로운 인증번호로 성공적인 검증 설정
+        when(mailService.verifyCode(email, newCode)).thenReturn(Count.SUCCESS);
+
+        // when: 새로운 인증번호로 성공적인 검증 요청
+        mockMvc.perform(post("/api/mail/verify")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(new MailRequest(email, newCode))))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.message").value("SUCCESS"));
+    }
+
 }

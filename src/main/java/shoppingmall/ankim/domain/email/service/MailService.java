@@ -10,6 +10,6 @@ public interface MailService {
     // 이메일 전송
     void sendMail(MimeMessage message);
     // 사용자가 입력한 인증번호와 생성된 인증번호 비교
-    boolean verifyCode(String email, String inputCode);
+    Count verifyCode(String email, String inputCode);
 
 }
