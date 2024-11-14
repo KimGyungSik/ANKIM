@@ -34,7 +34,7 @@ public class CategoryResponse {
                 .parentNo(category.getParent() != null ? category.getParent().getNo() : null)
                 .level(category.getLevel())
                 .name(category.getName())
-                .childCategories(category.getSubCategories().stream()
+                .childCategories(category.getChildCategories().stream()
                         .map(CategoryResponse::of)
                         .collect(Collectors.toList())
                 )

@@ -1,27 +1,22 @@
 package shoppingmall.ankim.domain.category.service;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
-import shoppingmall.ankim.domain.category.entity.CategoryLevel;
 import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
 import shoppingmall.ankim.domain.category.exception.ChildCategoryExistsException;
 import shoppingmall.ankim.domain.category.exception.DuplicateMiddleCategoryNameException;
 import shoppingmall.ankim.domain.category.exception.DuplicateSubCategoryNameException;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 import shoppingmall.ankim.domain.category.service.request.CategoryCreateServiceRequest;
-import shoppingmall.ankim.global.exception.ErrorCode;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import static shoppingmall.ankim.domain.category.entity.CategoryLevel.*;
+import static shoppingmall.ankim.domain.category.entity.CategoryLevel.MIDDLE;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
-import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NOT_FOUND;
 
 @Slf4j
 @Service
@@ -68,7 +63,7 @@ public class CategoryService {
         }else {
             Category parent = category.getParent();
             if (parent != null) {
-                parent.getSubCategories().remove(category);  // 부모의 컬렉션에서 제거
+                parent.getChildCategories().remove(category);  // 부모의 컬렉션에서 제거
             }
         }
 
@@ -84,7 +79,7 @@ public class CategoryService {
 
     private Category createMiddleCategory(CategoryCreateServiceRequest request) {
         Category middleCategory = Category.create(request.getName());
-        addSubCategories(middleCategory, request.getSubCategories());
+        addSubCategories(middleCategory, request.getChildCategories());
         return middleCategory;
     }
 
@@ -94,8 +89,8 @@ public class CategoryService {
     }
 
     private List<CategoryCreateServiceRequest> prepareSubCategoryRequests(CategoryCreateServiceRequest request) {
-        return (request.getSubCategories() != null && !request.getSubCategories().isEmpty())
-                ? request.getSubCategories()
+        return (request.getChildCategories() != null && !request.getChildCategories().isEmpty())
+                ? request.getChildCategories()
                 : List.of(request);
     }
 

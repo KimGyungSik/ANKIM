@@ -11,13 +11,13 @@ import java.util.List;
 public class CategoryCreateServiceRequest {
     private String name;
     private Long parentNo;
-    private List<CategoryCreateServiceRequest> subCategories;
+    private List<CategoryCreateServiceRequest> childCategories;
 
     @Builder
-    private CategoryCreateServiceRequest(String name, Long parentNo, List<CategoryCreateServiceRequest> subCategories) {
+    private CategoryCreateServiceRequest(String name, Long parentNo, List<CategoryCreateServiceRequest> childCategories) {
         this.name = name;
         this.parentNo = parentNo;
-        this.subCategories = subCategories;
+        this.childCategories = childCategories;
     }
 }
 

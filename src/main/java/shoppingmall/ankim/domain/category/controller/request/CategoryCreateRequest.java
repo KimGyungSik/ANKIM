@@ -22,18 +22,18 @@ public class CategoryCreateRequest {
     private Long parentNo;
 
     // 중분류와 소분류를 동시에 추가할 경우 하위 카테고리 목록
-    private List<CategoryCreateRequest> subCategories;
+    private List<CategoryCreateRequest> childCategories = new ArrayList<>();
 
     @Builder
-    private CategoryCreateRequest(String name, Long parentNo, List<CategoryCreateRequest> subCategories) {
+    private CategoryCreateRequest(String name, Long parentNo, List<CategoryCreateRequest> childCategories) {
         this.name = name;
         this.parentNo = parentNo;
-        this.subCategories = subCategories;
+        this.childCategories = childCategories;
     }
 
     public CategoryCreateServiceRequest toServiceRequest() {
-        List<CategoryCreateServiceRequest> subCategoryRequests = (subCategories != null)
-                ? subCategories.stream()
+        List<CategoryCreateServiceRequest> subCategoryRequests = (childCategories != null)
+                ? childCategories.stream()
                 .map(CategoryCreateRequest::toServiceRequest)
                 .collect(Collectors.toList())
                 : new ArrayList<>();
@@ -41,7 +41,7 @@ public class CategoryCreateRequest {
         return CategoryCreateServiceRequest.builder()
                 .name(this.name)
                 .parentNo(this.parentNo)
-                .subCategories(subCategoryRequests)
+                .childCategories(subCategoryRequests)
                 .build();
     }
 }
