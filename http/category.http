@@ -6,7 +6,7 @@ POST http://localhost:8080/category/new
 Content-Type: application/json
 
 {
-  "name": "상의"
+  "name": "test"
 }
 
 ### 기존 중분류에 소분류 추가 (parentNo로 중분류 ID 지정)

@@ -1,12 +1,11 @@
 package shoppingmall.ankim.domain.category.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
+import lombok.AccessLevel;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.category.exception.CategoryNameTooLongException;
-import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.util.ArrayList;
@@ -15,8 +14,8 @@ import java.util.stream.Collectors;
 
 import static jakarta.persistence.CascadeType.ALL;
 import static jakarta.persistence.FetchType.LAZY;
-import static java.util.stream.Collectors.toList;
-import static shoppingmall.ankim.domain.category.entity.CategoryLevel.*;
+import static shoppingmall.ankim.domain.category.entity.CategoryLevel.MIDDLE;
+import static shoppingmall.ankim.domain.category.entity.CategoryLevel.SUB;
 import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NAME_TOO_LONG;
 
 
@@ -53,7 +52,7 @@ public class Category extends BaseEntity {
     private Category parent; // 중분류의 경우 null, 소분류의 경우 상위 중분류 참조
 
     @OneToMany(mappedBy = "parent", cascade = ALL, orphanRemoval = true)
-    private List<Category> subCategories = new ArrayList<>(); // 중분류가 갖는 소분류 목록
+    private List<Category> childCategories = new ArrayList<>(); // 중분류가 갖는 소분류 목록
 
     @Builder
     public Category(String name, List<Category> subCategories) {
@@ -85,15 +84,15 @@ public class Category extends BaseEntity {
     public void addSubCategory(Category subCategory) {
         subCategory.parent = this;
         subCategory.level = SUB;
-        this.subCategories.add(subCategory);
+        this.childCategories.add(subCategory);
     }
 
     // 모든 최하위 카테고리 ID 추출
     public static List<Long> extractLowestCategoryIds(Category category) {
-        if (category.getSubCategories() == null || category.getSubCategories().isEmpty()) {
+        if (category.getChildCategories() == null || category.getChildCategories().isEmpty()) {
             return List.of(category.getNo());
         }
-        return category.getSubCategories()
+        return category.getChildCategories()
                 .stream()
                 .map(Category::extractLowestCategoryIds)
                 .flatMap(List::stream)

@@ -94,6 +94,16 @@ class ProductControllerTest {
                 .andExpect(status().isOk());
     }
 
+    @DisplayName("상품을 등록할 때 상품명은 필수값이다.")
+    @Test
+    void createProductWithoutProductName() {
+        // given
+
+        // when
+
+        // then
+    }
+
     private List<OptionGroupCreateRequest> createOptionGroupRequests() {
         OptionValueCreateRequest colorOption1 = OptionValueCreateRequest.builder()
                 .valueName("Blue")

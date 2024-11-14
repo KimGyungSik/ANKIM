@@ -1,7 +1,6 @@
 package shoppingmall.ankim.domain.category.service;
 
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +10,6 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.controller.request.CategoryCreateRequest;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
-import shoppingmall.ankim.domain.category.entity.CategoryLevel;
 import shoppingmall.ankim.domain.category.exception.ChildCategoryExistsException;
 import shoppingmall.ankim.domain.category.exception.DuplicateMiddleCategoryNameException;
 import shoppingmall.ankim.domain.category.exception.DuplicateSubCategoryNameException;
@@ -20,10 +18,10 @@ import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
 import shoppingmall.ankim.domain.category.service.request.CategoryCreateServiceRequest;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.*;
-import static shoppingmall.ankim.domain.category.entity.CategoryLevel.*;
+import static shoppingmall.ankim.domain.category.entity.CategoryLevel.MIDDLE;
+import static shoppingmall.ankim.domain.category.entity.CategoryLevel.SUB;
 
 @SpringBootTest
 @Transactional
@@ -95,7 +93,7 @@ class CategoryServiceTest {
         Category categoryMiddle = categoryRepository.save(Category.create("상의"));
         CategoryCreateRequest categoryCreateRequest = CategoryCreateRequest.builder()
                 .parentNo(categoryMiddle.getNo())
-                .subCategories(List.of(
+                .childCategories(List.of(
                         createRequest("티셔츠"),
                         createRequest("셔츠"),
                         createRequest("반팔")))
@@ -128,7 +126,7 @@ class CategoryServiceTest {
         // given
         CategoryCreateRequest categoryCreateRequest = CategoryCreateRequest.builder()
                 .name("상의")
-                .subCategories(List.of(
+                .childCategories(List.of(
                         createRequest("티셔츠"),
                         createRequest("셔츠"),
                         createRequest("반팔")))

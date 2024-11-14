@@ -1,8 +1,6 @@
 package shoppingmall.ankim.domain.category.repository.query;
 
 import com.querydsl.core.types.Projections;
-import com.querydsl.core.types.dsl.Expressions;
-import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
@@ -10,12 +8,11 @@ import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.entity.CategoryLevel;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
-import static shoppingmall.ankim.domain.category.entity.QCategory.*;
+import static shoppingmall.ankim.domain.category.entity.QCategory.category;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,7 +24,7 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository{
     public List<CategoryResponse> findAllMiddleCategoriesWithSubCategories() {
         List<Category> categories = queryFactory
                 .selectFrom(category)
-                .leftJoin(category.subCategories).fetchJoin()
+                .leftJoin(category.childCategories).fetchJoin()
                 .where(category.level.eq(CategoryLevel.MIDDLE))
                 .fetch();
 
@@ -90,7 +87,7 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository{
 
     // Category 엔티티를 계층 구조를 유지하며 CategoryResponse로 변환하는 메서드
     private CategoryResponse toCategoryResponseWithSubCategories(Category category) {
-        List<CategoryResponse> childResponses = category.getSubCategories().stream()
+        List<CategoryResponse> childResponses = category.getChildCategories().stream()
                 .map(this::toCategoryResponseWithSubCategories) // 재귀적으로 하위 소분류 매핑
                 .collect(Collectors.toList());
 
