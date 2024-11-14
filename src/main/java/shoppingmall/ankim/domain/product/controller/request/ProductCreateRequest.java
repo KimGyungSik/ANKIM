@@ -70,7 +70,6 @@ public class ProductCreateRequest {
 
     private List<OptionGroupCreateRequest> optionGroups; // 옵션 그룹 리스트
 
-    @NotNull(message = "상품 이미지는 필수 입력 값입니다.")
     private ProductImgeCreateRequest productImages; // 상품 이미지 리스트
 
     private ItemCreateRequest items; // 품목 필수 필드
