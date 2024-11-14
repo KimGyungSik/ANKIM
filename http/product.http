@@ -1,1 +1,63 @@
 ### 상품 등록하기
+POST http://localhost:8080/api/v1/products/new
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="productCreateRequest"
+Content-Type: application/json
+
+{
+  "name": "테스트 상품",
+  "code": "PROD123",
+  "desc": "테스트 상품 설명",
+  "discRate": 10,
+  "sellPrice": 10000,
+  "origPrice": 12000,
+  "optYn": "Y",
+  "restockYn": "N",
+  "qty": 100,
+  "bestYn": "N",
+  "freeShip": "Y",
+  "shipFee": 2500,
+  "searchKeywords": "테스트",
+  "relProdCode": "REL001",
+  "cauProd": "주의사항",
+  "cauOrd": "주문 유의사항",
+  "cauShip": "배송 유의사항",
+  "categoryNo": 1,
+  "optionGroups": [
+    {
+      "groupName": "컬러",
+      "optionValues": [
+        {"valueName": "Blue", "colorCode": "#0000FF"},
+        {"valueName": "Red", "colorCode": "#FF0000"}
+      ]
+    },
+    {
+      "groupName": "사이즈",
+      "optionValues": [
+        {"valueName": "Large"},
+        {"valueName": "Small"}
+      ]
+    }
+  ],
+  "items": {
+    "addPrice": 500,
+    "qty": 10,
+    "safQty": 2,
+    "maxQty": 5,
+    "minQty": 1
+  }
+}
+
+--boundary
+Content-Disposition: form-data; name="thumbnailImages"; filename="화면 캡처 2024-05-24 112646.png"
+Content-Type: image/png
+
+< C:/shop/item/화면 캡처 2024-05-24 112646.png
+--boundary
+Content-Disposition: form-data; name="detailImages"; filename="화면 캡처 2024-05-24 112646.png"
+Content-Type: image/png
+
+< C:/shop/item/화면 캡처 2024-05-24 112646.png
+--boundary--
