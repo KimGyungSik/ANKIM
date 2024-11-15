@@ -5,7 +5,6 @@ import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.AmazonS3Client;
 import com.amazonaws.services.s3.AmazonS3ClientBuilder;
-import com.amazonaws.services.s3.model.CannedAccessControlList;
 import com.amazonaws.services.s3.model.DeleteObjectRequest;
 import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.PutObjectRequest;
@@ -65,17 +64,20 @@ public class S3Service {
         objectMetadata.setContentType(file.getContentType());
 
         try (InputStream inputStream = file.getInputStream()) {
-            s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata)
-                    .withCannedAcl(CannedAccessControlList.PublicRead));
+            s3Client.putObject(new PutObjectRequest(bucket, fileName, inputStream, objectMetadata));
+//                    .withCannedAcl(CannedAccessControlList.PublicRead));
             return s3Client.getUrl(bucket, fileName).toString();
         } catch (IOException e) {
             throw new S3FileUploadException(S3_FILE_UPLOAD_ERROR);
         }
     }
 
+    // 파일 이름 중복방지
     private String createFileName(String fileName) {
         return UUID.randomUUID().toString().concat(getFileExtension(fileName));
     }
+
+    // 파일 유효성 검사
 
     private String getFileExtension(String fileName) {
         if (fileName == null || fileName.isEmpty()) {
@@ -89,6 +91,7 @@ public class S3Service {
         return fileExtension;
     }
 
+    // 파일 삭제
     public void deleteFile(String fileName) {
         try {
             DeleteObjectRequest deleteObjectRequest = new DeleteObjectRequest(bucket, fileName);
