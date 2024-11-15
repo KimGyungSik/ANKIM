@@ -20,6 +20,11 @@ public enum ErrorCode {
     DETAIL_IMAGE_REQUIRED(HttpStatus.BAD_REQUEST, "상세 이미지는 최소 1개가 필요합니다."),
     IMAGE_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지는 최대 6장까지 업로드할 수 있습니다."),
 
+    // S3 파일 처리
+    S3_FILE_UPLOAD_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3에 파일 업로드 중 오류가 발생했습니다."),
+    S3_FILE_DELETION_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "S3에서 파일 삭제 중 오류가 발생했습니다."),
+    S3_INVALID_FILE_FORMAT(HttpStatus.BAD_REQUEST, "유효하지 않은 파일 형식입니다. S3로 업로드할 수 없습니다."),
+
     // 옵션
     DUPLICATE_OPTION_VALUE(HttpStatus.BAD_REQUEST, "옵션 값이 중복되었습니다"),
     DUPLICATE_OPTION_GROUP(HttpStatus.BAD_REQUEST, "옵션 항목이 중복되었습니다"),

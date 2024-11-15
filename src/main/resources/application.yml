@@ -32,3 +32,16 @@ itemImgLocation: C:/shop/item
 
   # 리소스 업로드 경로
 uploadPath: file:///C:/shop/
+
+# S3 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+    stack:
+      auto: false
