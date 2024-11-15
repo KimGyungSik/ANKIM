@@ -2,10 +2,7 @@ package shoppingmall.ankim.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.GenericGenerator;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.terms.entity.Terms;
-import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.audit.Authority;
 import shoppingmall.ankim.global.audit.BaseEntity;
@@ -36,7 +33,7 @@ public class Member extends BaseEntity {
     private UUID uuid;
 
     @Column(nullable = false, length = 50, unique = true)
-    private String id; // 아이디(이메일)
+    private String loginId; // 아이디(이메일)
 
     @Column(nullable = false, length = 200)
     private String pwd; // 비밀번호
@@ -74,14 +71,14 @@ public class Member extends BaseEntity {
 //    Authority authority;
 
     @Builder
-    public Member(UUID uuid, String id, String pwd, String name,
+    public Member(UUID uuid, String loginId, String pwd, String name,
                   String phoneNum, LocalDate birth, String gender,
                   LocalDateTime joinDate, Integer grade,
                   MemberStatus status, Authority authority,
                   List<Terms> termsList
     ) {
         this.uuid = uuid;
-        this.id = id;
+        this.loginId = loginId;
         this.pwd = pwd;
         this.name = name;
         this.phoneNum = phoneNum;

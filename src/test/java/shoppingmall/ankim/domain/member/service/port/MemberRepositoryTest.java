@@ -6,10 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Commit;
-import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -33,10 +30,10 @@ class MemberRepositoryTest {
 
     @Test
     @DisplayName("이메일 중복 검증 테스트_중복 이메일이 없는 경우")
-    void notExistsByIdTest() {
+    void notExistsByLoginIdTest() {
         // given
         Member member = Member.builder()
-                .id("user123@ankim.com")
+                .loginId("user123@ankim.com")
                 .pwd("password")
 //                .uuid(UUID.randomUUID())
                 .name("user1")
@@ -56,7 +53,7 @@ class MemberRepositoryTest {
         String email = "test@ankim.com";
 
         // when
-        Boolean isExist = memberRepository.existsById(email);
+        Boolean isExist = memberRepository.existsByLoginId(email);
 
         // then
         Assertions.assertThat(isExist).isFalse();
@@ -64,10 +61,10 @@ class MemberRepositoryTest {
 
     @Test
     @DisplayName("이메일 중복 검증 테스트_중복 이메일이 있는 경우")
-    void existsByIdTest() {
+    void existsByLoginIdTest() {
         // given
         Member member = Member.builder()
-                .id("user123@ankim.com")
+                .loginId("user123@ankim.com")
                 .pwd("password")
 //                .uuid(UUID.randomUUID())
                 .name("user1")
@@ -86,7 +83,7 @@ class MemberRepositoryTest {
         String email = "user123@ankim.com";
 
         // when
-        Boolean isExist = memberRepository.existsById(email);
+        Boolean isExist = memberRepository.existsByLoginId(email);
 
         // then
         Assertions.assertThat(isExist).isTrue();
@@ -97,7 +94,7 @@ class MemberRepositoryTest {
     void saveAndFindMember() {
         // given
         Member member = Member.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -110,11 +107,11 @@ class MemberRepositoryTest {
 
         // when
         memberRepository.save(member);
-        Member savedMember = memberRepository.findByEmail(member.getId());
+        Member savedMember = memberRepository.findByLoginId(member.getLoginId());
 
         // then
         assertThat(savedMember).isNotNull();
-        assertThat(savedMember.getId()).isEqualTo("test@example.com");
+        assertThat(savedMember.getLoginId()).isEqualTo("test@example.com");
         assertThat(savedMember.getName()).isEqualTo("홍길동");
         assertThat(savedMember.getPhoneNum()).isEqualTo("010-1234-5678");
     }

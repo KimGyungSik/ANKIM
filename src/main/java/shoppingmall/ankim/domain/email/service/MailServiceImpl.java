@@ -56,15 +56,15 @@ public class MailServiceImpl implements MailService {
 
     // 이메일 메시지 생성
     @Override
-    public MimeMessage createMail(String email, String code) {
+    public MimeMessage createMail(String loginId, String code) {
         MimeMessage message = javaMailSender.createMimeMessage();
         try {
             MimeMessageHelper helper = new MimeMessageHelper(message, "UTF-8");
             helper.setFrom(new InternetAddress(fromAddress, "Ankim Admin")); // 보내는 사람
-            helper.setTo(email); // 받는 사람
+            helper.setTo(loginId); // 받는 사람
             helper.setSubject("Ankim 이메일 인증");
-            verificationCodes.put(email, code); // 생성된 인증번호 저장
-            failCounts.put(email, 0); // 실패 횟수 초기화
+            verificationCodes.put(loginId, code); // 생성된 인증번호 저장
+            failCounts.put(loginId, 0); // 실패 횟수 초기화
             helper.setText("<h1>인증번호: " + code + "</h1>", true); // HTML 형식 메시지
         } catch (MessagingException | UnsupportedEncodingException e) {
             throw new MailSendException(MAIL_SEND_FAIL);
@@ -80,20 +80,20 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public Count verifyCode(String email, String inputCode) {
-        String storedCode = verificationCodes.get(email);
+    public Count verifyCode(String loginId, String inputCode) {
+        String storedCode = verificationCodes.get(loginId);
 
         // 실패 횟수 초과 처리
-        if (failCounts.getOrDefault(email, 0) >= 3) {
+        if (failCounts.getOrDefault(loginId, 0) >= 3) {
             return Count.RETRY; // 실패 횟수 3회 초과 시 "RETRY" 반환
         }
 
         if (storedCode != null && storedCode.equals(inputCode)) {
-            failCounts.remove(email); // 성공 시 실패 횟수 초기화
+            failCounts.remove(loginId); // 성공 시 실패 횟수 초기화
             return Count.SUCCESS;
         }
 
-        failCounts.put(email, failCounts.getOrDefault(email, 0) + 1);
+        failCounts.put(loginId, failCounts.getOrDefault(loginId, 0) + 1);
         return Count.FAIL;
     }
 

@@ -11,13 +11,12 @@ import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.terms.entity.Terms;
-import shoppingmall.ankim.domain.terms.service.TermsService;
 import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.List;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.EMAIL_DUPLICATE;
+import static shoppingmall.ankim.global.exception.ErrorCode.LOGINID_DUPLICATE;
 
 @Slf4j
 @Service
@@ -33,9 +32,9 @@ public class MemberServiceImpl implements MemberService {
     private String verifiedEmailId; // 인증된 이메일 ID 저장
 
     // 이메일 중복 검증
-    public void emailCheck(String id) {
-        if (memberRepository.existsById(id)) {
-            throw new MemberRegistrationException(EMAIL_DUPLICATE);
+    public void loginIdCheck(String loginId) {
+        if (memberRepository.existsByLoginId(loginId)) {
+            throw new MemberRegistrationException(LOGINID_DUPLICATE);
         }
     }
 

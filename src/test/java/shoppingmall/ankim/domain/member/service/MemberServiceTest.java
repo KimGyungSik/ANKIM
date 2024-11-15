@@ -43,7 +43,7 @@ class MemberServiceTest {
     void registerMemberTest() {
         // given
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -56,7 +56,7 @@ class MemberServiceTest {
         memberService.registerMember(request, termsAgreements);
 
         // then
-        Member savedMember = memberRepository.findByEmail(request.getId());
+        Member savedMember = memberRepository.findByLoginId(request.getLoginId());
 
         assertThat(savedMember).isNotNull();
         assertThat(savedMember.getName()).isEqualTo("홍길동");
@@ -174,7 +174,7 @@ class MemberServiceTest {
 
         // 회원 정보
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")

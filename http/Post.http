@@ -38,7 +38,7 @@ Content-Type: application/json
 }
 
 ### 이메일 인증번호 발송
-POST http://localhost:8080/api/mail/send?id=gnstm831@gmail.com
+POST http://localhost:8080/api/mail/send?loginId=gnstm831@gmail.com
 Content-Type: application/json
 
 {
@@ -46,5 +46,5 @@ Content-Type: application/json
 }
 
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
-POST http://localhost:8080/api/member/email-next?id=test@example.com
+POST http://localhost:8080/api/member/email-next?loginId=test@example.com
 Content-Type: application/json

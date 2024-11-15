@@ -118,7 +118,7 @@ class MailServiceTest {
         MailRequest mailRequest = new MailRequest(email, code);
 
         // when
-        Count isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
+        Count isValid = mailService.verifyCode(mailRequest.getLoginId(), mailRequest.getVerificationCode());
 
         // then
         assertThat(isValid).isEqualTo(Count.SUCCESS);
@@ -141,7 +141,7 @@ class MailServiceTest {
         Set<ConstraintViolation<MailRequest>> violations = validator.validate(mailRequest);
 
         // when
-        Count isValid = mailService.verifyCode(mailRequest.getEmail(), mailRequest.getVerificationCode());
+        Count isValid = mailService.verifyCode(mailRequest.getLoginId(), mailRequest.getVerificationCode());
 
         // then
         assertThat(violations).isNotEmpty(); // 유효성 검사 오류가 있는지 확인

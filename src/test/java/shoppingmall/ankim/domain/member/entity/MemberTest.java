@@ -54,7 +54,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id(invalidId)
+                .loginId(invalidId)
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -77,7 +77,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id(nullId)
+                .loginId(nullId)
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -100,7 +100,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd(invalidPwd)
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -123,7 +123,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd(nullPwd)
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -146,7 +146,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name(invalidName)
                 .phoneNum("010-1234-5678")
@@ -169,7 +169,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name(nullName)
                 .phoneNum("010-1234-5678")
@@ -192,7 +192,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum(invalidPhoneNum) // 길이가 21인 문자열
@@ -215,7 +215,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum(nullPhoneNum)
@@ -238,7 +238,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -261,7 +261,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -284,7 +284,7 @@ class MemberTest {
         // when
         Member member = Member.builder()
 //                .uuid(UUID.randomUUID())
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("validPwd123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")

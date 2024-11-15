@@ -24,28 +24,28 @@ class MemberServiceMockTest {
 
     @Test
     @DisplayName("중복된 이메일로 검증 시 예외가 발생한다.")
-    void emailCheckDuplicateEmailTest() {
+    void emailCheckDuplicateLoginIdTest() {
         // given
         String duplicateEmail = "test@ankim.com";
 
         // when : 중복 이메일이 존재한다고 가정
-        when(mockMemberRepository.existsById(duplicateEmail)).thenReturn(true);
+        when(mockMemberRepository.existsByLoginId(duplicateEmail)).thenReturn(true);
 
         // then
-        assertThrows(MemberRegistrationException.class, () -> memberService.emailCheck(duplicateEmail));
+        assertThrows(MemberRegistrationException.class, () -> memberService.loginIdCheck(duplicateEmail));
     }
 
     @Test
     @DisplayName("중복되지 않은 이메일로 검증 시 예외가 발생하지 않는다.")
-    void emailCheckUniqueEmailTest() {
+    void emailCheckUniqueLoginIdTest() {
         // given
         String uniqueEmail = "unique@example.com";
 
         // when
-        when(mockMemberRepository.existsById(uniqueEmail)).thenReturn(false);
+        when(mockMemberRepository.existsByLoginId(uniqueEmail)).thenReturn(false);
 
         // then
-        memberService.emailCheck(uniqueEmail); // 예외가 발생하지 않으면 성공
+        memberService.loginIdCheck(uniqueEmail); // 예외가 발생하지 않으면 성공
     }
 
 }

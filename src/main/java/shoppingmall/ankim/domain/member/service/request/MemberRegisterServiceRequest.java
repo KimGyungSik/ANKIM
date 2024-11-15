@@ -1,15 +1,11 @@
 package shoppingmall.ankim.domain.member.service.request;
 
-import jakarta.persistence.PrePersist;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.springframework.beans.factory.annotation.Value;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.terms.entity.Terms;
-import shoppingmall.ankim.domain.termsHistory.service.request.TermsHistoryCreateServiceRequest;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,7 +15,7 @@ import java.util.List;
 @NoArgsConstructor
 public class MemberRegisterServiceRequest {
 
-    private String id; // 아이디(이메일)
+    private String loginId; // 아이디(이메일)
     private String pwd; // 비밀번호
     private String name; // 이름
     private String phoneNum; // 휴대전화번호
@@ -29,8 +25,8 @@ public class MemberRegisterServiceRequest {
     private List<Terms> terms;
 
     @Builder
-    public MemberRegisterServiceRequest(String id, String pwd, String name, String phoneNum, LocalDate birth, String gender,Integer grade, List<Terms> terms) {
-        this.id = id;
+    public MemberRegisterServiceRequest(String loginId, String pwd, String name, String phoneNum, LocalDate birth, String gender, Integer grade, List<Terms> terms) {
+        this.loginId = loginId;
         this.pwd = pwd;
         this.name = name;
         this.phoneNum = phoneNum;
@@ -44,7 +40,7 @@ public class MemberRegisterServiceRequest {
     public Member create(String encodePwd, List<Terms> terms) {
         return Member.builder()
 //                .uuid() // uuid 생성 로직 작성 후 값 넣기
-                .id(this.id)
+                .loginId(this.loginId)
                 .pwd(encodePwd)
                 .name(this.name)
                 .phoneNum(this.phoneNum)

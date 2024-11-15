@@ -62,7 +62,7 @@ public class MemberRegisterRequest {
     // Service단 Reqeust로 변경
     public MemberRegisterServiceRequest toServiceRequest() {
         return MemberRegisterServiceRequest.builder()
-                .id(this.id)
+                .loginId(this.id)
                 .pwd(this.pwd)
                 .name(this.name)
                 .phoneNum(this.phoneNum)

@@ -18,8 +18,8 @@ public class Admin extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // 자동 증가 ID
 
-    @Column(name = "id", nullable = false, unique = true, length = 20)
-    private String id; // 관리자 ID
+    @Column(name = "loginId", nullable = false, unique = true, length = 20)
+    private String loginId; // 관리자 ID
 
     @Column(name = "pwd", nullable = false, length = 200)
     private String pwd; // 비밀번호 (암호화)
@@ -51,4 +51,5 @@ public class Admin extends BaseEntity {
 
     @Column(name = "mod_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDate modDate; // 수정 날짜
+
 }

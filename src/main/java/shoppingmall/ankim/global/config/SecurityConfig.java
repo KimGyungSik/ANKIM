@@ -7,7 +7,6 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 @Configuration
 @EnableWebSecurity // 모든 요청 URL이 스프링 시큐리티 제어 받게 만듦
@@ -34,11 +33,11 @@ public class SecurityConfig {
         http
                 .httpBasic((auth) -> auth.disable());
 
-
         // 경로별 인가 설정
         http
                 .authorizeHttpRequests((authorize) -> authorize
                         .requestMatchers("/admin/**").hasAuthority("ADMIN") // 관리자 접근 경로에 관리자 권한 필요
+                        .requestMatchers("/my/**").hasAnyAuthority("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
                         .anyRequest().permitAll()); // 나머지 요청은 접근 허용
 
         // 세션 설정

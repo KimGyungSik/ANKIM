@@ -44,7 +44,7 @@
             })
                 .then(response => {
                     if (response.ok) {
-                        window.location.href = "/emailVerification";
+                        window.location.href = "/api/mail/emailVerification";
                     } else {
                         alert("약관 동의 전송 중 오류가 발생했습니다.");
                     }

@@ -11,15 +11,15 @@ import lombok.Setter;
 @NoArgsConstructor
 public class MailRequest {
 
-    private String email; // 받는사람
+    private String loginId; // 받는사람
 
     @NotBlank(message = "올바른 인증번호를 입력해주세요.")
     @Pattern(regexp = "^[a-zA-Z0-9]{6}$", message = "올바른 인증번호를 입력해주세요.")
     private String verificationCode; // 인증번호
 
     @Builder
-    public MailRequest(String email, String verificationCode) {
-        this.email = email;
+    public MailRequest(String loginId, String verificationCode) {
+        this.loginId = loginId;
         this.verificationCode = verificationCode;
     }
 }

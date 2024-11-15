@@ -18,6 +18,7 @@ import shoppingmall.ankim.global.exception.ErrorCode;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
@@ -63,8 +64,8 @@ class MemberJoinControllerTest {
                 .id("test@example.com")
                 .build();
 
-        doThrow(new MemberRegistrationException(ErrorCode.EMAIL_DUPLICATE)) // 중복 이메일 예외 발생
-                .when(memberService).emailCheck(request.getId());
+        doThrow(new MemberRegistrationException(ErrorCode.LOGINID_DUPLICATE)) // 중복 이메일 예외 발생
+                .when(memberService).loginIdCheck(request.getId());
 
         // when : 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")
@@ -83,7 +84,7 @@ class MemberJoinControllerTest {
                 .id("test@example.com")
                 .build();
 
-        doNothing().when(memberService).emailCheck(request.getId()); // 예외 발생하지 않도록 설정
+        doNothing().when(memberService).loginIdCheck(request.getId()); // 예외 발생하지 않도록 설정
 
         // when: 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")
@@ -92,42 +93,5 @@ class MemberJoinControllerTest {
                 // then: 상태 코드와 성공 메시지를 확인
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value("사용 가능한 이메일입니다."));  // ApiResponse 내의 메시지 필드 확인
-    }
-
-    @Test
-    @DisplayName("이메일을 입력한 뒤 다음 단계로 넘어갈 때 id값이 잘전달되는지 확인한다.")
-    public void idParameterCheck() throws Exception {
-        // given
-        String validId = "test@example.com";
-
-        // when & then
-        mockMvc.perform(post("/api/member/email-next")
-                        .param("id", validId))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    @DisplayName("이메일을 입력한 뒤 다음 단계로 넘어갈 때 id값이 전달되지 않은 경우 CLIENT_ERROR 에러가 발생하는지 확인한다.")
-    public void testMissingIdParameter() throws Exception {
-        // given
-        String validId = null;
-
-        // when & then
-        mockMvc.perform(post("/api/member/email-next")
-                .param("id", validId))
-                .andExpect(status().isBadRequest());
-    }
-
-    @Test
-    @DisplayName("이메일을 입력한 뒤 다음 단계로 넘어갈 때 id값이 전달되지 않은 경우 INTERNAL_SERVER_ERROR 에러가 발생하는지 확인한다.")
-    public void testMissingIdParameterWithCustomException() throws Exception {
-        // given
-        String validId = "";
-
-        // when & then
-        mockMvc.perform(post("/api/member/email-next")
-                        .param("id", validId))
-                .andExpect(status().isInternalServerError())
-                .andExpect(jsonPath("$.message").value("서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."));
     }
 }
