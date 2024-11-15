@@ -22,7 +22,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-
 class ProductImgServiceS3IntegrationTest {
 
     @Autowired
