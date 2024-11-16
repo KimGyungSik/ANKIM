@@ -4,18 +4,29 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
+import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.controller.request.CategoryCreateRequest;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
+import shoppingmall.ankim.domain.category.exception.CategoryLinkedWithProductException;
 import shoppingmall.ankim.domain.category.exception.ChildCategoryExistsException;
 import shoppingmall.ankim.domain.category.exception.DuplicateMiddleCategoryNameException;
 import shoppingmall.ankim.domain.category.exception.DuplicateSubCategoryNameException;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
 import shoppingmall.ankim.domain.category.service.request.CategoryCreateServiceRequest;
+import shoppingmall.ankim.domain.image.service.ProductImgService;
+import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.global.config.S3Config;
 
 import java.util.List;
 
@@ -25,8 +36,14 @@ import static shoppingmall.ankim.domain.category.entity.CategoryLevel.SUB;
 
 @SpringBootTest
 @Transactional
-@TestPropertySource(properties = "spring.sql.init.mode=never")
+@TestPropertySource(properties = {
+        "spring.sql.init.mode=never",
+        "spring.profiles.active=test" // "test" 프로파일 활성화
+})
 class CategoryServiceTest {
+
+    @MockBean
+    private S3Service s3Service;
 
     @Autowired
     CategoryService categoryService;
@@ -36,6 +53,9 @@ class CategoryServiceTest {
 
     @Autowired
     CategoryRepository categoryRepository;
+
+    @Autowired
+    ProductRepository productRepository;
 
     @Autowired
     EntityManager em;
@@ -152,7 +172,32 @@ class CategoryServiceTest {
                 );
     }
 
-    @DisplayName("소분류를 선택해서 삭제할 수 있다")
+    @DisplayName("삭제하고 싶은 카테고리에 상품이 존재할 경우 예외가 발생한다.")
+    @Test
+    void deleteCategoryLinkedWithProductException() {
+        // given
+        Category sub1 = Category.create("티셔츠");
+        Category sub2 = Category.create("셔츠");
+        Category sub3 = Category.create("반팔");
+        Category middle = Category.builder()
+                .name("상의")
+                .subCategories(List.of(sub1, sub2, sub3))
+                .build();
+        Category middleCategory = categoryRepository.save(middle);
+
+        Product product = productRepository.save(Product.builder()
+                .name("테스트 상품")
+                .category(middleCategory)
+                .build());
+
+
+        // when // then
+        assertThatThrownBy(() -> categoryService.deleteCategory(middleCategory.getNo()))
+                .isInstanceOf(CategoryLinkedWithProductException.class)
+                .hasMessage("해당 카테고리에 속한 상품이 존재하므로 삭제할 수 없습니다.");
+    }
+
+    @DisplayName("삭제하고 싶은 소분류에 상품이 없다면 소분류를 선택해서 삭제할 수 있다")
     @Test
     void deleteCategory() {
         // given
@@ -181,7 +226,7 @@ class CategoryServiceTest {
                 );
     }
 
-    @DisplayName("중분류를 선택해서 소분류가 없다면 삭제할 수 있다")
+    @DisplayName("삭제하고 싶은 중분류에 상품이 없고 소분류가 없다면 선택한 중분류를 삭제할 수 있다")
     @Test
     void deleteCategory2() {
         // given
@@ -195,7 +240,7 @@ class CategoryServiceTest {
         assertThat(categoryQueryService.retrieveMiddleCategories()).hasSize(0);
     }
 
-    @DisplayName("중분류를 삭제하려고 할 때 소분류가 존재하면 예외가 발생한다 ")
+    @DisplayName("중분류를 삭제하려고 할 때 소분류가 존재하면 예외가 발생한다.")
     @Test
     void deleteCategory3() {
         // given

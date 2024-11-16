@@ -41,7 +41,7 @@ public class Product {
 
     // 상품 : 카테고리 = N : 1
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "category_no", nullable = true)
+    @JoinColumn(name = "category_no")
     private Category category;
 
     // 이미지 리스트 필드 추가

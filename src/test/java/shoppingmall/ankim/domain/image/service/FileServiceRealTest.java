@@ -6,6 +6,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import shoppingmall.ankim.global.config.uuid.UuidHolder;
 
 import java.io.File;
@@ -14,9 +16,13 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
-
+@ActiveProfiles("test")
 @SpringBootTest
 class FileServiceRealTest {
+
+    @MockBean
+    S3Service s3Service;
+
     @Autowired
     FileService fileService;
 

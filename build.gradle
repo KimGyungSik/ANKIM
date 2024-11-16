@@ -66,6 +66,11 @@ tasks.named('test') {
     useJUnitPlatform()
 }
 
+tasks.withType(JavaCompile) {
+    options.compilerArgs << "-parameters"
+}
+
+
 ext { // 전역 변수
     snippetsDir = file('build/generated-snippets')
 }

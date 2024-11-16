@@ -6,7 +6,9 @@ import org.mockito.Mock;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.*;
 
 @SpringBootTest
 @Transactional
+@ActiveProfiles("test")
 class ProductImgServiceTest {
 
     @Autowired
@@ -45,6 +48,9 @@ class ProductImgServiceTest {
 
     @MockBean
     private FileService fileService;
+
+    @MockBean
+    private S3Service s3Service;
 
     @Mock
     private MultipartFile thumbnailImage;

@@ -4,10 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.util.List;
@@ -16,11 +19,12 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.*;
 import static shoppingmall.ankim.domain.category.entity.CategoryLevel.*;
 
-
 @DataJpaTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 class CategoryRepositoryTest {
+    @MockBean
+    private S3Service s3Service;
 
     @Autowired
     CategoryRepository categoryRepository;
