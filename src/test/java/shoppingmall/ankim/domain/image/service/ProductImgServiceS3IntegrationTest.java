@@ -23,7 +23,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
-@Profile("test")
 class ProductImgServiceS3IntegrationTest {
 
     @Autowired

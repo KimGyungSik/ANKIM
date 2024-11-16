@@ -98,6 +98,15 @@ public class Category extends BaseEntity {
                 .flatMap(List::stream)
                 .collect(Collectors.toList());
     }
+
+    public void updateName(String newName) {
+        validateName(newName); // 이름 유효성 검사
+        this.name = newName;
+    }
+
+    public void changeParentCategory(Category newParentCategory) {
+        this.parent = newParentCategory;
+    }
 }
 
 

@@ -8,6 +8,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.category.controller.request.CategoryCreateRequest;
+import shoppingmall.ankim.domain.category.controller.request.CategoryUpdateRequest;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.service.CategoryService;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
@@ -35,6 +36,15 @@ public class CategoryController {
     public ApiResponse<Void> deleteCategory(@PathVariable Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ApiResponse.ok();
+    }
+
+    // 카테고리 수정
+    @PutMapping("/{categoryId}")
+    public ResponseEntity<Void> updateCategory(
+            @PathVariable Long categoryId,
+            @RequestBody @Valid CategoryUpdateRequest request) {
+        categoryService.updateCategory(categoryId, request.toServiceRequest());
+        return ResponseEntity.ok().build();
     }
 
     // 모든 중분류와 그 하위 소분류 조회
