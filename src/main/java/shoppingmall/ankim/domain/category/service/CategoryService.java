@@ -6,12 +6,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
-import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
-import shoppingmall.ankim.domain.category.exception.ChildCategoryExistsException;
-import shoppingmall.ankim.domain.category.exception.DuplicateMiddleCategoryNameException;
-import shoppingmall.ankim.domain.category.exception.DuplicateSubCategoryNameException;
+import shoppingmall.ankim.domain.category.exception.*;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 import shoppingmall.ankim.domain.category.service.request.CategoryCreateServiceRequest;
+import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.util.List;
 
@@ -24,6 +22,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class CategoryService {
     private final CategoryRepository categoryRepository;
+    private final ProductRepository productRepository;
 
     // 중분류와 소분류를 동시에 추가하거나, 중분류만 추가하거나, 소분류만 추가
     // 단, 중복된 이름의 카테고리, 소분류가 중분류의 이름으로 등록 금지
@@ -48,12 +47,20 @@ public class CategoryService {
     }
 
     // 소분류, 중분류 삭제
-    // 단, 중분류 삭제 시 소분류가 존재할 경우 삭제 못함
+    // 조건 1. 삭제하고 싶은 카테고리가 어떤 상품에 속해져 있으면 삭제할 수 없음
+    // 조건 2. 중분류 삭제 시 소분류가 존재할 경우 삭제 못함
     public void deleteCategory(Long categoryId) {
         // 카테고리를 조회
         Category category = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
         log.info(String.valueOf(category.getNo()));
+
+        // 삭제하고 싶은 카테고리에 상품이 속해져 있는지 확인
+        // 카테고리에 속한 상품이 있을 경우 예외
+        if(productRepository.existsByCategory(category)) {
+            throw new CategoryLinkedWithProductException(CATEGORY_LINKED_WITH_PRODUCT);
+        }
+
 
         if (category.getLevel() == MIDDLE) {
             // 중분류인 경우: 소분류가 존재하는지 확인
@@ -71,6 +78,9 @@ public class CategoryService {
         categoryRepository.deleteById(categoryId);
         log.info("delete 완료");
     }
+
+    // 카테고리 수정
+    // 카테고리 수정 -> 해당 카테고리에 속해져 있는 상품의 카테고리는 자동 변경
 
 
     private boolean isMiddleCategoryRequest(CategoryCreateServiceRequest request) {

@@ -10,6 +10,7 @@ import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDoc
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
 import org.springframework.test.context.TestPropertySource;
@@ -30,9 +31,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@AutoConfigureMockMvc
-@AutoConfigureRestDocs
-@ExtendWith(RestDocumentationExtension.class)
+
 @WebMvcTest(controllers = CategoryController.class)
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @ImportAutoConfiguration(exclude =  {QuerydslConfig.class, JpaAuditingConfig.class})

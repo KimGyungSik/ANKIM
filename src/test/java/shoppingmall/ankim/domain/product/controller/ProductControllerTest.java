@@ -6,10 +6,12 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import shoppingmall.ankim.domain.image.dto.ProductImgeCreateRequest;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 import shoppingmall.ankim.domain.item.dto.ItemCreateRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
@@ -32,9 +34,12 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-
 @WebMvcTest(controllers = ProductController.class)
 class ProductControllerTest {
+
+    @MockBean
+    private S3Service s3Service;
+
     @Autowired
     private MockMvc mockMvc;
 

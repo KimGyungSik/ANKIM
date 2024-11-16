@@ -33,7 +33,7 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
         return new CategoryController(categoryService,categoryQueryService);
     }
 
-    @DisplayName("새로운 카테고리를 등록한다")
+    @DisplayName("새로운 카테고리(중분류, 소분류)를 등록한다")
     @Test
     void createCategory() throws Exception {
         // given

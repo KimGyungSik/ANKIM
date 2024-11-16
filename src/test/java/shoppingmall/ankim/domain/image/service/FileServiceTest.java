@@ -7,6 +7,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.util.FileSystemUtils;
 import shoppingmall.ankim.domain.image.exception.FileNotFoundException;
 import shoppingmall.ankim.global.config.uuid.UuidHolder;
@@ -21,7 +23,11 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 
 @SpringBootTest
+@ActiveProfiles("test")
 class FileServiceTest {
+    @MockBean
+    S3Service s3Service;
+
     @Autowired
     FileService fileService;
 
