@@ -8,7 +8,9 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.dto.OptionValueCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
@@ -20,7 +22,9 @@ import shoppingmall.ankim.domain.option.exception.OptionGroupNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionValueUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
@@ -31,10 +35,13 @@ import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-@Profile("test")
+@ActiveProfiles("test")
 @SpringBootTest
 @Transactional
 class OptionGroupServiceTest {
+
+    @MockBean
+    S3Service s3Service;
 
     @Autowired
     OptionGroupService optionGroupService;
@@ -238,10 +245,167 @@ class OptionGroupServiceTest {
                 .hasMessageContaining("옵션 항목이 중복되었습니다"); // 예외 메시지 확인
     }
 
+    @Test
+    @DisplayName("옵션 그룹 이름과 옵션 값이 함께 수정된다")
+    void updateOptionGroupsNameAndValues() {
+        // given
+        Product product = productRepository.save(createProduct());
+        OptionGroup optionGroup = OptionGroup.create("색상", product);
+        OptionValue optionValue = OptionValue.create(optionGroup, "Red", "#FF0000");
+        optionGroup.addOptionValue(optionValue);
+        product.addOptionGroup(optionGroup);
+        optionGroupRepository.save(optionGroup);
+
+        // 수정 요청
+        OptionValueUpdateServiceRequest updatedValueRequest = OptionValueUpdateServiceRequest.builder()
+                .valueId(optionValue.getNo())
+                .valueName("Blue")
+                .colorCode("#0000FF")
+                .build();
+
+        OptionGroupUpdateServiceRequest updateRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupId(optionGroup.getNo())
+                .groupName("컬러")
+                .optionValues(List.of(updatedValueRequest))
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(updateRequest));
+
+        // then
+        OptionGroup updatedGroup = optionGroupRepository.findById(optionGroup.getNo()).orElseThrow();
+        assertThat(updatedGroup.getName()).isEqualTo("컬러");
+        OptionValue updatedValue = updatedGroup.getOptionValues().get(0);
+        assertThat(updatedValue.getName()).isEqualTo("Blue");
+        assertThat(updatedValue.getColorCode()).isEqualTo("#0000FF");
+    }
+
+    @Test
+    @DisplayName("옵션 그룹 이름만 수정된다")
+    void updateOptionGroupNameOnly() {
+        // given
+        Product product = productRepository.save(createProduct());
+        OptionGroup optionGroup = OptionGroup.create("색상", product);
+        product.addOptionGroup(optionGroup);
+        optionGroupRepository.save(optionGroup);
+
+        OptionGroupUpdateServiceRequest updateRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupId(optionGroup.getNo())
+                .groupName("컬러")
+                .optionValues(List.of()) // 옵션 값은 변경 없음
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(updateRequest));
+
+        // then
+        OptionGroup updatedGroup = optionGroupRepository.findById(optionGroup.getNo()).orElseThrow();
+        assertThat(updatedGroup.getName()).isEqualTo("컬러");
+        assertThat(updatedGroup.getOptionValues()).isEmpty();
+    }
+
+    @Test
+    @DisplayName("옵션 값만 수정된다")
+    void updateOptionValuesOnly() {
+        // given
+        Product product = productRepository.save(createProduct());
+        OptionGroup optionGroup = OptionGroup.create("색상", product);
+        OptionValue optionValue = OptionValue.create(optionGroup, "Red", "#FF0000");
+        optionGroup.addOptionValue(optionValue);
+        product.addOptionGroup(optionGroup);
+        optionGroupRepository.save(optionGroup);
+
+        OptionValueUpdateServiceRequest updatedValueRequest = OptionValueUpdateServiceRequest.builder()
+                .valueId(optionValue.getNo())
+                .valueName("Blue")
+                .colorCode("#0000FF")
+                .build();
+
+        OptionGroupUpdateServiceRequest updateRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupId(optionGroup.getNo())
+                .groupName(null) // 그룹 이름은 변경 없음
+                .optionValues(List.of(updatedValueRequest))
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(updateRequest));
+
+        // then
+        OptionValue updatedValue = optionValueRepository.findById(optionValue.getNo()).orElseThrow();
+        assertThat(updatedValue.getName()).isEqualTo("Blue");
+        assertThat(updatedValue.getColorCode()).isEqualTo("#0000FF");
+    }
+
+    @Test
+    @DisplayName("새로운 옵션 그룹과 옵션 값이 추가된다")
+    void addNewOptionGroupAndValues() {
+        // given
+        Product product = productRepository.save(createProduct());
+
+        OptionValueUpdateServiceRequest newValueRequest = OptionValueUpdateServiceRequest.builder()
+                .valueName("Green")
+                .colorCode("#00FF00")
+                .build();
+
+        OptionGroupUpdateServiceRequest newGroupRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupName("새 옵션 그룹")
+                .optionValues(List.of(newValueRequest))
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(newGroupRequest));
+
+        // then
+        OptionGroup newGroup = optionGroupRepository.findAll().get(0);
+        assertThat(newGroup.getName()).isEqualTo("새 옵션 그룹");
+        assertThat(newGroup.getOptionValues()).hasSize(1);
+        OptionValue newValue = newGroup.getOptionValues().get(0);
+        assertThat(newValue.getName()).isEqualTo("Green");
+        assertThat(newValue.getColorCode()).isEqualTo("#00FF00");
+    }
+
+    @Test
+    @DisplayName("요청 데이터에 없는 옵션 그룹 및 옵션 값은 삭제된다.")
+    void deleteOptionGroupAndValuesIfNotInRequest() {
+        // given
+        Product product = productRepository.save(createProduct());
+
+        // 기존 옵션 그룹과 옵션 값 설정
+        OptionGroup existingGroup = OptionGroup.create("기존 그룹", product);
+        OptionValue existingValue = OptionValue.create(existingGroup, "기존 옵션 값", null);
+        existingGroup.addOptionValue(existingValue);
+        product.addOptionGroup(existingGroup);
+        optionGroupRepository.save(existingGroup);
+
+        // 새로운 요청 데이터 (기존 옵션 그룹 및 옵션 값이 포함되지 않음 = 삭제 대상)
+        OptionGroupUpdateServiceRequest newRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupId(null) // 새로운 옵션 그룹 추가를 의미
+                .groupName("새로운 옵션 그룹")
+                .optionValues(List.of(
+                        OptionValueUpdateServiceRequest.builder()
+                                .valueId(null) // 새로운 옵션 값 추가를 의미
+                                .valueName("새로운 옵션 값")
+                                .colorCode("#FFFFFF")
+                                .build()
+                ))
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(newRequest));
+
+        // then
+        // 기존 옵션 그룹 및 옵션 값이 삭제되었는지 검증
+        assertThat(optionGroupRepository.findById(existingGroup.getNo())).isEmpty();
+        assertThat(optionValueRepository.findById(existingValue.getNo())).isEmpty();
+    }
+
+
 
     private Product createProduct() {
         return Product.builder()
                 .name("Test Product")
+                .discRate(20)
+                .origPrice(100)
                 .build();
     }
 }

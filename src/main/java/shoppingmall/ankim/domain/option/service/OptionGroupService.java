@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.option.service;
 
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.exception.DuplicateOptionGroupException;
@@ -20,7 +21,9 @@ import shoppingmall.ankim.domain.option.exception.OptionGroupNotFoundException;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionValueUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
@@ -42,7 +45,7 @@ public class OptionGroupService {
     private final ProductRepository productRepository;
 
     public List<OptionGroupResponse> createOptionGroups(Long productId, List<OptionGroupCreateServiceRequest> requests) {
-        Product product = getProduct(productId);
+        Product product = getProductWithOptionGroups(productId);
         List<OptionGroupResponse> optionGroupResponses = new ArrayList<>();
 
         for (OptionGroupCreateServiceRequest request : requests) {
@@ -75,9 +78,123 @@ public class OptionGroupService {
         return optionGroupResponses;
     }
 
-    private Product getProduct(Long productId) {
+    /*
+     옵션 수정
+     옵션 그룹명 및 옵션 값 수정 가능
+     옵션 그룹 수정
+     * 고려해야할 요구사항
+       1. 옵션 그룹 이름만 수정.
+            옵션 그룹 삭제.
+            옵션 그룹 추가.
+
+       2. 옵션 값 수정
+            기존 옵션 값 이름이나 색상 코드 수정.
+            옵션 값 추가.
+            옵션 값 삭제.
+
+      옵션 그룹 업데이트 로직
+        groupId가 없는 경우: 새로운 옵션 그룹 생성.
+        groupName 변경 요청: 기존 옵션 그룹의 이름 수정.
+        요청 데이터에 없고 기존 DB에만 존재하는 옵션 그룹: 삭제
+
+    옵션 값 업데이트 로직
+        valueId가 없는 경우: 새로운 옵션 값 생성.
+        valueName 또는 colorCode가 변경된 경우: 기존 옵션 값 수정.
+        요청 데이터에 없고 기존 DB에만 존재하는 옵션 값: 삭제.
+    */
+    public void updateOptionGroups(Long productId, List<OptionGroupUpdateServiceRequest> requests) {
         // Product 조회
-        return productRepository.findById(productId)
+        Product product = getProductWithOptionGroups(productId);
+
+        // 기존 OptionGroup 가져오기
+        List<OptionGroup> existingGroups = product.getOptionGroups();
+
+        // 요청을 처리하여 OptionGroup 및 OptionValue 수정
+        for (OptionGroupUpdateServiceRequest request : requests) {
+            if (request.getGroupId() == null) {
+                // 새로운 옵션 그룹 추가
+                OptionGroup newGroup = OptionGroup.create(request.getGroupName(), product);
+
+                // 옵션 값 추가
+                if (request.getOptionValues() != null) {
+                    for (OptionValueUpdateServiceRequest valueRequest : request.getOptionValues()) {
+                        OptionValue newValue = OptionValue.create(newGroup, valueRequest.getValueName(), valueRequest.getColorCode());
+                        newGroup.addOptionValue(newValue);
+                    }
+                }
+
+                // Product와 연관 추가 및 저장
+                product.addOptionGroup(newGroup);
+                optionGroupRepository.save(newGroup);
+                continue;
+            }
+
+            // 기존 옵션 그룹 수정
+            OptionGroup existingGroup = existingGroups.stream()
+                    .filter(group -> group.getNo().equals(request.getGroupId()))
+                    .findFirst()
+                    .orElseThrow(() -> new OptionGroupNotFoundException(OPTION_GROUP_NOT_FOUND));
+
+            // 그룹 이름 변경 (제공된 경우만 수행)
+            if (request.getGroupName() != null && !request.getGroupName().isBlank()) {
+                existingGroup.updateName(request.getGroupName());
+            }
+
+            // 옵션 값 수정 요청이 없는 경우 옵션 그룹 이름만 변경하거나 유지
+            if (request.getOptionValues() == null || request.getOptionValues().isEmpty()) {
+                continue;
+            }
+
+            // 기존 OptionValue 처리
+            List<OptionValue> existingValues = existingGroup.getOptionValues();
+
+            for (OptionValueUpdateServiceRequest valueRequest : request.getOptionValues()) {
+                if (valueRequest.getValueId() == null) {
+                    // 새로운 옵션 값 추가
+                    OptionValue newValue = OptionValue.create(existingGroup, valueRequest.getValueName(), valueRequest.getColorCode());
+                    existingGroup.addOptionValue(newValue);
+                } else {
+                    // 기존 옵션 값 수정
+                    OptionValue existingValue = existingValues.stream()
+                            .filter(value -> value.getNo().equals(valueRequest.getValueId()))
+                            .findFirst()
+                            .orElseThrow(() -> new OptionValueNotFoundException(OPTION_VALUE_NOT_FOUND));
+
+                    existingValue.update(valueRequest.getValueName(), valueRequest.getColorCode());
+                }
+            }
+
+            // 삭제 대상 옵션 값 제거
+            List<Long> requestedValueIds = request.getOptionValues().stream()
+                    .map(OptionValueUpdateServiceRequest::getValueId)
+                    .toList();
+
+            List<OptionValue> valuesToDelete = existingValues.stream()
+                    .filter(value -> !requestedValueIds.contains(value.getNo()))
+                    .toList();
+
+            for (OptionValue valueToDelete : valuesToDelete) {
+                deleteOptionValue(valueToDelete.getNo());
+            }
+        }
+
+        // 삭제 대상 OptionGroup 처리
+        List<Long> requestedGroupIds = requests.stream()
+                .map(OptionGroupUpdateServiceRequest::getGroupId)
+                .toList();
+
+        List<OptionGroup> groupsToDelete = existingGroups.stream()
+                .filter(group -> !requestedGroupIds.contains(group.getNo()))
+                .toList();
+
+        for (OptionGroup groupToDelete : groupsToDelete) {
+            deleteOptionGroup(groupToDelete.getNo());
+        }
+    }
+
+    private Product getProductWithOptionGroups(Long productId) {
+        // Product 조회
+        return productRepository.findByIdWithOptionGroups(productId)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 

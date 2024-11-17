@@ -31,6 +31,8 @@ class OptionGroupTest {
     private Product createProduct() {
         return Product.builder()
                 .name("Test Product")
+                .discRate(20)
+                .origPrice(100)
                 .build();
     }
 

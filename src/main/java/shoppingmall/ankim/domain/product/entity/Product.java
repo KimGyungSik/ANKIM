@@ -111,7 +111,7 @@ public class Product {
 
     @Builder
     private Product(Category category, List<ProductImg> productImgs, List<Item> items, List<OptionGroup> optionGroups, String name, String code,
-                   String desc, Integer discRate, Integer sellPrice, Integer origPrice,
+                   String desc, Integer discRate, Integer origPrice,
                    String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String bestYn,
                    String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip) {
         this.category = category;
@@ -121,9 +121,9 @@ public class Product {
         validateName(name);
         this.code = code;
         this.desc = desc;
-        this.discRate = discRate;
-        this.sellPrice = sellPrice;
         this.origPrice = origPrice;
+        this.discRate = discRate;
+        this.sellPrice = calculateSellPrice(origPrice, discRate); // 판매가 계산
         this.optYn = optYn;
         this.restockYn = restockYn;
         this.qty = qty;
@@ -138,9 +138,14 @@ public class Product {
         this.cauShip = cauShip;
     }
 
+    // 판매가 계산 메서드
+    private Integer calculateSellPrice(Integer origPrice, Integer discRate) {
+        return origPrice - (origPrice * discRate / 100);
+    }
+
     public static Product create(
           Category category,String name, String code, String desc
-        , Integer discRate, Integer sellPrice, Integer origPrice, String optYn, String restockYn
+        , Integer discRate, Integer origPrice, String optYn, String restockYn
         , Integer qty, String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode
         , String cauProd, String cauOrd, String cauShip)
     {
@@ -151,7 +156,6 @@ public class Product {
                 .code(code)
                 .desc(desc)
                 .discRate(discRate)
-                .sellPrice(sellPrice)
                 .origPrice(origPrice)
                 .optYn(optYn)
                 .restockYn(restockYn)

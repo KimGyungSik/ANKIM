@@ -16,7 +16,6 @@ public class ProductCreateServiceRequest {
     private String code; // 상품코드
     private String desc; // 상세설명
     private Integer discRate; // 할인율
-    private Integer sellPrice; // 판매가격
     private Integer origPrice; // 정상가격
     private String optYn; // 옵션 여부
     private String restockYn; // 재입고 알림 여부
@@ -37,7 +36,7 @@ public class ProductCreateServiceRequest {
     private ItemCreateServiceRequest items;
 
     @Builder
-    private ProductCreateServiceRequest(String name, String code, String desc, Integer discRate, Integer sellPrice, Integer origPrice, String optYn, String restockYn, Integer qty,
+    private ProductCreateServiceRequest(String name, String code, String desc, Integer discRate,  Integer origPrice, String optYn, String restockYn, Integer qty,
                                  String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
                                  String cauProd, String cauOrd, String cauShip, ItemCreateServiceRequest items,
                                  Long categoryNo, List<OptionGroupCreateServiceRequest> optionGroups, ProductImgCreateServiceRequest productImages) {
@@ -45,7 +44,6 @@ public class ProductCreateServiceRequest {
         this.code = code;
         this.desc = desc;
         this.discRate = discRate;
-        this.sellPrice = sellPrice;
         this.origPrice = origPrice;
         this.optYn = optYn;
         this.restockYn = restockYn;

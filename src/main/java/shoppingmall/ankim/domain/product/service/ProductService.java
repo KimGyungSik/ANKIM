@@ -54,6 +54,15 @@ public class ProductService {
         return ProductResponse.of(savedProduct);
     }
 
+
+    // 상품 수정
+    // 조건 1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X
+    //
+
+
+
+
+
     private List<Long> getOptionGroupIds(ProductCreateServiceRequest request, Product savedProduct) {
         List<Long> optionGroupIds = new ArrayList<>();
         if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
@@ -66,13 +75,13 @@ public class ProductService {
     }
 
     private Product getProduct(ProductCreateServiceRequest request, Category category) {
+        // 상품 생성 시 판매가는 원가와 할인율을 적용하여 세팅됨
         Product product = Product.create(
                 category,
                 request.getName(),
                 request.getCode(),
                 request.getDesc(),
                 request.getDiscRate(),
-                request.getSellPrice(),
                 request.getOrigPrice(),
                 request.getOptYn(),
                 request.getRestockYn(),

@@ -190,6 +190,8 @@ class CategoryServiceTest {
 
         Product product = productRepository.save(Product.builder()
                 .name("테스트 상품")
+                .discRate(20)
+                .origPrice(100)
                 .category(middleCategory)
                 .build());
 
@@ -408,7 +410,6 @@ class CategoryServiceTest {
                 .code("PROD123")
                 .desc("테스트 상품 설명")
                 .discRate(10)
-                .sellPrice(10000)
                 .origPrice(12000)
                 .optYn("Y")
                 .restockYn("N")

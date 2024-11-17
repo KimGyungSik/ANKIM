@@ -89,5 +89,8 @@ public class OptionGroup {
         return optionGroup;
     }
 
+    public void updateName(String groupName) {
+        this.name = groupName;
+    }
 }
 
