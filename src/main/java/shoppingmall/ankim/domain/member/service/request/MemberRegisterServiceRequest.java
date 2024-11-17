@@ -46,7 +46,6 @@ public class MemberRegisterServiceRequest {
                 .phoneNum(this.phoneNum)
                 .birth(this.birth)
                 .gender(this.gender)
-                .joinDate(LocalDateTime.now())
                 .grade(this.grade) // 기본 등급 설정
                 .status(MemberStatus.ACTIVE) // 가입하면 바로 활성상태이므로 ACTIVE가 default
                 .termsList(terms)

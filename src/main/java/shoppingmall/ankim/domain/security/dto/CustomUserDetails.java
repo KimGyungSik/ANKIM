@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.security.dto;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,9 +14,14 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     // PK Long no
-    private final String loginId; // 사용자 id
-    private final String name; // 사용자 이름
+    private final String loginId; // 사용자 id("test@example.com")
+
+    // 사용자 이름 반환 (선택적으로 활용)
+    @Getter
+    private final String name; // 사용자 이름("홍길동")
+
     private final String password; // 사용자 비밀번호
+
     private final Collection<GrantedAuthority> authorities; // 사용자 권한 목록
 
     // 일반 고객이 로그인 하는 경우
@@ -56,10 +62,10 @@ public class CustomUserDetails implements UserDetails {
         return this.password;
     }
 
-    // 계정 이름 return
+    // 계정 이름 return (Spring Security의 사용자 ID)
     @Override
     public String getUsername() {
-        return this.name;
+        return this.loginId; // 이메일 아이디 반환
     }
 
     // 계정 잠겨있지 않은지 리턴( true : 잠겨있지 않음 )
@@ -79,4 +85,5 @@ public class CustomUserDetails implements UserDetails {
     public boolean isEnabled() {
         return UserDetails.super.isEnabled();
     }
+
 }

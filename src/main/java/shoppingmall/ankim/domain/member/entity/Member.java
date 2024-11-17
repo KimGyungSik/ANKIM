@@ -84,7 +84,7 @@ public class Member extends BaseEntity {
         this.phoneNum = phoneNum;
         this.birth = birth;
         this.gender = gender;
-        this.joinDate = joinDate;
+        this.joinDate = LocalDateTime.now();
         this.grade = (grade == null || grade == 0) ? 50 : grade; // 기본 등급 설정
         this.status = status;
 //        this.authority = authority;
