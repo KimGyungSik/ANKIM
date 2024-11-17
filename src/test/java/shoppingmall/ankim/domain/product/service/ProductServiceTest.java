@@ -77,7 +77,6 @@ class ProductServiceTest {
                 .code("PROD123")
                 .desc("테스트 상품 설명")
                 .discRate(10)
-                .sellPrice(10000)
                 .origPrice(12000)
                 .optYn("Y")
                 .restockYn("N")

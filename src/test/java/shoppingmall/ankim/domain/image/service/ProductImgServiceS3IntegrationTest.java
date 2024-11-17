@@ -71,7 +71,10 @@ class ProductImgServiceS3IntegrationTest {
                 "detail", "detail.jpg", "image/jpeg", "detail data".getBytes()
         );
 
-        Product product = Product.builder().name("Test Product").build();
+        Product product = Product.builder().name("Test Product")
+                .discRate(20)
+                .origPrice(100)
+                .build();
         productRepository.save(product);
         ProductImgCreateServiceRequest request = ProductImgCreateServiceRequest.builder()
                 .thumbnailImages(List.of(thumbnailImage))

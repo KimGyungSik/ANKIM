@@ -52,5 +52,10 @@ public class OptionValue {
                 .colorCode(response.getColorCode())
                 .build();
     }
+
+    public void update(String valueName, String colorCode) {
+        this.name = valueName;
+        this.colorCode = colorCode;
+    }
 }
 
