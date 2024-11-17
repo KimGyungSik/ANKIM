@@ -2,21 +2,16 @@ package shoppingmall.ankim.domain.category.service.request;
 
 import lombok.Builder;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
-
-import java.util.List;
 
 @Getter
 public class CategoryUpdateServiceRequest {
 
-    private final String name;
-    private final Long newParentNo; // 새로운 부모 ID
-    private final List<CategoryUpdateServiceRequest> childCategories;
+    private final String name;       // 변경할 이름
+    private final Long newParentNo;  // 변경할 부모 ID (소분류 전용)
 
     @Builder
-    public CategoryUpdateServiceRequest(String name, Long newParentNo, List<CategoryUpdateServiceRequest> childCategories) {
+    public CategoryUpdateServiceRequest(String name, Long newParentNo) {
         this.name = name;
-        this.newParentNo = newParentNo; // 부모 변경 처리
-        this.childCategories = childCategories;
+        this.newParentNo = newParentNo;
     }
 }

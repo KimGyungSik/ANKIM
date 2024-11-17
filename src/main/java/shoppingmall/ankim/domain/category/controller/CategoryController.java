@@ -38,14 +38,24 @@ public class CategoryController {
         return ApiResponse.ok();
     }
 
-    // 카테고리 수정
-    @PutMapping("/{categoryId}")
-    public ResponseEntity<Void> updateCategory(
+    // 카테고리 중분류 수정
+    @PutMapping("/middle/{categoryId}")
+    public ApiResponse<Void> updateMiddleCategory(
             @PathVariable Long categoryId,
             @RequestBody @Valid CategoryUpdateRequest request) {
-        categoryService.updateCategory(categoryId, request.toServiceRequest());
-        return ResponseEntity.ok().build();
+        categoryService.updateMiddleCategory(categoryId, request.toServiceRequest());
+        return ApiResponse.ok();
     }
+
+    // 카테고리 중분류 수정
+    @PutMapping("/sub/{categoryId}") // 매핑 경로의 변수명을 "categoryId"로 변경
+    public ApiResponse<Void> updateSubCategory(
+            @PathVariable Long categoryId, // 변수명도 "categoryId"로 유지
+            @RequestBody @Valid CategoryUpdateRequest request) {
+        categoryService.updateSubCategory(categoryId, request.toServiceRequest());
+        return ApiResponse.ok();
+    }
+
 
     // 모든 중분류와 그 하위 소분류 조회
     @GetMapping("/total")

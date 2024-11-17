@@ -85,55 +85,42 @@ public class CategoryService {
     // 소분류의 부모인 중분류를 수정할 수 있음
     // 조건 1. 해당 카테고리에 속해져 있는 상품의 카테고리는 자동 변경
     // 카테고리 수정 -> 해당 카테고리에 속해 있는 상품의 카테고리를 자동 변경
-    public void updateCategory(Long categoryId, CategoryUpdateServiceRequest request) {
-        // 1. 기존 카테고리 조회
-        Category category = categoryRepository.findById(categoryId)
+    public void updateMiddleCategory(Long categoryId, CategoryUpdateServiceRequest request) {
+        // 1. 기존 중분류 카테고리 조회
+        Category middleCategory = categoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
 
-        // 2. 카테고리 이름 업데이트
-        category.updateName(request.getName());
+        // 2. 카테고리 이름 업데이트 (null 체크)
+        if (request.getName() != null && !request.getName().isBlank()) {
+            middleCategory.updateName(request.getName());
+        }
 
-        // 3. 새로운 부모 설정 (중분류의 경우만 처리)
+        // 3. 상품 동기화 처리
+        productRepository.updateCategoryForProducts(categoryId, middleCategory);
+    }
+
+    public void updateSubCategory(Long categoryId, CategoryUpdateServiceRequest request) {
+        // 1. 기존 소분류 카테고리 조회
+        Category subCategory = categoryRepository.findById(categoryId)
+                .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+
+        // 2. 카테고리 이름 업데이트 (null 체크)
+        if (request.getName() != null && !request.getName().isBlank()) {
+            subCategory.updateName(request.getName());
+        }
+
+        // 3. 새로운 부모 설정
         if (request.getNewParentNo() != null) {
             Category newParentCategory = categoryRepository.findById(request.getNewParentNo())
                     .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
-            category.changeParentCategory(newParentCategory); // 부모 변경
 
-            // 중분류 변경 시 해당 카테고리에 속한 상품 업데이트
-            productRepository.updateCategoryForProducts(categoryId, newParentCategory);
+            // 부모 변경 처리
+            subCategory.changeParentCategory(newParentCategory);
         }
 
-        // 4. 하위 카테고리 수정 처리
-        if (request.getChildCategories() != null && !request.getChildCategories().isEmpty()) {
-            updateSubCategories(category, request.getChildCategories());
-        }
+        // 4. 상품 동기화 처리 (소분류 이름 변경 또는 부모 변경 시)
+        productRepository.updateCategoryForProducts(categoryId, subCategory);
     }
-
-
-    // 하위 카테고리 재귀적으로 수정
-    private void updateSubCategories(Category parentCategory, List<CategoryUpdateServiceRequest> subCategoryRequests) {
-        for (CategoryUpdateServiceRequest childRequest : subCategoryRequests) {
-            Category existingChild = parentCategory.getChildCategories()
-                    .stream()
-                    .filter(child -> child.getName().equals(childRequest.getName()))
-                    .findFirst()
-                    .orElse(null);
-
-            if (existingChild != null) {
-                // 이미 존재하는 하위 카테고리 이름 수정
-                existingChild.updateName(childRequest.getName());
-
-                // 해당 소분류에 속한 상품들의 카테고리 업데이트
-                productRepository.updateCategoryForProducts(existingChild.getNo(), existingChild);
-            } else {
-                // 새로운 하위 카테고리 추가
-                Category newChild = Category.create(childRequest.getName());
-                parentCategory.addSubCategory(newChild);
-            }
-        }
-    }
-
-
 
     private boolean isMiddleCategoryRequest(CategoryCreateServiceRequest request) {
         return request.getParentNo() == null;

@@ -4,10 +4,13 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
@@ -28,9 +31,12 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.tuple;
-@Profile("test")
+@ActiveProfiles("test")
 @SpringBootTest
 class ItemServiceTest {
+
+    @MockBean
+    S3Service s3Service;
 
     @Autowired
     ItemService itemService;

@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shoppingmall.ankim.domain.category.exception.CategoryNameTooLongException;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
@@ -31,6 +32,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NAME_TOO_LO
  */
 
 @Getter
+@Slf4j
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "category")
@@ -100,6 +102,7 @@ public class Category extends BaseEntity {
     }
 
     public void updateName(String newName) {
+        log.info("Updating category name from {} to {}", this.name, newName);
         validateName(newName); // 이름 유효성 검사
         this.name = newName;
     }
