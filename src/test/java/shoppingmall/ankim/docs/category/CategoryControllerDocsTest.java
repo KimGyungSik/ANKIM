@@ -245,7 +245,7 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("name").description("카테고리 이름 (필수)").type(JsonFieldType.STRING).optional(),
+                                fieldWithPath("name").description("카테고리 이름 (필수)").type(JsonFieldType.NULL),
                                 fieldWithPath("parentNo").description("중분류일 경우 null, 소분류일 경우 상위 카테고리 ID").optional().type(JsonFieldType.NUMBER),
                                 fieldWithPath("childCategories").description("중분류와 소분류를 동시에 추가할 경우 하위 카테고리 목록").optional().type(JsonFieldType.ARRAY)
                         ),
