@@ -13,12 +13,15 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 import org.springframework.restdocs.RestDocumentationExtension;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import shoppingmall.ankim.domain.category.controller.request.CategoryCreateRequest;
+import shoppingmall.ankim.domain.category.controller.request.CategoryUpdateRequest;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.service.CategoryService;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.global.config.JpaAuditingConfig;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
@@ -31,11 +34,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-
+@ActiveProfiles("test")
 @WebMvcTest(controllers = CategoryController.class)
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @ImportAutoConfiguration(exclude =  {QuerydslConfig.class, JpaAuditingConfig.class})
 class CategoryControllerTest {
+
+    @MockBean
+    private S3Service s3Service;
 
     @Autowired
     private MockMvc mockMvc;
@@ -169,7 +175,7 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
-    @DisplayName("중분류만 조회할 수 있다")
+    @DisplayName("중분류만 조회할 수 있다.")
     @Test
     void getMiddleCategories() throws Exception {
         // given
@@ -188,4 +194,78 @@ class CategoryControllerTest {
                 .andExpect(jsonPath("$.data").isArray());
     }
 
+    @DisplayName("카테고리 중분류를 수정할 수 있다.")
+    @Test
+    void updateMiddleCategory() throws Exception{
+        // given
+        Long categoryId = 1L;
+        CategoryUpdateRequest request = CategoryUpdateRequest.builder()
+                .name("새로운 중분류 이름")
+                .build();
+        doNothing().when(categoryService).updateMiddleCategory(categoryId, request.toServiceRequest());
+
+        // when // then
+        mockMvc.perform(
+                        put("/category/middle/{id}", categoryId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("카테고리 소분류를 수정할 수 있다.")
+    @Test
+    void updateSubCategory() throws Exception {
+        // given
+        Long categoryId = 2L;
+        CategoryUpdateRequest request = CategoryUpdateRequest.builder()
+                .name("새로운 소분류 이름")
+                .build();
+
+        doNothing().when(categoryService).updateSubCategory(categoryId, request.toServiceRequest());
+
+        // when // then
+        mockMvc.perform(
+                        put("/category/sub/{id}", categoryId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
+
+    @DisplayName("카테고리 소분류의 부모(중분류)를 변경할 수 있다.")
+    @Test
+    void updateSubCategoryChangeMiddleCategory() throws Exception {
+        // given
+        Long categoryId = 3L;
+        CategoryUpdateRequest request = CategoryUpdateRequest.builder()
+                .name("소분류 이름")
+                .newParentNo(1L) // 새로운 중분류의 ID
+                .build();
+
+        doNothing().when(categoryService).updateSubCategory(categoryId, request.toServiceRequest());
+
+        // when // then
+        mockMvc.perform(
+                        put("/category/sub/{id}", categoryId)
+                                .contentType(MediaType.APPLICATION_JSON)
+                                .content(objectMapper.writeValueAsString(request))
+                )
+                .andDo(print())
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isEmpty());
+    }
 }
