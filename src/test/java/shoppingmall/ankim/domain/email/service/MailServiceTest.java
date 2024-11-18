@@ -11,8 +11,10 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import static org.mockito.Mockito.*;
 
@@ -37,6 +39,9 @@ class MailServiceTest {
 
     @InjectMocks // 인터페이스 주입 X
     private MailServiceImpl mailService; // 모의 객체를 MailService에 주입
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
 
     @BeforeEach
     void setUp() {

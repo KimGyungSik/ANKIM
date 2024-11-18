@@ -91,10 +91,11 @@ public class JwtTokenProvider {
         }
     }
 
-    // 만료되지 않은 Token 정보 추출
+    // refreshToken이 만료되지 않은 Token 정보 추출
 
 
-    // 만료된 Token 정보 추출
+    // refreshToken이 만료된 Token 정보 추출
+
 
     // 토큰에서 사용자 이름(loginId) 추출
     public String getUsernameFromToken(String token) {

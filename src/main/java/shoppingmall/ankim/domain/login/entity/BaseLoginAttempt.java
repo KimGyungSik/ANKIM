@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.login.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -24,10 +25,21 @@ public class BaseLoginAttempt {
     @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
     private String activeYn = "Y";
 
+    @Builder
     public BaseLoginAttempt(Integer failCount, LocalDateTime lastAttemptTime, LocalDateTime unlockTime, String activeYn) {
-        this.failCount = failCount;
+        this.failCount = failCount == null ? 0 : failCount;
         this.lastAttemptTime = lastAttemptTime;
         this.unlockTime = unlockTime;
         this.activeYn = activeYn;
+    }
+
+    // Reset 상태를 초기화하는 메서드 추가
+    public void resetLoginAttempt() {
+        BaseLoginAttempt.builder()
+                .failCount(0)
+                .lastAttemptTime(LocalDateTime.now())
+                .unlockTime(null)
+                .activeYn("Y")
+                .build();
     }
 }

@@ -9,19 +9,24 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import org.thymeleaf.spring6.view.ThymeleafViewResolver;
 import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
+import shoppingmall.ankim.domain.security.service.CustomUserDetailsService;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
 import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doThrow;
+import java.util.Locale;
+
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
 @WebMvcTest(MemberController.class)
@@ -43,6 +48,15 @@ class MemberControllerTest {
     @MockBean
     private TermsQueryService termsQueryService;
 
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private ThymeleafViewResolver thymeleafViewResolver;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
+
 
     @Test
     @DisplayName("이메일을 입력한 뒤 다음 단계로 넘어갈 때 id값이 잘전달되는지 확인한다.")
@@ -51,9 +65,13 @@ class MemberControllerTest {
         String validId = "test@example.com";
 
         // when & then
+        when(thymeleafViewResolver.resolveViewName(anyString(), any(Locale.class)))
+                .thenReturn(null); // 템플릿 렌더링을 우회( thymleaf가 없어도 테스트 할 수 있음 )
+
         mockMvc.perform(get("/member/email-next")
                         .param("loginId", validId))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk()) // 상태 코드만 확인
+        ;
     }
 
     @Test

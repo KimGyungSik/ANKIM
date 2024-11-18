@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.member.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginAttempt;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.audit.Authority;
@@ -15,12 +16,12 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "member", indexes = {
         @Index(name = "idx_member_uuid", columnList = "uuid")
 })
-@ToString(of = {"id", "name"})
+@ToString(of = {"loginId", "name"})
 public class Member extends BaseEntity {
 
     @Id
@@ -32,7 +33,7 @@ public class Member extends BaseEntity {
     /*    BINARY(16)으로 변환해주는 컨버터 필요    */
     private UUID uuid;
 
-    @Column(nullable = false, length = 50, unique = true)
+    @Column(name = "login_id", nullable = false, length = 50, unique = true)
     private String loginId; // 아이디(이메일)
 
     @Column(nullable = false, length = 200)
@@ -67,6 +68,10 @@ public class Member extends BaseEntity {
     @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<TermsHistory> termsHistory = new ArrayList<>();
 
+    // 로그인 시도
+    @OneToMany(mappedBy = "member", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<MemberLoginAttempt> loginAttempts = new ArrayList<>();
+
 //    @Transient
 //    Authority authority;
 
@@ -95,6 +100,14 @@ public class Member extends BaseEntity {
                         .map(terms -> new TermsHistory(this, terms, "Y", this.joinDate)) // agreeYn = "Y", agreeDate = joinDate
                         .collect(Collectors.toList())
                 : new ArrayList<>();
+    }
+
+    public void activate() {
+        this.status = MemberStatus.ACTIVE;
+    }
+
+    public void lock() {
+        this.status = MemberStatus.LOCKED;
     }
 
 }

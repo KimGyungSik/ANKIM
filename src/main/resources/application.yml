@@ -17,6 +17,8 @@ spring:
     group:
       local:
         - email
+        - jwt
+        - login
   #      - prod
   main:
     allow-bean-definition-overriding: true

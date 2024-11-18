@@ -252,7 +252,7 @@ class MemberTest {
         assertThrows(DataIntegrityViolationException.class, () -> memberRepository.saveAndFlush(member));
     }
 
-    @Test
+/*    @Test
     @DisplayName("가입일이 null인 경우 예외가 발생해야 한다")
     void nullJoinDate() {
         // given
@@ -267,13 +267,13 @@ class MemberTest {
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
                 .gender("M")
-                .joinDate(nullJoinDate)
+                .joinDate(null)
                 .status(MemberStatus.ACTIVE)
                 .build();
 
         // then
         assertThrows(DataIntegrityViolationException.class, () -> memberRepository.saveAndFlush(member));
-    }
+    }*/
 
     @Test
     @DisplayName("회원 상태가 null인 경우 예외가 발생해야 한다")

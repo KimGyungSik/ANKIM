@@ -123,3 +123,5 @@ application.properties
 
 # yml
 application-email.yml
+application-jwt.yml
+application-login.yml

@@ -16,6 +16,8 @@ import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.email.exception.MailSendException;
 import shoppingmall.ankim.domain.email.service.Count;
 import shoppingmall.ankim.domain.email.service.MailService;
+import shoppingmall.ankim.domain.security.service.CustomUserDetailsService;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.mockito.Mockito.*;
@@ -36,6 +38,12 @@ class MailApiControllerTest {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @MockBean
+    private CustomUserDetailsService customUserDetailsService;
 
     @BeforeEach
     void setUp() {
