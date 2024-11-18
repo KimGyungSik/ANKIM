@@ -3,7 +3,9 @@ package shoppingmall.ankim.domain.image.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import shoppingmall.ankim.domain.image.service.request.ProductImgDto;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.image.exception.DetailImageRequiredException;
 import shoppingmall.ankim.domain.image.exception.FileUploadException;
@@ -11,11 +13,13 @@ import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -44,12 +48,48 @@ public class ProductImgService {
         saveImages(product, request.getDetailImages(), DETAIL);
     }
 
+    public void updateProductImgs(Long productId, ProductImgUpdateServiceRequest request) {
+        Product product = getProductWithImgs(productId);
+
+        // 기존 이미지 삭제
+        List<ProductImg> imgsToDelete = new ArrayList<>(product.getProductImgs()); // 복사본 사용
+        for (ProductImg existingImg : imgsToDelete) {
+            product.removeProductImg(existingImg); // 부모 관계에서 삭제
+            deleteProductImg(existingImg);        // DB에서 삭제
+        }
+
+        // 새로운 이미지 등록
+        validateImageCounts(request);
+        saveImages(product, request.getThumbnailImages(), THUMBNAIL);
+        saveImages(product, request.getDetailImages(), DETAIL);
+    }
+
+    private void deleteProductImg(ProductImg productImg) {
+        // 로컬 파일 삭제
+        if (productImg.getImgName() != null && !productImg.getImgName().isEmpty()) {
+            fileService.deleteFile(itemImgLocation + "/" + productImg.getImgName());
+        }
+
+        // S3 파일 삭제
+        if (productImg.getImgUrl() != null && !productImg.getImgUrl().isEmpty()) {
+            s3Service.deleteFile(productImg.getImgUrl().substring(productImg.getImgUrl().lastIndexOf("/") + 1));
+        }
+
+        // 데이터베이스에서 삭제
+        productImgRepository.delete(productImg);
+    }
+
     private Product getProduct(Long productId) {
         return productRepository.findById(productId)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 
-    private void validateImageCounts(ProductImgCreateServiceRequest request) {
+    private Product getProductWithImgs(Long productId) {
+        return productRepository.findByIdWithProductImgs(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    private void validateImageCounts(ProductImgDto request) {
         if (request.getThumbnailImages() == null || request.getThumbnailImages().isEmpty()) {
             throw new ThumbnailImageRequiredException(THUMBNAIL_IMAGE_REQUIRED);
         }
