@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.image.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
@@ -8,6 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -17,6 +19,7 @@ import shoppingmall.ankim.domain.image.exception.ImageLimitExceededException;
 import shoppingmall.ankim.domain.image.exception.ThumbnailImageRequiredException;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
@@ -161,6 +164,88 @@ class ProductImgServiceTest {
         assertThat(savedImages.get(1).getOrd()).isEqualTo(1); // Detail order 1
         assertThat(savedImages.get(2).getOrd()).isEqualTo(2); // Detail order 2
     }
+
+    @DisplayName("상품 이미지를 업데이트할 수 있다.")
+    @Rollback(value = false)
+    @Test
+    void updateProductImgs() throws IOException {
+        // given
+        Product product = createProduct();
+
+
+        // 기존 이미지 등록
+        ProductImg existingThumbnail = ProductImg.builder()
+                .imgName("old-thumbnail.jpg")
+                .oriImgName("old-thumbnail.jpg")
+                .imgUrl("old-thumbnail-url")
+                .repimgYn("Y")
+                .ord(1)
+                .product(product)
+                .build();
+        product.addProductImg(existingThumbnail);
+
+        ProductImg existingDetail = ProductImg.builder()
+                .imgName("old-detail.jpg")
+                .oriImgName("old-detail.jpg")
+                .imgUrl("old-detail-url")
+                .repimgYn("N")
+                .ord(1)
+                .product(product)
+                .build();
+        product.addProductImg(existingDetail);
+
+        Product savedProduct = productRepository.save(product);
+
+        // 새로운 이미지 요청 데이터 생성
+        MultipartFile newThumbnail = new MockMultipartFile(
+                "new-thumbnail", "new-thumbnail.jpg", "image/jpeg", "new thumbnail data".getBytes());
+        MultipartFile newDetail1 = new MockMultipartFile(
+                "new-detail1", "new-detail1.jpg", "image/jpeg", "new detail data 1".getBytes());
+        MultipartFile newDetail2 = new MockMultipartFile(
+                "new-detail2", "new-detail2.jpg", "image/jpeg", "new detail data 2".getBytes());
+
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(newThumbnail))
+                .detailImages(List.of(newDetail1, newDetail2))
+                .build();
+
+        // FileService 및 S3Service Mock 설정
+        given(fileService.uploadFile(anyString(), anyString(), any(byte[].class)))
+                .willReturn("new-test-image.jpg");
+        given(s3Service.uploadSingle(any(MultipartFile.class)))
+                .willReturn("new-s3-url");
+
+        // when
+        productImgService.updateProductImgs(savedProduct.getNo(), request);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        // 기존 이미지는 삭제되었는지 검증
+        assertThat(updatedImages).hasSize(3); // 1 Thumbnail + 2 Details
+        verify(fileService, times(2)).deleteFile(anyString());
+        verify(s3Service, times(2)).deleteFile(anyString());
+
+        // 새로운 이미지 검증
+        ProductImg newThumbnailImg = updatedImages.stream()
+                .filter(img -> img.getRepimgYn().equals("Y"))
+                .findFirst()
+                .orElseThrow();
+        assertThat(newThumbnailImg.getOriImgName()).isEqualTo("new-thumbnail.jpg");
+
+        ProductImg newDetailImg1 = updatedImages.stream()
+                .filter(img -> img.getRepimgYn().equals("N") && img.getOrd() == 1)
+                .findFirst()
+                .orElseThrow();
+        assertThat(newDetailImg1.getOriImgName()).isEqualTo("new-detail1.jpg");
+
+        ProductImg newDetailImg2 = updatedImages.stream()
+                .filter(img -> img.getRepimgYn().equals("N") && img.getOrd() == 2)
+                .findFirst()
+                .orElseThrow();
+        assertThat(newDetailImg2.getOriImgName()).isEqualTo("new-detail2.jpg");
+    }
+
 
     private Product createProduct() {
         return Product.builder()

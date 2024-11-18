@@ -13,6 +13,9 @@ public interface ProductRepository extends JpaRepository<Product,Long> {
     @Query("SELECT p FROM Product p LEFT JOIN FETCH p.optionGroups WHERE p.no = :productId")
     Optional<Product> findByIdWithOptionGroups(@Param("productId") Long productId);
 
+    @Query("SELECT p FROM Product p LEFT JOIN FETCH p.productImgs WHERE p.no = :productId")
+    Optional<Product> findByIdWithProductImgs(@Param("productId") Long productId);
+
     @Modifying
     @Query("UPDATE Product p SET p.category = :newCategory WHERE p.category.no = :oldCategoryId")
     void updateCategoryForProducts(@Param("oldCategoryId") Long oldCategoryId, @Param("newCategory") Category newCategory);

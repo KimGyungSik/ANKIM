@@ -49,6 +49,8 @@ public class ProductUpdateRequest {
 
     private String cauShip; // 배송 유의사항
 
+    // 상품 이미지 번호 리스트 필드 필요할듯
+
     @Builder
     private ProductUpdateRequest(String name, String desc, Integer discRate, Integer origPrice, String optYn,
                                  String restockYn, Integer qty, String bestYn, String freeShip, Integer shipFee,
