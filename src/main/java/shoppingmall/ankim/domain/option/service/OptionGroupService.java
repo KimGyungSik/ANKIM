@@ -31,6 +31,7 @@ import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -109,6 +110,10 @@ public class OptionGroupService {
         // 기존 OptionGroup 가져오기
         List<OptionGroup> existingGroups = product.getOptionGroups();
 
+        // 새로운 그룹과 값 추적을 위한 리스트
+        List<OptionGroup> newlyCreatedGroups = new ArrayList<>();
+        List<OptionValue> newlyCreatedValues = new ArrayList<>();
+
         // 요청을 처리하여 OptionGroup 및 OptionValue 수정
         for (OptionGroupUpdateServiceRequest request : requests) {
             if (request.getGroupId() == null) {
@@ -120,11 +125,13 @@ public class OptionGroupService {
                     for (OptionValueUpdateServiceRequest valueRequest : request.getOptionValues()) {
                         OptionValue newValue = OptionValue.create(newGroup, valueRequest.getValueName(), valueRequest.getColorCode());
                         newGroup.addOptionValue(newValue);
+                        newlyCreatedValues.add(newValue); // 새로 추가된 옵션 값 기록
                     }
                 }
 
                 // Product와 연관 추가 및 저장
                 product.addOptionGroup(newGroup);
+                newlyCreatedGroups.add(newGroup); // 새로 추가된 그룹 기록
                 optionGroupRepository.save(newGroup);
                 continue;
             }
@@ -153,6 +160,7 @@ public class OptionGroupService {
                     // 새로운 옵션 값 추가
                     OptionValue newValue = OptionValue.create(existingGroup, valueRequest.getValueName(), valueRequest.getColorCode());
                     existingGroup.addOptionValue(newValue);
+                    newlyCreatedValues.add(newValue); // 새로 추가된 옵션 값 기록
                 } else {
                     // 기존 옵션 값 수정
                     OptionValue existingValue = existingValues.stream()
@@ -164,13 +172,15 @@ public class OptionGroupService {
                 }
             }
 
-            // 삭제 대상 옵션 값 제거
+            // 삭제 대상 옵션 값 제거 (새로 추가된 값은 제외)
             List<Long> requestedValueIds = request.getOptionValues().stream()
                     .map(OptionValueUpdateServiceRequest::getValueId)
+                    .filter(Objects::nonNull) // null 값 제거
                     .toList();
 
             List<OptionValue> valuesToDelete = existingValues.stream()
-                    .filter(value -> !requestedValueIds.contains(value.getNo()))
+                    .filter(value -> !requestedValueIds.contains(value.getNo())) // 요청 데이터에 없는 값
+                    .filter(value -> !newlyCreatedValues.contains(value)) // 새로 생성된 값 제외
                     .toList();
 
             for (OptionValue valueToDelete : valuesToDelete) {
@@ -178,17 +188,22 @@ public class OptionGroupService {
             }
         }
 
-        // 삭제 대상 OptionGroup 처리
+        // 요청된 그룹 ID (새로 생성된 그룹 제외)
         List<Long> requestedGroupIds = requests.stream()
                 .map(OptionGroupUpdateServiceRequest::getGroupId)
+                .filter(Objects::nonNull) // null 값 제거
                 .toList();
 
+        // 기존 그룹 중 삭제 대상 확인 (새로 생성된 그룹 제외)
         List<OptionGroup> groupsToDelete = existingGroups.stream()
-                .filter(group -> !requestedGroupIds.contains(group.getNo()))
+                .filter(group -> !requestedGroupIds.contains(group.getNo())) // 요청 데이터에 없는 기존 그룹
+                .filter(group -> !newlyCreatedGroups.contains(group)) // 새로 생성된 그룹 제외
                 .toList();
 
+        // 삭제 처리
         for (OptionGroup groupToDelete : groupsToDelete) {
             deleteOptionGroup(groupToDelete.getNo());
+            product.removeOptionGroup(groupToDelete);
         }
     }
 
@@ -227,6 +242,7 @@ public class OptionGroupService {
                 .orElseThrow(() -> new OptionValueNotFoundException(OPTION_VALUE_NOT_FOUND));
 
         optionValue.getOptionGroup().removeOptionValue(optionValue);
+        optionValueRepository.delete(optionValue);
     }
 }
 
