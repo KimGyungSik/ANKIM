@@ -70,6 +70,8 @@ public class OptionGroup {
 
         optionValues.add(optionValue);
     }
+
+    // OptionValue 삭제 메서드
     public void removeOptionValue(OptionValue optionValue) {
         this.optionValues.remove(optionValue);
     }

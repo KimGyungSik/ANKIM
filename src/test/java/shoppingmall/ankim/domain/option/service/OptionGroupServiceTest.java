@@ -365,25 +365,44 @@ class OptionGroupServiceTest {
     }
 
     @Test
-    @DisplayName("요청 데이터에 없는 옵션 그룹 및 옵션 값은 삭제된다.")
-    void deleteOptionGroupAndValuesIfNotInRequest() {
+    @DisplayName("요청 데이터에 없는 기존 DB에만 존재하는 옵션 그룹은 삭제된다.")
+    void deleteExistingGroupsNotInRequest() {
         // given
         Product product = productRepository.save(createProduct());
 
-        // 기존 옵션 그룹과 옵션 값 설정
-        OptionGroup existingGroup = OptionGroup.create("기존 그룹", product);
-        OptionValue existingValue = OptionValue.create(existingGroup, "기존 옵션 값", null);
-        existingGroup.addOptionValue(existingValue);
-        product.addOptionGroup(existingGroup);
-        optionGroupRepository.save(existingGroup);
+        // 기존 옵션 그룹 및 옵션 값 설정
+        OptionGroup existingGroup1 = OptionGroup.create("기존 그룹 1", product);
+        OptionValue existingValue1 = OptionValue.create(existingGroup1, "기존 옵션 값 1", null);
+        existingGroup1.addOptionValue(existingValue1);
+        product.addOptionGroup(existingGroup1);
 
-        // 새로운 요청 데이터 (기존 옵션 그룹 및 옵션 값이 포함되지 않음 = 삭제 대상)
-        OptionGroupUpdateServiceRequest newRequest = OptionGroupUpdateServiceRequest.builder()
-                .groupId(null) // 새로운 옵션 그룹 추가를 의미
-                .groupName("새로운 옵션 그룹")
+        OptionGroup existingGroup2 = OptionGroup.create("기존 그룹 2", product);
+        OptionValue existingValue2 = OptionValue.create(existingGroup2, "기존 옵션 값 2", null);
+        existingGroup2.addOptionValue(existingValue2);
+        product.addOptionGroup(existingGroup2);
+
+        optionGroupRepository.saveAll(List.of(existingGroup1, existingGroup2));
+
+        // 새로운 요청 데이터 (기존 그룹 1만 포함)
+        OptionGroupUpdateServiceRequest request1 = OptionGroupUpdateServiceRequest.builder()
+                .groupId(existingGroup1.getNo()) // 기존 그룹 1 유지
+                .groupName("기존 그룹 1 수정됨") // 이름 변경
                 .optionValues(List.of(
                         OptionValueUpdateServiceRequest.builder()
-                                .valueId(null) // 새로운 옵션 값 추가를 의미
+                                .valueId(existingValue1.getNo()) // 기존 옵션 값 유지
+                                .valueName("기존 옵션 값 1 수정됨") // 이름 변경
+                                .colorCode("#FF0000") // 색상 변경
+                                .build()
+                ))
+                .build();
+
+        // 새로운 요청 데이터 (새로운 그룹 추가)
+        OptionGroupUpdateServiceRequest request2 = OptionGroupUpdateServiceRequest.builder()
+                .groupId(null) // 새로운 그룹 추가
+                .groupName("새로운 그룹")
+                .optionValues(List.of(
+                        OptionValueUpdateServiceRequest.builder()
+                                .valueId(null) // 새로운 옵션 값 추가
                                 .valueName("새로운 옵션 값")
                                 .colorCode("#FFFFFF")
                                 .build()
@@ -391,14 +410,91 @@ class OptionGroupServiceTest {
                 .build();
 
         // when
-        optionGroupService.updateOptionGroups(product.getNo(), List.of(newRequest));
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(request1, request2));
 
         // then
-        // 기존 옵션 그룹 및 옵션 값이 삭제되었는지 검증
-        assertThat(optionGroupRepository.findById(existingGroup.getNo())).isEmpty();
-        assertThat(optionValueRepository.findById(existingValue.getNo())).isEmpty();
+        // 기존 그룹 1은 수정되었는지 확인
+        OptionGroup updatedGroup1 = optionGroupRepository.findById(existingGroup1.getNo()).orElseThrow();
+        assertThat(updatedGroup1.getName()).isEqualTo("기존 그룹 1 수정됨");
+        OptionValue updatedValue1 = updatedGroup1.getOptionValues().get(0);
+        assertThat(updatedValue1.getName()).isEqualTo("기존 옵션 값 1 수정됨");
+        assertThat(updatedValue1.getColorCode()).isEqualTo("#FF0000");
+
+        // 기존 그룹 2는 삭제되었는지 확인
+        assertThat(optionGroupRepository.findById(existingGroup2.getNo())).isEmpty();
+        assertThat(optionValueRepository.findById(existingValue2.getNo())).isEmpty();
+
+        // 새로운 그룹이 추가되었는지 확인
+        OptionGroup newGroup = optionGroupRepository.findAll().stream()
+                .filter(group -> group.getName().equals("새로운 그룹"))
+                .findFirst()
+                .orElseThrow();
+        OptionValue newValue = newGroup.getOptionValues().get(0);
+        assertThat(newValue.getName()).isEqualTo("새로운 옵션 값");
+        assertThat(newValue.getColorCode()).isEqualTo("#FFFFFF");
+
+        // 전체 그룹 및 옵션 값 개수 확인
+        assertThat(optionGroupRepository.findAll()).hasSize(2); // 기존 그룹 1 + 새로운 그룹
+        assertThat(optionValueRepository.findAll()).hasSize(2); // 기존 옵션 값 1 + 새로운 옵션 값
     }
 
+    @Test
+    @DisplayName("요청 데이터에 없는 기존 DB에만 존재하는 옵션 값은 삭제된다.")
+    void deleteExistingAndAddNewOptionValue() {
+        // given
+        Product product = productRepository.save(createProduct());
+
+        // 기존 옵션 그룹과 옵션 값 설정
+        OptionGroup existingGroup = OptionGroup.create("기존 그룹", product);
+        OptionValue existingValue1 = OptionValue.create(existingGroup, "기존 옵션 값 1", "#FF0000");
+        OptionValue existingValue2 = OptionValue.create(existingGroup, "기존 옵션 값 2", "#00FF00");
+        existingGroup.addOptionValue(existingValue1);
+        existingGroup.addOptionValue(existingValue2);
+        product.addOptionGroup(existingGroup);
+        optionGroupRepository.save(existingGroup);
+
+        // 요청 데이터: 기존 옵션 값 2는 삭제하고, 새로운 옵션 값 2 추가
+        OptionGroupUpdateServiceRequest updateRequest = OptionGroupUpdateServiceRequest.builder()
+                .groupId(existingGroup.getNo()) // 기존 그룹 ID
+                .groupName("기존 그룹 수정됨") // 그룹 이름 수정
+                .optionValues(List.of(
+                        OptionValueUpdateServiceRequest.builder()
+                                .valueId(existingValue1.getNo()) // 기존 옵션 값 1 유지
+                                .valueName("기존 옵션 값 1 수정됨")
+                                .colorCode("#FFFFFF")
+                                .build(),
+                        OptionValueUpdateServiceRequest.builder()
+                                .valueId(null) // 새로운 옵션 값 추가
+                                .valueName("새로운 옵션 값 2")
+                                .colorCode("#0000FF")
+                                .build()
+                ))
+                .build();
+
+        // when
+        optionGroupService.updateOptionGroups(product.getNo(), List.of(updateRequest));
+
+        // then
+        // 기존 옵션 값 1은 수정되었는지 확인
+        OptionValue updatedValue1 = optionValueRepository.findById(existingValue1.getNo()).orElseThrow();
+        assertThat(updatedValue1.getName()).isEqualTo("기존 옵션 값 1 수정됨");
+        assertThat(updatedValue1.getColorCode()).isEqualTo("#FFFFFF");
+
+        // 기존 옵션 값 2는 삭제되었는지 확인
+        assertThat(optionValueRepository.findById(existingValue2.getNo())).isEmpty();
+
+        // 새로운 옵션 값 2가 추가되었는지 확인
+        OptionGroup updatedGroup = optionGroupRepository.findById(existingGroup.getNo()).orElseThrow();
+        List<OptionValue> updatedValues = updatedGroup.getOptionValues();
+        assertThat(updatedValues).hasSize(2);
+        assertThat(updatedValues).anySatisfy(value -> {
+            assertThat(value.getName()).isEqualTo("새로운 옵션 값 2");
+            assertThat(value.getColorCode()).isEqualTo("#0000FF");
+        });
+
+        // 그룹 이름이 수정되었는지 확인
+        assertThat(updatedGroup.getName()).isEqualTo("기존 그룹 수정됨");
+    }
 
 
     private Product createProduct() {
