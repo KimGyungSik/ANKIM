@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
@@ -95,23 +96,34 @@ public class Item {
                 .build();
     }
 
-    public void change(Item updatedItem) {
+    public void change(ItemDetailServiceRequest updatedItem) {
+        // 추가 가격
         if (updatedItem.getAddPrice() != null) {
             this.addPrice = updatedItem.getAddPrice();
         }
+
+        // 재고량
         if (updatedItem.getQty() != null) {
             this.qty = updatedItem.getQty();
         }
+
+        // 안전 재고량
         if (updatedItem.getSafQty() != null) {
             this.safQty = updatedItem.getSafQty();
         }
+
+        // 최대 주문 가능 수량
         if (updatedItem.getMaxQty() != null) {
             this.maxQty = updatedItem.getMaxQty();
         }
+
+        // 최소 주문 가능 수량
         if (updatedItem.getMinQty() != null) {
             this.minQty = updatedItem.getMinQty();
         }
     }
+
+
 
     public boolean isQuantityLessThan(int qty) {
         return this.qty < qty;
