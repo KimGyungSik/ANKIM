@@ -11,7 +11,7 @@ import java.util.List;
 
 @Getter
 @NoArgsConstructor
-public class ProductCreateServiceRequest {
+public class ProductCreateServiceRequest implements CategoryRequest{
     private String name; // 상품명
     private String code; // 상품코드
     private String desc; // 상세설명

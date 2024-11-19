@@ -17,4 +17,6 @@ public interface OptionValueRepository extends JpaRepository<OptionValue,Long> {
 
     // 특정 옵션 그룹에 속한 옵션 값 이름 리스트로 조회
     List<OptionValue> findByOptionGroupNoAndNameIn(Long optionGroupId, List<String> names);
+
+    Optional<OptionValue> findByOptionGroupNoAndName(Long no, String valueName);
 }

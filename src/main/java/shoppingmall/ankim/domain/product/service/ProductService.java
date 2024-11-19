@@ -15,7 +15,9 @@ import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.domain.product.service.request.CategoryRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
 import shoppingmall.ankim.global.exception.ErrorCode;
@@ -56,7 +58,7 @@ public class ProductService {
         saveOptionGroup(request, savedProduct);
 
         // 5. 품목 생성
-        itemService.createItems(savedProduct, request.getItems());
+        itemService.createItems(savedProduct.getNo(), request.getItems());
 
         return ProductResponse.of(savedProduct);
     }
@@ -65,12 +67,26 @@ public class ProductService {
     // 상품 수정
     // 조건 1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X
     // 조건 2. 상품 이미지는 파라미터로 들어오면 수정 안들어왔으면 유지
-//    public ProductResponse updateProduct(ProductUpdateServiceRequest request) {
-//
-//    }
+    public ProductResponse updateProduct(Long productId, ProductUpdateServiceRequest request) {
+        // 1. 카테고리 id로 카테고리 엔티티 가져오기
+        Category category = getCategory(request);
 
+        // 2. 상품 id로 상품 엔티티 가져와서 수정하기
+        Product modifyProduct = getProduct(productId);
+        modifyProduct.changeCategory(category);
+        modifyProduct.change(request);
 
+        // 3. 상품 이미지 수정
+        productImgService.updateProductImgs(productId, request.getProductImages());
 
+        // 4. 옵션 그룹 및 옵션 값 수정
+        optionGroupService.updateOptionGroups(productId, request.getOptionGroups());
+
+        // 5. 품목 수정
+        itemService.updateItems(productId, request.getItems());
+
+        return ProductResponse.of(modifyProduct);
+    }
 
 
     private void saveOptionGroup(ProductCreateServiceRequest request, Product savedProduct) {
@@ -103,8 +119,13 @@ public class ProductService {
         return productRepository.save(product);
     }
 
-    private Category getCategory(ProductCreateServiceRequest request) {
+    private Category getCategory(CategoryRequest request) {
         return categoryRepository.findById(request.getCategoryNo())
                 .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
+    }
+
+    private Product getProduct(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 }

@@ -100,8 +100,7 @@ class ItemServiceTest {
     void createItems() {
         // given
         // 1. 상품 생성
-        Product product = createProduct();
-        productRepository.save(product);
+        Product product = createAndSaveProduct();
 
         // 2. 옵션 그룹 및 옵션 값 생성
         OptionGroup colorGroup = optionGroupRepository.save(
@@ -159,7 +158,7 @@ class ItemServiceTest {
                 .build();
 
         // when
-        List<ItemResponse> result = itemService.createItems(product, request);
+        List<ItemResponse> result = itemService.createItems(product.getNo(), request);
 
         // then
         assertThat(result).hasSize(4) // 생성된 품목의 개수 확인
@@ -188,6 +187,260 @@ class ItemServiceTest {
                 );
     }
 
+    @DisplayName("원하는 옵션 조합만 선택해서 품목을 등록할 수 있다.")
+    @Test
+    void createItemsSelectItem() {
+        // given
+        // 1. 상품 생성
+        Product product = createAndSaveProduct();
+
+        // 2. 옵션 그룹 및 옵션 값 생성
+        OptionGroup colorGroup = optionGroupRepository.save(
+                OptionGroup.builder().name("색상").product(product).build()
+        );
+        OptionGroup sizeGroup = optionGroupRepository.save(
+                OptionGroup.builder().name("사이즈").product(product).build()
+        );
+
+        OptionValue blue = optionValueRepository.save(OptionValue.builder().optionGroup(colorGroup).name("Blue").colorCode("#0000FF").build());
+        OptionValue red = optionValueRepository.save(OptionValue.builder().optionGroup(colorGroup).name("Red").colorCode("#FF0000").build());
+        OptionValue small = optionValueRepository.save(OptionValue.builder().optionGroup(sizeGroup).name("Small").build());
+        OptionValue large = optionValueRepository.save(OptionValue.builder().optionGroup(sizeGroup).name("Large").build());
+
+        // 3. 품목 생성 요청 데이터
+        ItemCreateServiceRequest request = ItemCreateServiceRequest.builder()
+                .items(List.of(
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Blue, 사이즈: Small")
+                                .optionValueNames(List.of("Blue", "Small"))
+                                .addPrice(500)
+                                .qty(100)
+                                .safQty(10)
+                                .maxQty(5)
+                                .minQty(1)
+                                .build(),
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Red, 사이즈: Small")
+                                .optionValueNames(List.of("Red", "Small"))
+                                .addPrice(700)
+                                .qty(120)
+                                .safQty(15)
+                                .maxQty(7)
+                                .minQty(2)
+                                .build(),
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Red, 사이즈: Large")
+                                .optionValueNames(List.of("Red", "Large"))
+                                .addPrice(800)
+                                .qty(60)
+                                .safQty(8)
+                                .maxQty(4)
+                                .minQty(1)
+                                .build()
+                ))
+                .build();
+
+        // when
+        List<ItemResponse> result = itemService.createItems(product.getNo(), request);
+
+        // then
+        assertThat(result).hasSize(3) // 생성된 품목의 개수 확인
+                .extracting("name", "addPrice", "qty", "safQty", "maxQty", "minQty")
+                .containsExactlyInAnyOrder(
+                        tuple("색상: Blue, 사이즈: Small", 500, 100, 10, 5, 1),
+                        tuple("색상: Red, 사이즈: Small", 700, 120, 15, 7, 2),
+                        tuple("색상: Red, 사이즈: Large", 800, 60, 8, 4, 1)
+                );
+
+        // 추가 검증: 데이터베이스에 저장된 품목 확인
+        List<Item> savedItems = itemRepository.findAll();
+        assertThat(savedItems).hasSize(3);
+        assertThat(savedItems).extracting("product").containsOnly(product); // 모든 품목이 동일한 상품과 연결됨
+        // 추가 검증: 상품의 품목 리스트에 잘 추가되었는지 확인
+        Product updatedProduct = productRepository.findById(product.getNo())
+                .orElseThrow(() -> new IllegalArgumentException("상품이 존재하지 않습니다."));
+        assertThat(updatedProduct.getItems()).hasSize(3)
+                .extracting("name", "addPrice", "qty", "safQty", "maxQty", "minQty")
+                .containsExactlyInAnyOrder(
+                        tuple("색상: Blue, 사이즈: Small", 500, 100, 10, 5, 1),
+                        tuple("색상: Red, 사이즈: Small", 700, 120, 15, 7, 2),
+                        tuple("색상: Red, 사이즈: Large", 800, 60, 8, 4, 1)
+                );
+    }
+
+    @DisplayName("품목 업데이트만 있는 경우")
+    @Test
+    void updateItemsOnlyUpdate() {
+        // given
+        Product product = createAndSaveProduct();
+        OptionGroup colorGroup = createAndSaveOptionGroup(product, "색상", List.of("Blue", "Red"));
+        OptionGroup sizeGroup = createAndSaveOptionGroup(product, "사이즈", List.of("Small", "Large"));
+
+        Item existingItem = itemRepository.save(Item.create(product,
+                List.of(findOptionValue(colorGroup, "Blue"), findOptionValue(sizeGroup, "Small")),
+                "PROD123-1", "색상: Blue, 사이즈: Small", 500, 100, 10, 5, 1));
+
+        ItemUpdateServiceRequest updateRequest = ItemUpdateServiceRequest.builder()
+                .items(List.of(
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Blue, 사이즈: Small")
+                                .optionValueNames(List.of("Blue", "Small"))
+                                .addPrice(600) // 변경된 값
+                                .qty(90)
+                                .safQty(15)
+                                .maxQty(4)
+                                .minQty(1)
+                                .build()
+                ))
+                .build();
+
+        // when
+        itemService.updateItems(product.getNo(), updateRequest);
+
+        // then
+        List<Item> updatedItems = itemRepository.findByProduct_No(product.getNo());
+        assertThat(updatedItems).hasSize(1)
+                .extracting("name", "addPrice", "qty", "safQty", "maxQty", "minQty")
+                .containsExactlyInAnyOrder(
+                        tuple("색상: Blue, 사이즈: Small", 600, 90, 15, 4, 1)
+                );
+    }
+
+    @DisplayName("품목 생성만 있는 경우")
+    @Test
+    void updateItemsOnlyCreate() {
+        // given
+        Product product = createAndSaveProduct();
+        OptionGroup colorGroup = createAndSaveOptionGroup(product, "색상", List.of("Blue", "Red"));
+        OptionGroup sizeGroup = createAndSaveOptionGroup(product, "사이즈", List.of("Small", "Large"));
+
+        ItemUpdateServiceRequest createRequest = ItemUpdateServiceRequest.builder()
+                .items(List.of(
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Red, 사이즈: Large")
+                                .optionValueNames(List.of("Red", "Large"))
+                                .addPrice(800)
+                                .qty(60)
+                                .safQty(10)
+                                .maxQty(4)
+                                .minQty(2)
+                                .build()
+                ))
+                .build();
+
+        // when
+        itemService.updateItems(product.getNo(), createRequest);
+
+        // then
+        List<Item> createdItems = itemRepository.findByProduct_No(product.getNo());
+        assertThat(createdItems).hasSize(1)
+                .extracting("name", "addPrice", "qty", "safQty", "maxQty", "minQty")
+                .containsExactlyInAnyOrder(
+                        tuple("색상: Red, 사이즈: Large", 800, 60, 10, 4, 2)
+                );
+    }
+
+    @DisplayName("품목 삭제가 포함된 경우")
+    @Test
+    void updateItemsWithDelete() {
+        // given
+        Product product = createAndSaveProduct();
+        OptionGroup colorGroup = createAndSaveOptionGroup(product, "색상", List.of("Blue", "Red"));
+        OptionGroup sizeGroup = createAndSaveOptionGroup(product, "사이즈", List.of("Small", "Large"));
+
+        Item existingItem1 = itemRepository.save(Item.create(product,
+                List.of(findOptionValue(colorGroup, "Blue"), findOptionValue(sizeGroup, "Small")),
+                "PROD123-1", "색상: Blue, 사이즈: Small", 500, 100, 10, 5, 1));
+
+        Item existingItem2 = itemRepository.save(Item.create(product,
+                List.of(findOptionValue(colorGroup, "Red"), findOptionValue(sizeGroup, "Large")),
+                "PROD123-2", "색상: Red, 사이즈: Large", 800, 60, 10, 4, 2));
+
+        ItemUpdateServiceRequest deleteRequest = ItemUpdateServiceRequest.builder()
+                .items(List.of(
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Blue, 사이즈: Small")
+                                .optionValueNames(List.of("Blue", "Small"))
+                                .addPrice(500)
+                                .qty(100)
+                                .safQty(10)
+                                .maxQty(5)
+                                .minQty(1)
+                                .build()
+                ))
+                .build();
+
+        // when
+        itemService.updateItems(product.getNo(), deleteRequest);
+
+        // then
+        List<Item> remainingItems = itemRepository.findByProduct_No(product.getNo());
+        assertThat(remainingItems).hasSize(1)
+                .extracting("name")
+                .containsExactly("색상: Blue, 사이즈: Small");
+    }
+
+    @DisplayName("업데이트, 생성, 삭제가 동시에 발생하는 경우")
+    @Test
+    void updateItemsMixed() {
+        // given
+        Product product = createAndSaveProduct();
+        OptionGroup colorGroup = createAndSaveOptionGroup(product, "색상", List.of("Blue", "Red"));
+        OptionGroup sizeGroup = createAndSaveOptionGroup(product, "사이즈", List.of("Small", "Large"));
+
+        itemRepository.save(Item.create(product,
+                List.of(findOptionValue(colorGroup, "Blue"), findOptionValue(sizeGroup, "Small")),
+                "PROD123-1", "색상: Blue, 사이즈: Small", 500, 100, 10, 5, 1));
+
+        ItemUpdateServiceRequest mixedRequest = ItemUpdateServiceRequest.builder()
+                .items(List.of(
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Blue, 사이즈: Small")
+                                .optionValueNames(List.of("Blue", "Small"))
+                                .addPrice(550) // 업데이트
+                                .qty(110)
+                                .safQty(15)
+                                .maxQty(6)
+                                .minQty(1)
+                                .build(),
+                        ItemDetailServiceRequest.builder()
+                                .name("색상: Red, 사이즈: Small")
+                                .optionValueNames(List.of("Red", "Small"))
+                                .addPrice(700) // 생성
+                                .qty(120)
+                                .safQty(20)
+                                .maxQty(8)
+                                .minQty(2)
+                                .build()
+                ))
+                .build();
+
+        // when
+        itemService.updateItems(product.getNo(), mixedRequest);
+
+        // then
+        List<Item> updatedItems = itemRepository.findByProduct_No(product.getNo());
+        assertThat(updatedItems).hasSize(2)
+                .extracting("name", "addPrice", "qty", "safQty", "maxQty", "minQty")
+                .containsExactlyInAnyOrder(
+                        tuple("색상: Blue, 사이즈: Small", 550, 110, 15, 6, 1),
+                        tuple("색상: Red, 사이즈: Small", 700, 120, 20, 8, 2)
+                );
+    }
+
+    private OptionValue findOptionValue(OptionGroup group, String valueName) {
+        return  optionValueRepository.findByOptionGroupNoAndName(group.getNo(), valueName)
+                .orElseThrow(() -> new IllegalArgumentException("옵션 값이 존재하지 않습니다."));
+    }
+
+    private OptionGroup createAndSaveOptionGroup(Product product, String groupName, List<String> valueNames) {
+        OptionGroup group = optionGroupRepository.save(
+                OptionGroup.builder().name(groupName).product(product).build()
+        );
+        valueNames.forEach(name -> optionValueRepository.save(OptionValue.builder().optionGroup(group).name(name).build()));
+        return group;
+    }
+
     private Category createCategory() {
         return categoryRepository.save(Category.builder()
                 .name("상의")
@@ -196,11 +449,8 @@ class ItemServiceTest {
                         .build()))
                 .build());
     }
-
-
-
-    private Product createProduct() {
-        return Product.builder()
+    private Product createAndSaveProduct() {
+        Product product = Product.builder()
                 .category(createCategory())
                 .name("테스트 상품")
                 .code("PROD123")
@@ -219,5 +469,6 @@ class ItemServiceTest {
                 .cauOrd("주문 유의사항")
                 .cauShip("배송 유의사항")
                 .build();
+        return productRepository.save(product);
     }
 }

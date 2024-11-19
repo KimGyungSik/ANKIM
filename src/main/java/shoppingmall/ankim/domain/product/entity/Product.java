@@ -11,6 +11,7 @@ import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.product.exception.ProductNameTooLongException;
+import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -207,5 +208,32 @@ public class Product {
             throw new ProductNameTooLongException(PRODUCT_NAME_TOO_LONG);
         }
         this.name = name;
+    }
+
+    public void changeCategory(Category category) {
+        if(category != null) {
+            this.category = category;
+        }
+    }
+
+    public void change(ProductUpdateServiceRequest updateRequest) {
+        if (updateRequest.getName() != null) {
+            validateName(updateRequest.getName());
+        }
+
+        this.desc = updateRequest.getDesc() != null ? updateRequest.getDesc() : this.desc;
+        this.discRate = updateRequest.getDiscRate() != null ? updateRequest.getDiscRate() : this.discRate;
+        this.origPrice = updateRequest.getOrigPrice() != null ? updateRequest.getOrigPrice() : this.origPrice;
+        this.sellPrice = calculateSellPrice(this.origPrice, this.discRate); // 판매가 재계산
+        this.optYn = updateRequest.getOptYn() != null ? updateRequest.getOptYn() : this.optYn;
+        this.restockYn = updateRequest.getRestockYn() != null ? updateRequest.getRestockYn() : this.restockYn;
+        this.qty = updateRequest.getQty() != null ? updateRequest.getQty() : this.qty;
+        this.bestYn = updateRequest.getBestYn() != null ? updateRequest.getBestYn() : this.bestYn;
+        this.freeShip = updateRequest.getFreeShip() != null ? updateRequest.getFreeShip() : this.freeShip;
+        this.shipFee = updateRequest.getShipFee() != null ? updateRequest.getShipFee() : this.shipFee;
+        this.searchKeywords = updateRequest.getSearchKeywords() != null ? updateRequest.getSearchKeywords() : this.searchKeywords;
+        this.cauProd = updateRequest.getCauProd() != null ? updateRequest.getCauProd() : this.cauProd;
+        this.cauOrd = updateRequest.getCauOrd() != null ? updateRequest.getCauOrd() : this.cauOrd;
+        this.cauShip = updateRequest.getCauShip() != null ? updateRequest.getCauShip() : this.cauShip;
     }
 }

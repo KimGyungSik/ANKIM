@@ -9,6 +9,7 @@ import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
+import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
@@ -26,6 +27,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
+
 // 옵션 조합 생성 -> 조합 결과 반환 -> 세부 값 입력 및 저장
 // 옵션 조합 생성 후 품목 반환 → 각 품목에 대한 세부 값 입력 및 저장
 @Service
@@ -34,6 +36,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 public class ItemService {
 
     private final ItemRepository itemRepository;
+    private final ProductRepository productRepository;
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
 
@@ -59,7 +62,9 @@ public class ItemService {
     /**
      * 품목 등록
      */
-    public List<ItemResponse> createItems(Product product, ItemCreateServiceRequest request) {
+    public List<ItemResponse> createItems(Long productId, ItemCreateServiceRequest request) {
+        Product product = getProduct(productId);
+
         List<ItemResponse> itemResponses = new ArrayList<>();
         for (ItemDetailServiceRequest detail : request.getItems()) {
 
@@ -89,15 +94,67 @@ public class ItemService {
 
     /**
      * 품목 수정
+     * 상품 id로 품목들 조회
+     * 기존 품목 업데이트와 새로 생성되어야 하는 품목을 구별해야함
+     * 품목명이 다르면 품목 새로 생성
+     * 품목명이 같다면 업데이트만 진행
      */
+    public void updateItems(Long productId, ItemUpdateServiceRequest updatedItemsRequest) {
+        List<ItemDetailServiceRequest> updatedItems = updatedItemsRequest.getItems();
+
+        // 1. 상품 ID로 기존 품목 조회
+        Product product = getProduct(productId);
+
+        List<Item> existingItems = itemRepository.findByProduct_No(productId);
+
+        // 2. 수정 요청 데이터를 Map 형태로 변환 (key: name, value: ItemDetailServiceRequest)
+        Map<String, ItemDetailServiceRequest> updatedItemMap = updatedItems.stream()
+                .collect(Collectors.toMap(ItemDetailServiceRequest::getName, item -> item));
+
+        // 3. 업데이트 및 생성 리스트 정의
+        List<Item> itemsToSave = new ArrayList<>();
+        List<Item> itemsToDelete = new ArrayList<>(existingItems); // 초기값은 기존 리스트 전체
+
+        for (Item item : existingItems) {
+            if (updatedItemMap.containsKey(item.getName())) {
+                // 기존 품목 업데이트
+                ItemDetailServiceRequest detail = updatedItemMap.get(item.getName());
+                item.change(detail);
+                itemsToDelete.remove(item); // 업데이트 된 품목은 삭제 리스트에서 제외
+            }
+        }
+
+        // 새로 추가해야 할 품목 찾기
+        for (ItemDetailServiceRequest detail : updatedItems) {
+            if (existingItems.stream().noneMatch(item -> item.getName().equals(detail.getName()))) {
+                // 새 품목 생성
+                Item newItem = Item.create(
+                        product,
+                        getOptionValuesFromNames(detail.getOptionValueNames(), product), // 옵션 값 매핑
+                        generateItemCode(product), // 새로운 품목 코드 생성
+                        detail.getName(),
+                        detail.getAddPrice(),
+                        detail.getQty(),
+                        detail.getSafQty(),
+                        detail.getMaxQty(),
+                        detail.getMinQty()
+                );
+                itemsToSave.add(newItem);
+            }
+        }
+
+        // 4. 삭제해야 할 품목 처리
+        itemRepository.deleteAll(itemsToDelete);
+
+        // 5. 저장해야 할 품목 저장
+        itemRepository.saveAll(itemsToSave);
+    }
 
 
-
-
-
-
-
-
+    private Product getProduct(Long productId) {
+        return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    }
     private List<OptionValue> getOptionValuesFromNames(List<String> optionValueNames, Product product) {
         List<OptionGroup> optionGroups = optionGroupRepository.findAllByProduct(product);
 
