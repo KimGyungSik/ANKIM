@@ -12,16 +12,23 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import shoppingmall.ankim.domain.security.service.CustomAuthenticationFailureHandler;
-import shoppingmall.ankim.domain.security.service.JwtAuthenticationFilter;
+import shoppingmall.ankim.domain.security.service.*;
 
 @Configuration
 @EnableWebSecurity // 모든 요청 URL이 스프링 시큐리티 제어 받게 만듦
 @RequiredArgsConstructor
 public class SecurityConfig {
 
+    private final AuthenticationConfiguration authenticationConfiguration;
+    private final JwtTokenProvider jwtTokenProvider;
+
     private final CustomAuthenticationFailureHandler customAuthenticationFailureHandler;
     private final JwtAuthenticationFilter jwtAuthenticationFilter;
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
+        return configuration.getAuthenticationManager();
+    }
 
     // 비밀번호 암호화
     @Bean
@@ -30,7 +37,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain filterChain(HttpSecurity http, JwtTokenProvider jwtTokenProvider) throws Exception {
 
         // csrf 비활성화
         http
@@ -48,10 +55,19 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
 //                        .requestMatchers("/my/**").authenticated() // my라는 url로 들어오면 인증이 필요
-                        .requestMatchers("/admin/**").hasAuthority("ROLE_ADMIN") // 관리자 접근 경로에 관리자 권한 필요
-                        .requestMatchers("/my/**").hasAnyAuthority("ROLE_USER", "ROLE_ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
+                        .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 접근 경로에 관리자 권한 필요
+                        .requestMatchers("/my/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
                         .anyRequest().permitAll()) // 나머지 요청은 접근 허용
         ;
+
+        // 필터 추가
+/*
+        http
+                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+*/
+
+/*        http
+                .addFilterAfter(new JwtFilter(jwtTokenProvider), LoginFilter.class);*/
 
 /*        http
                 .formLogin(login -> login
@@ -69,14 +85,9 @@ public class SecurityConfig {
 
         // JWT 필터 추가
         http
-                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                .addFilterAfter(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
-    }
-
-    @Bean
-    public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
-        return configuration.getAuthenticationManager();
     }
 
 }

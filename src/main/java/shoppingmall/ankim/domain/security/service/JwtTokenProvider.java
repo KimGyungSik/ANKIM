@@ -78,7 +78,6 @@ public class JwtTokenProvider {
 
     // Token 만료 여부 검증
     public boolean isTokenExpired(String token) {
-        try {
             Date expirationDate = Jwts.parser()
                     .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
                     .build()
@@ -86,9 +85,6 @@ public class JwtTokenProvider {
                     .getPayload()
                     .getExpiration();
             return expirationDate.before(new Date()); // expirationDate가 현재 시간보다 이전인지 확인
-        } catch (ExpiredJwtException e) {
-            return true; // 만료된 경우 true 반환
-        }
     }
 
     // refreshToken이 만료되지 않은 Token 정보 추출

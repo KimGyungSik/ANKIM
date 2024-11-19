@@ -4,6 +4,6 @@ import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
 
 public interface LoginService {
 
-    void login(LoginServiceRequest loginServiceRequest);
+    String login(LoginServiceRequest loginServiceRequest);
 
 }

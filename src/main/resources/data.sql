@@ -27,3 +27,26 @@ VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 
 -- 상위 약관
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 'v1', 1, 'Y');
+
+-- [ 회원 삽입 ]
+INSERT INTO member (
+    login_id,
+    pwd,
+    name,
+    phone_num,
+    birth,
+    gender,
+    grade,
+    join_date,
+    status
+) VALUES (
+             'sample@example.com',        -- login_id
+             '$2a$10$FjPDD9Y58GVTeOei3JvgVu84kZFxxZSs9j39yOLdkWXOlzOaDrhZe',            -- pwd( passWorld! )
+             '홍길동',                    -- name
+             '010-1234-5678',           -- phone_num
+             '1990-01-01',              -- birth
+             'M',                       -- gender
+             '50',                      -- grade
+             '2024-11-18T23:59:59',     -- join_date (현재 시간)
+             'ACTIVE'                   -- status
+         );

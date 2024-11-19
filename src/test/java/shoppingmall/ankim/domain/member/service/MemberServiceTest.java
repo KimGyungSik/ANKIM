@@ -188,6 +188,8 @@ class MemberServiceTest {
         // then
         Member savedMember = memberRepository.findById(memberResponse.getNo()).orElse(null);
 
+        System.out.println("savedMember.getPwd() = " + savedMember.getPwd());
+
         assertThat(savedMember).isNotNull();
         assertThat(savedMember.getName()).isEqualTo("홍길동");
         assertThat(savedMember.getPhoneNum()).isEqualTo("010-1234-5678");

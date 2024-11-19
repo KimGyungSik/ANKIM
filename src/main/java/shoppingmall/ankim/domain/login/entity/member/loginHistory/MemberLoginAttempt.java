@@ -65,6 +65,15 @@ public class MemberLoginAttempt extends BaseEntity {
                 this.loginAttemptDetails.getUnlockTime().isBefore(LocalDateTime.now());
     }
 
+    public void resetFailCount() {
+        this.loginAttemptDetails = BaseLoginAttempt.builder()
+                .failCount(this.loginAttemptDetails.getFailCount())
+                .lastAttemptTime(LocalDateTime.now()) // 마지막 시도 시간 갱신
+                .unlockTime(this.loginAttemptDetails.getUnlockTime()) // 잠금 시간 초기화
+                .activeYn("N") // 활성화 상태 비활성으로 업데이트
+                .build();
+    }
+
 
     /*
     @Column(name = "fail_cnt")

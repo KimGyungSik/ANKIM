@@ -48,6 +48,7 @@ class CustomUserDetailsServiceTest {
     void testLoadUserByUsername_Success() {
         // given
         member = Member.builder()
+                .no(2L)
                 .loginId("user@example.com")
                 .pwd("password")
                 .name("Test User")
@@ -62,7 +63,6 @@ class CustomUserDetailsServiceTest {
                 .build();
 
         loginAttempt = MemberLoginAttempt.builder()
-                .no(1L)
                 .member(member)
                 .loginAttemptDetails(loginAttemptDetails)
                 .build();
@@ -135,6 +135,7 @@ class CustomUserDetailsServiceTest {
     void testLoadUserByUsername_UnlockTimePassed() {
         // given
         member = Member.builder()
+                .no(2L)
                 .loginId("unlock@example.com")
                 .pwd("password")
                 .name("Test User")
@@ -149,7 +150,6 @@ class CustomUserDetailsServiceTest {
                 .build();
 
         loginAttempt = MemberLoginAttempt.builder()
-                .no(1L)
                 .member(member)
                 .loginAttemptDetails(loginAttemptDetails)
                 .build();

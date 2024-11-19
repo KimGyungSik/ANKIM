@@ -1,8 +1,10 @@
 package shoppingmall.ankim.domain.login.controller;
 
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -16,6 +18,7 @@ import shoppingmall.ankim.domain.login.controller.request.LoginRequest;
 import shoppingmall.ankim.domain.login.exception.LoginFailedException;
 import shoppingmall.ankim.domain.login.service.LoginService;
 import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
+import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
@@ -39,9 +42,18 @@ public class LoginApiController {
     private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성기
 
     @PostMapping("/login")
-    public ApiResponse<Map<String, String>> login(@RequestBody @Valid LoginRequest loginRequest) throws LoginFailedException {
+    public ApiResponse<?> login(@RequestBody @Valid LoginRequest loginRequest, HttpServletResponse response) throws LoginFailedException {
         try {
-            // Spring Security 인증 시도
+            // LoginService를 통해 인증 처리
+            String jwtToken = loginService.login(loginRequest.toServiceRequest());
+
+            // 성공 시 토큰 반환
+            // 헤더에 토큰 추가
+            response.addHeader("Authorization", "Bearer " + jwtToken);
+
+            return ApiResponse.ok("로그인 성공");
+
+/*            // Spring Security 인증 시도
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPwd())
             );
@@ -61,10 +73,9 @@ public class LoginApiController {
                 );
 
                 return ApiResponse.ok(tokens);
-            }
+            }*/
         } catch (BadCredentialsException ex) {
             throw new LoginFailedException(INVALID_CREDENTIALS);
         }
-        return ApiResponse.ok(HttpStatus.MULTI_STATUS, ""); // FIXME
     }
 }

@@ -48,3 +48,5 @@ Content-Type: application/json
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
 POST http://localhost:8080/api/member/email-next?loginId=test@example.com
 Content-Type: application/json
+
+

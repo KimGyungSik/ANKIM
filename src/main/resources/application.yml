@@ -22,10 +22,10 @@ spring:
   #      - prod
   main:
     allow-bean-definition-overriding: true
-#  sql:
-#    init:
-#      data-locations: classpath*:data.sql
-#      mode: always
+  sql:
+    init:
+      data-locations: classpath*:data.sql
+      mode: always
   thymeleaf:
     prefix: classpath:/templates/
     suffix: .html

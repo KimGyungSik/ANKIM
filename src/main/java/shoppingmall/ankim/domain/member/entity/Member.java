@@ -76,12 +76,13 @@ public class Member extends BaseEntity {
 //    Authority authority;
 
     @Builder
-    public Member(UUID uuid, String loginId, String pwd, String name,
+    public Member(Long no,UUID uuid, String loginId, String pwd, String name,
                   String phoneNum, LocalDate birth, String gender,
                   LocalDateTime joinDate, Integer grade,
                   MemberStatus status, Authority authority,
                   List<Terms> termsList
     ) {
+        this.no = no;
         this.uuid = uuid;
         this.loginId = loginId;
         this.pwd = pwd;
