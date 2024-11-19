@@ -4,6 +4,14 @@ package shoppingmall.ankim.domain.product.service.request;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
+import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
+import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
+
+import java.util.List;
 
 @Getter
 @NoArgsConstructor
@@ -24,10 +32,20 @@ public class ProductUpdateServiceRequest {
     private String cauOrd; // 주문 유의사항
     private String cauShip; // 배송 유의사항
 
+    private Long categoryNo; // 소분류 카테고리 ID
+
+    private List<OptionGroupUpdateServiceRequest> optionGroups; // 옵션 그룹 리스트
+    private ProductImgUpdateServiceRequest productImages; // 상품 이미지 리스트
+    private ItemUpdateServiceRequest items;
+
+
     @Builder
     public ProductUpdateServiceRequest(String name, String desc, Integer discRate, Integer origPrice, String optYn,
                                        String restockYn, Integer qty, String bestYn, String freeShip, Integer shipFee,
-                                       String searchKeywords, String cauProd, String cauOrd, String cauShip) {
+                                       String searchKeywords, String cauProd, String cauOrd, String cauShip,
+                                       Long categoryNo, List<OptionGroupUpdateServiceRequest> optionGroups,
+                                       ProductImgUpdateServiceRequest productImages,
+                                       ItemUpdateServiceRequest items) {
         this.name = name;
         this.desc = desc;
         this.discRate = discRate;
@@ -42,6 +60,10 @@ public class ProductUpdateServiceRequest {
         this.cauProd = cauProd;
         this.cauOrd = cauOrd;
         this.cauShip = cauShip;
+        this.categoryNo = categoryNo;
+        this.optionGroups = optionGroups;
+        this.productImages = productImages;
+        this.items = items;
     }
 }
 
