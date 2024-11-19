@@ -17,6 +17,7 @@ import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
+import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.ArrayList;
@@ -34,7 +35,13 @@ public class ProductService {
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
     private final ItemService itemService;
-
+    /*
+        1. 카테고리 검증 및 조회
+        2. 상품 생성 및 저장
+        3. 상품 이미지 저장
+        4. 옵션 그룹 및 옵션 값 생성
+        5. 옵션 조합 기반 품목 생성
+     */
     public ProductResponse createProduct(ProductCreateServiceRequest request) {
         // 1. 카테고리 id로 카테고리 엔티티 가져오기
         Category category = getCategory(request);
@@ -46,10 +53,10 @@ public class ProductService {
         productImgService.createProductImgs(savedProduct.getNo(), request.getProductImages());
 
         // 4. 옵션 그룹 생성 및 저장
-        List<Long> optionGroupIds = getOptionGroupIds(request, savedProduct);
+        saveOptionGroup(request, savedProduct);
 
-        // 5. 품목 생성 - optionGroupIds와 productId만 전달
-        itemService.createItem(savedProduct.getNo(), optionGroupIds, request.getItems());
+        // 5. 품목 생성
+        itemService.createItems(savedProduct, request.getItems());
 
         return ProductResponse.of(savedProduct);
     }
@@ -58,20 +65,18 @@ public class ProductService {
     // 상품 수정
     // 조건 1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X
     // 조건 2. 상품 이미지는 파라미터로 들어오면 수정 안들어왔으면 유지
+//    public ProductResponse updateProduct(ProductUpdateServiceRequest request) {
+//
+//    }
 
 
 
 
 
-    private List<Long> getOptionGroupIds(ProductCreateServiceRequest request, Product savedProduct) {
-        List<Long> optionGroupIds = new ArrayList<>();
+    private void saveOptionGroup(ProductCreateServiceRequest request, Product savedProduct) {
         if (request.getOptionGroups() != null && !request.getOptionGroups().isEmpty()) {
             List<OptionGroupResponse> optionGroups = optionGroupService.createOptionGroups(savedProduct.getNo(), request.getOptionGroups());
-            for (OptionGroupResponse optionGroupResponse : optionGroups) {
-                optionGroupIds.add(optionGroupResponse.getOptionGroupNo());
-            }
         }
-        return optionGroupIds;
     }
 
     private Product getProduct(ProductCreateServiceRequest request, Category category) {

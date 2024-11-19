@@ -5,6 +5,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.entity.Product;
@@ -92,6 +93,24 @@ public class Item {
                 .maxQty(maxQty)
                 .minQty(minQty)
                 .build();
+    }
+
+    public void change(Item updatedItem) {
+        if (updatedItem.getAddPrice() != null) {
+            this.addPrice = updatedItem.getAddPrice();
+        }
+        if (updatedItem.getQty() != null) {
+            this.qty = updatedItem.getQty();
+        }
+        if (updatedItem.getSafQty() != null) {
+            this.safQty = updatedItem.getSafQty();
+        }
+        if (updatedItem.getMaxQty() != null) {
+            this.maxQty = updatedItem.getMaxQty();
+        }
+        if (updatedItem.getMinQty() != null) {
+            this.minQty = updatedItem.getMinQty();
+        }
     }
 
     public boolean isQuantityLessThan(int qty) {
