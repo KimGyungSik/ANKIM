@@ -4,13 +4,13 @@ import io.jsonwebtoken.*;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.authentication.AuthenticationCredentialsNotFoundException;
 import org.springframework.stereotype.Component;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+import java.util.List;
 
 // Jwt 토큰 생성, 인증, 권한 부여, 유효성 검사, pk 추출 등 기능 제공
 @Slf4j
@@ -21,16 +21,17 @@ public class JwtTokenProvider {
     private String secretKey;
 
     @Value("${jwt.access.token.expire.time}")
-    private long accessTokenExpiration;
+    private long ACCESS_TOKEN_EXPIRE_TIME;
 
     @Value("${jwt.refresh.token.expire.time}")
-    private long refreshTokenExpiration;
+    private long REFRESH_TOKEN_EXPIRE_TIME;
 
     // 토큰 생성 메서드
-    public String generateToken(CustomUserDetails userDetails, long expirationTime) {
+    public String generateToken(CustomUserDetails userDetails, String category, long expirationTime) {
         Date now = new Date(); // 생성일 설정
         return Jwts.builder()
                 .subject(userDetails.getUsername()) // loginId 저장
+                .claim("category", category)
                 .claim("name", userDetails.getUsername()) // 사용자 이름 저장
                 .claim("roles", userDetails.getAuthorities()) // 권한 정보 저장
                 .issuedAt(now)
@@ -46,13 +47,13 @@ public class JwtTokenProvider {
     }
 
     // Access Token 생성
-    public String generateAccessToken(CustomUserDetails userDetails) {
-        return generateToken(userDetails, accessTokenExpiration);
+    public String generateAccessToken(CustomUserDetails userDetails, String category) {
+        return generateToken(userDetails, category, ACCESS_TOKEN_EXPIRE_TIME);
     }
 
     // Refresh Token 생성
-    public String generateRefreshToken(CustomUserDetails userDetails) {
-        return generateToken(userDetails, refreshTokenExpiration);
+    public String generateRefreshToken(CustomUserDetails userDetails, String category) {
+        return generateToken(userDetails, category, REFRESH_TOKEN_EXPIRE_TIME);
     }
 
     // Token 유효 여부 검증
@@ -101,5 +102,28 @@ public class JwtTokenProvider {
                 .parseSignedClaims(token)
                 .getPayload();
         return claims.getSubject(); // Subject는 username(loginId)
+    }
+
+    // 토큰에서 Category 추출
+    public String getCategoryFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        // 클레임에서 "category" 값을 추출
+        return claims.get("category", String.class);
+    }
+
+    public String getRoleFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        // 클레임에서 "category" 값을 추출
+        return claims.get("roles", String.class);
     }
 }

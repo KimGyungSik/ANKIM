@@ -42,6 +42,11 @@ public class ApiResponse<T> {
         return of(HttpStatus.OK, data);
     }
 
+    // ErrorCode를 받아 ApiResponse 생성
+    public static <T> ApiResponse<T> of(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null, null);
+    }
+
     public static <T> ApiResponse<T> ok(HttpStatus httpStatus, String message) {
         return new ApiResponse<>(httpStatus, message, null, null);
     }

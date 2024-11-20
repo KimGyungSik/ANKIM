@@ -23,8 +23,8 @@ public class LoginServiceRequest {
     public LoginServiceRequest(String loginId, String pwd, LoginType loginType, LocalDateTime loginTime, boolean autoLogin) {
         this.loginId = loginId;
         this.pwd = pwd;
-        this.loginType = loginType;
-        this.loginTime = loginTime;
+        this.loginType = loginType == null? LoginType.EMAIL : loginType;
+        this.loginTime = loginTime == null? LocalDateTime.now() : loginTime;
         this.autoLogin = autoLogin;
     }
 }

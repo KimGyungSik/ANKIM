@@ -5,6 +5,7 @@ import jakarta.persistence.Embeddable;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.AccessLevel;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.login.entity.member.LoginType;
@@ -24,6 +25,7 @@ public class BaseLoginHistory {
     @Column(name = "active_yn", length = 1, nullable = false)
     private String activeYn = "Y";
 
+    @Builder
     public BaseLoginHistory(LocalDateTime loginAttemptDate, String ipAddress, String activeYn) {
         this.loginAttemptDate = loginAttemptDate;
         this.ipAddress = ipAddress;

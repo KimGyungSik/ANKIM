@@ -43,7 +43,7 @@ public class LoginFilter extends UsernamePasswordAuthenticationFilter {
 
         CustomUserDetails userDetails = (CustomUserDetails) auth.getPrincipal();
 
-        String token = jwtTokenProvider.generateAccessToken(userDetails);
+        String token = jwtTokenProvider.generateAccessToken(userDetails, "");
 
         res.addHeader("Authorization", "Bearer " + token);
     }

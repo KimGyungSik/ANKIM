@@ -37,11 +37,11 @@ public class LoginRequest {
     // Service단 Reqeust로 변경
     public LoginServiceRequest toServiceRequest() {
         return LoginServiceRequest.builder()
-                .loginId(loginId)
-                .pwd(pwd)
-                .loginType(loginType)
-                .loginTime(loginTime)
-                .autoLogin(autoLogin)
+                .loginId(this.loginId)
+                .pwd(this.pwd)
+                .loginType(this.loginType)
+                .loginTime(this.loginTime)
+                .autoLogin(this.autoLogin)
                 .build();
     }
 }

@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.security.service;
 
+import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -8,12 +9,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.filter.OncePerRequestFilter;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 
 import java.io.IOException;
+import java.io.PrintWriter;
 
 @Slf4j
 public class JwtFilter extends OncePerRequestFilter {
@@ -25,34 +26,51 @@ public class JwtFilter extends OncePerRequestFilter {
     }
 
     @Override
+    protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
+        String path = request.getServletPath();
+        return path.equals("/api/auth/login"); // 로그인 요청은 필터 제외
+    }
+
+    @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // request에서 Authorization 헤더 조회
-        String authHeader = request.getHeader("Authorization");
+        // header의 access 키에 담긴 토큰 추출
+        String accessToken = request.getHeader("access");
 
-        if (authHeader == null && !authHeader.startsWith("Bearer ")) {
-            log.info("token null");
-            filterChain.doFilter(request, response); // 다음 필터로 request, response를 넘김
-
-            // 조건이 해당하면 메서드 종료 ( 필수 )
-            return;
-        }
-
-        String token = authHeader.split(" ")[1]; // "Bearer " 제거
-
-        // 토큰 소멸시간 검증
-        if (jwtTokenProvider.isTokenExpired(token)) {
-
-            log.info("token expired");
+        // 토큰이 없는 경우 다음 필터로
+        if(accessToken == null) {
             filterChain.doFilter(request, response);
-
-            // 조건에 해당하면 메서드 종료 ( 필수 )
+            // 조건이 해당하면 메서드 종료
             return;
         }
 
-        // 토큰에서 username(id)와 role 추출
-        String username = jwtTokenProvider.getUsernameFromToken(token);
-        System.out.println("token에서 Id 추출 = " + username);
-//        jwtTokenProvider.get
+        // 토큰 만료 여부 확인, 만료 시 다음 필터로 넘기지 않음
+        try {
+            jwtTokenProvider.isTokenExpired(accessToken);
+        } catch (ExpiredJwtException e) {
+            // response body
+            PrintWriter writer = response.getWriter();
+            writer.print("access token expired");
+
+            // response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // 토큰이 access인지 확인 (발급 시 페이로드에 명시)
+        String category = jwtTokenProvider.getCategoryFromToken(accessToken);
+
+        if(!category.equals("access")) {
+            // response body
+            PrintWriter writer = response.getWriter();
+            writer.print("invalid access token");
+
+            // response status code
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            return;
+        }
+
+        // 토큰에서 username(id) 추출
+        String username = jwtTokenProvider.getUsernameFromToken(accessToken);
 
         // Member 엔티티 생성
         Member member = Member.builder()
@@ -62,7 +80,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // UserDetails에 Member 엔티티 담기
         CustomUserDetails customUserDetails = new CustomUserDetails(member);
-        System.out.println(customUserDetails.getAuthorities());
 
         // 스프링 시큐리티 인증 토큰을 생성
         Authentication authenticationToken = new UsernamePasswordAuthenticationToken(customUserDetails, null, customUserDetails.getAuthorities());
@@ -71,6 +88,5 @@ public class JwtFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         filterChain.doFilter(request, response);
-
     }
 }
