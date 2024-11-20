@@ -94,10 +94,21 @@ public class ItemService {
 
     /**
      * 품목 수정
-     * 상품 id로 품목들 조회
+     * 옵션 수정을 같이? 품목 수정 시 옵션 수정도 같이 진행
+     * 그냥 품목 아이디로 품목 엔티티 가져오기
+     * 수정한 옵션그룹 DTO를 받아서 해당 ID가 ItemOption테이블에 존재하는지 확인
+     * 존재하면 기존 품목 업데이트
+     * 존재하지 않으면 새로운 품목 생성
+
+     * 옵션아이템 테이블에서 옵션 ID 로 품목을 꺼내오기
+     * 해당 옵션 ID가 존재하면 기존 품목 업데이트
+     * 존재하지 않으면 새로운 품목 생성
+
      * 기존 품목 업데이트와 새로 생성되어야 하는 품목을 구별해야함
      * 품목명이 다르면 품목 새로 생성
      * 품목명이 같다면 업데이트만 진행
+
+     * 조건 1. 품목 상태가 판매중이면 안됨
      */
     public void updateItems(Long productId, ItemUpdateServiceRequest updatedItemsRequest) {
         List<ItemDetailServiceRequest> updatedItems = updatedItemsRequest.getItems();

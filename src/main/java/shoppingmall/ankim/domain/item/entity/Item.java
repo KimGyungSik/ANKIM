@@ -44,6 +44,8 @@ public class Item {
     @Column(name = "add_price", precision = 10, scale = 2)
     private Integer addPrice; // 추가금액
 
+    private Integer totalPrice; // 판매가(할인률 적용된 가격) + 추가금액
+
     private Integer qty; // 재고량
 
     @Column(name = "saf_qty")
@@ -71,6 +73,7 @@ public class Item {
         this.maxQty = maxQty;
         this.minQty = minQty;
         addItemOptions(optionValues); // ItemOption 관계 추가
+        this.totalPrice = product.getSellPrice() + addPrice; // 총 가격 추가
     }
 
     // 옵션 값에 따라 ItemOption을 생성하고 리스트에 추가
@@ -105,6 +108,11 @@ public class Item {
         // 재고량
         if (updatedItem.getQty() != null) {
             this.qty = updatedItem.getQty();
+        }
+
+        // 판매 상태
+        if (updatedItem.getSellingStatus() != null) {
+            this.sellingStatus = updatedItem.getSellingStatus();
         }
 
         // 안전 재고량
