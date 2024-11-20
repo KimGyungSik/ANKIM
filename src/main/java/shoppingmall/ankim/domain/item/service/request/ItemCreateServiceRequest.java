@@ -3,7 +3,6 @@ package shoppingmall.ankim.domain.item.service.request;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shoppingmall.ankim.domain.item.dto.ItemDetailRequest;
 
 import java.util.List;
 

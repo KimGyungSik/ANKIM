@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
 
@@ -19,6 +20,7 @@ public class ItemDetailServiceRequest {
     private Integer addPrice; // 추가 금액
     private Integer qty; // 재고량
     private Integer safQty; // 안전 재고량
+    private ProductSellingStatus sellingStatus; // 판매 상태
     private Integer maxQty; // 최대 구매 수량
     private Integer minQty; // 최소 구매 수량
 }

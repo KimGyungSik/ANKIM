@@ -3,10 +3,9 @@ package shoppingmall.ankim.domain.product.controller.request;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.image.dto.ProductImgeCreateRequest;
-import shoppingmall.ankim.domain.item.dto.ItemCreateRequest;
+import shoppingmall.ankim.domain.item.controller.request.ItemCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupCreateRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 

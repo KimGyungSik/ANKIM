@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.item.dto;
+package shoppingmall.ankim.domain.item.controller.request;
 
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
 
@@ -28,6 +29,9 @@ public class ItemDetailRequest {
     @NotNull(message = "안전 재고량은 필수 입력 값입니다.")
     private Integer safQty; // 안전 재고량
 
+    @NotNull(message = "품목 판매상태는 필수입니다.")
+    private ProductSellingStatus sellingStatus; // 판매 상태
+
     @NotNull(message = "최대 구매 수량은 필수 입력 값입니다.")
     private Integer maxQty; // 최대 구매 수량
 
@@ -35,12 +39,13 @@ public class ItemDetailRequest {
     private Integer minQty; // 최소 구매 수량
 
     @Builder
-    public ItemDetailRequest(String name, List<String> optionValueNames, Integer addPrice, Integer qty, Integer safQty, Integer maxQty, Integer minQty) {
+    public ItemDetailRequest(String name, List<String> optionValueNames, Integer addPrice, Integer qty, ProductSellingStatus sellingStatus, Integer safQty, Integer maxQty, Integer minQty) {
         this.name = name;
         this.optionValueNames = optionValueNames;
         this.addPrice = addPrice;
         this.qty = qty;
         this.safQty = safQty;
+        this.sellingStatus = sellingStatus;
         this.maxQty = maxQty;
         this.minQty = minQty;
     }
@@ -55,6 +60,7 @@ public class ItemDetailRequest {
                 .addPrice(addPrice)
                 .qty(qty)
                 .safQty(safQty)
+                .sellingStatus(sellingStatus)
                 .maxQty(maxQty)
                 .minQty(minQty)
                 .build();
