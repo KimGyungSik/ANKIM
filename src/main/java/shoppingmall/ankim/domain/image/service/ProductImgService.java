@@ -115,7 +115,7 @@ public class ProductImgService {
     }
 
 
-    private void deleteProductImg(ProductImg productImg) {
+    public void deleteProductImg(ProductImg productImg) {
         // 로컬 파일 삭제
         if (productImg.getImgName() != null && !productImg.getImgName().isEmpty()) {
             fileService.deleteFile(itemImgLocation + "/" + productImg.getImgName());

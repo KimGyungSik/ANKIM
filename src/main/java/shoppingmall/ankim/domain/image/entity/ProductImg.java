@@ -21,13 +21,17 @@ public class ProductImg {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
+    @Column(name = "img_name")
     private String imgName; // 이미지 파일명, 실제 로컬에 저장된 상품 이미지 파일의 이름
 
     @Column(name = "orig_name")
     private String oriImgName; // 원본 이미지 파일명, 업로드했던 상품 이미지 파일의 원래 이름
 
     private String imgUrl; // 이미지 조회 경로, 업로드 결과 로컬에 저장된 상품 이미지 파일을 불러오는 경로
+
+    @Column(name = "repimg_yn")
     private String repimgYn; // 대표 이미지 여부 (Y: 썸네일 / N: 상세)
+
     private Integer ord; // 이미지 순서
 
     @ManyToOne(fetch = FetchType.LAZY)

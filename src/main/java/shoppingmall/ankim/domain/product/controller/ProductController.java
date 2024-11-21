@@ -57,9 +57,10 @@ public class ProductController {
         return ApiResponse.ok(productService.updateProduct(productId, productUpdateRequest.toServiceRequest()));
     }
 
-
-
-
-
-
+    // 상품 삭제
+    @DeleteMapping("/api/v1/products/{productId}")
+    public ApiResponse<Void> deleteProduct(@PathVariable Long productId) {
+        productService.deleteProduct(productId);
+        return ApiResponse.ok();
+    }
 }
