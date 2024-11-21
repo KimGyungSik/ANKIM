@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.security.service;
+package shoppingmall.ankim.domain.security.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import java.io.IOException;
 import java.io.PrintWriter;

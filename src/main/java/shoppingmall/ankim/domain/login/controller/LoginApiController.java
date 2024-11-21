@@ -7,12 +7,8 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -20,17 +16,9 @@ import org.springframework.web.bind.annotation.RestController;
 import shoppingmall.ankim.domain.login.controller.request.LoginRequest;
 import shoppingmall.ankim.domain.login.exception.LoginFailedException;
 import shoppingmall.ankim.domain.login.service.LoginService;
-import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
-import shoppingmall.ankim.domain.member.dto.MemberResponse;
-import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
-import shoppingmall.ankim.global.exception.ErrorCode;
 import shoppingmall.ankim.global.response.ApiResponse;
 
-import javax.security.auth.login.LoginException;
-
-import java.time.LocalDateTime;
 import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_CREDENTIALS;

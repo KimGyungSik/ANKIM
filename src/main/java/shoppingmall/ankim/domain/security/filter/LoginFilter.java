@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.security.service;
+package shoppingmall.ankim.domain.security.filter;
 
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.http.HttpServletRequest;
@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 
 @Slf4j

@@ -16,7 +16,7 @@
 //import shoppingmall.ankim.domain.member.entity.Member;
 //import shoppingmall.ankim.domain.member.entity.MemberStatus;
 //import shoppingmall.ankim.domain.member.repository.MemberRepository;
-//import shoppingmall.ankim.domain.security.service.CustomAuthenticationFailureHandler;
+//import shoppingmall.ankim.domain.security.handler.CustomAuthenticationFailureHandler;
 //import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 //import shoppingmall.ankim.global.config.SecurityConfig;
 //

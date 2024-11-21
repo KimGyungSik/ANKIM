@@ -19,7 +19,8 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.NOT_FOUND, "아이디 또는 비밀번호가 일치하지 않습니다."),
     MEMBER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
 
-    // Refresh Token 관련 에러 코드
+    // Token 관련 에러 코드
+    ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Access Token이 요청에 포함되지 않았습니다."),
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Refresh Token이 요청에 포함되지 않았습니다."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),

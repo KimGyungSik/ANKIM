@@ -20,6 +20,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
+import shoppingmall.ankim.domain.security.handler.RedisHandler;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import java.net.InetAddress;
@@ -40,12 +41,16 @@ public class LoginServiceImpl implements LoginService {
     private final MemberLoginHistoryRepository loginHistoryRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
+    private final RedisHandler redisHandler;
 
     @Value("${login.attempt.max}")
     private int MAX_LOGIN_ATTEMPTS; // 최대 로그인 시도 횟수
 
     @Value("${login.lock.time}")
     private int LOCK_TIME_MINUTES; // 잠금 시간 (분)
+
+    @Value("${jwt.refresh.token.expire.time}")
+    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간
 
     @Override
     public Map<String, String> login(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
@@ -94,7 +99,7 @@ public class LoginServiceImpl implements LoginService {
             // username, role을 가지고 있음
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            // 토큰 생성
+            // 토큰 생성 및 refresh token 저장
             return successfulAuthentication(userDetails);
 
         } catch (BadCredentialsException | UnknownHostException ex) {
@@ -190,7 +195,15 @@ public class LoginServiceImpl implements LoginService {
         token.put("access", access);
         token.put("refresh", refresh);
 
+        addRefreshToken(access, refresh);
+
         return token;
+    }
+
+    // refresh token 저장
+    private void addRefreshToken(String access, String refresh) {
+
+        redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);
     }
 
 }

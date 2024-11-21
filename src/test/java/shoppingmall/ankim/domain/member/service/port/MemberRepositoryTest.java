@@ -6,10 +6,12 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.security.repository.TokenRepository;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDate;
@@ -27,6 +29,9 @@ class MemberRepositoryTest {
     
     @Autowired
     MemberRepository memberRepository;
+
+    @MockBean
+    private TokenRepository tokenRepository;
 
     @Test
     @DisplayName("이메일 중복 검증 테스트_중복 이메일이 없는 경우")

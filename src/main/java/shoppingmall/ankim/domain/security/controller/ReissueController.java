@@ -14,8 +14,7 @@ import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.Map;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
-import static shoppingmall.ankim.global.exception.ErrorCode.REFRESH_TOKEN_NOT_FOUND;
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -28,6 +27,13 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+        // 헤더에서 Access Token 추출
+        String access = request.getHeader("access");
+
+        if (access == null || access.isEmpty()) {
+            return ApiResponse.of(ACCESS_TOKEN_NOT_FOUND);
+        }
+
         // cookie에서 Refresh Token 추출
         String refresh = null;
         Cookie[] cookies = request.getCookies();
@@ -51,8 +57,11 @@ public class ReissueController {
             // Refresh Token 검증
             reissueService.validateRefreshToken(refresh);
 
+            // Redis에 access token이 저장되어 있는지 확인
+            reissueService.isAccessTokenExist(access);
+
             // 새로운 Access Token 재발급
-            Map<String, String> token = reissueService.reissueToken(refresh);
+            Map<String, String> token = reissueService.reissueToken(access, refresh);
             String newAccess = token.get("access");
             String newRefresh = token.get("refresh");
 

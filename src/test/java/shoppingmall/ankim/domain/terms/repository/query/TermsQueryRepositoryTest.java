@@ -5,8 +5,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import shoppingmall.ankim.domain.security.repository.TokenRepository;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
@@ -14,7 +16,6 @@ import shoppingmall.ankim.domain.terms.repository.TermsRepository;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
@@ -29,6 +30,8 @@ class TermsQueryRepositoryTest {
     private TermsRepository termsRepository;
     @Autowired
     private EntityManager em;
+    @MockBean
+    private TokenRepository tokenRepository;
 
     @Test
     @DisplayName("최상위 약관을 기준으로 모든 하위 약관을 재귀적으로 조회한다.")

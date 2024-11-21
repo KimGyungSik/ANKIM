@@ -125,3 +125,4 @@ application.properties
 application-email.yml
 application-jwt.yml
 application-login.yml
+application-redis.yml

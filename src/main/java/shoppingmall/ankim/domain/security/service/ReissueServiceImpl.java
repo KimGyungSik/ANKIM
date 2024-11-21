@@ -5,10 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.exception.JwtTokenException;
+import shoppingmall.ankim.domain.security.handler.RedisHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -21,6 +21,10 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 public class ReissueServiceImpl implements ReissueService {
 
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisHandler redisHandler;
+
+    @Value("${jwt.refresh.token.expire.time}")
+    private long REFRESH_TOKEN_EXPIRE_TIME;
 
     // Refresh Token 검증
     public void validateRefreshToken(String refreshToken) {
@@ -43,7 +47,7 @@ public class ReissueServiceImpl implements ReissueService {
     }
 
     // Access Token 재발급
-    public Map<String, String> reissueToken(String refreshToken) {
+    public Map<String, String> reissueToken(String accessToken, String refreshToken) {
         // Refresh Token에서 사용자 정보 추출
         String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
 
@@ -57,13 +61,34 @@ public class ReissueServiceImpl implements ReissueService {
         CustomUserDetails customUserDetails = new CustomUserDetails(member);
 
         // 새로운 Token 생성
-        String access = jwtTokenProvider.generateAccessToken(customUserDetails,"access");
-        String refresh = jwtTokenProvider.generateRefreshToken(customUserDetails,"refresh");
+        String newAccess = jwtTokenProvider.generateAccessToken(customUserDetails,"access");
+        String newRefresh = jwtTokenProvider.generateRefreshToken(customUserDetails,"refresh");
 
         Map<String, String> map = new HashMap<>();
-        map.put("access", access);
-        map.put("refresh", refresh);
+        map.put("access", newAccess);
+        map.put("refresh", newRefresh);
+
+        // 기존에 저장되어있는 refresh token을 삭제한 후 새로운 refresh token을 저장
+        redisHandler.delete(accessToken);
+
+        addRefreshToken(newAccess, newRefresh);
 
         return map;
     }
+
+    // Redis에 access token이 저장되어 있는지 확인
+    @Override
+    public void isAccessTokenExist(String accessToken) {
+        boolean isExist = redisHandler.exists(accessToken);
+        if (!isExist) {
+            throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND);
+        }
+    }
+
+    // refresh token 저장
+    private void addRefreshToken(String access, String refresh) {
+
+        redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);
+    }
+
 }

@@ -4,6 +4,8 @@ import java.util.Map;
 
 public interface ReissueService {
 
-    public void validateRefreshToken(String refreshToken);
-    public Map<String, String> reissueToken(String refreshToken);
+    void validateRefreshToken(String refreshToken);
+    Map<String, String> reissueToken(String accessToken, String refreshToken);
+    void isAccessTokenExist(String accessToken);
+//    void isRefreshTokenExist(String refreshToken);
 }
