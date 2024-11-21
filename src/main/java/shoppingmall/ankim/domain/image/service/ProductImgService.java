@@ -51,18 +51,69 @@ public class ProductImgService {
     public void updateProductImgs(Long productId, ProductImgUpdateServiceRequest request) {
         Product product = getProductWithImgs(productId);
 
-        // 기존 이미지 삭제
-        List<ProductImg> imgsToDelete = new ArrayList<>(product.getProductImgs()); // 복사본 사용
-        for (ProductImg existingImg : imgsToDelete) {
-            product.removeProductImg(existingImg); // 부모 관계에서 삭제
-            deleteProductImg(existingImg);        // DB에서 삭제
-        }
+        // 요청에서 제공된 이미지 URL 리스트
+        List<String> newThumbnailUrls = extractUrls(request.getThumbnailImages());
+        List<String> newDetailUrls = extractUrls(request.getDetailImages());
 
-        // 새로운 이미지 등록
-        validateImageCounts(request);
-        saveImages(product, request.getThumbnailImages(), THUMBNAIL);
-        saveImages(product, request.getDetailImages(), DETAIL);
+        // 기존 썸네일 및 상세 이미지 분리
+        List<ProductImg> existingThumbnails = product.getProductImgs().stream()
+                .filter(img -> THUMBNAIL.equals(img.getRepimgYn()))
+                .toList();
+
+        List<ProductImg> existingDetails = product.getProductImgs().stream()
+                .filter(img -> DETAIL.equals(img.getRepimgYn()))
+                .toList();
+
+        // 1. 삭제: 요청에 없는 기존 이미지를 삭제
+        deleteImages(product, existingThumbnails, newThumbnailUrls);
+        deleteImages(product, existingDetails, newDetailUrls);
+
+        // 2. 추가: 요청에 있는 새로운 이미지를 추가
+        saveNewImages(product, request.getThumbnailImages(), THUMBNAIL, existingThumbnails, newThumbnailUrls);
+        saveNewImages(product, request.getDetailImages(), DETAIL, existingDetails, newDetailUrls);
     }
+
+    private void deleteImages(Product product, List<ProductImg> existingImgs, List<String> newImgUrls) {
+        // 삭제 대상 이미지 리스트를 필터링
+        List<ProductImg> imgsToDelete = existingImgs.stream()
+                .filter(img -> !newImgUrls.contains(img.getOriImgName())) // 요청에 없는 이미지
+                .toList();
+
+        for (ProductImg img : imgsToDelete) {
+            // 상품의 이미지 리스트에서 제거
+            product.removeProductImg(img);
+            // 기존 삭제 메서드 활용 (DB와 스토리지에서 삭제)
+            deleteProductImg(img);
+        }
+    }
+
+
+    private void saveNewImages(Product product, List<MultipartFile> newImages, String repimgYn,
+                               List<ProductImg> existingImgs, List<String> newImgUrls) {
+        if (newImages == null || newImages.isEmpty()) return;
+
+        for (int i = 0; i < newImages.size(); i++) {
+            MultipartFile imageFile = newImages.get(i);
+            String oriImgName = imageFile.getOriginalFilename();
+
+            // 이미 존재하는 이미지가 아니라면 추가
+            if (existingImgs.stream().noneMatch(img -> img.getOriImgName().equals(oriImgName))) {
+                ProductImg productImg = ProductImg.init(product, repimgYn, i + 1);
+                saveProductImg(productImg, imageFile); // 기존 저장 메서드 활용
+                product.addProductImg(productImg);
+            }
+        }
+    }
+
+    private List<String> extractUrls(List<MultipartFile> images) {
+        if (images == null) {
+            return List.of();
+        }
+        return images.stream()
+                .map(MultipartFile::getOriginalFilename) // 원본 파일명 사용
+                .toList();
+    }
+
 
     private void deleteProductImg(ProductImg productImg) {
         // 로컬 파일 삭제

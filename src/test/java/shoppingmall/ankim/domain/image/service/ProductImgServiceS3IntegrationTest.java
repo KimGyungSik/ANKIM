@@ -4,10 +4,12 @@ import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.web.multipart.MultipartFile;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
@@ -18,6 +20,7 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,6 +50,31 @@ class ProductImgServiceS3IntegrationTest {
     private final List<String> uploadedImgUrls = new ArrayList<>();
     private final List<String> uploadedLocalFilePaths = new ArrayList<>();
 
+    @AfterEach
+    void cleanupUploadedImgUrl() {
+        // 업로드된 S3 파일 삭제
+        for (String imgUrl : uploadedImgUrls) {
+            try {
+                s3Service.deleteFile(imgUrl);
+                System.out.println("삭제된 S3 파일: " + imgUrl);
+            } catch (Exception e) {
+                System.err.println("S3 파일 삭제 실패: " + imgUrl);
+            }
+        }
+        uploadedImgUrls.clear();
+
+        // 업로드된 로컬 파일 삭제
+        for (String filePath : uploadedLocalFilePaths) {
+            try {
+                fileService.deleteFile(filePath);
+                System.out.println("삭제된 로컬 파일: " + filePath);
+            } catch (Exception e) {
+                System.err.println("로컬 파일 삭제 실패: " + filePath);
+            }
+        }
+        uploadedLocalFilePaths.clear();
+    }
+
     @Test
     @DisplayName("AWS S3에 파일이 실제로 업로드되고 URL을 반환한다.")
     void uploadFileToS3() throws IOException {
@@ -69,7 +97,7 @@ class ProductImgServiceS3IntegrationTest {
     }
 
     @Test
-    @DisplayName("S3 및 로컬 저장소에 파일 업로드")
+    @DisplayName("상품 이미지를 S3 및 로컬 저장소에 파일 업로드를 할 수 있다.")
     void uploadFileToLocalAndS3() throws IOException {
         // given
         MultipartFile thumbnailImage = new MockMultipartFile(
@@ -174,28 +202,126 @@ class ProductImgServiceS3IntegrationTest {
         System.out.println("업로드된 로컬 파일 경로 리스트: " + uploadedLocalFilePaths);
     }
 
-    @AfterEach
-    void cleanupUploadedImgUrl() {
-        // 업로드된 S3 파일 삭제
-        for (String imgUrl : uploadedImgUrls) {
-            try {
-                s3Service.deleteFile(imgUrl);
-                System.out.println("삭제된 S3 파일: " + imgUrl);
-            } catch (Exception e) {
-                System.err.println("S3 파일 삭제 실패: " + imgUrl);
-            }
-        }
-        uploadedImgUrls.clear();
+    @Test
+    @DisplayName("요청에 포함된 기존 이미지는 로컬과 S3에 유지된다.")
+    void updateProductImgsKeepsExistingImages() throws IOException {
+        // given
+        Product product = Product.builder().name("Integration Test Product")
+                .discRate(20)
+                .origPrice(100)
+                .build();
+        Product savedProduct = productRepository.save(product);
 
-        // 업로드된 로컬 파일 삭제
-        for (String filePath : uploadedLocalFilePaths) {
-            try {
-                fileService.deleteFile(filePath);
-                System.out.println("삭제된 로컬 파일: " + filePath);
-            } catch (Exception e) {
-                System.err.println("로컬 파일 삭제 실패: " + filePath);
-            }
-        }
-        uploadedLocalFilePaths.clear();
+        MultipartFile thumbnail = createMockFile("existing-thumbnail.jpg", "image/jpeg", "thumbnail data");
+        MultipartFile detail = createMockFile("existing-detail.jpg", "image/jpeg", "detail data");
+
+        productImgService.createProductImgs(product.getNo(), ProductImgCreateServiceRequest.builder()
+                .thumbnailImages(List.of(thumbnail))
+                .detailImages(List.of(detail))
+                .build());
+
+        ProductImgUpdateServiceRequest updateRequest = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(thumbnail)) // 기존 썸네일 유지
+                .detailImages(List.of(detail))     // 기존 상세 이미지 유지
+                .build();
+
+        // when
+        productImgService.updateProductImgs(product.getNo(), updateRequest);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        assertThat(updatedImages).hasSize(2);
+        assertThat(updatedImages).anyMatch(img -> img.getOriImgName().equals("existing-thumbnail.jpg"));
+        assertThat(updatedImages).anyMatch(img -> img.getOriImgName().equals("existing-detail.jpg"));
+
+        // 업로드된 파일 이름 기록
+        List<String> uploadedS3FileNames = updatedImages.stream()
+                .map(ProductImg::getImgUrl)
+                .map(url -> url.substring(url.lastIndexOf("/") + 1))
+                .toList();
+        uploadedImgUrls.addAll(uploadedS3FileNames);
+
+        List<String> uploadedFilePaths = updatedImages.stream()
+                .map(ProductImg::getImgName)
+                .map(fileName -> itemImgLocation + "/" + fileName)
+                .toList();
+        uploadedLocalFilePaths.addAll(uploadedFilePaths);
+    }
+
+    @Test
+    @DisplayName("요청에 없는 기존 이미지는 로컬 및 S3에서도 삭제된다.")
+    void updateProductImgsDeletesRemovedImages() throws IOException {
+        // given
+        Product product = Product.builder().name("Integration Test Product")
+                .discRate(20)
+                .origPrice(100)
+                .build();
+        Product savedProduct = productRepository.save(product);
+
+        MultipartFile thumbnail = createMockFile("old-thumbnail.jpg", "image/jpeg", "old thumbnail data");
+        MultipartFile detail = createMockFile("old-detail.jpg", "image/jpeg", "old detail data");
+
+        productImgService.createProductImgs(product.getNo(), ProductImgCreateServiceRequest.builder()
+                .thumbnailImages(List.of(thumbnail))
+                .detailImages(List.of(detail))
+                .build());
+
+        ProductImgUpdateServiceRequest updateRequest = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(Collections.emptyList()) // 기존 썸네일 삭제
+                .detailImages(Collections.emptyList())    // 기존 상세 이미지 삭제
+                .build();
+
+        // when
+        productImgService.updateProductImgs(product.getNo(), updateRequest);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+        assertThat(updatedImages).isEmpty();
+    }
+
+    @Test
+    @DisplayName("요청에 포함된 새로운 이미지는 로컬 및 S3에도 성공적으로 추가한다.")
+    void updateProductImgsAddsNewImages() throws IOException {
+        // given
+        Product product = Product.builder().name("Integration Test Product")
+                .discRate(20)
+                .origPrice(100)
+                .build();
+        Product savedProduct = productRepository.save(product);
+
+        MultipartFile newThumbnail = createMockFile("new-thumbnail.jpg", "image/jpeg", "new thumbnail data");
+        MultipartFile newDetail = createMockFile("new-detail.jpg", "image/jpeg", "new detail data");
+
+        ProductImgUpdateServiceRequest updateRequest = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(newThumbnail))
+                .detailImages(List.of(newDetail))
+                .build();
+
+        // when
+        productImgService.updateProductImgs(product.getNo(), updateRequest);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+        assertThat(updatedImages).hasSize(2);
+        assertThat(updatedImages).anyMatch(img -> img.getOriImgName().equals("new-thumbnail.jpg"));
+        assertThat(updatedImages).anyMatch(img -> img.getOriImgName().equals("new-detail.jpg"));
+
+        // 업로드된 파일 이름 기록
+        List<String> uploadedS3FileNames = updatedImages.stream()
+                .map(ProductImg::getImgUrl)
+                .map(url -> url.substring(url.lastIndexOf("/") + 1))
+                .toList();
+        uploadedImgUrls.addAll(uploadedS3FileNames);
+
+        List<String> uploadedFilePaths = updatedImages.stream()
+                .map(ProductImg::getImgName)
+                .map(fileName -> itemImgLocation + "/" + fileName)
+                .toList();
+        uploadedLocalFilePaths.addAll(uploadedFilePaths);
+    }
+
+    private MultipartFile createMockFile(String fileName, String contentType, String content) {
+        return new MockMultipartFile(fileName, fileName, contentType, content.getBytes());
     }
 }

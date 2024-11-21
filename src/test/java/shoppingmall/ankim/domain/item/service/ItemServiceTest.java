@@ -268,7 +268,7 @@ class ItemServiceTest {
                 );
     }
 
-    @DisplayName("품목 업데이트만 있는 경우")
+    @DisplayName("기존 품목을 업데이트 할 수 있다.")
     @Test
     void updateItemsOnlyUpdate() {
         // given
@@ -306,7 +306,7 @@ class ItemServiceTest {
                 );
     }
 
-    @DisplayName("품목 생성만 있는 경우")
+    @DisplayName("새로운 품목을 추가할 수 있다.")
     @Test
     void updateItemsOnlyCreate() {
         // given
@@ -340,7 +340,7 @@ class ItemServiceTest {
                 );
     }
 
-    @DisplayName("품목 삭제가 포함된 경우")
+    @DisplayName("요청에 들어오지 않은 기존 품목을 삭제할 수 있다.")
     @Test
     void updateItemsWithDelete() {
         // given
@@ -380,7 +380,7 @@ class ItemServiceTest {
                 .containsExactly("색상: Blue, 사이즈: Small");
     }
 
-    @DisplayName("업데이트, 생성, 삭제가 동시에 발생하는 경우")
+    @DisplayName("품목 수정 시 업데이트, 생성, 삭제가 동시에 발생하는 경우에 모두 처리할 수 있다.")
     @Test
     void updateItemsMixed() {
         // given

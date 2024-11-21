@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -22,9 +23,11 @@ import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRe
 import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -166,7 +169,6 @@ class ProductImgServiceTest {
     }
 
     @DisplayName("상품 이미지를 업데이트할 수 있다.")
-    @Rollback(value = false)
     @Test
     void updateProductImgs() throws IOException {
         // given
@@ -245,6 +247,207 @@ class ProductImgServiceTest {
                 .orElseThrow();
         assertThat(newDetailImg2.getOriImgName()).isEqualTo("new-detail2.jpg");
     }
+
+    @DisplayName("요청에 포함된 기존 이미지는 유지된다.")
+    @Test
+    void updateProductImgsKeepsExistingImages() throws IOException {
+        // given
+        Product product = createProduct();
+
+        // 기존 이미지 등록
+        ProductImg existingThumbnail = ProductImg.builder()
+                .imgName("existing-thumbnail.jpg")
+                .oriImgName("existing-thumbnail.jpg")
+                .imgUrl("existing-thumbnail-url")
+                .repimgYn("Y")
+                .ord(1)
+                .product(product)
+                .build();
+        product.addProductImg(existingThumbnail);
+
+        Product savedProduct = productRepository.save(product);
+
+        // 요청 데이터에 기존 이미지 포함
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(createMockFile("existing-thumbnail.jpg"))) // 기존 이미지
+                .detailImages(Collections.emptyList())
+                .build();
+
+        // FileService 및 S3Service Mock 설정
+        given(fileService.uploadFile(anyString(), anyString(), any(byte[].class)))
+                .willReturn("existing-thumbnail.jpg");
+
+        // when
+        productImgService.updateProductImgs(savedProduct.getNo(), request);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        // 기존 이미지는 삭제되지 않고 유지되는지 확인
+        assertThat(updatedImages).hasSize(1); // 기존 썸네일만 유지
+        assertThat(updatedImages.get(0).getOriImgName()).isEqualTo("existing-thumbnail.jpg");
+        verify(fileService, never()).deleteFile(anyString()); // 삭제 동작이 호출되지 않음
+        verify(s3Service, never()).deleteFile(anyString()); // 삭제 동작이 호출되지 않음
+    }
+
+    @DisplayName("요청에 포함되지 않은 기존 이미지는 삭제된다.")
+    @Test
+    void updateProductImgsDeletesRemovedImages() throws IOException {
+        // given
+        Product product = createProduct();
+
+        // 기존 이미지 등록
+        ProductImg existingThumbnail = ProductImg.builder()
+                .imgName("old-thumbnail.jpg")
+                .oriImgName("old-thumbnail.jpg")
+                .imgUrl("old-thumbnail-url")
+                .repimgYn("Y")
+                .ord(1)
+                .product(product)
+                .build();
+        product.addProductImg(existingThumbnail);
+
+        Product savedProduct = productRepository.save(product);
+
+        // 새로운 요청 데이터 (기존 이미지 없음)
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(Collections.emptyList())
+                .detailImages(Collections.emptyList())
+                .build();
+
+        // when
+        productImgService.updateProductImgs(savedProduct.getNo(), request);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        // 기존 이미지는 삭제되었는지 확인
+        assertThat(updatedImages).isEmpty();
+        assertThat(savedProduct.getProductImgs()).isEmpty(); // Product의 리스트에서도 삭제 확인
+        verify(fileService, times(1)).deleteFile(anyString()); // 삭제 동작이 호출되었는지 확인
+        verify(s3Service, times(1)).deleteFile(anyString()); // 삭제 동작이 호출되었는지 확인
+    }
+
+    @DisplayName("새로운 이미지가 요청되면 추가된다.")
+    @Test
+    void updateProductImgsAddsNewImages() throws IOException {
+        // given
+        Product product = createProduct();
+
+        Product savedProduct = productRepository.save(product);
+
+        // 새로운 이미지 요청 데이터 생성
+        MultipartFile newThumbnail = createMockFile("new-thumbnail.jpg");
+        MultipartFile newDetail = createMockFile("new-detail.jpg");
+
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(newThumbnail))
+                .detailImages(List.of(newDetail))
+                .build();
+
+        // FileService 및 S3Service Mock 설정
+        given(fileService.uploadFile(anyString(), anyString(), any(byte[].class)))
+                .willReturn("new-image.jpg");
+        given(s3Service.uploadSingle(any(MultipartFile.class)))
+                .willReturn("s3-url");
+
+        // when
+        productImgService.updateProductImgs(savedProduct.getNo(), request);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        // 새로운 이미지가 추가되었는지 확인
+        assertThat(updatedImages).hasSize(2);
+        assertThat(updatedImages.stream().anyMatch(img -> img.getOriImgName().equals("new-thumbnail.jpg"))).isTrue();
+        assertThat(updatedImages.stream().anyMatch(img -> img.getOriImgName().equals("new-detail.jpg"))).isTrue();
+    }
+
+    @DisplayName("잘못된 상품 ID가 주어지면 예외가 발생한다.")
+    @Test
+    void updateProductImgsThrowsExceptionForInvalidProductId() {
+        // given
+        Long invalidProductId = 999L;
+
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(createMockFile("new-thumbnail.jpg")))
+                .detailImages(List.of(createMockFile("new-detail.jpg")))
+                .build();
+
+        // when // then
+        assertThatThrownBy(() -> productImgService.updateProductImgs(invalidProductId, request))
+                .isInstanceOf(ProductNotFoundException.class)
+                .hasMessageContaining("상품을 찾을 수 없습니다.");
+    }
+    @DisplayName("새로 추가된 이미지는 요청 순서대로 저장된다.")
+    @Test
+    void updateProductImgsPreservesImageOrder() throws IOException {
+        // given
+        Product product = createProduct();
+
+        Product savedProduct = productRepository.save(product);
+
+        // 새로운 이미지 요청 데이터 생성
+        MultipartFile detailImage1 = createMockFile("detail1.jpg");
+        MultipartFile detailImage2 = createMockFile("detail2.jpg");
+
+        ProductImgUpdateServiceRequest request = ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(Collections.emptyList())
+                .detailImages(List.of(detailImage1, detailImage2))
+                .build();
+
+        // FileService 및 S3Service Mock 설정
+        given(fileService.uploadFile(anyString(), anyString(), any(byte[].class)))
+                .willReturn("image.jpg");
+
+        // when
+        productImgService.updateProductImgs(savedProduct.getNo(), request);
+
+        // then
+        List<ProductImg> updatedImages = productImgRepository.findAll();
+
+        // 이미지 순서 확인
+        assertThat(updatedImages).hasSize(2);
+        assertThat(updatedImages.get(0).getOriImgName()).isEqualTo("detail1.jpg");
+        assertThat(updatedImages.get(1).getOriImgName()).isEqualTo("detail2.jpg");
+    }
+
+    private ProductImgUpdateServiceRequest getRequestWithUpdatedImages() {
+        return ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of(
+                        createMockFile("new-thumbnail.jpg")
+                ))
+                .detailImages(List.of(
+                        createMockFile("new-detail.jpg"),
+                        createMockFile("existing-detail.jpg") // 유지될 이미지
+                ))
+                .build();
+    }
+
+    private ProductImgUpdateServiceRequest getRequestWithoutImages() {
+        return ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(List.of())
+                .detailImages(List.of())
+                .build();
+    }
+
+    private ProductImgUpdateServiceRequest getRequestWithExceedingImages() {
+        List<MultipartFile> tooManyImages = new ArrayList<>();
+        for (int i = 0; i < 10; i++) {
+            tooManyImages.add(createMockFile("image-" + i + ".jpg"));
+        }
+        return ProductImgUpdateServiceRequest.builder()
+                .thumbnailImages(tooManyImages)
+                .detailImages(tooManyImages)
+                .build();
+    }
+
+    private MultipartFile createMockFile(String fileName) {
+        MultipartFile file = Mockito.mock(MultipartFile.class);
+        Mockito.when(file.getOriginalFilename()).thenReturn(fileName);
+        return file;
+    }
+
 
 
     private Product createProduct() {

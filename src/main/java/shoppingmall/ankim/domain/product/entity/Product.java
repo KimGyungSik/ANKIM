@@ -220,7 +220,6 @@ public class Product {
         if (updateRequest.getName() != null) {
             validateName(updateRequest.getName());
         }
-
         this.desc = updateRequest.getDesc() != null ? updateRequest.getDesc() : this.desc;
         this.discRate = updateRequest.getDiscRate() != null ? updateRequest.getDiscRate() : this.discRate;
         this.origPrice = updateRequest.getOrigPrice() != null ? updateRequest.getOrigPrice() : this.origPrice;
