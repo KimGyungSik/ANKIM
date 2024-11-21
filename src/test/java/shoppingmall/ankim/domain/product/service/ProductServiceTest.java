@@ -8,6 +8,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
@@ -43,6 +44,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("test")
 @SpringBootTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Transactional
 class ProductServiceTest {
 

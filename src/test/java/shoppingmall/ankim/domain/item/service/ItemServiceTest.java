@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 import shoppingmall.ankim.domain.image.service.S3Service;
@@ -36,6 +37,7 @@ import static org.assertj.core.api.Assertions.tuple;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class ItemServiceTest {
 
     @MockBean

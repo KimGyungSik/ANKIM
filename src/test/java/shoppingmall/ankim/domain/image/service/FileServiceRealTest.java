@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.global.config.uuid.UuidHolder;
 
 import java.io.File;
@@ -18,6 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
 @ActiveProfiles("test")
 @SpringBootTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class FileServiceRealTest {
 
     @MockBean
