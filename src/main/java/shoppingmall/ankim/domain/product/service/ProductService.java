@@ -68,6 +68,7 @@ public class ProductService {
 
 
     // 상품 수정
+    // TODO 이미지, 옵션, 품목 따로 컨트롤러로 빼서 업데이트 시킬지 차후 고민해볼것
     public ProductResponse updateProduct(Long productId, ProductUpdateServiceRequest request) {
         // 1. 상품 id로 상품 엔티티 가져와서 수정하기
         Product modifyProduct = getProduct(productId);
@@ -92,6 +93,15 @@ public class ProductService {
 
         return ProductResponse.of(modifyProduct);
     }
+
+
+    // 상품 삭제
+    public void deleteProduct(Long productId) {
+
+
+
+    }
+
 
 
     private void saveOptionGroup(ProductCreateServiceRequest request, Product savedProduct) {

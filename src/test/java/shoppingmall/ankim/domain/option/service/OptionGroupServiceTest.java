@@ -9,6 +9,7 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.mock;
 @ActiveProfiles("test")
 @SpringBootTest
 @Transactional
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class OptionGroupServiceTest {
 
     @MockBean

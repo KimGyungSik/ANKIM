@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.multipart.MultipartFile;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
@@ -27,6 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
 @Transactional
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class ProductImgServiceS3IntegrationTest {
 
     @Value("${itemImgLocation}")

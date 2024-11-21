@@ -4,7 +4,16 @@ import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.image.dto.ProductImgUpdateRequest;
+import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
+import shoppingmall.ankim.domain.item.controller.request.ItemUpdateRequest;
+import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
+import shoppingmall.ankim.domain.option.dto.OptionGroupCreateRequest;
+import shoppingmall.ankim.domain.option.dto.OptionGroupUpdateRequest;
+import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+
+import java.util.List;
 
 @Data
 @NoArgsConstructor
@@ -49,10 +58,19 @@ public class ProductUpdateRequest {
 
     private String cauShip; // 배송 유의사항
 
+    private Long categoryNo; // 소분류 카테고리 ID
+
+    private List<OptionGroupUpdateRequest> optionGroups; // 옵션 그룹 리스트
+    private ProductImgUpdateRequest productImages; // 상품 이미지 리스트
+    private ItemUpdateRequest items;
+
     @Builder
     private ProductUpdateRequest(String name, String desc, Integer discRate, Integer origPrice, String optYn,
                                  String restockYn, Integer qty, String bestYn, String freeShip, Integer shipFee,
-                                 String searchKeywords, String cauProd, String cauOrd, String cauShip) {
+                                 String searchKeywords, String cauProd, String cauOrd, String cauShip,
+                                 Long categoryNo, List<OptionGroupUpdateRequest> optionGroups,
+                                 ProductImgUpdateRequest productImages,
+                                 ItemUpdateRequest items) {
         this.name = name;
         this.desc = desc;
         this.discRate = discRate;
@@ -67,6 +85,10 @@ public class ProductUpdateRequest {
         this.cauProd = cauProd;
         this.cauOrd = cauOrd;
         this.cauShip = cauShip;
+        this.categoryNo = categoryNo;
+        this.optionGroups = optionGroups;
+        this.productImages = productImages;
+        this.items = items;
     }
 
     public ProductUpdateServiceRequest toServiceRequest() {
@@ -85,6 +107,12 @@ public class ProductUpdateRequest {
                 .cauProd(this.cauProd)
                 .cauOrd(this.cauOrd)
                 .cauShip(this.cauShip)
+                .categoryNo(this.categoryNo)
+                .optionGroups(this.optionGroups.stream()
+                        .map(OptionGroupUpdateRequest::toServiceRequest)
+                        .toList())
+                .productImages(this.productImages.toServiceRequest())
+                .items(this.items.toServiceRequest())
                 .build();
     }
 }
