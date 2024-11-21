@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
 

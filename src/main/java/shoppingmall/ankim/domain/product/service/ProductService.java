@@ -66,7 +66,6 @@ public class ProductService {
 
     // 상품 수정
     // 조건 1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X
-    // 조건 2. 상품 이미지는 파라미터로 들어오면 수정 안들어왔으면 유지
     public ProductResponse updateProduct(Long productId, ProductUpdateServiceRequest request) {
         // 1. 카테고리 id로 카테고리 엔티티 가져오기
         Category category = getCategory(request);
@@ -76,13 +75,13 @@ public class ProductService {
         modifyProduct.changeCategory(category);
         modifyProduct.change(request);
 
-        // 3. 상품 이미지 수정
+        // 3. 상품 이미지 수정 ( 기존 이미지는 유지, 요청에 없는 이미지는 삭제, 요청에 새로운 이미지는 추가)
         productImgService.updateProductImgs(productId, request.getProductImages());
 
-        // 4. 옵션 그룹 및 옵션 값 수정
+        // 4. 옵션 그룹 및 옵션 값 수정 (옵션은 식별자 존재유무로 기존 옵션인 경우엔 업데이트, 새로운 옵션인 경우엔 새로 생성)
         optionGroupService.updateOptionGroups(productId, request.getOptionGroups());
 
-        // 5. 품목 수정
+        // 5. 품목 수정 ( 기존 품목은 유지 및 업데이트, 요청에 없는 품목은 삭제, 요청에 새로운 품목은 추가)
         itemService.updateItems(productId, request.getItems());
 
         return ProductResponse.of(modifyProduct);
