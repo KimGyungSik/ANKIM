@@ -25,7 +25,7 @@ public class ProductController {
     // 상품 등록
     @PostMapping(value = "/api/v1/products/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductResponse> createProduct(
-            @RequestPart("productCreateRequest") @Valid ProductCreateRequest productCreateRequest,
+            @Valid @RequestPart("productCreateRequest") ProductCreateRequest productCreateRequest,
             @RequestPart("thumbnailImages") List<MultipartFile> thumbnailImages,
             @RequestPart("detailImages") List<MultipartFile> detailImages
     ) {

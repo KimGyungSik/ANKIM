@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.image.dto;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Builder;
 import lombok.Getter;
@@ -14,10 +15,12 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ProductImgeCreateRequest {
+    @Valid
     @NotEmpty(message = "썸네일 이미지는 필수입니다.")
     @ValidImageFile
     private List<MultipartFile> thumbnailImages;
 
+    @Valid
     @NotEmpty(message = "상세 이미지는 필수입니다.")
     @ValidImageFile
     private List<MultipartFile> detailImages;
