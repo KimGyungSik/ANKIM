@@ -6,7 +6,6 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.category.entity.Category;
-import shoppingmall.ankim.domain.category.exception.CategoryNameTooLongException;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
@@ -18,7 +17,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
-import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NAME_TOO_LONG;
 import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NAME_TOO_LONG;
 
 /*
@@ -85,7 +83,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductSellingStatus sellingStatus; // 판매 상태
 
-    private String bestYn; // 베스트 상품 여부
+    private String handMadeYn; // 베스트 상품 여부
 
     private String freeShip; // 무료배송 여부
 
@@ -114,7 +112,7 @@ public class Product {
     @Builder
     private Product(Category category, List<ProductImg> productImgs, List<Item> items, List<OptionGroup> optionGroups, String name, String code,
                    String desc, Integer discRate, Integer origPrice,
-                   String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String bestYn,
+                   String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String handMadeYn,
                    String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip) {
         this.category = category;
         this.productImgs = productImgs != null ? productImgs : new ArrayList<>();
@@ -130,7 +128,7 @@ public class Product {
         this.restockYn = restockYn;
         this.qty = qty;
         this.sellingStatus = sellingStatus;
-        this.bestYn = bestYn;
+        this.handMadeYn = handMadeYn;
         this.freeShip = freeShip;
         this.shipFee = shipFee;
         this.searchKeywords = searchKeywords;
@@ -165,7 +163,7 @@ public class Product {
     public static Product create(
           Category category,String name, String code, String desc
         , Integer discRate, Integer origPrice, String optYn, String restockYn
-        , Integer qty, String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode
+        , Integer qty, String handMadeYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode
         , String cauProd, String cauOrd, String cauShip)
     {
         return Product.builder()
@@ -179,7 +177,7 @@ public class Product {
                 .optYn(optYn)
                 .restockYn(restockYn)
                 .qty(qty)
-                .bestYn(bestYn)
+                .handMadeYn(handMadeYn)
                 .freeShip(freeShip)
                 .shipFee(shipFee)
                 .searchKeywords(searchKeywords)
@@ -245,7 +243,7 @@ public class Product {
         this.optYn = updateRequest.getOptYn() != null ? updateRequest.getOptYn() : this.optYn;
         this.restockYn = updateRequest.getRestockYn() != null ? updateRequest.getRestockYn() : this.restockYn;
         this.qty = updateRequest.getQty() != null ? updateRequest.getQty() : this.qty;
-        this.bestYn = updateRequest.getBestYn() != null ? updateRequest.getBestYn() : this.bestYn;
+        this.handMadeYn = updateRequest.getBestYn() != null ? updateRequest.getBestYn() : this.handMadeYn;
         this.freeShip = updateRequest.getFreeShip() != null ? updateRequest.getFreeShip() : this.freeShip;
         this.shipFee = updateRequest.getShipFee() != null ? updateRequest.getShipFee() : this.shipFee;
         this.searchKeywords = updateRequest.getSearchKeywords() != null ? updateRequest.getSearchKeywords() : this.searchKeywords;

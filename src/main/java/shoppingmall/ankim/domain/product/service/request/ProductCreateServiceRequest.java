@@ -20,7 +20,7 @@ public class ProductCreateServiceRequest implements CategoryRequest{
     private String optYn; // 옵션 여부
     private String restockYn; // 재입고 알림 여부
     private Integer qty; // 재고량 (옵션이 없는 경우 단품)
-    private String bestYn; // 베스트 상품 여부
+    private String handMadeYn; // 베스트 상품 여부
     private String freeShip; // 무료배송 여부
     private Integer shipFee; // 배송비
     private String searchKeywords; // 검색 키워드
@@ -37,7 +37,7 @@ public class ProductCreateServiceRequest implements CategoryRequest{
 
     @Builder
     private ProductCreateServiceRequest(String name, String code, String desc, Integer discRate,  Integer origPrice, String optYn, String restockYn, Integer qty,
-                                 String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
+                                 String handMadeYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
                                  String cauProd, String cauOrd, String cauShip, ItemCreateServiceRequest items,
                                  Long categoryNo, List<OptionGroupCreateServiceRequest> optionGroups, ProductImgCreateServiceRequest productImages) {
         this.name = name;
@@ -48,7 +48,7 @@ public class ProductCreateServiceRequest implements CategoryRequest{
         this.optYn = optYn;
         this.restockYn = restockYn;
         this.qty = qty;
-        this.bestYn = bestYn;
+        this.handMadeYn = handMadeYn;
         this.freeShip = freeShip;
         this.shipFee = shipFee;
         this.searchKeywords = searchKeywords;

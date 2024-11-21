@@ -41,8 +41,8 @@ public class ProductCreateRequest {
     @PositiveOrZero(message = "재고량은 0 이상이어야 합니다.")
     private Integer qty; // 재고량 (옵션이 없는 경우 단품)
 
-    @Pattern(regexp = "Y|N", message = "베스트 상품 여부는 'Y' 또는 'N'이어야 합니다.")
-    private String bestYn; // 베스트 상품 여부
+    @Pattern(regexp = "Y|N", message = "핸드메이드 상품 여부는 'Y' 또는 'N'이어야 합니다.")
+    private String handMadeYn; // 베스트 상품 여부
 
     @Pattern(regexp = "Y|N", message = "무료배송 여부는 'Y' 또는 'N'이어야 합니다.")
     private String freeShip; // 무료배송 여부
@@ -75,7 +75,7 @@ public class ProductCreateRequest {
 
     @Builder
     private ProductCreateRequest(String name, String code, String desc, Integer discRate,  Integer origPrice, String optYn, String restockYn, Integer qty,
-                                String bestYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
+                                String handMadeYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode,
                                 String cauProd, String cauOrd, String cauShip, ItemCreateRequest items,
                                 Long categoryNo, List<OptionGroupCreateRequest> optionGroups, ProductImgeCreateRequest productImages) {
         this.name = name;
@@ -86,7 +86,7 @@ public class ProductCreateRequest {
         this.optYn = optYn;
         this.restockYn = restockYn;
         this.qty = qty;
-        this.bestYn = bestYn;
+        this.handMadeYn = handMadeYn;
         this.freeShip = freeShip;
         this.shipFee = shipFee;
         this.searchKeywords = searchKeywords;
@@ -110,7 +110,7 @@ public class ProductCreateRequest {
                 .optYn(this.optYn)
                 .restockYn(this.restockYn)
                 .qty(this.qty)
-                .bestYn(this.bestYn)
+                .handMadeYn(this.handMadeYn)
                 .freeShip(this.freeShip)
                 .shipFee(this.shipFee)
                 .searchKeywords(this.searchKeywords)

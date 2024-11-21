@@ -23,7 +23,7 @@ public class ProductResponse {
     private final String restockYn;
     private final Integer qty;
     private final String sellingStatus;
-    private final String bestYn;
+    private final String handMadeYn;
     private final String freeShip;
     private final Integer shipFee;
     private final String searchKeywords;
@@ -56,7 +56,7 @@ public class ProductResponse {
         this.restockYn = product.getRestockYn();
         this.qty = product.getQty();
         this.sellingStatus = product.getSellingStatus().name();
-        this.bestYn = product.getBestYn();
+        this.handMadeYn = product.getHandMadeYn();
         this.freeShip = product.getFreeShip();
         this.shipFee = product.getShipFee();
         this.searchKeywords = product.getSearchKeywords();

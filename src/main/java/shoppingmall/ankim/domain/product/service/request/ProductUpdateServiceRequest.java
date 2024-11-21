@@ -25,7 +25,7 @@ public class ProductUpdateServiceRequest implements CategoryRequest{
     private String optYn; // 옵션 여부
     private String restockYn; // 재입고 알림 여부
     private Integer qty; // 재고량
-    private String bestYn; // 베스트 상품 여부
+    private String handMadeYn; // 베스트 상품 여부
     private String freeShip; // 무료배송 여부
     private Integer shipFee; // 배송비
     private String searchKeywords; // 검색 키워드
@@ -42,7 +42,7 @@ public class ProductUpdateServiceRequest implements CategoryRequest{
 
     @Builder
     public ProductUpdateServiceRequest(String name, String desc, Integer discRate, Integer origPrice, String optYn,
-                                       String restockYn, Integer qty, String bestYn, String freeShip, Integer shipFee,
+                                       String restockYn, Integer qty, String handMadeYn, String freeShip, Integer shipFee,
                                        String searchKeywords, String cauProd, String cauOrd, String cauShip,
                                        Long categoryNo, List<OptionGroupUpdateServiceRequest> optionGroups,
                                        ProductImgUpdateServiceRequest productImages,
@@ -54,7 +54,7 @@ public class ProductUpdateServiceRequest implements CategoryRequest{
         this.optYn = optYn;
         this.restockYn = restockYn;
         this.qty = qty;
-        this.bestYn = bestYn;
+        this.handMadeYn = handMadeYn;
         this.freeShip = freeShip;
         this.shipFee = shipFee;
         this.searchKeywords = searchKeywords;
