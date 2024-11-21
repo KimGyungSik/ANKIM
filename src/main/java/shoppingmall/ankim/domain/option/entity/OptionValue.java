@@ -28,7 +28,7 @@ public class OptionValue {
     @Column(length = 255)
     private String name;
 
-    @Column(length = 7)
+    @Column(length = 7, name = "color_code")
     private String colorCode;
 
     @Builder

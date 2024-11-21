@@ -6,6 +6,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
+import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.image.service.ProductImgService;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.ItemService;
@@ -97,9 +98,16 @@ public class ProductService {
 
     // 상품 삭제
     public void deleteProduct(Long productId) {
+        // 상품 ID로 상품 엔티티와 이미지 리스트 fetch join으로 가져오기
+        Product deleteProduct = getProductWithImgs(productId);
 
+        // 해당 상품 이미지 리스트에서 이미지 추출 후 로컬 및 S3에서 파일 삭제
+        for (ProductImg deleteProductImg : deleteProduct.getProductImgs()) {
+            productImgService.deleteProductImg(deleteProductImg);
+        }
 
-
+        // 해당 상품 삭제 -> 이미지 삭제 -> 옵션 삭제 -> 품목 삭제
+        productRepository.delete(deleteProduct);
     }
 
 
@@ -141,6 +149,11 @@ public class ProductService {
 
     private Product getProduct(Long productId) {
         return productRepository.findById(productId)
+                .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
+    }
+
+    private Product getProductWithImgs(Long productId) {
+        return productRepository.findByIdWithProductImgs(productId)
                 .orElseThrow(() -> new ProductNotFoundException(PRODUCT_NOT_FOUND));
     }
 }

@@ -21,14 +21,14 @@ VALUES
     ('니트 스웨터', '포근한 느낌의 니트 스웨터', 25, 40000, 200, 'STOP_SELLING', 8);
 
 -- 옵션 그룹 데이터
-INSERT INTO option_group (group_name, product_no) VALUES
+INSERT INTO option_group (name, prod_no) VALUES
                                                       ('컬러', 1),
                                                       ('사이즈', 1),
                                                       ('컬러', 3),
                                                       ('사이즈', 3);
 
 -- 옵션 값 데이터
-INSERT INTO option_value (value_name, color_code, option_group_no) VALUES
+INSERT INTO option_value (name, color_code, optg_no) VALUES
                                                                        ('블랙', '#000000', 1),
                                                                        ('그레이', '#808080', 1),
                                                                        ('M', NULL, 2),
@@ -39,7 +39,7 @@ INSERT INTO option_value (value_name, color_code, option_group_no) VALUES
                                                                        ('XL', NULL, 4);
 
 -- 품목 데이터
-INSERT INTO item (name, code, add_price, qty, saf_qty, max_qty, min_qty, product_no) VALUES
+INSERT INTO item (name, code, add_price, qty, saf_qty, max_qty, min_qty, prod_no) VALUES
                                                                                          ('색상: 블랙, 사이즈: M', 'P001-BLK-M', 0, 50, 10, 5, 1, 1),
                                                                                          ('색상: 블랙, 사이즈: L', 'P001-BLK-L', 0, 30, 5, 3, 1, 1),
                                                                                          ('색상: 그레이, 사이즈: M', 'P001-GRY-M', 1000, 40, 8, 4, 1, 1),
@@ -48,7 +48,7 @@ INSERT INTO item (name, code, add_price, qty, saf_qty, max_qty, min_qty, product
                                                                                          ('색상: 블루, 사이즈: XL', 'P003-BLU-XL', 2000, 80, 15, 8, 2, 3);
 
 -- 상품 이미지 데이터
-INSERT INTO product_img (img_name, ori_img_name, img_url, repimg_yn, ord, product_no) VALUES
+INSERT INTO product_img (img_name, orig_name, img_url, repimg_yn, ord, prod_no) VALUES
                                                                                           ('cashmere-coat-thumbnail.jpg', '캐시미어 코트 썸네일', 'http://example.com/images/cashmere-coat-thumbnail.jpg', 'Y', 1, 1),
                                                                                           ('cashmere-coat-detail.jpg', '캐시미어 코트 상세', 'http://example.com/images/cashmere-coat-detail.jpg', 'N', 1, 1),
                                                                                           ('cotton-tshirt-thumbnail.jpg', '면 티셔츠 썸네일', 'http://example.com/images/cotton-tshirt-thumbnail.jpg', 'Y', 1, 3),

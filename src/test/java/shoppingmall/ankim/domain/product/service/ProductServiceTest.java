@@ -7,11 +7,15 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
+import shoppingmall.ankim.domain.image.service.FileService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
@@ -42,6 +46,9 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.*;
+
 @ActiveProfiles("test")
 @SpringBootTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -50,6 +57,9 @@ class ProductServiceTest {
 
     @MockBean
     S3Service s3Service;
+
+    @MockBean
+    FileService fileService;
 
     @Autowired
     ItemService itemService;
@@ -205,6 +215,29 @@ class ProductServiceTest {
         assertThat(response.getOptionGroups()).hasSize(2); // 옵션 그룹 수정 확인
         assertThat(itemRepository.findByProduct_No(response.getNo())).hasSize(4); // 품목 수정 확인
     }
+
+    @DisplayName("상품을 삭제할 수 있다.")
+    @Rollback(value = false)
+    @Test
+    @Sql(scripts = "/data.sql", config = @SqlConfig(encoding = "UTF-8"))
+    void deleteProduct() {
+        // given
+        Long productIdToDelete = 1L; // 삭제할 상품 ID
+
+        // Mock S3와 파일 시스템 동작
+        doNothing().when(s3Service).deleteFile(anyString());
+        doNothing().when(fileService).deleteFile(anyString());
+
+        // when
+        productService.deleteProduct(productIdToDelete);
+
+        // then
+        assertFalse(productRepository.findById(productIdToDelete).isPresent(), "상품이 삭제되지 않았습니다.");
+        verify(s3Service, times(2)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
+        verify(fileService, times(2)).deleteFile(anyString()); // 로컬 파일 삭제 호출 확인
+    }
+
+
 
     private Product createProduct(Category category) {
         return productRepository.save(Product.builder()
