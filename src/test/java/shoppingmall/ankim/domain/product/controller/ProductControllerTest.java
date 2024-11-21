@@ -37,9 +37,10 @@ import shoppingmall.ankim.domain.product.service.ProductService;
 import java.util.List;
 
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.jsonPath;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 @WebMvcTest(controllers = ProductController.class)
@@ -162,6 +163,25 @@ class ProductControllerTest {
                         }))
                 .andDo(print())
                 .andExpect(status().isOk());
+    }
+
+    @DisplayName("상품을 삭제할 수 있다.")
+    @Test
+    void deleteProduct() throws Exception {
+        // given
+        Long productIdToDelete = 1L; // 삭제하려는 상품 ID
+
+        // Mock 설정: service의 deleteProduct 호출 시 동작 없음
+        doNothing().when(productService).deleteProduct(productIdToDelete);
+
+        // when & then
+        mockMvc.perform(delete("/api/v1/products/" + productIdToDelete)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk());
+
+        // deleteProduct 호출 여부 검증
+        verify(productService).deleteProduct(productIdToDelete);
     }
 
 
