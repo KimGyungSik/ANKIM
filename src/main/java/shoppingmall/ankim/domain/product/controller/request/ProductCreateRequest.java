@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.product.controller.request;
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
@@ -63,10 +64,13 @@ public class ProductCreateRequest {
     @NotNull(message = "카테고리 ID는 필수 입력 값입니다.")
     private Long categoryNo; // 소분류 카테고리 ID
 
+    @Valid
     private List<OptionGroupCreateRequest> optionGroups; // 옵션 그룹 리스트
 
+    @Valid
     private ProductImgeCreateRequest productImages; // 상품 이미지 리스트
 
+    @Valid
     private ItemCreateRequest items; // 품목 필수 필드
 
     @Builder

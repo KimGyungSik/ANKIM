@@ -4,6 +4,7 @@ package shoppingmall.ankim.domain.item.controller.request;
 // 재고수량, 옵션추가가격, 안전재고량, 최대 구매 수량, 최소 구매 수량 받아야할듯
 // 품목코드, 품목명은 로직으로 박아주고
 
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -18,6 +19,7 @@ import java.util.stream.Collectors;
 @NoArgsConstructor
 public class ItemCreateRequest {
     @NotNull(message = "품목 정보는 필수 입력 값입니다.")
+    @Valid
     private List<ItemDetailRequest> items; // 옵션 조합별 상세 요청 리스트
 
     @Builder

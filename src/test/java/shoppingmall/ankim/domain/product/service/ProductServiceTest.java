@@ -7,6 +7,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Profile;
 import org.springframework.mock.web.MockMultipartFile;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -15,10 +16,13 @@ import org.springframework.test.context.jdbc.SqlConfig;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
+import shoppingmall.ankim.domain.image.entity.ProductImg;
+import shoppingmall.ankim.domain.image.repository.ProductImgRepository;
 import shoppingmall.ankim.domain.image.service.FileService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
+import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
@@ -26,6 +30,7 @@ import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
+import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
@@ -40,6 +45,7 @@ import shoppingmall.ankim.domain.product.exception.CannotModifySellingProductExc
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.List;
@@ -66,6 +72,9 @@ class ProductServiceTest {
 
     @Autowired
     ProductRepository productRepository;
+
+    @Autowired
+    ProductImgRepository productImgRepository;
 
     @Autowired
     CategoryRepository categoryRepository;
@@ -217,26 +226,31 @@ class ProductServiceTest {
     }
 
     @DisplayName("상품을 삭제할 수 있다.")
-    @Rollback(value = false)
     @Test
-    @Sql(scripts = "/data.sql", config = @SqlConfig(encoding = "UTF-8"))
+    @Rollback(value = false)
     void deleteProduct() {
         // given
-        Long productIdToDelete = 1L; // 삭제할 상품 ID
+        Product product = ProductFactory.createProduct(
+                categoryRepository,
+                productRepository,
+                optionGroupRepository,
+                optionValueRepository,
+                productImgRepository,
+                itemRepository
+        );
 
         // Mock S3와 파일 시스템 동작
         doNothing().when(s3Service).deleteFile(anyString());
         doNothing().when(fileService).deleteFile(anyString());
 
         // when
-        productService.deleteProduct(productIdToDelete);
+        productService.deleteProduct(product.getNo());
 
         // then
-        assertFalse(productRepository.findById(productIdToDelete).isPresent(), "상품이 삭제되지 않았습니다.");
+        assertFalse(productRepository.findById(product.getNo()).isPresent(), "상품이 삭제되지 않았습니다.");
         verify(s3Service, times(2)).deleteFile(anyString()); // S3 파일 삭제 호출 확인
         verify(fileService, times(2)).deleteFile(anyString()); // 로컬 파일 삭제 호출 확인
     }
-
 
 
     private Product createProduct(Category category) {

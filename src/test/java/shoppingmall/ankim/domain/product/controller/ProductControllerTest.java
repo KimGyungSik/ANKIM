@@ -184,8 +184,6 @@ class ProductControllerTest {
         verify(productService).deleteProduct(productIdToDelete);
     }
 
-
-
     private List<OptionGroupUpdateRequest> createOptionGroupUpdateRequests() {
         OptionValueUpdateRequest colorOption1 = OptionValueUpdateRequest.builder()
                 .valueName("Blue")
@@ -302,6 +300,7 @@ class ProductControllerTest {
                                 .addPrice(500)
                                 .qty(100)
                                 .safQty(10)
+                                .sellingStatus(ProductSellingStatus.SELLING)
                                 .maxQty(5)
                                 .minQty(1)
                                 .build(),
@@ -310,6 +309,7 @@ class ProductControllerTest {
                                 .optionValueNames(List.of("Blue", "Large"))
                                 .addPrice(600)
                                 .qty(80)
+                                .sellingStatus(ProductSellingStatus.SELLING)
                                 .safQty(5)
                                 .maxQty(3)
                                 .minQty(1)
@@ -321,6 +321,7 @@ class ProductControllerTest {
                                 .qty(120)
                                 .safQty(15)
                                 .maxQty(7)
+                                .sellingStatus(ProductSellingStatus.SELLING)
                                 .minQty(2)
                                 .build(),
                         ItemDetailRequest.builder()
@@ -329,6 +330,7 @@ class ProductControllerTest {
                                 .addPrice(800)
                                 .qty(60)
                                 .safQty(8)
+                                .sellingStatus(ProductSellingStatus.SELLING)
                                 .maxQty(4)
                                 .minQty(1)
                                 .build()
