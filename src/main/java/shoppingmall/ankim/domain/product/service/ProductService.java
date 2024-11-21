@@ -131,7 +131,7 @@ public class ProductService {
                 request.getOptYn(),
                 request.getRestockYn(),
                 request.getQty(),
-                request.getBestYn(),
+                request.getHandMadeYn(),
                 request.getFreeShip(),
                 request.getShipFee(),
                 request.getSearchKeywords(),
