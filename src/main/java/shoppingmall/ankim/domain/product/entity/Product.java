@@ -235,4 +235,8 @@ public class Product {
         this.cauOrd = updateRequest.getCauOrd() != null ? updateRequest.getCauOrd() : this.cauOrd;
         this.cauShip = updateRequest.getCauShip() != null ? updateRequest.getCauShip() : this.cauShip;
     }
+
+    public void changeSellingStatus(ProductSellingStatus productSellingStatus) {
+        this.sellingStatus = productSellingStatus;
+    }
 }

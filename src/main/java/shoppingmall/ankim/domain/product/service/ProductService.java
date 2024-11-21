@@ -15,6 +15,8 @@ import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.domain.product.exception.CannotModifySellingProductException;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.CategoryRequest;
@@ -25,6 +27,7 @@ import shoppingmall.ankim.global.exception.ErrorCode;
 import java.util.ArrayList;
 import java.util.List;
 
+import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Service
@@ -65,15 +68,18 @@ public class ProductService {
 
 
     // 상품 수정
-    // 조건 1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X
     public ProductResponse updateProduct(Long productId, ProductUpdateServiceRequest request) {
-        // 1. 카테고리 id로 카테고리 엔티티 가져오기
-        Category category = getCategory(request);
-
-        // 2. 상품 id로 상품 엔티티 가져와서 수정하기
+        // 1. 상품 id로 상품 엔티티 가져와서 수정하기
         Product modifyProduct = getProduct(productId);
-        modifyProduct.changeCategory(category);
+        // 1-1. 판매중인 상품은 카테고리 & 옵션 및 재고 수정 X 예외 발생
+        if(modifyProduct.getSellingStatus() == SELLING) {
+            throw new CannotModifySellingProductException(CANNOT_MODIFY_SELLING_PRODUCT);
+        }
         modifyProduct.change(request);
+
+        // 2. 카테고리 id로 카테고리 엔티티 가져오기
+        Category category = getCategory(request);
+        modifyProduct.changeCategory(category);
 
         // 3. 상품 이미지 수정 ( 기존 이미지는 유지, 요청에 없는 이미지는 삭제, 요청에 새로운 이미지는 추가)
         productImgService.updateProductImgs(productId, request.getProductImages());
