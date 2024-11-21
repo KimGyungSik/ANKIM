@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.category.exception.CategoryNameTooLongException
 import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
+import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.exception.ProductNameTooLongException;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
 
@@ -138,6 +139,23 @@ public class Product {
         this.cauOrd = cauOrd;
         this.cauShip = cauShip;
     }
+
+    // 검색 키워드에 색상 옵션 값 추가
+    public void updateSearchKeywords() {
+        StringBuilder keywordsBuilder = new StringBuilder(searchKeywords != null ? searchKeywords : "");
+        for (OptionGroup optionGroup : optionGroups) {
+            if ("컬러".equals(optionGroup.getName()) || "색상".equals(optionGroup.getName())) {
+                for (OptionValue optionValue : optionGroup.getOptionValues()) {
+                    if (keywordsBuilder.length() > 0) {
+                        keywordsBuilder.append(", ");
+                    }
+                    keywordsBuilder.append(optionValue.getName());
+                }
+            }
+        }
+        this.searchKeywords = keywordsBuilder.toString();
+    }
+
 
     // 판매가 계산 메서드
     private Integer calculateSellPrice(Integer origPrice, Integer discRate) {

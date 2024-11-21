@@ -53,7 +53,7 @@ public class ProductService {
         Category category = getCategory(request);
 
         // 2. 상품 생성
-        Product savedProduct = getProduct(request, category);
+        Product savedProduct = saveProduct(request, category);
 
         // 3. 상품 이미지 생성
         productImgService.createProductImgs(savedProduct.getNo(), request.getProductImages());
@@ -88,6 +88,7 @@ public class ProductService {
 
         // 4. 옵션 그룹 및 옵션 값 수정 (옵션은 식별자 존재유무로 기존 옵션인 경우엔 업데이트, 새로운 옵션인 경우엔 새로 생성)
         optionGroupService.updateOptionGroups(productId, request.getOptionGroups());
+        modifyProduct.updateSearchKeywords();
 
         // 5. 품목 수정 ( 기존 품목은 유지 및 업데이트, 요청에 없는 품목은 삭제, 요청에 새로운 품목은 추가)
         itemService.updateItems(productId, request.getItems());
@@ -118,7 +119,7 @@ public class ProductService {
         }
     }
 
-    private Product getProduct(ProductCreateServiceRequest request, Category category) {
+    private Product saveProduct(ProductCreateServiceRequest request, Category category) {
         // 상품 생성 시 판매가는 원가와 할인율을 적용하여 세팅됨
         Product product = Product.create(
                 category,
@@ -139,6 +140,7 @@ public class ProductService {
                 request.getCauOrd(),
                 request.getCauShip()
         );
+        product.updateSearchKeywords();
         return productRepository.save(product);
     }
 
