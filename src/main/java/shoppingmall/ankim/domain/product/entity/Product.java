@@ -243,7 +243,7 @@ public class Product {
         this.optYn = updateRequest.getOptYn() != null ? updateRequest.getOptYn() : this.optYn;
         this.restockYn = updateRequest.getRestockYn() != null ? updateRequest.getRestockYn() : this.restockYn;
         this.qty = updateRequest.getQty() != null ? updateRequest.getQty() : this.qty;
-        this.handMadeYn = updateRequest.getBestYn() != null ? updateRequest.getBestYn() : this.handMadeYn;
+        this.handMadeYn = updateRequest.getHandMadeYn() != null ? updateRequest.getHandMadeYn() : this.handMadeYn;
         this.freeShip = updateRequest.getFreeShip() != null ? updateRequest.getFreeShip() : this.freeShip;
         this.shipFee = updateRequest.getShipFee() != null ? updateRequest.getShipFee() : this.shipFee;
         this.searchKeywords = updateRequest.getSearchKeywords() != null ? updateRequest.getSearchKeywords() : this.searchKeywords;

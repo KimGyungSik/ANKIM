@@ -414,7 +414,7 @@ class CategoryServiceTest {
                 .optYn("Y")
                 .restockYn("N")
                 .qty(100)
-                .bestYn("N")
+                .handMadeYn("N")
                 .freeShip("Y")
                 .shipFee(2500)
                 .searchKeywords("테스트")
