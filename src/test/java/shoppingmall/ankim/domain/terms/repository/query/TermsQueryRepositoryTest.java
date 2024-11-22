@@ -8,7 +8,6 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
-import shoppingmall.ankim.domain.security.repository.TokenRepository;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
@@ -30,8 +29,6 @@ class TermsQueryRepositoryTest {
     private TermsRepository termsRepository;
     @Autowired
     private EntityManager em;
-    @MockBean
-    private TokenRepository tokenRepository;
 
     @Test
     @DisplayName("최상위 약관을 기준으로 모든 하위 약관을 재귀적으로 조회한다.")

@@ -11,7 +11,10 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.authentication.logout.LogoutFilter;
+import shoppingmall.ankim.domain.security.filter.CustomLogoutFilter;
 import shoppingmall.ankim.domain.security.filter.JwtFilter;
+import shoppingmall.ankim.domain.security.handler.RedisHandler;
 import shoppingmall.ankim.domain.security.service.*;
 
 @Configuration
@@ -21,6 +24,7 @@ public class SecurityConfig {
 
     private final AuthenticationConfiguration authenticationConfiguration;
     private final JwtTokenProvider jwtTokenProvider;
+    private final RedisHandler redisHandler;
 
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration configuration) throws Exception {
@@ -83,6 +87,10 @@ public class SecurityConfig {
         // JWT 필터 추가
         http
                 .addFilterAfter(new JwtFilter(jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
+
+        // logout 필터 추가
+        http
+                .addFilterBefore(new CustomLogoutFilter(jwtTokenProvider, redisHandler), LogoutFilter.class);
 
         return http.build();
     }

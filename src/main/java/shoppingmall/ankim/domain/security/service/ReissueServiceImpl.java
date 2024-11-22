@@ -26,24 +26,31 @@ public class ReissueServiceImpl implements ReissueService {
     @Value("${jwt.refresh.token.expire.time}")
     private long REFRESH_TOKEN_EXPIRE_TIME;
 
-    // Refresh Token 검증
-    public void validateRefreshToken(String refreshToken) {
-        if (refreshToken == null || refreshToken.isEmpty()) {
+    @Override
+    public String validateRefreshToken(String access) {
+        if(access == null || access.isEmpty()) {
+            throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND);
+        }
+
+        String refresh = (String) redisHandler.get(access);
+        if(refresh == null || refresh.isEmpty()) {
             throw new JwtTokenException(REFRESH_TOKEN_NOT_FOUND);
         }
 
         // 만료 여부 확인
         try {
-            jwtTokenProvider.isTokenExpired(refreshToken);
+            jwtTokenProvider.isTokenExpired(refresh);
         } catch (ExpiredJwtException e) {
+            // FIXME Refresh 토큰이 만료된 경우 로그아웃 또는 재인증 요청
             throw new JwtTokenException(REFRESH_TOKEN_EXPIRED);
         }
 
         // 토큰 타입 확인
-        String category = jwtTokenProvider.getCategoryFromToken(refreshToken);
+        String category = jwtTokenProvider.getCategoryFromToken(refresh);
         if (!"refresh".equals(category)) {
             throw new JwtTokenException(INVALID_REFRESH_TOKEN);
         }
+        return refresh;
     }
 
     // Access Token 재발급

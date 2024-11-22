@@ -10,7 +10,6 @@ import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
-import java.util.List;
 
 // Jwt 토큰 생성, 인증, 권한 부여, 유효성 검사, pk 추출 등 기능 제공
 @Slf4j
@@ -87,12 +86,6 @@ public class JwtTokenProvider {
                     .getExpiration();
             return expirationDate.before(new Date()); // expirationDate가 현재 시간보다 이전인지 확인
     }
-
-    // refreshToken이 만료되지 않은 Token 정보 추출
-
-
-    // refreshToken이 만료된 Token 정보 추출
-
 
     // 토큰에서 사용자 이름(loginId) 추출
     public String getUsernameFromToken(String token) {

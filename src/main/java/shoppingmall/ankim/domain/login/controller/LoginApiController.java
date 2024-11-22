@@ -42,12 +42,12 @@ public class LoginApiController {
             // LoginService를 통해 인증 처리
             Map<String, String> jwtToken = loginService.login(loginRequest.toServiceRequest(), request);
             String access = jwtToken.get("access");
-            String refresh = jwtToken.get("refresh");
+//            String refresh = jwtToken.get("refresh");
 
             // 성공 시 토큰 반환
             // 응답 설정
             response.setHeader("access", access);
-            response.addCookie(createCookie("refresh", refresh));
+//            response.addCookie(createCookie("refresh", refresh));
             response.setStatus(HttpStatus.OK.value());
 
             // 헤더에 토큰 추가
@@ -55,27 +55,6 @@ public class LoginApiController {
 
             return ApiResponse.ok("로그인 성공");
 
-/*            // Spring Security 인증 시도
-            Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getLoginId(), loginRequest.getPwd())
-            );
-
-            CustomUserDetails customUserDetails = (CustomUserDetails) authentication.getPrincipal();
-
-            // 인증 성공 시 private boolean autoLogin 설정을 했는지 확인
-            if (loginRequest.isAutoLogin()) {
-                // Access Token 및 Refresh Token 생성
-                String accessToken = jwtTokenProvider.generateAccessToken(customUserDetails);
-                String refreshToken = jwtTokenProvider.generateRefreshToken(customUserDetails);
-
-
-                Map<String, String> tokens = Map.of(
-                        "accessToken", accessToken,
-                        "refreshToken", refreshToken
-                );
-
-                return ApiResponse.ok(tokens);
-            }*/
         } catch (BadCredentialsException ex) {
             throw new LoginFailedException(INVALID_CREDENTIALS);
         }
@@ -85,8 +64,8 @@ public class LoginApiController {
         Cookie cookie = new Cookie(key, value);
 
         // 쿠키 설정
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정
-/*
+        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정 ( 밀리초 → 초 )
+ /*
         cookie.setSecure(true); // https 통신시 사용
         cookie.setPath("/"); // cookie 적용 범위
 */

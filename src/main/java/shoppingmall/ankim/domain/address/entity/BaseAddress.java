@@ -2,10 +2,7 @@ package shoppingmall.ankim.domain.address.entity;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Embeddable;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.time.LocalDateTime;
 
@@ -29,6 +26,7 @@ public class BaseAddress {
     @Column(name = "mod_date")
     private LocalDateTime modificationDate = LocalDateTime.now();
 
+    @Builder
     public BaseAddress(Integer zipCode, String addressMain, String addressDetail, LocalDateTime registrationDate, LocalDateTime modificationDate) {
         this.zipCode = zipCode;
         this.addressMain = addressMain;
