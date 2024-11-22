@@ -10,7 +10,7 @@ import shoppingmall.ankim.domain.option.entity.OptionValue;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
+@Data
 @NoArgsConstructor
 public class OptionGroupResponse {
     private Long optionGroupNo;

@@ -18,12 +18,13 @@ import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
+@RequestMapping("/api/v1/products")
 public class ProductController {
 
     private final ProductService productService;
 
     // 상품 등록
-    @PostMapping(value = "/api/v1/products/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PostMapping(value = "/new", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductResponse> createProduct(
             @Valid @RequestPart("productCreateRequest") ProductCreateRequest productCreateRequest,
             @RequestPart("thumbnailImages") List<MultipartFile> thumbnailImages,
@@ -39,7 +40,7 @@ public class ProductController {
     }
 
     // 상품 수정
-    @PutMapping(value = "/api/v1/products/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductResponse> updateProduct(
             @PathVariable Long productId,
             @RequestPart("productUpdateRequest") @Valid ProductUpdateRequest productUpdateRequest,
@@ -58,7 +59,7 @@ public class ProductController {
     }
 
     // 상품 삭제
-    @DeleteMapping("/api/v1/products/{productId}")
+    @DeleteMapping("/{productId}")
     public ApiResponse<Void> deleteProduct(@PathVariable Long productId) {
         productService.deleteProduct(productId);
         return ApiResponse.ok();
