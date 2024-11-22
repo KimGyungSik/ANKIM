@@ -109,6 +109,12 @@ public class ItemService {
      * 품목명이 같다면 업데이트만 진행
 
      * 조건 1. 품목 상태가 판매중이면 안됨
+
+
+
+     * TODO OptionValueResponse에 itemId가 있으니 해당 필드로 기존 품목 유무로 판단해보는것도 고려해볼것
+     * TODO ItemDetailServiceRequest에 OptionValueRequest(itemId 필드존재)를 받아서 판단
+     * TODO 근거 -> 관리자 상품 상세 페이지에 OptionValueResponse(itemId 필드존재)를 반환하기 때문에
      */
     public void updateItems(Long productId, ItemUpdateServiceRequest updatedItemsRequest) {
         List<ItemDetailServiceRequest> updatedItems = updatedItemsRequest.getItems();

@@ -2,6 +2,8 @@ package shoppingmall.ankim.domain.item.dto;
 
 import lombok.Builder;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
@@ -10,17 +12,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Getter
+@NoArgsConstructor
 public class ItemResponse {
-    private final Long itemId;
-    private final String code; // 품목코드
-    private final String name; // 품목명
-    private final Integer addPrice; // 추가금액
-    private final Integer qty; // 재고량
-    private final Integer safQty; // 안전재고량
-    private final ProductSellingStatus sellingStatus; // 판매 상태
-    private final Integer maxQty; // 최대 구매 수량
-    private final Integer minQty; // 최소 구매 수량
-    private final List<OptionValueResponse> optionValues; // 품목 옵션 리스트
+    private Long itemId;
+    private String code; // 품목코드
+    private String name; // 품목명
+    private Integer addPrice; // 추가금액
+    private Integer qty; // 재고량
+    private Integer safQty; // 안전재고량
+    private ProductSellingStatus sellingStatus; // 판매 상태
+    private Integer maxQty; // 최대 구매 수량
+    private Integer minQty; // 최소 구매 수량
+    // OptionValues 설정을 위한 Setter
+    @Setter
+    private List<OptionValueResponse> optionValues; // 품목 옵션 리스트
 
     @Builder
     private ItemResponse(Long itemId, String code, String name, Integer addPrice, Integer qty, Integer safQty,
@@ -53,4 +58,5 @@ public class ItemResponse {
                         .collect(Collectors.toList()))
                 .build();
     }
+
 }
