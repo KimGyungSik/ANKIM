@@ -16,6 +16,7 @@ import org.springframework.test.web.servlet.ResultMatcher;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
@@ -54,6 +55,26 @@ class ProductQueryControllerTest {
         
         // when // then
         mockMvc.perform(get("/api/v1/product/catalog/{productId}",1L )
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(print())
+                .andExpect(status().isOk()) // 응답 HTTP 상태 코드 검증
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @DisplayName("관리자들을 위한 상품 상세 페이지를 조회할 수 있다.")
+    @Test
+    void adminDetailProductResponse() throws Exception {
+        // given
+        ProductResponse mockResponse = new ProductResponse();
+
+        when(productRepository.adminDetailProduct(anyLong()))
+                .thenReturn(mockResponse);
+
+        // when // then
+        mockMvc.perform(get("/api/v1/product/catalog/admin/{productId}",1L )
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
                 .andExpect(status().isOk()) // 응답 HTTP 상태 코드 검증

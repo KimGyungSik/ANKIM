@@ -11,10 +11,12 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
+import shoppingmall.ankim.domain.image.dto.ProductImgResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgUrlResponse;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
+import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.factory.ProductFactory;
@@ -83,6 +85,60 @@ class ProductRepositoryTest {
         // 옵션 값 검증
         assertThat(optionGroups.get(0).getOptionValueResponses()).hasSize(2); // 첫 번째 옵션 그룹의 옵션 값 개수 확인
         assertThat(optionGroups.get(0).getOptionValueResponses().get(0).getValueName()).isEqualTo("블랙"); // 첫 번째 옵션 값 이름 확인
+    }
+
+    @DisplayName("관리자를 위한 상세 상품 페이지 단건 조회가 가능하다.")
+    @Test
+    void adminDetailProduct() {
+        // given
+        Product product = ProductFactory.createProduct(em);
+
+        // when
+        ProductResponse result = productRepository.adminDetailProduct(product.getNo());
+
+        // then
+        assertThat(result).isNotNull();
+
+        // 기본 필드 검증
+        assertThat(result.getNo()).isEqualTo(product.getNo());
+        assertThat(result.getName()).isEqualTo(product.getName());
+        assertThat(result.getCode()).isEqualTo(product.getCode());
+        assertThat(result.getDesc()).isEqualTo(product.getDesc());
+        assertThat(result.getDiscRate()).isEqualTo(product.getDiscRate());
+        assertThat(result.getSellPrice()).isEqualTo(product.getSellPrice());
+        assertThat(result.getOrigPrice()).isEqualTo(product.getOrigPrice());
+        assertThat(result.getSellingStatus()).isEqualTo(product.getSellingStatus());
+        assertThat(result.getSearchKeywords()).isEqualTo(product.getSearchKeywords());
+
+        // 카테고리 검증
+        assertThat(result.getCategoryResponse()).isNotNull();
+        assertThat(result.getCategoryResponse().getCategoryNo()).isEqualTo(product.getCategory().getNo());
+        assertThat(result.getCategoryResponse().getName()).isEqualTo(product.getCategory().getName());
+
+        // 상품 이미지 검증
+        List<ProductImgResponse> productImgs = result.getProductImgs();
+        assertThat(productImgs).isNotNull();
+        assertThat(productImgs).hasSize(2); // 이미지 개수 확인
+        assertThat(productImgs.get(0).getRepImgYn()).isEqualTo("Y"); // 대표 이미지 여부 확인
+
+        // 옵션 그룹 검증
+        List<OptionGroupResponse> optionGroups = result.getOptionGroups();
+        assertThat(optionGroups).isNotNull();
+        assertThat(optionGroups).hasSize(2); // 옵션 그룹 수 확인
+        assertThat(optionGroups.get(0).getGroupName()).isEqualTo("컬러"); // 첫 번째 옵션 그룹 이름 확인
+
+        // 옵션 값 검증
+        assertThat(optionGroups.get(0).getOptionValueResponses()).hasSize(2); // 첫 번째 옵션 그룹의 옵션 값 개수 확인
+        assertThat(optionGroups.get(0).getOptionValueResponses().get(0).getValueName()).isEqualTo("블랙"); // 첫 번째 옵션 값 이름 확인
+
+        // 품목 검증
+        List<ItemResponse> items = result.getItems();
+        assertThat(items.get(0).getName()).isEqualTo("색상: 블랙, 사이즈: M");
+        assertThat(items.get(1).getName()).isEqualTo("색상: 블랙, 사이즈: L");
+        assertThat(items.get(0).getQty()).isEqualTo(50);
+        assertThat(items.get(1).getQty()).isEqualTo(30);
+        assertThat(items.get(0).getOptionValues()).isNotEmpty();
+        assertThat(items.get(1).getOptionValues()).isNotEmpty();
     }
 
 

@@ -65,3 +65,7 @@ Content-Type: image/png
 
 ### 사용자를 위한 상세 상품 페이지 단건 조회
 GET http://localhost:8080/api/v1/product/catalog/1
+
+### 관리자를 위한 상세 상품 페이지 단건 조회
+GET http://localhost:8080/api/v1/product/catalog/admin/1
+

@@ -1,48 +1,53 @@
 package shoppingmall.ankim.domain.product.dto;
 
+import lombok.Data;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgResponse;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Getter
+@Data
+@NoArgsConstructor
 public class ProductResponse {
-    private final Long no;
-    private final String name;
-    private final String code;
-    private final String desc;
-    private final Integer discRate;
-    private final Integer sellPrice;
-    private final Integer origPrice;
-    private final String optYn;
-    private final String restockYn;
-    private final Integer qty;
-    private final String sellingStatus;
-    private final String handMadeYn;
-    private final String freeShip;
-    private final Integer shipFee;
-    private final String searchKeywords;
-    private final String relProdCode;
-    private final String cauProd;
-    private final String cauOrd;
-    private final String cauShip;
-    private final Integer avgR;
-    private final Integer wishCnt;
-    private final Integer viewCnt;
-    private final Integer rvwCnt;
-    private final Integer qnaCnt;
-    private final Integer dispOrd;
+    private Long no;
+    private String name;
+    private String code;
+    private String desc;
+    private Integer discRate;
+    private Integer sellPrice;
+    private Integer origPrice;
+    private String optYn;
+    private String restockYn;
+    private Integer qty;
+    private ProductSellingStatus sellingStatus;
+    private String handMadeYn;
+    private String freeShip;
+    private Integer shipFee;
+    private String searchKeywords;
+    private String relProdCode;
+    private String cauProd;
+    private String cauOrd;
+    private String cauShip;
+    private Integer avgR;
+    private Integer wishCnt;
+    private Integer viewCnt;
+    private Integer rvwCnt;
+    private Integer qnaCnt;
+    private Integer dispOrd;
 
     // Related entities as nested DTOs
-    private final CategoryResponse categoryResponse;
-    private final List<ProductImgResponse> productImgs;
-    private final List<OptionGroupResponse> optionGroups;
-    private final List<ItemResponse> items;
+    private CategoryResponse categoryResponse;
+    private List<ProductImgResponse> productImgs;
+    private List<OptionGroupResponse> optionGroups;
+    private List<ItemResponse> items;
 
     private ProductResponse(Product product) {
         this.no = product.getNo();
@@ -55,7 +60,7 @@ public class ProductResponse {
         this.optYn = product.getOptYn();
         this.restockYn = product.getRestockYn();
         this.qty = product.getQty();
-        this.sellingStatus = product.getSellingStatus().name();
+        this.sellingStatus = product.getSellingStatus();
         this.handMadeYn = product.getHandMadeYn();
         this.freeShip = product.getFreeShip();
         this.shipFee = product.getShipFee();
