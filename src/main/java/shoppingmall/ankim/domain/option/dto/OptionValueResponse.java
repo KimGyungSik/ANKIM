@@ -12,12 +12,14 @@ public class OptionValueResponse {
     private Long optionValueNo;
     private String valueName;
     private String colorCode;
+    private Long optionGroupNo;
 
     @Builder
-    private OptionValueResponse(Long optionValueNo,String valueName, String colorCode) {
+    private OptionValueResponse(Long optionValueNo,String valueName, String colorCode, Long optionGroupNo) {
         this.optionValueNo = optionValueNo;
         this.valueName = valueName;
         this.colorCode = colorCode;
+        this.optionGroupNo = optionGroupNo;
     }
 
     // 엔티티를 DTO로 변환하는 정적 메서드
@@ -26,6 +28,7 @@ public class OptionValueResponse {
                 .optionValueNo(optionValue.getNo())
                 .valueName(optionValue.getName())
                 .colorCode(optionValue.getColorCode())
+                .optionGroupNo(optionValue.getOptionGroup().getNo())
                 .build();
     }
 }

@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 public class ProductQueryService {
     // 상품 상세페이지 조회 by User (상품 기본 필드, 상품 이미지, 옵션 그룹 및 옵션 값)
 
+
     // 상품 수정 페이지 by Admin (모든 필드를 보여줘야함)
 
     // 1차 필터링 : 최신 한달 이내 등록 상품 / 할인 중인 상품 / 좋아요 특정 갯수 이상 / 중분류 카테고리별 상품 / 핸드메이드 상품
