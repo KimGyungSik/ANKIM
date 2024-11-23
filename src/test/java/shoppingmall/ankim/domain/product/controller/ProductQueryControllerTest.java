@@ -1,31 +1,19 @@
 package shoppingmall.ankim.domain.product.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.ImportAutoConfiguration;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultMatcher;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
-import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
-import shoppingmall.ankim.domain.product.service.ProductService;
-import shoppingmall.ankim.factory.ProductFactory;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.anyLong;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
@@ -50,7 +38,7 @@ class ProductQueryControllerTest {
         // given
         ProductUserDetailResponse mockResponse = new ProductUserDetailResponse();
 
-        when(productRepository.findProductUserDetailResponse(anyLong()))
+        when(productRepository.findUserProductDetailResponse(anyLong()))
                 .thenReturn(mockResponse);
         
         // when // then
@@ -70,7 +58,7 @@ class ProductQueryControllerTest {
         // given
         ProductResponse mockResponse = new ProductResponse();
 
-        when(productRepository.adminDetailProduct(anyLong()))
+        when(productRepository.findAdminProductDetailResponse(anyLong()))
                 .thenReturn(mockResponse);
 
         // when // then

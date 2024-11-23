@@ -12,7 +12,9 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.exception.ProductNameTooLongException;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+import shoppingmall.ankim.global.audit.BaseEntity;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,7 +32,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NAME_TOO_LON
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Entity
 @Table(name = "product")
-public class Product {
+public class Product extends BaseEntity {
     private static final int NAME_MAX_LENGTH = 50;
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -83,7 +85,7 @@ public class Product {
     @Enumerated(EnumType.STRING)
     private ProductSellingStatus sellingStatus; // 판매 상태
 
-    private String handMadeYn; // 베스트 상품 여부
+    private String handMadeYn; // 핸드메이드 상품 여부
 
     private String freeShip; // 무료배송 여부
 
@@ -113,7 +115,8 @@ public class Product {
     private Product(Category category, List<ProductImg> productImgs, List<Item> items, List<OptionGroup> optionGroups, String name, String code,
                    String desc, Integer discRate, Integer origPrice,
                    String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String handMadeYn,
-                   String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip) {
+                   String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip,
+                    Integer avgR, Integer wishCnt, Integer viewCnt, Integer rvwCnt,Integer qnaCnt, Integer dispOrd) {
         this.category = category;
         this.productImgs = productImgs != null ? productImgs : new ArrayList<>();
         this.items = items != null ? items : new ArrayList<>();
@@ -136,6 +139,12 @@ public class Product {
         this.cauProd = cauProd;
         this.cauOrd = cauOrd;
         this.cauShip = cauShip;
+        this.avgR =avgR;
+        this.wishCnt =wishCnt;
+        this.viewCnt = viewCnt;
+        this.rvwCnt = rvwCnt;
+        this.qnaCnt = qnaCnt;
+        this.dispOrd = dispOrd;
     }
 
     // 검색 키워드에 색상 옵션 값 추가

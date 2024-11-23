@@ -18,9 +18,233 @@ import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Map;
 
 public class ProductFactory {
+
+    // 1. 특정 조건별 상품 생성 (NEW, BEST, HANDMADE, DISCOUNT 등)
+    public static void createTestProductsWithSubcategories(
+            EntityManager entityManager,
+            int newCount, int bestCount, int handmadeCount, int discountCount,
+            Map<String, List<String>> categoryStructure) {
+        LocalDateTime now = LocalDateTime.now();
+
+        // 중분류 -> 소분류 구조를 순회하면서 데이터 생성
+        for (Map.Entry<String, List<String>> entry : categoryStructure.entrySet()) {
+            String middleCategory = entry.getKey(); // 중분류
+            List<String> subcategories = entry.getValue(); // 소분류 목록
+
+            // 중분류 생성
+            Category middleCategoryEntity = Category.builder()
+                    .name(middleCategory)
+                    .build();
+            entityManager.persist(middleCategoryEntity);
+
+            for (String subcategory : subcategories) {
+                // 소분류 생성
+                Category subCategoryEntity = Category.builder()
+                        .name(subcategory)
+                        .build();
+                middleCategoryEntity.addSubCategory(subCategoryEntity);
+                entityManager.persist(subCategoryEntity);
+
+                // NEW 상품 생성
+                for (int i = 0; i < newCount; i++) {
+                    Product newProduct = Product.builder()
+                            .category(subCategoryEntity)
+                            .name("NEW 상품 - " + subcategory + " - " + i)
+                            .desc("NEW 상품 설명")
+                            .discRate(0) // 할인 없음
+                            .origPrice(10000 + i)
+                            .wishCnt(0)
+                            .handMadeYn("N")
+                            .build();
+                    newProduct.setCreatedAt(now.minusDays(i));
+                    entityManager.persist(newProduct);
+
+                    // 이미지 추가 (옵션)
+                    addProductImages(entityManager, newProduct, i);
+                }
+
+                // BEST 상품 생성
+                for (int i = 0; i < bestCount; i++) {
+                    Product bestProduct = Product.builder()
+                            .category(subCategoryEntity)
+                            .name("BEST 상품 - " + subcategory + " - " + i)
+                            .desc("BEST 상품 설명")
+                            .discRate(0)
+                            .origPrice(15000 + i)
+                            .wishCnt(50 + i) // 찜 수 50 이상
+                            .handMadeYn("N")
+                            .build();
+                    bestProduct.setCreatedAt(now.minusDays(30));
+                    entityManager.persist(bestProduct);
+
+                    // 이미지 추가 (옵션)
+                    addProductImages(entityManager, bestProduct, i);
+                }
+
+                // HANDMADE 상품 생성
+                for (int i = 0; i < handmadeCount; i++) {
+                    Product handmadeProduct = Product.builder()
+                            .category(subCategoryEntity)
+                            .name("HANDMADE 상품 - " + subcategory + " - " + i)
+                            .desc("HANDMADE 상품 설명")
+                            .discRate(0)
+                            .origPrice(20000 + i)
+                            .wishCnt(0)
+                            .handMadeYn("Y") // 핸드메이드
+                            .build();
+                    handmadeProduct.setCreatedAt(now.minusDays(15));
+                    entityManager.persist(handmadeProduct);
+
+                    // 이미지 추가 (옵션)
+                    addProductImages(entityManager, handmadeProduct, i);
+                }
+
+                // DISCOUNT 상품 생성
+                for (int i = 0; i < discountCount; i++) {
+                    Product discountProduct = Product.builder()
+                            .category(subCategoryEntity)
+                            .name("DISCOUNT 상품 - " + subcategory + " - " + i)
+                            .desc("DISCOUNT 상품 설명")
+                            .discRate(10 + i) // 할인율
+                            .origPrice(25000 + i)
+                            .wishCnt(0)
+                            .handMadeYn("N")
+                            .build();
+                    discountProduct.setCreatedAt(now.minusDays(10));
+                    entityManager.persist(discountProduct);
+
+                    // 이미지 추가 (옵션)
+                    addProductImages(entityManager, discountProduct, i);
+                }
+            }
+        }
+    }
+
+    // 추가된 이미지 생성 메서드
+    private static void addProductImages(EntityManager entityManager, Product product, int index) {
+        // 대표 이미지 (썸네일)
+        ProductImg thumbnailImg = ProductImg.builder()
+                .imgName("thumbnail_" + index + ".jpg")
+                .oriImgName("썸네일 이미지 " + index)
+                .imgUrl("http://example.com/images/thumbnail_" + index + ".jpg")
+                .repimgYn("Y") // 대표 이미지
+                .ord(1) // 첫 번째 이미지
+                .product(product)
+                .build();
+        entityManager.persist(thumbnailImg);
+
+        ProductImg thumbnailImg2 = ProductImg.builder()
+                .imgName("thumbnail_" + index + ".jpg")
+                .oriImgName("썸네일 이미지2 " + index)
+                .imgUrl("http://example.com/images/thumbnail_" + index + ".jpg")
+                .repimgYn("Y") // 대표 이미지
+                .ord(2) // 두 번째 이미지
+                .product(product)
+                .build();
+        entityManager.persist(thumbnailImg2);
+
+        product.addProductImg(thumbnailImg);
+        product.addProductImg(thumbnailImg2);
+
+        // 상세 이미지
+        ProductImg detailImg = ProductImg.builder()
+                .imgName("detail_" + index + ".jpg")
+                .oriImgName("상세 이미지 " + index)
+                .imgUrl("http://example.com/images/detail_" + index + ".jpg")
+                .repimgYn("N") // 상세 이미지
+                .ord(2) // 두 번째 이미지
+                .product(product)
+                .build();
+        entityManager.persist(detailImg);
+
+        product.addProductImg(detailImg);
+    }
+
+
+    // 2. 카테고리 생성 메서드
+    private static Category createCategory(EntityManager entityManager, String name, String parentName) {
+        Category parentCategory = null;
+        if (parentName != null) {
+            parentCategory = entityManager.createQuery("SELECT c FROM Category c WHERE c.name = :name", Category.class)
+                    .setParameter("name", parentName)
+                    .getSingleResult();
+        }
+
+        Category category = Category.builder()
+                .name(name)
+                .build();
+        if (parentCategory != null) {
+            parentCategory.addSubCategory(category);
+        }
+        entityManager.persist(category);
+        return category;
+    }
+
+    // 3. 상품 생성 메서드 (특정 속성으로 생성)
+    private static Product createProductWithAttributes(EntityManager entityManager, String code, String name, Category category,
+                                                       LocalDateTime createdAt, long wishCnt, int discRate,
+                                                       boolean isHandmade, boolean isDiscounted) {
+        // 상품 생성
+        Product product = Product.builder()
+                .category(category)
+                .name(name)
+                .code(code)
+                .desc(name + " 상세 설명입니다.")
+                .origPrice(100000)
+                .discRate(discRate)
+                .qty(100)
+                .wishCnt((int) wishCnt)
+                .handMadeYn(isHandmade ? "Y" : "N")
+                .sellingStatus(ProductSellingStatus.SELLING)
+                .build();
+        product.setCreatedAt(createdAt);
+        entityManager.persist(product);
+
+        // 상품 이미지 추가
+        ProductImg thumbnail = ProductImg.builder()
+                .imgName("thumbnail.jpg")
+                .oriImgName(name + " 썸네일")
+                .imgUrl("http://example.com/images/" + code + "_thumbnail.jpg")
+                .repimgYn("Y")
+                .ord(1)
+                .product(product)
+                .build();
+        entityManager.persist(thumbnail);
+
+        // 옵션 그룹 생성
+        OptionGroup colorGroup = OptionGroup.builder().name("컬러").product(product).build();
+        OptionGroup sizeGroup = OptionGroup.builder().name("사이즈").product(product).build();
+        entityManager.persist(colorGroup);
+        entityManager.persist(sizeGroup);
+
+        // 옵션 값 생성
+        OptionValue black = OptionValue.builder().name("블랙").colorCode("#000000").optionGroup(colorGroup).build();
+        OptionValue medium = OptionValue.builder().name("M").optionGroup(sizeGroup).build();
+        entityManager.persist(black);
+        entityManager.persist(medium);
+
+        // 품목 추가
+        Item item = Item.builder()
+                .name(name + " 품목")
+                .code(code + "_ITEM")
+                .optionValues(List.of(black, medium))
+                .addPrice(0)
+                .qty(50)
+                .safQty(10)
+                .maxQty(5)
+                .minQty(1)
+                .product(product)
+                .build();
+        entityManager.persist(item);
+
+        return product;
+    }
+
 
     public static Product createProduct(EntityManager entityManager) {
         // 카테고리 생성 및 저장
