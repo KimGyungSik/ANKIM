@@ -1,8 +1,6 @@
 package shoppingmall.ankim.domain.product.controller;
 
-import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,14 +21,14 @@ public class ProductQueryController {
     @GetMapping("/{productId}")
     public ApiResponse<ProductUserDetailResponse> findProductUserDetailResponse(
             @PathVariable Long productId) {
-        return ApiResponse.ok(productRepository.findProductUserDetailResponse(productId));
+        return ApiResponse.ok(productRepository.findUserProductDetailResponse(productId));
     }
 
     // by Admin
     @GetMapping("/admin/{productId}")
     public ApiResponse<ProductResponse> adminDetailProductResponse(
             @PathVariable Long productId) {
-        return ApiResponse.ok(productRepository.adminDetailProduct(productId));
+        return ApiResponse.ok(productRepository.findAdminProductDetailResponse(productId));
     }
 
 }

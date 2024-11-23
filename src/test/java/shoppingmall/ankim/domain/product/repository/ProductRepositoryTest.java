@@ -1,29 +1,32 @@
 package shoppingmall.ankim.domain.product.repository;
 
 import jakarta.persistence.EntityManager;
-import org.assertj.core.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.test.context.TestPropertySource;
-import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgUrlResponse;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
+import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
+import java.util.HashMap;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -41,6 +44,18 @@ class ProductRepositoryTest {
     @Autowired
     ProductRepository productRepository;
 
+    @BeforeEach
+    void setup() {
+        // 중분류 -> 소분류 구조 정의
+        Map<String, List<String>> categoryStructure = new HashMap<>();
+        categoryStructure.put("Top", List.of("티셔츠", "맨투맨"));
+        categoryStructure.put("Outer", List.of("자켓", "코트"));
+        categoryStructure.put("Knit", List.of("스웨터", "가디건"));
+
+        // 테스트 데이터 생성
+        ProductFactory.createTestProductsWithSubcategories(em, 10, 10, 10, 10, categoryStructure);
+    }
+
 
     @DisplayName("유저를 위한 상세 상품 페이지 단건 조회가 가능하다.")
     @Test
@@ -49,7 +64,7 @@ class ProductRepositoryTest {
         Product product = ProductFactory.createProduct(em);
 
         // when
-        ProductUserDetailResponse result = productRepository.findProductUserDetailResponse(product.getNo());
+        ProductUserDetailResponse result = productRepository.findUserProductDetailResponse(product.getNo());
 
         // then
         assertThat(result).isNotNull();
@@ -94,7 +109,7 @@ class ProductRepositoryTest {
         Product product = ProductFactory.createProduct(em);
 
         // when
-        ProductResponse result = productRepository.adminDetailProduct(product.getNo());
+        ProductResponse result = productRepository.findAdminProductDetailResponse(product.getNo());
 
         // then
         assertThat(result).isNotNull();
@@ -141,5 +156,153 @@ class ProductRepositoryTest {
         assertThat(items.get(1).getOptionValues()).isNotEmpty();
     }
 
+    @DisplayName("홈페이지 메뉴바에서 NEW라는 메뉴를 클릭하면 최신 한달 이내 등록 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfNew() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.NEW;
 
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent())
+                .allMatch(product -> product.getCreatedAt().isAfter(java.time.LocalDateTime.now().minusMonths(1)));
+    }
+
+    @DisplayName("홈페이지 메뉴바에서 BEST라는 메뉴를 클릭하면 찜횟수가 30개 이상인 베스트 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfBEST() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.BEST;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent())
+                .allMatch(product -> product.getWishCnt() >= 30);
+    }
+
+    @DisplayName("홈페이지 메뉴바에서 HANDMADE라는 메뉴를 클릭하면 핸드메이드 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfHANDMADE() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.HANDMADE;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent())
+                .allMatch(product -> product.getHandMadeYn().equals("Y"));
+    }
+
+    @DisplayName("홈페이지 메뉴바에서 DISCOUNT라는 메뉴를 클릭하면 할인중인 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfDISCOUNT() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.DISCOUNT;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent())
+                .allMatch(product -> product.getDiscRate() > 0);
+    }
+
+    @DisplayName("홈페이지 메뉴바에서 원하는 중분류 카테고리 메뉴를 클릭하면 중분류에 해당하는 모든 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfMiddleCategory() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.TOP;
+
+        // 중분류 카테고리 이름 설정 (예: "상의"가 중분류)
+        String middleCategoryName = "Top";
+
+        // 중분류 카테고리에 해당하는 소분류 이름 목록 가져옴
+        List<String> subCategoryNames = em.createQuery("SELECT c.name FROM Category c WHERE c.parent.name = :middleCategoryName", String.class)
+                .setParameter("middleCategoryName", middleCategoryName)
+                .getResultList();
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        // 중분류 또는 소분류에 해당하는 상품인지 확인
+        assertThat(result.getContent())
+                .allMatch(product -> isCategoryOrSubcategoryName(middleCategoryName, subCategoryNames, product.getCategoryName()));
+    }
+
+
+    @DisplayName("홈페이지 메뉴바에서 원하는 소분류 카테고리 메뉴를 클릭하면 해당하는 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithConditionOfSubCategory() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        String subCategoryName = "코트"; // 소분류 카테고리 이름
+
+        // 소분류 ID를 가져옴
+        Long subCategoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :subCategoryName", Long.class)
+                .setParameter("subCategoryName", subCategoryName)
+                .getSingleResult();
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, subCategoryId, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 반환된 상품들의 카테고리 이름이 소분류 카테고리 이름과 일치하는지 검증
+        assertThat(result.getContent())
+                .allMatch(product -> product.getCategoryName().equals(subCategoryName));
+    }
+
+    @DisplayName("상품들의 썸네일 이미지는 첫 번째(ord=1) 썸네일 이미지 URL이다.")
+    @Test
+    void testThumbnailImageIsFirstImage() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+        for (ProductListResponse product : result.getContent()) {
+            // 실제 썸네일 이미지 URL
+            String thumbnailUrl = product.getThumbNailImgUrl();
+
+            // DB에서 해당 상품의 첫 번째 이미지 URL 조회
+            String expectedThumbnailUrl = em.createQuery(
+                            "SELECT img.imgUrl FROM ProductImg img WHERE img.product.no = :productId AND img.repimgYn = 'Y' AND img.ord = 1",
+                            String.class)
+                    .setParameter("productId", product.getNo())
+                    .getSingleResult();
+
+            // 검증: 썸네일 이미지 URL이 첫 번째 이미지 URL과 동일한지 확인
+            assertThat(thumbnailUrl).isEqualTo(expectedThumbnailUrl);
+        }
+    }
+
+
+
+
+
+    // 중분류 또는 소분류 이름인지 확인하는 메서드
+    private boolean isCategoryOrSubcategoryName(String middleCategoryName, List<String> subCategoryNames, String productCategoryName) {
+        // 중분류 이름 또는 소분류 이름에 해당하면 true 반환
+        return middleCategoryName.equals(productCategoryName) || subCategoryNames.contains(productCategoryName);
+    }
 }
