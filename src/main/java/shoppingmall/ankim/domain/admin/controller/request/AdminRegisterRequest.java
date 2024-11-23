@@ -9,6 +9,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.address.service.request.AddressRegisterServiceRequest;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
+import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
 
 import java.time.LocalDate;
 
@@ -16,8 +17,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class AdminRegisterRequest {
 
-    @NotBlank(message = "올바른 아이디를 입력해주세요.")
-    private String loginId; // 아이디
+    @NotBlank(message = "아이디를 입력해주세요.")
+    private String loginId; // 아이디(검증 완료)
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(
@@ -84,8 +85,18 @@ public class AdminRegisterRequest {
         this.addressDetail = addressDetail;
     }
 
-    public AddressRegisterServiceRequest toServiceRequest() {
-        return AddressRegisterServiceRequest.builder()
+    public AdminRegisterServiceRequest toServiceRequest() {
+        return AdminRegisterServiceRequest.builder()
+                .loginId(loginId)
+                .pwd(pwd)
+                .name(name)
+                .email(email)
+                .phoneNum(phoneNum)
+                .officeNum(officeNum)
+                .birth(birth)
+                .gender(gender)
+                .joinDate(joinDate)
+                .status(status)
                 .zipCode(this.zipCode)
                 .addressMain(this.addressMain)
                 .addressDetail(this.addressDetail)

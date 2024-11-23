@@ -48,7 +48,7 @@ class AdminRegisterServiceRequestTest {
 
         // when
         BaseAddress baseAddress = request.toBaseAddress();
-        Admin admin = request.toAdminEntity(baseAddress);
+        Admin admin = request.toAdminEntity(request.getPwd());
 
         // then
         assertThat(admin).isNotNull();

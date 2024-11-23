@@ -48,7 +48,7 @@ class AdminRegisterRequestTest {
         // then
         assertThat(violations).isNotEmpty();
         assertThat(violations).extracting(ConstraintViolation::getMessage).containsExactlyInAnyOrder(
-                "올바른 아이디를 입력해주세요.",
+                "아이디를 입력해주세요.",
                 "비밀번호는 8~20자 이내의 영문 대소문자, 숫자, 특수문자를 포함해야 합니다.",
                 "이름은 공백, 숫자 없이 2~15자 이내로 입력해야 합니다.",
                 "이메일을 입력해주세요.",

@@ -12,7 +12,6 @@ import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
-import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.List;
 
@@ -26,6 +25,7 @@ public class MemberController {
     private final MemberService memberService;
 
     @GetMapping("/join")
+    @ResponseBody
     public String joinProcess() {
 
         return "welcome"; // FIXME 회원가입 페이지 작성 필요
@@ -45,7 +45,7 @@ public class MemberController {
 
     // 입력한 회원가입 정보를 등록한다.
     @PostMapping("/register")
-    public String registerMember(@Valid @ModelAttribute MemberRegisterRequest request, Model model, HttpSession session) {
+    public String register (@Valid @ModelAttribute MemberRegisterRequest request, Model model, HttpSession session) {
         // 회원가입 정보 - Member에 저장
         // 약관동의 정보 - termsAgreements(세션에 저장되어 있음)에서 데이터 꺼내서 입력
 

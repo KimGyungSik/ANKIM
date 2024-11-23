@@ -32,7 +32,7 @@ class MemberServiceMockTest {
         when(mockMemberRepository.existsByLoginId(duplicateEmail)).thenReturn(true);
 
         // then
-        assertThrows(MemberRegistrationException.class, () -> memberService.loginIdCheck(duplicateEmail));
+        assertThrows(MemberRegistrationException.class, () -> memberService.isLoginIdDuplicated(duplicateEmail));
     }
 
     @Test
@@ -45,7 +45,7 @@ class MemberServiceMockTest {
         when(mockMemberRepository.existsByLoginId(uniqueEmail)).thenReturn(false);
 
         // then
-        memberService.loginIdCheck(uniqueEmail); // 예외가 발생하지 않으면 성공
+        memberService.isLoginIdDuplicated(uniqueEmail); // 예외가 발생하지 않으면 성공
     }
 
 }

@@ -3,21 +3,13 @@ package shoppingmall.ankim.domain.member.controller;
 import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
-import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
-import shoppingmall.ankim.domain.member.dto.MemberResponse;
-import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
-
-import static shoppingmall.ankim.global.exception.ErrorCode.MISSING_REQUIRED_ID;
 
 @RestController
 @RequiredArgsConstructor
@@ -31,7 +23,7 @@ public class MemberJoinController {
     @PostMapping("/email-check")
     public ApiResponse<String> existByEmail(@Valid @RequestBody MemberEmailRequest request) {
         // 이메일 중복 확인 로직
-        memberService.loginIdCheck(request.getId());
+        memberService.isLoginIdDuplicated(request.getId());
         return ApiResponse.ok("사용 가능한 이메일입니다.");
     }
 

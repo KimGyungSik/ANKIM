@@ -2,16 +2,16 @@ package shoppingmall.ankim.domain.address.controller;
 
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.address.service.request.AddressRegisterServiceRequest;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 
 @Getter
 @NoArgsConstructor
 public class AddressRegisterRequest {
-    @NotBlank(message = "우편번호를 입력해주세요.")
+    @NotNull(message = "우편번호를 입력해주세요.")
     private Integer zipCode; // 우편번호
     @NotBlank(message = "주소를 선택해주세요.")
     private String addressMain; // 주소

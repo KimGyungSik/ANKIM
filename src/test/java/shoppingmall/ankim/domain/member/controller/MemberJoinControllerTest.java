@@ -72,8 +72,8 @@ class MemberJoinControllerTest {
                 .id("test@example.com")
                 .build();
 
-        doThrow(new MemberRegistrationException(ErrorCode.LOGINID_DUPLICATE)) // 중복 이메일 예외 발생
-                .when(memberService).loginIdCheck(request.getId());
+        doThrow(new MemberRegistrationException(ErrorCode.MEMBER_ID_DUPLICATE)) // 중복 이메일 예외 발생
+                .when(memberService).isLoginIdDuplicated(request.getId());
 
         // when : 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")
@@ -92,7 +92,7 @@ class MemberJoinControllerTest {
                 .id("test@example.com")
                 .build();
 
-        doNothing().when(memberService).loginIdCheck(request.getId()); // 예외 발생하지 않도록 설정
+        doNothing().when(memberService).isLoginIdDuplicated(request.getId()); // 예외 발생하지 않도록 설정
 
         // when: 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.admin.entity.Admin;
+import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 @Entity
@@ -26,7 +27,7 @@ public class AdminAddress extends BaseEntity {
     // 팩토리 메서드
     public static AdminAddress create(Admin admin, BaseAddress baseAddress) {
         AdminAddress adminAddress = new AdminAddress();
-        adminAddress.admin = admin; // 연관 관계 설정
+        adminAddress.admin = admin;
         adminAddress.baseAddress = baseAddress;
         return adminAddress;
     }

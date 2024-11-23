@@ -1,5 +1,5 @@
 ### 회원가입 페이지 진입
-GET http://localhost:8080/join
+GET http://localhost:8080/member/join
 
 ### 약관 동의
 POST http://localhost:8080/api/member/terms-next

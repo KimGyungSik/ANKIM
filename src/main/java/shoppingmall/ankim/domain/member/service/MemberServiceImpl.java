@@ -16,7 +16,7 @@ import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.List;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.LOGINID_DUPLICATE;
+import static shoppingmall.ankim.global.exception.ErrorCode.MEMBER_ID_DUPLICATE;
 
 @Slf4j
 @Service
@@ -32,9 +32,9 @@ public class MemberServiceImpl implements MemberService {
     private String verifiedEmailId; // 인증된 이메일 ID 저장
 
     // 이메일 중복 검증
-    public void loginIdCheck(String loginId) {
+    public void isLoginIdDuplicated(String loginId) {
         if (memberRepository.existsByLoginId(loginId)) {
-            throw new MemberRegistrationException(LOGINID_DUPLICATE);
+            throw new MemberRegistrationException(MEMBER_ID_DUPLICATE);
         }
     }
 

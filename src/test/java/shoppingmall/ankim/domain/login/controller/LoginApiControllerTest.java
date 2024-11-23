@@ -86,7 +86,7 @@
 //                .thenReturn(Optional.of(loginAttempt));
 //
 //        // when
-//        mockMvc.perform(post("/api/auth/login")
+//        mockMvc.perform(post("/api/login/member")
 //                        .param("username", loginId) // 요청 파라미터에 id와 password 전달
 //                        .param("password", wrongPassword))
 //                .andExpect(status().isUnauthorized()) // 인증 실패 예상

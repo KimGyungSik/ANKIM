@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.admin.AdminAddress;
+import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
+import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
@@ -59,6 +61,7 @@ public class Admin extends BaseEntity {
 
     @Builder
     public Admin(Long no, String loginId, String pwd, String name, String email, String phoneNum, String officeNum, LocalDate birth, String gender, LocalDate joinDate, AdminStatus status, LocalDate modDate, AdminAddress adminAddress) {
+        LocalDate localDate = LocalDate.now();
         this.no = no;
         this.loginId = loginId;
         this.pwd = pwd;
@@ -68,14 +71,22 @@ public class Admin extends BaseEntity {
         this.officeNum = officeNum;
         this.birth = birth;
         this.gender = gender;
-        this.joinDate = joinDate;
-        this.status = status;
-        this.modDate = modDate;
+        this.joinDate = joinDate != null ? joinDate : localDate;
+        this.status = status != null ? status : AdminStatus.ACTIVE;
+        this.modDate = modDate != null ? modDate : localDate;
         this.adminAddress = adminAddress;
     }
 
     // 연관 관계 설정 메서드
     public void registerAddress(BaseAddress baseAddress) {
         this.adminAddress = AdminAddress.create(this, baseAddress);
+    }
+
+    public void activate() {
+        this.status = AdminStatus.ACTIVE;
+    }
+
+    public void lock() {
+        this.status = AdminStatus.LOCKED;
     }
 }

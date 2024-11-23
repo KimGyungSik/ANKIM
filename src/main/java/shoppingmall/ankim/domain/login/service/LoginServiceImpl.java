@@ -9,10 +9,18 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import shoppingmall.ankim.domain.admin.entity.Admin;
+import shoppingmall.ankim.domain.admin.entity.AdminStatus;
+import shoppingmall.ankim.domain.admin.repository.AdminRepository;
 import shoppingmall.ankim.domain.login.entity.BaseLoginAttempt;
+import shoppingmall.ankim.domain.login.entity.admin.loginHistory.AdminLoginAttempt;
+import shoppingmall.ankim.domain.login.entity.admin.loginHistory.AdminLoginHistory;
 import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginAttempt;
 import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginHistory;
-import shoppingmall.ankim.domain.login.exception.LoginFailedException;
+import shoppingmall.ankim.domain.login.exception.AdminLoginFailedException;
+import shoppingmall.ankim.domain.login.exception.MemberLoginFailedException;
+import shoppingmall.ankim.domain.login.repository.admin.AdminLoginAttemptRepository;
+import shoppingmall.ankim.domain.login.repository.admin.AdminLoginHistoryRepository;
 import shoppingmall.ankim.domain.login.repository.member.MemberLoginAttemptRepository;
 import shoppingmall.ankim.domain.login.repository.member.MemberLoginHistoryRepository;
 import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
@@ -37,8 +45,13 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 public class LoginServiceImpl implements LoginService {
 
     private final MemberRepository memberRepository;
-    private final MemberLoginAttemptRepository loginAttemptRepository;
-    private final MemberLoginHistoryRepository loginHistoryRepository;
+    private final MemberLoginAttemptRepository memberLoginAttemptRepository;
+    private final MemberLoginHistoryRepository memberLoginHistoryRepository;
+
+    private final AdminRepository adminRepository;
+    private final AdminLoginAttemptRepository adminLoginAttemptRepository;
+    private final AdminLoginHistoryRepository adminLoginHistoryRepository;
+
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
     private final RedisHandler redisHandler;
@@ -53,23 +66,23 @@ public class LoginServiceImpl implements LoginService {
     private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간
 
     @Override
-    public Map<String, String> login(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+    public Map<String, String> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 사용자 조회 (status에 따라서 상태를 반환해줘야 됨)
         Member member = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
 
         // 사용자가 없는 경우
         if(member == null) {
-            throw new LoginFailedException(NOT_FOUND_MEMBER);
+            throw new MemberLoginFailedException(NOT_FOUND_USER);
         }
 
         // 로그인 시도 기록 가져오기
-        MemberLoginAttempt loginAttempt = loginAttemptRepository
+        MemberLoginAttempt loginAttempt = memberLoginAttemptRepository
                 .findByMemberAndLoginAttemptDetailsActiveYn(member, "Y")
                 .orElseGet(() -> createNewLoginAttempt(member));
 
         // 회원 계정이 잠김 상태인 경우
         if (member.getStatus() == MemberStatus.LOCKED && !loginAttempt.isUnlockTimePassed()) {
-            throw new LoginFailedException(MEMBER_STATUS_LOCKED);
+            throw new MemberLoginFailedException(USER_STATUS_LOCKED);
         }
 
         // 비밀번호 검증
@@ -86,14 +99,14 @@ public class LoginServiceImpl implements LoginService {
 
             // 인증 성공 시 실패 기록 초기화
             loginAttempt.resetFailCount();
-            loginAttemptRepository.save(loginAttempt);
+            memberLoginAttemptRepository.save(loginAttempt);
 
             // 사용자(클라이언트)의 ip주소 가져오기
             String ipAddress = getClientIp(request);
 
             // 로그인 성공 이력 저장
             MemberLoginHistory hisotry = MemberLoginHistory.recordLoginHistory(member, ipAddress, loginServiceRequest);
-            loginHistoryRepository.save(hisotry);
+            memberLoginHistoryRepository.save(hisotry);
 
             // JWT 생성 및 반환 ( 기존 : LoginFilter의 successfulAuthentication )
             // username, role을 가지고 있음
@@ -105,14 +118,71 @@ public class LoginServiceImpl implements LoginService {
         } catch (BadCredentialsException | UnknownHostException ex) {
             // 실패 시 처리
             handleLoginFailure(member, loginAttempt);
-            throw new LoginFailedException(INVALID_CREDENTIALS);
+            throw new MemberLoginFailedException(INVALID_CREDENTIALS);
+        }
+    }
+
+    @Override
+    public Map<String, String> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+        // 퇴사하지 않은 사용자 조회
+        Admin admin = adminRepository.findByLoginIdExcludingResigned(loginServiceRequest.getLoginId());
+
+        // 사용자가 없는 경우
+        if(admin == null) {
+            throw new AdminLoginFailedException(NOT_FOUND_USER);
+        }
+
+        // 로그인 시도 기록 가져오기
+        AdminLoginAttempt loginAttempt = adminLoginAttemptRepository
+                .findByAdminAndLoginAttemptDetailsActiveYn(admin, "Y")
+                .orElseGet(() -> createNewLoginAttempt(admin));
+
+        // 관리자 계정이 잠김 상태인 경우
+        if (admin.getStatus() == AdminStatus.LOCKED && !loginAttempt.isUnlockTimePassed()) {
+            throw new AdminLoginFailedException(USER_STATUS_LOCKED);
+        }
+
+        // 비밀번호 검증
+        // 사용자 세부 정보 생성 (CustomUserDetails)
+        // Jwt 토큰 생성
+        String username = loginServiceRequest.getLoginId();
+        String password = loginServiceRequest.getPwd();
+
+        try {
+            // Spring Security를 통해 인증 시도
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(username, password)
+            );
+
+            // 인증 성공 시 실패 기록 초기화
+            loginAttempt.resetFailCount();
+            adminLoginAttemptRepository.save(loginAttempt);
+
+            // 사용자(클라이언트)의 ip주소 가져오기
+            String ipAddress = getClientIp(request);
+
+            // 로그인 성공 이력 저장
+            AdminLoginHistory hisotry = AdminLoginHistory.recordLoginHistory(admin, ipAddress, loginServiceRequest);
+            adminLoginHistoryRepository.save(hisotry);
+
+            // JWT 생성 및 반환 ( 기존 : LoginFilter의 successfulAuthentication )
+            // username, role을 가지고 있음
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
+
+            // 토큰 생성 및 refresh token 저장
+            return successfulAuthentication(userDetails);
+
+        } catch (BadCredentialsException | UnknownHostException ex) {
+            // 실패 시 처리
+            handleLoginFailure(admin, loginAttempt);
+            throw new MemberLoginFailedException(INVALID_CREDENTIALS);
         }
     }
 
     private void handleLoginFailure(Member member, MemberLoginAttempt loginAttempt) {
         // 실패 횟수 증가
         loginAttempt.increaseFailCount();
-        loginAttemptRepository.save(loginAttempt);
+        memberLoginAttemptRepository.save(loginAttempt);
 
         // 최대 실패 횟수 초과 시 계정 잠금
         if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
@@ -122,18 +192,43 @@ public class LoginServiceImpl implements LoginService {
         }
     }
 
+    private void handleLoginFailure(Admin admin, AdminLoginAttempt loginAttempt) {
+        // 실패 횟수 증가
+        loginAttempt.increaseFailCount();
+        adminLoginAttemptRepository.save(loginAttempt);
+
+        // 최대 실패 횟수 초과 시 계정 잠금
+        if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
+            admin.lock();
+            loginAttempt.setLockTime(LOCK_TIME_MINUTES);
+            adminRepository.save(admin);
+        }
+    }
+
     // 새로운 로그인 시도 객체 생성
     private MemberLoginAttempt createNewLoginAttempt(Member member) {
         MemberLoginAttempt loginAttempt = MemberLoginAttempt.builder()
                 .member(member)
-                .loginAttemptDetails(BaseLoginAttempt.builder()
-                        .failCount(0)
-                        .lastAttemptTime(LocalDateTime.now())
-                        .unlockTime(null)
-                        .activeYn("Y")
-                        .build())
+                .loginAttemptDetails(createBaseLoginAttempt())
                 .build();
-        return loginAttemptRepository.save(loginAttempt);
+        return memberLoginAttemptRepository.save(loginAttempt);
+    }
+
+    private AdminLoginAttempt createNewLoginAttempt(Admin admin) {
+        AdminLoginAttempt loginAttempt = AdminLoginAttempt.builder()
+                .admin(admin)
+                .loginAttemptDetails(createBaseLoginAttempt())
+                .build();
+        return adminLoginAttemptRepository.save(loginAttempt);
+    }
+
+    private BaseLoginAttempt createBaseLoginAttempt() {
+        return BaseLoginAttempt.builder()
+                .failCount(0)
+                .lastAttemptTime(LocalDateTime.now())
+                .unlockTime(null)
+                .activeYn("Y")
+                .build();
     }
 
 

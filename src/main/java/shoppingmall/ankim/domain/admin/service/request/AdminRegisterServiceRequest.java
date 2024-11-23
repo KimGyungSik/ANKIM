@@ -60,22 +60,22 @@ public class AdminRegisterServiceRequest {
     }
 
 
-    public Admin toAdminEntity(BaseAddress baseAddress) {
+    public Admin toAdminEntity(String pwd) {
         Admin admin = Admin.builder()
                 .loginId(this.loginId)
-                .pwd(this.pwd)
+                .pwd(pwd)
                 .name(this.name)
                 .email(this.email)
                 .phoneNum(this.phoneNum)
                 .officeNum(this.officeNum)
                 .birth(this.birth)
                 .gender(this.gender)
-                .joinDate(this.joinDate != null ? LocalDate.parse(this.joinDate) : LocalDate.now())
-                .status(this.status != null ? this.status : AdminStatus.ACTIVE)
                 .build();
 
         // AdminAddress 설정
+        BaseAddress baseAddress = this.toBaseAddress();
         admin.registerAddress(baseAddress);
+
         return admin;
     }
 

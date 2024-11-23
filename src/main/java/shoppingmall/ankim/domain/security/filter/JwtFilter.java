@@ -29,7 +29,10 @@ public class JwtFilter extends OncePerRequestFilter {
     @Override
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
-        return path.equals("/api/auth/login"); // 로그인 요청은 필터 제외
+        return path.equals("/api/login/member")
+                || path.equals("/api/login/admin");
+//                || path.equals("/api/admin/register");
+//                || path.equals("/admin/join");
     }
 
     @Override

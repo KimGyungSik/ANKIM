@@ -74,19 +74,4 @@ public class MemberLoginAttempt extends BaseEntity {
                 .build();
     }
 
-
-    /*
-    @Column(name = "fail_cnt")
-    private Integer failCount; // 공통
-
-    @Column(name = "last_attpt_time")
-    private LocalDateTime lastAttemptTime = LocalDateTime.now(); // 공통
-
-    @Column(name = "unlock_time")
-    private LocalDateTime unlockTime; // 공통
-
-    @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
-    private String activeYn = "Y"; // 공통
-*/
-
 }
