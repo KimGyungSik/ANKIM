@@ -62,7 +62,7 @@ public class Product extends BaseEntity {
 
     private String code; // 상품코드
 
-    @Lob
+    @Column(columnDefinition = "TEXT")
     private String desc; // 상세설명
 
     @Column
@@ -91,6 +91,7 @@ public class Product extends BaseEntity {
 
     private Integer shipFee; // 배송비
 
+    @Column(columnDefinition = "TEXT")
     private String searchKeywords; // 검색 키워드
 
     private String relProdCode; // 연관 상품코드

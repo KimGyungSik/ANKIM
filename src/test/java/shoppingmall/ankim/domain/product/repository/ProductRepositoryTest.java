@@ -21,12 +21,14 @@ import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
+import shoppingmall.ankim.domain.product.repository.query.helper.OrderBy;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
 
@@ -269,6 +271,128 @@ class ProductRepositoryTest {
                 .allMatch(product -> product.getCategoryName().equals(subCategoryName));
     }
 
+    @DisplayName("중분류 카테고리(TOP)의 결과를 2차로 소분류 카테고리(티셔츠)로 필터링하여 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithCategoryFilter() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        Condition condition = Condition.TOP; // 중분류 카테고리
+
+        String subCategoryName = "티셔츠"; // 소분류 카테고리
+
+        // 소분류 ID를 가져옴
+        Long subCategoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :subCategoryName", Long.class)
+                .setParameter("subCategoryName", subCategoryName)
+                .getSingleResult();
+
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, subCategoryId, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 반환된 상품들의 카테고리 이름이 소분류 카테고리 이름과 일치하는지 검증
+        assertThat(result.getContent())
+                .allMatch(product -> product.getCategoryName().equals(subCategoryName));
+    }
+
+
+    @DisplayName("검색 키워드가 NEW이고 카테고리(티셔츠)로 필터링하면 관련된 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithCategoryFilterWithKeyword() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 20);
+        String keyword = "NEW"; // 검색 키워드
+        String categoryName = "티셔츠"; // 필터링할 카테고리 이름
+
+        // 카테고리 ID 가져오기
+        Long categoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :name", Long.class)
+                .setParameter("name", categoryName)
+                .getSingleResult();
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, categoryId, keyword);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent()).hasSize(10);
+        // 검증: 반환된 상품들이 검색 키워드에 일치하거나, 카테고리에 속해 있는지 확인
+        assertThat(result.getContent())
+                .allMatch(product ->
+                        product.getName().toLowerCase().contains(keyword.toLowerCase()) || // 상품명에 포함
+                                product.getDesc().toLowerCase().contains(keyword.toLowerCase()) || // 상세 설명에 포함
+                                product.getCategoryName().equals(categoryName)); // 카테고리가 티셔츠
+    }
+
+
+    @DisplayName("정렬 조건은 높은 가격순이고 카테고리(티셔츠)로 필터링하면 관련된 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithCategoryFilterWithOrderBy() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 20);
+        OrderBy order = OrderBy.HIGH_PRICE;
+        String categoryName = "티셔츠"; // 필터링할 카테고리 이름
+
+        // 카테고리 ID 가져오기
+        Long categoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :name", Long.class)
+                .setParameter("name", categoryName)
+                .getSingleResult();
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 필터링 검증: 반환된 상품들이 지정한 카테고리에 속하는지 확인
+        assertThat(result.getContent())
+                .allMatch(product -> product.getCategoryName().equals(categoryName));
+
+        // 정렬 검증: 높은 가격순으로 정렬되었는지 Streams API로 확인
+        List<Integer> prices = result.getContent().stream()
+                .map(ProductListResponse::getSellPrice)
+                .toList();
+
+        assertThat(prices).isSortedAccordingTo((a, b) -> Integer.compare(b, a)); // 높은 가격순 검증
+    }
+    @DisplayName("검색 키워드와 높은 가격순 정렬을 적용하고 카테고리(티셔츠)로 필터링하면 관련된 상품들을 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithCategoryFilterWithKeywordAndOrderBy() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 20); // 페이지 요청 (1페이지, 20개씩)
+        String keyword = "NEW"; // 검색 키워드
+        OrderBy order = OrderBy.HIGH_PRICE; // 높은 가격순 정렬
+        String categoryName = "티셔츠"; // 필터링할 카테고리 이름
+
+        // 카테고리 ID 가져오기
+        Long categoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :name", Long.class)
+                .setParameter("name", categoryName)
+                .getSingleResult();
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, keyword);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 필터링 검증: 반환된 상품들이 검색 키워드와 지정한 카테고리에 속하는지 확인
+        assertThat(result.getContent())
+                .allMatch(product ->
+                        (product.getName().toLowerCase().contains(keyword.toLowerCase()) || // 상품명에 포함
+                                product.getDesc().toLowerCase().contains(keyword.toLowerCase())) // 상세 설명에 포함
+                                && product.getCategoryName().equals(categoryName)); // 카테고리가 티셔츠
+
+        // 정렬 검증: 높은 가격순으로 정렬되었는지 Streams API로 확인
+        List<Integer> prices = result.getContent().stream()
+                .map(ProductListResponse::getSellPrice)
+                .toList();
+
+        assertThat(prices).isSortedAccordingTo((a, b) -> Integer.compare(b, a)); // 높은 가격순 검증
+    }
+
+
+
+
     @DisplayName("상품들의 썸네일 이미지는 첫 번째(ord=1) 썸네일 이미지 URL이다.")
     @Test
     void testThumbnailImageIsFirstImage() {
@@ -280,20 +404,31 @@ class ProductRepositoryTest {
 
         // then
         assertThat(result).isNotEmpty();
-        for (ProductListResponse product : result.getContent()) {
-            // 실제 썸네일 이미지 URL
-            String thumbnailUrl = product.getThumbNailImgUrl();
+        // DB에서 상품 ID와 첫 번째 썸네일 URL을 매핑
+        Map<Long, String> expectedThumbnails = em.createQuery(
+                        "SELECT img.product.no, img.imgUrl FROM ProductImg img WHERE img.repimgYn = 'Y' AND img.ord = 1",
+                        Object[].class)
+                .getResultList()
+                .stream()
+                .collect(Collectors.toMap(
+                        row -> (Long) row[0], // 상품 ID
+                        row -> (String) row[1] // 썸네일 URL
+                ));
 
-            // DB에서 해당 상품의 첫 번째 이미지 URL 조회
-            String expectedThumbnailUrl = em.createQuery(
-                            "SELECT img.imgUrl FROM ProductImg img WHERE img.product.no = :productId AND img.repimgYn = 'Y' AND img.ord = 1",
-                            String.class)
-                    .setParameter("productId", product.getNo())
-                    .getSingleResult();
+        // 상품 ID를 기준으로 실제와 예상 썸네일 비교
+        result.getContent().forEach(product ->
+                assertThat(product.getThumbNailImgUrl())
+                        .isEqualTo(expectedThumbnails.get(product.getNo())));
+    }
 
-            // 검증: 썸네일 이미지 URL이 첫 번째 이미지 URL과 동일한지 확인
-            assertThat(thumbnailUrl).isEqualTo(expectedThumbnailUrl);
-        }
+    @DisplayName("")
+    @Test
+    void test() {
+        // given
+
+        // when
+
+        // then
     }
 
 

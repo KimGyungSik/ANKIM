@@ -89,9 +89,10 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                 .select(Projections.fields(ProductListResponse.class,
                         product.no,
                         category.name.as("categoryName"),
-//                        productImg.imgUrl.as("thumbNailImgUrl"),
                         product.name,
                         product.code,
+                        product.desc,
+                        product.searchKeywords,
                         product.discRate,
                         product.sellPrice,
                         product.createdAt,
@@ -103,28 +104,44 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                 ))
                 .from(product)
                 .leftJoin(product.category, category)
-//                .leftJoin(product.productImgs,productImg)
-//                .on(productImg.repimgYn.eq("Y").and(productImg.ord.eq(1)))
                 .where(filterBuilder)
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
                 .fetch();
-        for (ProductListResponse productListResponse : response) {
-            productListResponse.setThumbNailImgUrl(getThumbNailImgUrl(productListResponse.getNo()));
-        }
+
+        // 2. 상품 ID 리스트 추출
+        List<Long> productIds = toProductListResponseIds(response);
+
+        // 3. 상품 ID와 썸네일 URL 매핑
+        Map<Long, String> thumbnailMap = getThumbnailUrls(productIds);
+
+        // 4. 썸네일 URL을 ProductListResponse에 매핑
+        response.forEach(product -> product.setThumbNailImgUrl(thumbnailMap.get(product.getNo())));
 
         return response;
     }
 
-    private String getThumbNailImgUrl(Long productId) {
+    private List<Long> toProductListResponseIds(List<ProductListResponse> responses) {
+        return responses.stream()
+                .map(ProductListResponse::getNo)
+                .toList();
+    }
+
+    // 상품 ID에 해당하는 썸네일 URL 매핑
+    private Map<Long, String> getThumbnailUrls(List<Long> productIds) {
         return queryFactory
-                .select(productImg.imgUrl)
+                .select(productImg.product.no, productImg.imgUrl)
                 .from(productImg)
-                .where(productImg.product.no.eq(productId)
+                .where(productImg.product.no.in(productIds)
                         .and(productImg.repimgYn.eq("Y"))
                         .and(productImg.ord.eq(1)))
-                .fetchOne();
+                .fetch()
+                .stream()
+                .collect(Collectors.toMap(
+                        tuple -> tuple.get(productImg.product.no), // 상품 ID
+                        tuple -> tuple.get(productImg.imgUrl)      // 썸네일 URL
+                ));
     }
 
 

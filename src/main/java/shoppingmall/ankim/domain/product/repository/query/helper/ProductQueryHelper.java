@@ -85,7 +85,7 @@ public class ProductQueryHelper {
         if (categoryName != null) {
             filterBuilder.andAnyOf(
                     product.category.name.eq(categoryName),
-                    product.category.parent.name.isNull()
+                    product.category.parent.name.eq(categoryName)
             );
         }
     }
