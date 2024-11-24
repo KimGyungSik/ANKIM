@@ -389,10 +389,6 @@ class ProductRepositoryTest {
 
         assertThat(prices).isSortedAccordingTo((a, b) -> Integer.compare(b, a)); // 높은 가격순 검증
     }
-
-
-
-
     @DisplayName("상품들의 썸네일 이미지는 첫 번째(ord=1) 썸네일 이미지 URL이다.")
     @Test
     void testThumbnailImageIsFirstImage() {
@@ -421,17 +417,58 @@ class ProductRepositoryTest {
                         .isEqualTo(expectedThumbnails.get(product.getNo())));
     }
 
-    @DisplayName("")
+    @DisplayName("NEW라고 검색을 했을 때 상품명에 NEW가 들어간 상품들을 모두 볼 수 있다.")
     @Test
-    void test() {
+    void findUserProductListResponseWithKeywordFilterWithProductName() {
         // given
+        PageRequest pageable = PageRequest.of(0, 70);
+        String keyword = "NEW"; // 검색 키워드
 
         // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
 
         // then
+        assertThat(result).isNotEmpty();
+        assertThat(result.getContent()).hasSize(61);
+        assertThat(result.getContent())
+                .allMatch(product -> product.getName().toLowerCase().contains(keyword.toLowerCase()));
     }
 
 
+    @DisplayName("RED라고 검색을 했을 때 상품 색상이 RED인 상품들을 모두 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithKeywordFilterWithSearchKeywords() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        String keyword = "RED"; // 검색 키워드
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(1);
+        assertThat(result.getContent())
+                .allMatch(product -> product.getSearchKeywords().toLowerCase().contains(keyword.toLowerCase()));
+    }
+
+
+    @DisplayName("'코튼재질'이라고 검색을 했을 때 상품 상세설명에 '코튼재질'이 들어간 상품들을 모두 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithKeywordFilterWithProductDesc() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        String keyword = "코튼재질"; // 검색 키워드
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
+
+        // then
+        assertThat(result).isNotEmpty();
+        assertThat(result).hasSize(1);
+        assertThat(result.getContent())
+                .allMatch(product -> product.getDesc().contains(keyword));
+    }
 
 
 
