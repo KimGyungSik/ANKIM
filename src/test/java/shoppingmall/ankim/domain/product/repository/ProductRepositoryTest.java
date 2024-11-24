@@ -33,6 +33,8 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
+import static shoppingmall.ankim.factory.ProductFactory.createSearchTestProducts;
+import static shoppingmall.ankim.factory.ProductFactory.createTestProductsWithColorOptions;
 
 
 @DataJpaTest
@@ -58,6 +60,8 @@ class ProductRepositoryTest {
 
         // 테스트 데이터 생성
         ProductFactory.createTestProductsWithSubcategories(em, 10, 10, 10, 10, categoryStructure);
+        createSearchTestProducts(em);
+        createTestProductsWithColorOptions(em, 10);
     }
 
 
@@ -168,7 +172,7 @@ class ProductRepositoryTest {
         Condition condition = Condition.NEW;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -184,7 +188,7 @@ class ProductRepositoryTest {
         Condition condition = Condition.BEST;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -200,7 +204,7 @@ class ProductRepositoryTest {
         Condition condition = Condition.HANDMADE;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -216,7 +220,7 @@ class ProductRepositoryTest {
         Condition condition = Condition.DISCOUNT;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -240,7 +244,7 @@ class ProductRepositoryTest {
                 .getResultList();
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -263,7 +267,7 @@ class ProductRepositoryTest {
                 .getSingleResult();
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, subCategoryId, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, subCategoryId, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -289,7 +293,7 @@ class ProductRepositoryTest {
 
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, subCategoryId, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, null, subCategoryId, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -314,7 +318,7 @@ class ProductRepositoryTest {
                 .getSingleResult();
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, categoryId, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, categoryId, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -341,7 +345,7 @@ class ProductRepositoryTest {
                 .setParameter("name", categoryName)
                 .getSingleResult();
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -372,7 +376,7 @@ class ProductRepositoryTest {
                 .getSingleResult();
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, categoryId, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -398,7 +402,7 @@ class ProductRepositoryTest {
         PageRequest pageable = PageRequest.of(0, 10);
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -427,7 +431,7 @@ class ProductRepositoryTest {
         String keyword = "NEW"; // 검색 키워드
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -445,7 +449,7 @@ class ProductRepositoryTest {
         String keyword = "RED"; // 검색 키워드
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -463,7 +467,7 @@ class ProductRepositoryTest {
         String keyword = "코튼재질"; // 검색 키워드
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, null, null, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -481,7 +485,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.LATEST;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -503,7 +507,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.POPULAR;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -524,7 +528,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.LOW_PRICE;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -545,7 +549,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.HIGH_PRICE;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -566,7 +570,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.HIGH_DISCOUNT_RATE;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -587,7 +591,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.HIGH_REVIEW;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -609,7 +613,7 @@ class ProductRepositoryTest {
         OrderBy order = OrderBy.HIGH_VIEW;
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -644,7 +648,7 @@ class ProductRepositoryTest {
                 .getSingleResult();
 
         // when
-        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, order, categoryId, keyword);
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, order, categoryId, keyword,null,null,null,null,null);
 
         // then
         assertThat(result).isNotEmpty();
@@ -686,7 +690,6 @@ class ProductRepositoryTest {
             Condition.HANDMADE, product -> "Y".equals(product.getHandMadeYn()),
             Condition.DISCOUNT, product -> product.getDiscRate() > 0
     );
-
 
 
     // 중분류 또는 소분류 이름인지 확인하는 메서드

@@ -22,6 +22,7 @@ public class ProductListResponse {
     private String name; // 상품명
     private String code; // 상품코드
     private String desc; // 상세 설명
+    private Integer qty; // 재고량
     private String searchKeywords; // 검색 키워드
     private Integer discRate; // 할인율
     private Integer sellPrice; // 상품가격
@@ -34,13 +35,14 @@ public class ProductListResponse {
     private Integer avgR; // 평균별점
 
     @Builder
-    private ProductListResponse(Long no, String categoryName, String desc, String searchKeywords, String thumbNailImgUrl, String name, String code, Integer discRate, Integer sellPrice, LocalDateTime createdAt, String handMadeYn, String freeShip, Integer wishCnt, Integer rvwCnt, Integer viewCnt, Integer avgR) {
+    private ProductListResponse(Long no, String categoryName, String desc,Integer qty, String searchKeywords, String thumbNailImgUrl, String name, String code, Integer discRate, Integer sellPrice, LocalDateTime createdAt, String handMadeYn, String freeShip, Integer wishCnt, Integer rvwCnt, Integer viewCnt, Integer avgR) {
         this.no = no;
         this.categoryName = categoryName;
         this.thumbNailImgUrl = thumbNailImgUrl;
         this.name = name;
         this.code = code;
         this.desc =desc;
+        this.qty = qty;
         this.searchKeywords = searchKeywords;
         this.discRate = discRate;
         this.sellPrice = sellPrice;
@@ -59,6 +61,7 @@ public class ProductListResponse {
                 .name(product.getName())
                 .code(product.getCode())
                 .desc(product.getDesc())
+                .qty(product.getQty())
                 .searchKeywords(product.getSearchKeywords())
                 .discRate(product.getDiscRate())
                 .sellPrice(product.getSellPrice())

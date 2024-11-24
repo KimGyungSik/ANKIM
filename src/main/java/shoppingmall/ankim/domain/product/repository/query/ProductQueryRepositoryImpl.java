@@ -66,9 +66,9 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
 
     @Override
     public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
-                                                                 ColorCondition colorCondition, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
+                                                                 List<ColorCondition> colorConditions, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
         // 필터링
-        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, colorCondition, priceCondition, customMinPrice, customMaxPrice, infoSearches, product);
+        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product);
 
         // 정렬
         OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
@@ -93,6 +93,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                         product.name,
                         product.code,
                         product.desc,
+                        product.qty,
                         product.searchKeywords,
                         product.discRate,
                         product.sellPrice,
@@ -106,7 +107,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                 ))
                 .from(product)
                 .leftJoin(product.category, category)
-                .where(filterBuilder.and(product.sellingStatus.eq(SELLING)))
+                .where(filterBuilder)
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())
