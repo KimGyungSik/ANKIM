@@ -100,6 +100,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                         product.freeShip,
                         product.wishCnt,
                         product.rvwCnt,
+                        product.viewCnt,
                         product.avgR
                 ))
                 .from(product)
