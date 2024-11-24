@@ -63,7 +63,10 @@ public class LoginServiceImpl implements LoginService {
     private int LOCK_TIME_MINUTES; // 잠금 시간 (분)
 
     @Value("${jwt.refresh.token.expire.time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간
+    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 X)
+
+    @Value("${jwt.refresh.token.remember.time}")
+    private long REFRESH_TOKEN_REMEBER_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 O)
 
     @Override
     public Map<String, String> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
@@ -112,8 +115,8 @@ public class LoginServiceImpl implements LoginService {
             // username, role을 가지고 있음
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
-            // 토큰 생성 및 refresh token 저장
-            return successfulAuthentication(userDetails);
+            // 토큰 생성 및 refresh token 저장(자동로그인 체크여부에 따라서 refresh 토큰 만료 시간이 달라짐)
+            return successfulAuthentication(userDetails, loginServiceRequest.getAutoLogin());
 
         } catch (BadCredentialsException | UnknownHostException ex) {
             // 실패 시 처리
@@ -170,7 +173,7 @@ public class LoginServiceImpl implements LoginService {
             CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
 
             // 토큰 생성 및 refresh token 저장
-            return successfulAuthentication(userDetails);
+            return successfulAuthentication(userDetails, loginServiceRequest.getAutoLogin());
 
         } catch (BadCredentialsException | UnknownHostException ex) {
             // 실패 시 처리
@@ -231,7 +234,6 @@ public class LoginServiceImpl implements LoginService {
                 .build();
     }
 
-
     // 접속 ip 조회
     public static String getClientIp(HttpServletRequest request) throws UnknownHostException {
         // 요청 헤더에서 "X-Forwarded-For" 값 확인 (프록시 서버 또는 로드 밸런서를 통해 전달된 클라이언트의 실제 IP 주소를 식별)
@@ -270,7 +272,6 @@ public class LoginServiceImpl implements LoginService {
             ip = address.getHostName() + "/" + address.getHostAddress(); // 호스트 이름과 IP 주소 결합
         }
 
-
         // local인 경우
         if(ip.equals("0:0:0:0:0:0:0:1") || ip.equals("127.0.0.1"))
         {
@@ -282,23 +283,28 @@ public class LoginServiceImpl implements LoginService {
     }
 
     // 로그인 성공
-    private Map<String, String> successfulAuthentication(CustomUserDetails userDetails) {
+    private Map<String, String> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
         String access = jwtTokenProvider.generateAccessToken(userDetails, "access");
-        String refresh = jwtTokenProvider.generateRefreshToken(userDetails, "refresh");
+
+        long expireTime = autoLogin.equals("rememberMe") ? REFRESH_TOKEN_REMEBER_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME;
+
+        String refresh = jwtTokenProvider.generateRefreshToken(userDetails, "refresh", expireTime);
 
         Map<String, String> token = new HashMap<>();
         token.put("access", access);
         token.put("refresh", refresh);
 
-        addRefreshToken(access, refresh);
+        addRefreshToken(access, refresh, autoLogin);
 
         return token;
     }
 
     // refresh token 저장
-    private void addRefreshToken(String access, String refresh) {
-
-        redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);
+    private void addRefreshToken(String access, String refresh, String autoLogin) {
+        if(autoLogin.equals("rememberMe")) {
+            redisHandler.save(access, refresh, REFRESH_TOKEN_REMEBER_EXPIRE_TIME);
+        } else {
+            redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);
+        }
     }
-
 }

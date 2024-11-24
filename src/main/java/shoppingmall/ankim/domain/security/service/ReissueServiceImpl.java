@@ -28,10 +28,6 @@ public class ReissueServiceImpl implements ReissueService {
 
     @Override
     public String validateRefreshToken(String access) {
-        if(access == null || access.isEmpty()) {
-            throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND);
-        }
-
         String refresh = (String) redisHandler.get(access);
         if(refresh == null || refresh.isEmpty()) {
             throw new JwtTokenException(REFRESH_TOKEN_NOT_FOUND);
@@ -42,6 +38,7 @@ public class ReissueServiceImpl implements ReissueService {
             jwtTokenProvider.isTokenExpired(refresh);
         } catch (ExpiredJwtException e) {
             // FIXME Refresh 토큰이 만료된 경우 로그아웃 또는 재인증 요청
+            redisHandler.delete(access); // Refresh Token이 만료되었으므로 Redis에서 해당 데이터를 삭제
             throw new JwtTokenException(REFRESH_TOKEN_EXPIRED);
         }
 
@@ -55,32 +52,37 @@ public class ReissueServiceImpl implements ReissueService {
 
     // Access Token 재발급
     public Map<String, String> reissueToken(String accessToken, String refreshToken) {
-        // Refresh Token에서 사용자 정보 추출
-        String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
+        try {
+            // Refresh Token에서 사용자 정보 추출
+            String username = jwtTokenProvider.getUsernameFromToken(refreshToken);
 
-        // Member 엔티티 생성
-        Member member = Member.builder()
-                .loginId(username)
-                .pwd("tempPassword")
-                .build();
+            // Member 엔티티 생성
+            Member member = Member.builder()
+                    .loginId(username)
+                    .pwd("tempPassword")
+                    .build();
 
-        // UserDetails에 Member 엔티티 담기
-        CustomUserDetails customUserDetails = new CustomUserDetails(member);
+            // UserDetails에 Member 엔티티 담기
+            CustomUserDetails customUserDetails = new CustomUserDetails(member);
 
-        // 새로운 Token 생성
-        String newAccess = jwtTokenProvider.generateAccessToken(customUserDetails,"access");
-        String newRefresh = jwtTokenProvider.generateRefreshToken(customUserDetails,"refresh");
+            // 새로운 Token 생성
+            String newAccess = jwtTokenProvider.generateAccessToken(customUserDetails,"access");
+            String newRefresh = jwtTokenProvider.generateRefreshToken(customUserDetails,"refresh");
 
-        Map<String, String> map = new HashMap<>();
-        map.put("access", newAccess);
-        map.put("refresh", newRefresh);
+            Map<String, String> map = new HashMap<>();
+            map.put("access", newAccess);
+            map.put("refresh", newRefresh);
 
-        // 기존에 저장되어있는 refresh token을 삭제한 후 새로운 refresh token을 저장
-        redisHandler.delete(accessToken);
+            // 기존에 저장되어있는 refresh token을 삭제한 후 새로운 refresh token을 저장
+            redisHandler.delete(accessToken);
 
-        addRefreshToken(newAccess, newRefresh);
+            addRefreshToken(newAccess, newRefresh);
 
-        return map;
+            return map;
+        } catch (Exception e) {
+            log.error("Token 재발급 중 오류 발생", e);
+            throw new JwtTokenException(TOKEN_REISSUE_FAILED);
+        }
     }
 
     // Redis에 access token이 저장되어 있는지 확인

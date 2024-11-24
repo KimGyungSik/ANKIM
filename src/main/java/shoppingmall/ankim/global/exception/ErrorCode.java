@@ -26,6 +26,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Refresh Token이 요청에 포함되지 않았습니다."),
     REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),
+    TOKEN_REISSUE_FAILED(HttpStatus.BAD_REQUEST, "Token 재발급 중 오류 발생"),
 
     // 쿠키 관련 에러 코드
     COOKIE_NOT_INCLUDED(HttpStatus.BAD_REQUEST, "쿠키가 요청에 포함되어 있지 않습니다."),

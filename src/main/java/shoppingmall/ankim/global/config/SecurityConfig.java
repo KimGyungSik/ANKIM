@@ -44,6 +44,11 @@ public class SecurityConfig {
         http
                 .csrf((auth) -> auth.disable());
 
+        // 세션 설정
+        http
+                .sessionManagement((session) -> session
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT에서는 세션을 stateless 상태로 사용
+
 //         Form 로그인 방식 비활성화
 //        http
 //                .formLogin((auth) -> auth.disable());
@@ -61,29 +66,6 @@ public class SecurityConfig {
                         .requestMatchers("/my/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
                         .anyRequest().permitAll()) // 나머지 요청은 접근 허용
         ;
-
-        // 필터 추가
-/*
-        http
-                .addFilterAt(new LoginFilter(authenticationManager(authenticationConfiguration), jwtTokenProvider), UsernamePasswordAuthenticationFilter.class);
-*/
-
-/*        http
-                .addFilterAfter(new JwtFilter(jwtTokenProvider), LoginFilter.class);*/
-
-/*        http
-                .formLogin(login -> login
-//                        .loginPage("login")
-                                .loginProcessingUrl("/api/login/member")
-                                .failureHandler(customAuthenticationFailureHandler) // 실패 핸들러 등록
-                                .permitAll()
-                );*/
-
-        // 세션 설정
-        http
-                .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS)); // JWT에서는 세션을 stateless 상태로 사용
-
 
         // JWT 필터 추가
         http

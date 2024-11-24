@@ -54,6 +54,9 @@ public class JwtTokenProvider {
     public String generateRefreshToken(CustomUserDetails userDetails, String category) {
         return generateToken(userDetails, category, REFRESH_TOKEN_EXPIRE_TIME);
     }
+    public String generateRefreshToken(CustomUserDetails userDetails, String category, long expireTime) {
+        return generateToken(userDetails, category, expireTime);
+    }
 
     // Token 유효 여부 검증
     public boolean isTokenValidate(String token) {

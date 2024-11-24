@@ -49,6 +49,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
         }
+
         // DB에 토큰이 있는지 확인
         // access token 에서 refresh token 추출
         String refresh = (String) redisHandler.get(access);

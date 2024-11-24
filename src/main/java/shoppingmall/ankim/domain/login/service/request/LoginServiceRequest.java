@@ -17,10 +17,10 @@ public class LoginServiceRequest {
     private String pwd; // 비밀번호
     private LoginType loginType; // 로그인 타입 (EMAIL)
     private LocalDateTime loginTime; // 로그인 시각
-    private boolean autoLogin; // 자동로그인 여부
+    private String autoLogin; // 자동로그인 여부
 
     @Builder
-    public LoginServiceRequest(String loginId, String pwd, LoginType loginType, LocalDateTime loginTime, boolean autoLogin) {
+    public LoginServiceRequest(String loginId, String pwd, LoginType loginType, LocalDateTime loginTime, String autoLogin) {
         this.loginId = loginId;
         this.pwd = pwd;
         this.loginType = loginType == null? LoginType.EMAIL : loginType;

@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.security.dto;
 
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -13,6 +14,8 @@ import java.util.List;
 public class CustomUserDetails implements UserDetails {
 
     private final String name; // 사용자 id("test@example.com")
+    @Getter
+    private final String nickName; // 사용자 이름
     private final String password; // 사용자 비밀번호
 
     private final Collection<GrantedAuthority> authorities; // 사용자 권한 목록
@@ -20,6 +23,7 @@ public class CustomUserDetails implements UserDetails {
     // 일반 고객이 로그인 하는 경우
     public CustomUserDetails(Member member) {
         this.name = member.getLoginId();
+        this.nickName = member.getName();
         this.password = member.getPwd();
 
         // 단일 권한 ROLE_USER 추가
@@ -29,6 +33,7 @@ public class CustomUserDetails implements UserDetails {
     // 관리자가 로그인 하는 경우
     public CustomUserDetails(Admin admin) {
         this.name = admin.getLoginId();
+        this.nickName = admin.getName();
         this.password = admin.getPwd();
 
         // 기본 권한을 "ROLE_USER"로 설정

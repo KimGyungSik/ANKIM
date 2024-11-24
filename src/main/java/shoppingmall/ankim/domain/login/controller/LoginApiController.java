@@ -46,7 +46,8 @@ public class LoginApiController {
 
             // 성공 시 토큰 반환
             // 응답 설정
-            response.setHeader("access", access);
+//            response.setHeader("access", access);
+            response.addHeader("Authorization", "Bearer " + access);
             response.setStatus(HttpStatus.OK.value());
 
             return ApiResponse.ok("로그인 성공");

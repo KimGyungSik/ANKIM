@@ -23,10 +23,10 @@ public class LoginRequest {
 
     private LoginType loginType; // 로그인 타입 (EMAIL)
     private LocalDateTime loginTime; // 로그인 시각
-    private boolean autoLogin; // 자동 로그인 여부
+    private String autoLogin; // 자동 로그인 여부(자동로그인 true, 일반 로그인 false)
 
     @Builder
-    public LoginRequest(String loginId, String pwd, boolean autoLogin) {
+    public LoginRequest(String loginId, String pwd, String autoLogin) {
         this.loginId = loginId;
         this.pwd = pwd;
         this.loginType = LoginType.EMAIL;
