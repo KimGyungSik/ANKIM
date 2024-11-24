@@ -31,6 +31,39 @@ public class ProductFactory {
             Map<String, List<String>> categoryStructure) {
         LocalDateTime now = LocalDateTime.now();
 
+        // 1. NEW 키워드가 포함된 상품 생성
+        Product productWithNewName = Product.builder()
+                .name("NEW Fashionable Shirt")
+                .desc("Comfortable and trendy NEW shirt")
+                .searchKeywords("Fashion, Shirt")
+                .origPrice(15000)
+                .discRate(0) // 할인 없음
+                .build();
+        productWithNewName.setCreatedAt(now.minusDays(5));
+        entityManager.persist(productWithNewName);
+
+        // 2. 상품 색상 키워드 포함 (RED)
+        Product productWithRedKeyword = Product.builder()
+                .name("Summer Dress")
+                .desc("Bright and elegant dress")
+                .searchKeywords("RED, Dress")
+                .discRate(0) // 할인 없음
+                .origPrice(20000)
+                .build();
+        productWithRedKeyword.setCreatedAt(now.minusDays(10));
+        entityManager.persist(productWithRedKeyword);
+
+        // 3. 상품 상세 설명 키워드 포함
+        Product productWithDescKeyword = Product.builder()
+                .name("Comfortable Cotton T-shirt")
+                .desc("Made of 100% pure '코튼재질' for maximum comfort")
+                .searchKeywords("Cotton, T-shirt")
+                .discRate(0) // 할인 없음
+                .origPrice(10000)
+                .build();
+        productWithDescKeyword.setCreatedAt(now.minusDays(15));
+        entityManager.persist(productWithDescKeyword);
+
         // 중분류 -> 소분류 구조를 순회하면서 데이터 생성
         for (Map.Entry<String, List<String>> entry : categoryStructure.entrySet()) {
             String middleCategory = entry.getKey(); // 중분류
@@ -56,6 +89,7 @@ public class ProductFactory {
                             .category(subCategoryEntity)
                             .name("NEW 상품 - " + subcategory + " - " + i)
                             .desc("NEW 상품 설명")
+                            .searchKeywords("NEW")
                             .discRate(0) // 할인 없음
                             .origPrice(10000 + i)
                             .wishCnt(0)
