@@ -26,6 +26,8 @@ public class ProductQueryHelper {
             case LOW_PRICE -> product.sellPrice.asc();
             case HIGH_PRICE -> product.sellPrice.desc();
             case HIGH_DISCOUNT_RATE -> product.discRate.desc();
+            case HIGH_REVIEW -> product.rvwCnt.desc();
+            case HIGH_VIEW -> product.viewCnt.desc();
             default -> product.createdAt.desc();
         };
     }

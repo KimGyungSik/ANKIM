@@ -30,10 +30,11 @@ public class ProductListResponse {
     private String freeShip; // 무료배송 여부
     private Integer wishCnt; // 찜 갯수
     private Integer rvwCnt; // 리뷰 갯수
+    private Integer viewCnt; // 조회수
     private Integer avgR; // 평균별점
 
     @Builder
-    private ProductListResponse(Long no, String categoryName, String desc, String searchKeywords, String thumbNailImgUrl, String name, String code, Integer discRate, Integer sellPrice, LocalDateTime createdAt, String handMadeYn, String freeShip, Integer wishCnt, Integer rvwCnt, Integer avgR) {
+    private ProductListResponse(Long no, String categoryName, String desc, String searchKeywords, String thumbNailImgUrl, String name, String code, Integer discRate, Integer sellPrice, LocalDateTime createdAt, String handMadeYn, String freeShip, Integer wishCnt, Integer rvwCnt, Integer viewCnt, Integer avgR) {
         this.no = no;
         this.categoryName = categoryName;
         this.thumbNailImgUrl = thumbNailImgUrl;
@@ -48,6 +49,7 @@ public class ProductListResponse {
         this.freeShip = freeShip;
         this.wishCnt = wishCnt;
         this.rvwCnt = rvwCnt;
+        this.viewCnt = viewCnt;
         this.avgR = avgR;
     }
 
@@ -65,6 +67,7 @@ public class ProductListResponse {
                 .freeShip(product.getFreeShip())
                 .wishCnt(product.getWishCnt())
                 .rvwCnt(product.getRvwCnt())
+                .viewCnt(product.getViewCnt())
                 .avgR(product.getAvgR())
                 .build();
     }

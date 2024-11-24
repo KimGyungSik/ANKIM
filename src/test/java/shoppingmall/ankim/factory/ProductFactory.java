@@ -38,9 +38,12 @@ public class ProductFactory {
                 .searchKeywords("Fashion, Shirt")
                 .origPrice(15000)
                 .discRate(0) // 할인 없음
+                .rvwCnt(10)  // 리뷰 수 추가
+                .viewCnt(150) // 조회수 추가
                 .build();
         productWithNewName.setCreatedAt(now.minusDays(5));
         entityManager.persist(productWithNewName);
+        addProductImages(entityManager, productWithNewName, 1);
 
         // 2. 상품 색상 키워드 포함 (RED)
         Product productWithRedKeyword = Product.builder()
@@ -49,9 +52,12 @@ public class ProductFactory {
                 .searchKeywords("RED, Dress")
                 .discRate(0) // 할인 없음
                 .origPrice(20000)
+                .rvwCnt(5)
+                .viewCnt(100)
                 .build();
         productWithRedKeyword.setCreatedAt(now.minusDays(10));
         entityManager.persist(productWithRedKeyword);
+        addProductImages(entityManager, productWithRedKeyword, 2);
 
         // 3. 상품 상세 설명 키워드 포함
         Product productWithDescKeyword = Product.builder()
@@ -60,9 +66,12 @@ public class ProductFactory {
                 .searchKeywords("Cotton, T-shirt")
                 .discRate(0) // 할인 없음
                 .origPrice(10000)
+                .rvwCnt(15)
+                .viewCnt(200)
                 .build();
         productWithDescKeyword.setCreatedAt(now.minusDays(15));
         entityManager.persist(productWithDescKeyword);
+        addProductImages(entityManager, productWithDescKeyword, 3);
 
         // 중분류 -> 소분류 구조를 순회하면서 데이터 생성
         for (Map.Entry<String, List<String>> entry : categoryStructure.entrySet()) {
@@ -92,6 +101,8 @@ public class ProductFactory {
                             .searchKeywords("NEW")
                             .discRate(0) // 할인 없음
                             .origPrice(10000 + i)
+                            .rvwCnt(i) // 리뷰 수 추가
+                            .viewCnt(i * 10) // 조회수 추가
                             .wishCnt(0)
                             .handMadeYn("N")
                             .build();
@@ -110,6 +121,8 @@ public class ProductFactory {
                             .desc("BEST 상품 설명")
                             .discRate(0)
                             .origPrice(15000 + i)
+                            .rvwCnt(50 + i) // 리뷰 수 추가
+                            .viewCnt(500 + i * 10) // 조회수 추가
                             .wishCnt(50 + i) // 찜 수 50 이상
                             .handMadeYn("N")
                             .build();
@@ -128,6 +141,8 @@ public class ProductFactory {
                             .desc("HANDMADE 상품 설명")
                             .discRate(0)
                             .origPrice(20000 + i)
+                            .rvwCnt(20 + i) // 리뷰 수 추가
+                            .viewCnt(300 + i * 10) // 조회수 추가
                             .wishCnt(0)
                             .handMadeYn("Y") // 핸드메이드
                             .build();
@@ -146,6 +161,8 @@ public class ProductFactory {
                             .desc("DISCOUNT 상품 설명")
                             .discRate(10 + i) // 할인율
                             .origPrice(25000 + i)
+                            .rvwCnt(5 + i) // 리뷰 수 추가
+                            .viewCnt(150 + i * 5) // 조회수 추가
                             .wishCnt(0)
                             .handMadeYn("N")
                             .build();
@@ -157,6 +174,7 @@ public class ProductFactory {
                 }
             }
         }
+        System.out.println("Test products successfully created.");
     }
 
     // 추가된 이미지 생성 메서드

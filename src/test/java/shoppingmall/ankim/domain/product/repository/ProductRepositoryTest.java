@@ -4,6 +4,8 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -25,9 +27,8 @@ import shoppingmall.ankim.domain.product.repository.query.helper.OrderBy;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.time.LocalDateTime;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
@@ -470,6 +471,230 @@ class ProductRepositoryTest {
                 .allMatch(product -> product.getDesc().contains(keyword));
     }
 
+
+    @DisplayName("상품들을 최신순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByLATEST() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.LATEST;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 최신순 정렬 검증
+        List<LocalDateTime> createdDates = result.getContent().stream()
+                .map(ProductListResponse::getCreatedAt)
+                .toList();
+
+        assertThat(createdDates).isSortedAccordingTo((d1, d2) -> d2.compareTo(d1)); // 최신순 검증
+    }
+
+
+    @DisplayName("상품들을 인기순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByPOPULAR() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.POPULAR;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 인기순 검증
+        List<Integer> wishCounts = result.getContent().stream()
+                .map(ProductListResponse::getWishCnt)
+                .toList();
+
+        assertThat(wishCounts).isSortedAccordingTo((w1, w2) -> Integer.compare(w2, w1)); // 인기순 검증
+    }
+
+    @DisplayName("상품들을 낮은 가격순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByLOW_PRICE() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.LOW_PRICE;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 낮은 가격순 검증
+        List<Integer> sellPrices = result.getContent().stream()
+                .map(ProductListResponse::getSellPrice)
+                .toList();
+
+        assertThat(sellPrices).isSorted();
+    }
+
+    @DisplayName("상품들을 높은 가격순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByHIGH_PRICE() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.HIGH_PRICE;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 높은 가격순 검증
+        List<Integer> sellPrices = result.getContent().stream()
+                .map(ProductListResponse::getSellPrice)
+                .toList();
+
+        assertThat(sellPrices).isSortedAccordingTo((p1, p2) -> Integer.compare(p2, p1));
+    }
+
+    @DisplayName("상품들을 높은 할인율순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByHIGH_DISCOUNT_RATE() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.HIGH_DISCOUNT_RATE;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 높은 할인율 검증
+        List<Integer> discountRates = result.getContent().stream()
+                .map(ProductListResponse::getDiscRate)
+                .toList();
+
+        assertThat(discountRates).isSortedAccordingTo((d1, d2) -> Integer.compare(d2, d1));
+    }
+
+    @DisplayName("상품들을 리뷰 많은순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByHIGH_REVIEW() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.HIGH_REVIEW;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 리뷰 많은 순 검증
+        List<Integer> reviewCounts = result.getContent().stream()
+                .map(ProductListResponse::getRvwCnt)
+                .filter(Objects::nonNull) // Null 값 필터링
+                .toList();
+
+        assertThat(reviewCounts).isSortedAccordingTo((r1, r2) -> Integer.compare(r2, r1));
+    }
+
+    @DisplayName("상품들을 조회수 많은순 정렬로 볼 수 있다.")
+    @Test
+    void findUserProductListResponseWithOrderByHIGH_VIEW() {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+        OrderBy order = OrderBy.HIGH_VIEW;
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, null, order, null, null);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 조회수 많은 순 검증
+        List<Integer> viewCounts = result.getContent().stream()
+                .map(ProductListResponse::getViewCnt)
+                .filter(Objects::nonNull) // Null 값 필터링
+                .toList();
+
+        assertThat(viewCounts).isSortedAccordingTo((v1, v2) -> Integer.compare(v2, v1));
+    }
+
+    @DisplayName("검색 키워드, 카테고리, 정렬 조건, 필터링 조건을 모두 만족하는 상품들을 조회한다.")
+    @ParameterizedTest
+    @CsvSource({
+            "NEW, 티셔츠, HIGH_REVIEW, NEW",      // 키워드 "NEW", 카테고리 "티셔츠", 리뷰 많은 순, 최신 상품
+            "BEST, 맨투맨, HIGH_PRICE, BEST",     // 키워드 "BEST", 카테고리 "맨투맨", 높은 가격 순, 베스트 상품
+            "DISCOUNT, 자켓, LOW_PRICE, DISCOUNT" // 키워드 "DISCOUNT", 카테고리 "자켓", 낮은 가격 순, 할인 상품
+    })
+    void findUserProductListResponseWithAllConditions(
+            String keyword,
+            String categoryName,
+            OrderBy order,
+            Condition condition) {
+        // given
+        PageRequest pageable = PageRequest.of(0, 10);
+
+        // 카테고리 ID 가져오기
+        Long categoryId = em.createQuery("SELECT c.no FROM Category c WHERE c.name = :name", Long.class)
+                .setParameter("name", categoryName)
+                .getSingleResult();
+
+        // when
+        Page<ProductListResponse> result = productRepository.findUserProductListResponse(pageable, condition, order, categoryId, keyword);
+
+        // then
+        assertThat(result).isNotEmpty();
+
+        // 검증 1: 검색 키워드 만족
+        assertThat(result.getContent())
+                .allMatch(product ->
+                        product.getName().toLowerCase().contains(keyword.toLowerCase()) ||
+                                product.getDesc().toLowerCase().contains(keyword.toLowerCase()) ||
+                                product.getSearchKeywords().toLowerCase().contains(keyword.toLowerCase()));
+
+        // 검증 2: 카테고리 필터링 만족
+        assertThat(result.getContent())
+                .allMatch(product -> product.getCategoryName().equals(categoryName));
+
+        // 검증 3: 정렬 조건 만족
+        if (order == OrderBy.HIGH_REVIEW) {
+            List<Integer> reviewCounts = result.getContent().stream()
+                    .map(ProductListResponse::getRvwCnt)
+                    .filter(Objects::nonNull)
+                    .toList();
+            assertThat(reviewCounts).isSortedAccordingTo(Comparator.reverseOrder());
+        } else if (order == OrderBy.HIGH_PRICE) {
+            List<Integer> prices = result.getContent().stream()
+                    .map(ProductListResponse::getSellPrice)
+                    .filter(Objects::nonNull)
+                    .toList();
+            assertThat(prices).isSortedAccordingTo(Comparator.reverseOrder());
+        } else if (order == OrderBy.LOW_PRICE) {
+            List<Integer> prices = result.getContent().stream()
+                    .map(ProductListResponse::getSellPrice)
+                    .filter(Objects::nonNull)
+                    .toList();
+            assertThat(prices).isSortedAccordingTo(Comparator.naturalOrder());
+        }
+
+        // 검증 4: 필터링 조건 만족
+        if (condition == Condition.NEW) {
+            assertThat(result.getContent())
+                    .allMatch(product -> product.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(1)));
+        } else if (condition == Condition.BEST) {
+            assertThat(result.getContent())
+                    .allMatch(product -> product.getWishCnt() >= 30);
+        } else if (condition == Condition.HANDMADE) {
+            assertThat(result.getContent())
+                    .allMatch(product -> product.getHandMadeYn().equals("Y"));
+        } else if (condition == Condition.DISCOUNT) {
+            assertThat(result.getContent())
+                    .allMatch(product -> product.getDiscRate() > 0);
+        }
+    }
 
 
     // 중분류 또는 소분류 이름인지 확인하는 메서드
