@@ -20,10 +20,9 @@ import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.entity.QProduct;
-import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
-import shoppingmall.ankim.domain.product.repository.query.helper.OrderBy;
-import shoppingmall.ankim.domain.product.repository.query.helper.ProductQueryHelper;
+import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
 import java.util.List;
 import java.util.Map;
@@ -35,6 +34,7 @@ import static shoppingmall.ankim.domain.item.entity.QItem.*;
 import static shoppingmall.ankim.domain.itemOption.entity.QItemOption.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionGroup.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionValue.*;
+import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.domain.product.entity.QProduct.*;
 
 @Repository
@@ -65,9 +65,10 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
     }
 
     @Override
-    public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword) {
+    public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
+                                                                 ColorCondition colorCondition, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
         // 필터링
-        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, QProduct.product);
+        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, colorCondition, priceCondition, customMinPrice, customMaxPrice, infoSearches, product);
 
         // 정렬
         OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
@@ -105,7 +106,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                 ))
                 .from(product)
                 .leftJoin(product.category, category)
-                .where(filterBuilder)
+                .where(filterBuilder.and(product.sellingStatus.eq(SELLING)))
                 .orderBy(orderSpecifier)
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize())

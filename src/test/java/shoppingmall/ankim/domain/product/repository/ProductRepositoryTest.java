@@ -29,6 +29,7 @@ import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.*;
@@ -660,41 +661,32 @@ class ProductRepositoryTest {
                 .allMatch(product -> product.getCategoryName().equals(categoryName));
 
         // 검증 3: 정렬 조건 만족
-        if (order == OrderBy.HIGH_REVIEW) {
-            List<Integer> reviewCounts = result.getContent().stream()
-                    .map(ProductListResponse::getRvwCnt)
-                    .filter(Objects::nonNull)
-                    .toList();
-            assertThat(reviewCounts).isSortedAccordingTo(Comparator.reverseOrder());
-        } else if (order == OrderBy.HIGH_PRICE) {
-            List<Integer> prices = result.getContent().stream()
-                    .map(ProductListResponse::getSellPrice)
-                    .filter(Objects::nonNull)
-                    .toList();
-            assertThat(prices).isSortedAccordingTo(Comparator.reverseOrder());
-        } else if (order == OrderBy.LOW_PRICE) {
-            List<Integer> prices = result.getContent().stream()
-                    .map(ProductListResponse::getSellPrice)
-                    .filter(Objects::nonNull)
-                    .toList();
-            assertThat(prices).isSortedAccordingTo(Comparator.naturalOrder());
+        if (ORDER_VALIDATORS.containsKey(order)) {
+            List<ProductListResponse> products = result.getContent();
+            assertThat(products).isSortedAccordingTo(ORDER_VALIDATORS.get(order));
         }
 
         // 검증 4: 필터링 조건 만족
-        if (condition == Condition.NEW) {
+        if (CONDITION_VALIDATORS.containsKey(condition)) {
             assertThat(result.getContent())
-                    .allMatch(product -> product.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(1)));
-        } else if (condition == Condition.BEST) {
-            assertThat(result.getContent())
-                    .allMatch(product -> product.getWishCnt() >= 30);
-        } else if (condition == Condition.HANDMADE) {
-            assertThat(result.getContent())
-                    .allMatch(product -> product.getHandMadeYn().equals("Y"));
-        } else if (condition == Condition.DISCOUNT) {
-            assertThat(result.getContent())
-                    .allMatch(product -> product.getDiscRate() > 0);
+                    .allMatch(CONDITION_VALIDATORS.get(condition));
         }
     }
+
+
+    private static final Map<OrderBy, Comparator<ProductListResponse>> ORDER_VALIDATORS = Map.of(
+            OrderBy.HIGH_REVIEW, Comparator.comparing(ProductListResponse::getRvwCnt, Comparator.nullsLast(Comparator.reverseOrder())),
+            OrderBy.HIGH_PRICE, Comparator.comparing(ProductListResponse::getSellPrice, Comparator.nullsLast(Comparator.reverseOrder())),
+            OrderBy.LOW_PRICE, Comparator.comparing(ProductListResponse::getSellPrice, Comparator.nullsLast(Comparator.naturalOrder()))
+    );
+
+    private static final Map<Condition, Predicate<ProductListResponse>> CONDITION_VALIDATORS = Map.of(
+            Condition.NEW, product -> product.getCreatedAt().isAfter(LocalDateTime.now().minusMonths(1)),
+            Condition.BEST, product -> product.getWishCnt() >= 30,
+            Condition.HANDMADE, product -> "Y".equals(product.getHandMadeYn()),
+            Condition.DISCOUNT, product -> product.getDiscRate() > 0
+    );
+
 
 
     // 중분류 또는 소분류 이름인지 확인하는 메서드
