@@ -22,6 +22,6 @@ public interface ProductQueryRepository {
     // ....할인율 높은 순 / 리뷰 많은순 / 조회수 많은순
     // 모든 필터링 / 정렬 / 검색은 원하는대로 동시에 이루어져야함
     Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
-                                                          ColorCondition colorCondition, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches);
+                                                          List<ColorCondition> colorConditions, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches);
 
 }

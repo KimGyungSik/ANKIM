@@ -67,9 +67,9 @@ class ProductTest {
         assertThat(product.getSellPrice()).isEqualTo(0);
     }
 
-    @DisplayName("옵션 그룹의 옵션 값들이 검색 키워드에 반영된다.")
+    @DisplayName("옵션 그룹의 색상 코드들이 검색 키워드에 반영된다.")
     @Test
-    void updateSearchKeywords() {
+    void updateSearchKeywordsWithColorCodes() {
         // given
         Product product = Product.builder()
                 .name("테스트 상품")
@@ -82,8 +82,8 @@ class ProductTest {
         OptionGroup colorGroup = OptionGroup.builder()
                 .name("컬러")
                 .optionValues(List.of(
-                        OptionValue.builder().name("레드").build(),
-                        OptionValue.builder().name("블루").build()
+                        OptionValue.builder().name("레드").colorCode("#FF0000").build(),
+                        OptionValue.builder().name("블루").colorCode("#0000FF").build()
                 ))
                 .build();
 
@@ -103,9 +103,10 @@ class ProductTest {
 
         // then
         assertThat(product.getSearchKeywords())
-                .contains("기본 키워드", "레드", "블루")
-                .doesNotContain("M", "L");
+                .contains("기본 키워드", "#FF0000", "#0000FF") // 색상 코드 검증
+                .doesNotContain("M", "L"); // 사이즈는 검색 키워드에 반영되지 않음
     }
+
 
     @DisplayName("옵션 그룹이 없을 경우 검색 키워드는 기존 값과 동일하다.")
     @Test
@@ -125,9 +126,9 @@ class ProductTest {
         assertThat(product.getSearchKeywords()).isEqualTo("기본 키워드");
     }
 
-    @DisplayName("검색 키워드가 기존에 없을 경우 새롭게 추가된다.")
+    @DisplayName("검색 키워드가 기존에 없을 경우 색상 코드가 새롭게 추가된다.")
     @Test
-    void updateSearchKeywordsWhenNoInitialKeywords() {
+    void updateSearchKeywordsWithColorCodesWhenNoInitialKeywords() {
         // given
         Product product = Product.builder()
                 .name("테스트 상품")
@@ -139,8 +140,8 @@ class ProductTest {
         OptionGroup colorGroup = OptionGroup.builder()
                 .name("컬러")
                 .optionValues(List.of(
-                        OptionValue.builder().name("그린").build(),
-                        OptionValue.builder().name("옐로우").build()
+                        OptionValue.builder().name("그린").colorCode("#00FF00").build(),
+                        OptionValue.builder().name("옐로우").colorCode("#FFFF00").build()
                 ))
                 .build();
 
@@ -150,7 +151,9 @@ class ProductTest {
         product.updateSearchKeywords();
 
         // then
-        assertThat(product.getSearchKeywords()).contains("그린", "옐로우");
+        assertThat(product.getSearchKeywords())
+                .contains("#00FF00", "#FFFF00"); // 색상 코드 검증
     }
+
 
 }

@@ -31,4 +31,6 @@ public class ProductQueryController {
         return ApiResponse.ok(productRepository.findAdminProductDetailResponse(productId));
     }
 
+    // 필터링, 정렬
+
 }

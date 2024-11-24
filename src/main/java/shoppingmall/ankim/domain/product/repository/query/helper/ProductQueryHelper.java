@@ -41,7 +41,7 @@ public class ProductQueryHelper {
      * @return BooleanBuilder
      */
     public static BooleanBuilder createFilterBuilder(Condition condition, Long category, String keyword,
-                                                     ColorCondition colorCondition, PriceCondition priceCondition,Integer customMinPrice, Integer customMaxPrice,
+                                                     List<ColorCondition> colorConditions, PriceCondition priceCondition,Integer customMinPrice, Integer customMaxPrice,
                                                      List<InfoSearch> infoSearches, QProduct product) {
         BooleanBuilder filterBuilder = new BooleanBuilder();
 
@@ -52,7 +52,7 @@ public class ProductQueryHelper {
         // 검색 필터링
         addKeywordFilter(keyword, product, filterBuilder);
         // 색상 필터링 -> 특정 옵션 컬러 색상코드를 가지고 있는 상품
-        addColorFilter(colorCondition, product, filterBuilder);
+        addColorFilters(colorConditions, product, filterBuilder);
         // 가격 필터링 -> 가격대별 상품
         addPriceFilter(priceCondition, customMinPrice, customMaxPrice, product, filterBuilder);
         // 상품정보 필터링 -> 무료배송인 상품, 할인 상품, 품절 상품 제외,핸드메이드 상품만
@@ -120,6 +120,17 @@ public class ProductQueryHelper {
             if (priceCondition.getMaxPrice() != null) {
                 filterBuilder.and(product.sellPrice.loe(priceCondition.getMaxPrice()));
             }
+        }
+    }
+
+    private static void addColorFilters(List<ColorCondition> colorConditions, QProduct product, BooleanBuilder filterBuilder) {
+        if (colorConditions == null || colorConditions.isEmpty()) {
+            // 조건이 없으면 필터를 추가하지 않음
+            return;
+        }
+
+        for (ColorCondition colorCondition : colorConditions) {
+            addColorFilter(colorCondition, product, filterBuilder);
         }
     }
 
