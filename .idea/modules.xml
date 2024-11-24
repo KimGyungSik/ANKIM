@@ -3,8 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/ANKIM.iml" filepath="$PROJECT_DIR$/.idea/ANKIM.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.main.iml" />
-      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.test.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.main~1.iml" filepath="$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.main~1.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.test~1.iml" filepath="$PROJECT_DIR$/.idea/modules/ANKIM.ANKIM.test~1.iml" />
     </modules>
   </component>
 </project>
