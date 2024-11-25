@@ -120,3 +120,9 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/macos,windows,visualstudiocode
 
 application.properties
+
+# yml
+application-email.yml
+application-jwt.yml
+application-login.yml
+application-redis.yml

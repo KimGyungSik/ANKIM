@@ -21,7 +21,7 @@ public class SocialLogin extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // 기본 키
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member; // 회원 번호 (FK)
 

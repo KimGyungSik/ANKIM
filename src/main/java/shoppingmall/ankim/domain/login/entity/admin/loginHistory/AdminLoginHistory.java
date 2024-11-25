@@ -1,11 +1,12 @@
 package shoppingmall.ankim.domain.login.entity.admin.loginHistory;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import shoppingmall.ankim.domain.admin.entity.Admin;
+import shoppingmall.ankim.domain.login.entity.BaseLoginHistory;
+import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginHistory;
+import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
+import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -20,17 +21,34 @@ public class AdminLoginHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no; // 기본 키
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "admin_no", nullable = false)
     private Admin admin;
 
-    @Column(name = "ip_addr", length = 45, nullable = false)
-    private String ipAddress; // 접속 IP
+    @Embedded
+    private BaseLoginHistory loginHistory;
 
-    @Column(name = "login_att_dt", nullable = false)
-    private LocalDateTime loginAttemptDate = LocalDateTime.now(); // 로그인 시도 시간
+    @Builder
+    public AdminLoginHistory(Long no, Admin admin, BaseLoginHistory loginHistory) {
+        this.no = no;
+        this.admin = admin;
+        this.loginHistory = loginHistory;
+    }
 
-    @Column(name = "active_yn", length = 1, nullable = false)
-    private String activeYn = "Y";
+    public static AdminLoginHistory recordLoginHistory(Admin admin, String ipAddress, LoginServiceRequest loginServiceRequest) {
+        // BaseLoginHistory 객체 생성
+        BaseLoginHistory baseLoginHistory = BaseLoginHistory.builder()
+                .ipAddress(ipAddress)
+                .loginAttemptDate(loginServiceRequest.getLoginTime())
+                .activeYn("Y")
+                .build();
 
+        // MemberLoginHistory 객체 생성
+        AdminLoginHistory adminLoginHistory = AdminLoginHistory.builder()
+                .admin(admin)
+                .loginHistory(baseLoginHistory)
+                .build();
+
+        return adminLoginHistory;
+    }
 }

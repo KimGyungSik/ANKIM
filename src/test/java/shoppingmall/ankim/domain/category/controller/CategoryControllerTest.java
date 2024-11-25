@@ -37,6 +37,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 @WebMvcTest(controllers = CategoryController.class)
 @TestPropertySource(properties = "spring.sql.init.mode=never")
+@AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
 @ImportAutoConfiguration(exclude =  {QuerydslConfig.class, JpaAuditingConfig.class})
 class CategoryControllerTest {
 

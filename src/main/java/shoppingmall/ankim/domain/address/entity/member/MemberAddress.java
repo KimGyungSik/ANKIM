@@ -11,7 +11,7 @@ import shoppingmall.ankim.global.audit.BaseEntity;
 
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "mem_addr")
 public class MemberAddress extends BaseEntity {
@@ -20,7 +20,7 @@ public class MemberAddress extends BaseEntity {
         @GeneratedValue(strategy = GenerationType.IDENTITY)
         private Long no;
 
-        @ManyToOne
+        @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "mem_no", nullable = false)
         private Member member;
 

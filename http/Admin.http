@@ -1,0 +1,27 @@
+### 회원가입 페이지 진입
+GET http://localhost:8080/admin/join
+
+### 아이디 중복 확인
+POST http://localhost:8080/api/admin/check-login-id
+Content-Type: application/json
+
+{
+  "loginId": "admin123"
+}
+
+### 관리자 회원가입
+POST http://localhost:8080/admin/register
+Content-Type: application/json
+
+{
+  "loginId": "admin123",
+  "pwd": "AdminPass123!",
+  "name": "홍길동",
+  "email": "admin@ankim.com",
+  "phoneNum": "010-1234-5678",
+  "birth": "1995-02-14",
+  "gender": "M",
+  "zipCode": 12345,
+  "addressMain": "서울특별시 강남구 미왕빌딩",
+  "addressDetail": "10층"
+}

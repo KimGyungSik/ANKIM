@@ -19,11 +19,11 @@ public class MemberGradeHistory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member; // 회원 번호
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "grade_no", nullable = false)
     private GradeCode gradeNo; // 등급 번호 (50 / 100 / 150 / 200)
 

@@ -45,6 +45,15 @@ public class ApiResponse<T> {
         return new ApiResponse<>(HttpStatus.OK, "OK", null, null);
     }
 
+    // ErrorCode를 받아 ApiResponse 생성
+    public static <T> ApiResponse<T> of(ErrorCode errorCode) {
+        return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null, null);
+    }
+
+    public static <T> ApiResponse<T> ok(HttpStatus httpStatus, String message) {
+        return new ApiResponse<>(httpStatus, message, null, null);
+    }
+
     @Getter
     public static class FieldError {
         private String field;

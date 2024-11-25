@@ -1,0 +1,52 @@
+### 회원가입 페이지 진입
+GET http://localhost:8080/member/join
+
+### 약관 동의
+POST http://localhost:8080/api/member/terms-next
+Content-Type: application/json
+
+[
+  {
+    "no" : 2,
+    "name" : "만 14세 이상입니다",
+    "agreeYn" : "Y",
+    "level" : 2,
+    "termsYn" : "Y"
+  },
+  {
+    "no" : 3,
+    "name" : "이용약관 동의",
+    "agreeYn" : "Y",
+    "level" : 2,
+    "termsYn" : "Y"
+  },
+  {
+    "no" : 5,
+    "name" : "광고성 정보 수신 동의",
+    "agreeYn" : "Y",
+    "level" : 2,
+    "termsYn" : "N"
+  }
+]
+
+### 이메일 중복확인
+POST http://localhost:8080/api/member/email-check
+Content-Type: application/json
+
+{
+  "id": "test@example.com"
+}
+
+### 이메일 인증번호 발송
+POST http://localhost:8080/api/mail/send?loginId=gnstm831@gmail.com
+Content-Type: application/json
+
+{
+  "id": "gnstm831@gmail.com"
+}
+
+### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
+POST http://localhost:8080/api/member/email-next?loginId=test@example.com
+Content-Type: application/json
+
+
