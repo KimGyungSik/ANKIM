@@ -1,0 +1,31 @@
+### 전체 카테고리 조회
+GET http://localhost:8080/category/total
+
+### 중분류 추가 (name 필수, 중분류일 경우 parentNo 없이)
+POST http://localhost:8080/category/new
+Content-Type: application/json
+
+{
+  "name": "test"
+}
+
+### 기존 중분류에 소분류 추가 (parentNo로 중분류 ID 지정)
+POST http://localhost:8080/category/new
+Content-Type: application/json
+
+{
+  "name": "티셔츠",
+  "parentNo": 24
+}
+
+### 특정 중분류에 속한 모든 소분류 조회
+GET http://localhost:8080/category/subcategories?middleCategoryId=24
+
+### 소분류 ID로 해당 소분류의 상위 중분류 조회
+GET http://localhost:8080/category/parent?subCategoryId=25
+
+### 중분류만 조회
+GET http://localhost:8080/category/middle
+
+### 카테고리 삭제 (중분류 또는 소분류)
+DELETE http://localhost:8080/category/24

@@ -1,0 +1,56 @@
+spring:
+  output:
+    ansi:
+      enabled: always
+  jpa:
+    hibernate:
+      ddl-auto: create
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    defer-datasource-initialization: true
+    open-in-view: true
+  profiles:
+    active:
+      - local
+    group:
+      local:
+        - email
+        - jwt
+        - login
+        - redis
+  #      - prod
+  main:
+    allow-bean-definition-overriding: true
+  sql:
+    init:
+      data-locations: classpath*:data.sql
+      mode: always
+
+  servlet:
+    multipart:
+      maxFileSize: 20MB   # 파일 한 개당 최대 사이즈
+      maxRequestSize: 100MB  # 요청당 최대 파일 크기
+
+  # 상품 이미지 업로드 경로
+itemImgLocation: C:/shop/item
+
+  # 리소스 업로드 경로
+uploadPath: file:///C:/shop/
+
+# S3 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+    stack:
+      auto: false
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
