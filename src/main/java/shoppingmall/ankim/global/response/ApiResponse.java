@@ -41,6 +41,9 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T data) {
         return of(HttpStatus.OK, data);
     }
+    public static ApiResponse<Void> ok() {
+        return new ApiResponse<>(HttpStatus.OK, "OK", null, null);
+    }
 
     // ErrorCode를 받아 ApiResponse 생성
     public static <T> ApiResponse<T> of(ErrorCode errorCode) {
@@ -57,7 +60,7 @@ public class ApiResponse<T> {
         private Object rejectedValue;
         private String reason;
 
-        private FieldError(String field, Object rejectedValue, String reason) {
+        public FieldError(String field, Object rejectedValue, String reason) {
             this.field = field;
             this.rejectedValue = rejectedValue;
             this.reason = reason;

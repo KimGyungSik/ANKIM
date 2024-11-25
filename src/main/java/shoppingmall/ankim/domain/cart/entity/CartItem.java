@@ -26,7 +26,7 @@ public class CartItem extends BaseEntity {
     private Cart cart; // 장바구니 번호
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @Column(name = "item_no", nullable = false)
+    @JoinColumn(name = "item_no", nullable = false)
     private Item itemNo; // 상품 품목 번호
 
     @Column(name = "qty", nullable = false)

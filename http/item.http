@@ -1,0 +1,21 @@
+### 품목 미리보기
+POST http://localhost:8080/api/items/preview
+Content-Type: application/json
+
+[
+  {
+    "groupName": "색상",
+    "optionValues": [
+      { "valueName": "Blue", "colorCode": "#0000FF" },
+      { "valueName": "Red", "colorCode": "#FF0000" }
+    ]
+  },
+  {
+    "groupName": "사이즈",
+    "optionValues": [
+      { "valueName": "Small" },
+      { "valueName": "Large" }
+    ]
+  }
+]
+

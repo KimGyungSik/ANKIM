@@ -8,11 +8,11 @@ spring:
   jpa:
     hibernate:
       ddl-auto: create
-    show-sql: true
+#    show-sql: true
     properties:
       hibernate:
         format_sql: true
-#        default_batch_fetch_size: 1000
+        default_batch_fetch_size: 1000
   data:
     redis:
       host: localhost
@@ -35,3 +35,16 @@ decorator:
   datasource:
     p6spy:
       enable-logging: 'true'
+
+# S3 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+    stack:
+      auto: false

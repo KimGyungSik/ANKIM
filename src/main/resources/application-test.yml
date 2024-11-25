@@ -1,0 +1,94 @@
+spring:
+  datasource:
+    url: jdbc:h2:tcp://localhost/~/test;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+
+  jpa:
+    hibernate:
+      ddl-auto: create
+#    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+        default_batch_fetch_size: 1000
+
+  h2:
+    console:
+      enabled: true
+
+  # Redis 설정
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: 'true'
+
+# S3 설정
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+    stack:
+      auto: false
+
+
+# 로그인 설정
+login:
+  attempt:
+    max: 5
+  lock:
+    time: 10
+
+# 토큰 설정
+jwt:
+  secret: 23aca2ed0815953971212551d4abbfe1ce73b58230ef7be989f3a32f79a0d360
+  access:
+    token:
+      expire:
+        time: 3600000 # 1시간( 1000 * 60 * 60 )
+  refresh:
+    token:
+      expire:
+        #        time: 604800000 # 7일( 1000 * 60 * 60 * 24 * 7 )
+        time: 600000 # 10분
+      remember:
+        time: 604800000 # 7일
+
+# 이메일 설정
+#Email 인증
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: "jh96.dev@gmail.com"
+  password: "fell fchr vphm xvfl"
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+  auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30?
