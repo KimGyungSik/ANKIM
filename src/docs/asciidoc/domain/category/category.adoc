@@ -1,0 +1,111 @@
+[[category-create]]
+=== 신규 카테고리 등록
+
+==== HTTP Request
+include::{snippets}/category-create/http-request.adoc[]
+include::{snippets}/category-create/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-create/http-response.adoc[]
+include::{snippets}/category-create/response-fields.adoc[]
+
+[[category-update-middle]]
+=== 중분류 카테고리 수정
+
+==== HTTP Request
+include::{snippets}/category-update-middle/http-request.adoc[]
+include::{snippets}/category-update-middle/request-fields.adoc[]
+include::{snippets}/category-update-middle/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-update-middle/http-response.adoc[]
+include::{snippets}/category-update-middle/response-fields.adoc[]
+
+[[category-update-sub]]
+=== 소분류 카테고리 수정
+
+==== HTTP Request
+include::{snippets}/category-update-sub/http-request.adoc[]
+include::{snippets}/category-update-sub/request-fields.adoc[]
+include::{snippets}/category-update-sub/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-update-sub/http-response.adoc[]
+include::{snippets}/category-update-sub/response-fields.adoc[]
+
+[[category-update-sub-change-parent]]
+=== 소분류 카테고리의 부모 변경
+
+==== HTTP Request
+include::{snippets}/category-update-sub-change-parent/http-request.adoc[]
+include::{snippets}/category-update-sub-change-parent/request-fields.adoc[]
+include::{snippets}/category-update-sub-change-parent/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-update-sub-change-parent/http-response.adoc[]
+include::{snippets}/category-update-sub-change-parent/response-fields.adoc[]
+
+[[category-get-all]]
+=== 모든 카테고리 조회
+
+==== HTTP Request
+include::{snippets}/category-get-all/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-get-all/http-response.adoc[]
+include::{snippets}/category-get-all/response-fields.adoc[]
+
+[[category-create-missing-name]]
+=== 카테고리 이름 필수값 예외 처리
+
+==== HTTP Request
+include::{snippets}/category-create-missing-name/http-request.adoc[]
+include::{snippets}/category-create-missing-name/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-create-missing-name/http-response.adoc[]
+include::{snippets}/category-create-missing-name/response-fields.adoc[]
+
+[[category-get-subcategories-under-middle]]
+=== 특정 중분류의 모든 소분류 조회
+
+==== HTTP Request
+include::{snippets}/category-get-subcategories-under-middle/http-request.adoc[]
+include::{snippets}/category-get-subcategories-under-middle/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-get-subcategories-under-middle/http-response.adoc[]
+include::{snippets}/category-get-subcategories-under-middle/response-fields.adoc[]
+
+[[category-delete]]
+=== 카테고리 삭제
+
+==== HTTP Request
+include::{snippets}/category-delete/http-request.adoc[]
+include::{snippets}/category-delete/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-delete/http-response.adoc[]
+include::{snippets}/category-delete/response-fields.adoc[]
+
+[[category-delete-linked-with-product-exception]]
+=== 상품이 존재하는 카테고리 삭제 시 예외
+
+==== HTTP Request
+include::{snippets}/category-delete-linked-with-product-exception/http-request.adoc[]
+include::{snippets}/category-delete-linked-with-product-exception/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-delete-linked-with-product-exception/http-response.adoc[]
+include::{snippets}/category-delete-linked-with-product-exception/response-fields.adoc[]
+
+[[category-delete-child-category-exists-exception]]
+=== 중분류 삭제 시 소분류 존재 예외 처리
+
+==== HTTP Request
+include::{snippets}/category-delete-child-category-exists-exception/http-request.adoc[]
+include::{snippets}/category-delete-child-category-exists-exception/path-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/category-delete-child-category-exists-exception/http-response.adoc[]
+include::{snippets}/category-delete-child-category-exists-exception/response-fields.adoc[]

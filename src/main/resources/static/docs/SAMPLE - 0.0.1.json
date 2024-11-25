@@ -1,0 +1,151 @@
+{
+  "openapi" : "3.0.1",
+  "info" : {
+    "title" : "SAMPLE API 문서",
+    "description" : "Spring REST Docs with SwaggerUI.",
+    "version" : "0.0.1"
+  },
+  "servers" : [ {
+    "url" : "http://localhost:8080"
+  } ],
+  "tags" : [ ],
+  "paths" : {
+    "/category/new" : {
+      "post" : {
+        "tags" : [ "category" ],
+        "operationId" : "category-create",
+        "requestBody" : {
+          "content" : {
+            "application/json;charset=UTF-8" : {
+              "schema" : {
+                "$ref" : "#/components/schemas/category-new534342137"
+              },
+              "examples" : {
+                "category-create" : {
+                  "value" : "{\r\n  \"name\" : \"하의\",\r\n  \"parentNo\" : null,\r\n  \"childCategories\" : null\r\n}"
+                }
+              }
+            }
+          }
+        },
+        "responses" : {
+          "200" : {
+            "description" : "200",
+            "content" : {
+              "application/json" : {
+                "schema" : {
+                  "$ref" : "#/components/schemas/category-new-271886754"
+                },
+                "examples" : {
+                  "category-create" : {
+                    "value" : "{\r\n  \"code\" : 200,\r\n  \"status\" : \"OK\",\r\n  \"message\" : \"OK\",\r\n  \"fieldErrors\" : null,\r\n  \"data\" : {\r\n    \"categoryNo\" : 1,\r\n    \"parentNo\" : null,\r\n    \"level\" : \"MIDDLE\",\r\n    \"name\" : \"하의\",\r\n    \"childCategories\" : [ ]\r\n  }\r\n}"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components" : {
+    "schemas" : {
+      "category-new534342137" : {
+        "type" : "object",
+        "properties" : {
+          "parentNo" : {
+            "type" : "number",
+            "description" : "중분류일 경우 null, 소분류일 경우 상위 카테고리 ID"
+          },
+          "name" : {
+            "type" : "string",
+            "description" : "카테고리 이름"
+          },
+          "childCategories" : {
+            "type" : "array",
+            "description" : "중분류와 소분류를 동시에 추가할 경우 하위 카테고리 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          }
+        }
+      },
+      "category-new-271886754" : {
+        "type" : "object",
+        "properties" : {
+          "fieldErrors" : {
+            "type" : "array",
+            "description" : "필드 오류 목록",
+            "items" : {
+              "oneOf" : [ {
+                "type" : "object"
+              }, {
+                "type" : "boolean"
+              }, {
+                "type" : "string"
+              }, {
+                "type" : "number"
+              } ]
+            }
+          },
+          "code" : {
+            "type" : "number",
+            "description" : "응답 코드"
+          },
+          "data" : {
+            "type" : "object",
+            "properties" : {
+              "parentNo" : {
+                "type" : "number",
+                "description" : "상위 카테고리 번호 (없으면 null)"
+              },
+              "level" : {
+                "type" : "string",
+                "description" : "카테고리 레벨"
+              },
+              "name" : {
+                "type" : "string",
+                "description" : "카테고리 이름"
+              },
+              "categoryNo" : {
+                "type" : "number",
+                "description" : "카테고리 번호"
+              },
+              "childCategories" : {
+                "type" : "array",
+                "description" : "하위 카테고리 목록 (없으면 빈 배열)",
+                "items" : {
+                  "oneOf" : [ {
+                    "type" : "object"
+                  }, {
+                    "type" : "boolean"
+                  }, {
+                    "type" : "string"
+                  }, {
+                    "type" : "number"
+                  } ]
+                }
+              }
+            }
+          },
+          "message" : {
+            "type" : "string",
+            "description" : "응답 메시지"
+          },
+          "status" : {
+            "type" : "string",
+            "description" : "응답 상태"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,84 @@
+### 상품 등록하기
+POST http://localhost:8080/api/v1/products/new
+Content-Type: multipart/form-data; boundary=boundary
+
+--boundary
+Content-Disposition: form-data; name="productCreateRequest"
+Content-Type: application/json
+
+{
+  "name": "테스트 상품",
+  "code": "PROD123",
+  "desc": "테스트 상품 설명",
+  "discRate": 10,
+  "sellPrice": 10000,
+  "origPrice": 12000,
+  "optYn": "Y",
+  "restockYn": "N",
+  "qty": 100,
+  "handMadeYn": "N",
+  "freeShip": "Y",
+  "shipFee": 2500,
+  "searchKeywords": "테스트",
+  "relProdCode": "REL001",
+  "cauProd": "주의사항",
+  "cauOrd": "주문 유의사항",
+  "cauShip": "배송 유의사항",
+  "categoryNo": 1,
+  "optionGroups": [
+    {
+      "groupName": "컬러",
+      "optionValues": [
+        {"valueName": "Blue", "colorCode": "#0000FF"},
+        {"valueName": "Red", "colorCode": "#FF0000"}
+      ]
+    },
+    {
+      "groupName": "사이즈",
+      "optionValues": [
+        {"valueName": "Large"},
+        {"valueName": "Small"}
+      ]
+    }
+  ],
+  "items": {
+    "addPrice": 500,
+    "qty": 10,
+    "safQty": 2,
+    "maxQty": 5,
+    "minQty": 1
+  }
+}
+
+--boundary
+Content-Disposition: form-data; name="thumbnailImages"; filename="화면 캡처 2024-05-24 112646.png"
+Content-Type: image/png
+
+< C:/shop/item/화면 캡처 2024-05-24 112646.png
+--boundary
+Content-Disposition: form-data; name="detailImages"; filename="화면 캡처 2024-05-24 112646.png"
+Content-Type: image/png
+
+< C:/shop/item/화면 캡처 2024-05-24 112646.png
+--boundary--
+
+
+### 사용자를 위한 상세 상품 페이지 단건 조회
+GET http://localhost:8080/api/v1/product/catalog/1
+
+### 관리자를 위한 상세 상품 페이지 단건 조회
+GET http://localhost:8080/api/v1/product/catalog/admin/1
+
+
+### 기본 상품 리스트 조회 (페이지 0, 크기 10)
+GET http://localhost:8080/api/v1/product/catalog/list?page=0&size=10
+
+### 조건 포함 상품 리스트 조회
+GET http://localhost:8080/api/v1/product/catalog/list?page=0&size=10&condition=NEW&order=POPULAR&category=1&keyword=테스트&priceCondition=CUSTOM&customMinPrice=10000&customMaxPrice=50000&infoSearches=FREESHIP,DISCOUNT_ONLY&colorConditions=%23FF0000,%230000FF
+
+### 상품 목록 조회 요청
+GET http://localhost:8080/api/v1/product/catalog/list?
+    page=0&size=10&condition=NEW&order=POPULAR&category=7&keyword=더미
+    &
+    priceCondition=CUSTOM&customMinPrice=0&customMaxPrice=50000
+    &infoSearches=FREESHIP&colorConditions=BABYPINK
