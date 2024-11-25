@@ -47,12 +47,6 @@ dependencies {
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta'
-    // Jackson 의존성 추가
-    implementation 'com.fasterxml.jackson.core:jackson-databind' // 기본 직렬화 지원
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // Java 8 Date/Time 지원
-    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-hibernate5-jakarta' // Hibernate와 호환되는 직렬화 지원
-    implementation 'com.fasterxml.jackson.module:jackson-module-parameter-names' // 직렬화 시 메서드 파라미터 이름 지원
-    implementation 'com.fasterxml.jackson.module:jackson-module-jaxb-annotations' // JAXB 어노테이션 지원
 
     // Querydsl 추가
     implementation 'com.querydsl:querydsl-jpa:5.0.0:jakarta'

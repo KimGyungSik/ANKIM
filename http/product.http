@@ -69,3 +69,16 @@ GET http://localhost:8080/api/v1/product/catalog/1
 ### 관리자를 위한 상세 상품 페이지 단건 조회
 GET http://localhost:8080/api/v1/product/catalog/admin/1
 
+
+### 기본 상품 리스트 조회 (페이지 0, 크기 10)
+GET http://localhost:8080/api/v1/product/catalog/list?page=0&size=10
+
+### 조건 포함 상품 리스트 조회
+GET http://localhost:8080/api/v1/product/catalog/list?page=0&size=10&condition=NEW&order=POPULAR&category=1&keyword=테스트&priceCondition=CUSTOM&customMinPrice=10000&customMaxPrice=50000&infoSearches=FREESHIP,DISCOUNT_ONLY&colorConditions=%23FF0000,%230000FF
+
+### 상품 목록 조회 요청
+GET http://localhost:8080/api/v1/product/catalog/list?
+    page=0&size=10&condition=NEW&order=POPULAR&category=7&keyword=더미
+    &
+    priceCondition=CUSTOM&customMinPrice=0&customMaxPrice=50000
+    &infoSearches=FREESHIP&colorConditions=BABYPINK
