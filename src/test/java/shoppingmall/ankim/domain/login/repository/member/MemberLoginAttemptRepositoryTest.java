@@ -5,12 +5,18 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.login.entity.BaseLoginAttempt;
 import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginAttempt;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.security.handler.RedisHandler;
+import shoppingmall.ankim.global.config.QuerydslConfig;
+import shoppingmall.ankim.global.config.RedisConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -19,8 +25,8 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 
-@SpringBootTest
-@Transactional
+@DataJpaTest
+@Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 class MemberLoginAttemptRepositoryTest {
 
     @Autowired
@@ -28,6 +34,15 @@ class MemberLoginAttemptRepositoryTest {
 
     @Autowired
     private MemberRepository memberRepository;
+
+    @MockBean
+    private RedisHandler redisHandler;
+
+    @MockBean
+    private RedisConfig redisConfig;
+
+    @MockBean
+    S3Service s3Service;
 
     @Test
     @DisplayName("활성화된 로그인 시도 정보를 조회한다.")

@@ -42,7 +42,7 @@ public class ProductController {
     // 상품 수정
     @PutMapping(value = "/{productId}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ApiResponse<ProductResponse> updateProduct(
-            @PathVariable Long productId,
+            @PathVariable("productId") Long productId,
             @RequestPart("productUpdateRequest") @Valid ProductUpdateRequest productUpdateRequest,
             @RequestPart("thumbnailImages") List<MultipartFile> thumbnailImages,
             @RequestPart("detailImages") List<MultipartFile> detailImages
@@ -60,7 +60,7 @@ public class ProductController {
 
     // 상품 삭제
     @DeleteMapping("/{productId}")
-    public ApiResponse<Void> deleteProduct(@PathVariable Long productId) {
+    public ApiResponse<Void> deleteProduct(@PathVariable("productId") Long productId) {
         productService.deleteProduct(productId);
         return ApiResponse.ok();
     }

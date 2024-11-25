@@ -4,8 +4,10 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
@@ -31,6 +33,9 @@ class TermsQueryServiceTest {
 
     @Autowired
     private TermsRepository termsRepository;
+
+    @MockBean
+    private S3Service s3Service;
 
     // validateTerms 테스트
     @Test

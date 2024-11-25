@@ -24,14 +24,14 @@ public class ProductQueryController {
     // 상품 상세 by User
     @GetMapping("/{productId}")
     public ApiResponse<ProductUserDetailResponse> findProductUserDetailResponse(
-            @PathVariable Long productId) {
+            @PathVariable("productId") Long productId) {
         return ApiResponse.ok(productRepository.findUserProductDetailResponse(productId));
     }
 
     // 상품 상세 by Admin
     @GetMapping("/admin/{productId}")
     public ApiResponse<ProductResponse> adminDetailProductResponse(
-            @PathVariable Long productId) {
+            @PathVariable("productId") Long productId) {
         return ApiResponse.ok(productRepository.findAdminProductDetailResponse(productId));
     }
 
@@ -52,21 +52,32 @@ public class ProductQueryController {
      */
     @GetMapping("/list")
     public ApiResponse<Page<ProductListResponse>> getFilteredAndSortedProducts(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(required = false) Condition condition,
-            @RequestParam(required = false) OrderBy order,
-            @RequestParam(required = false) Long category,
-            @RequestParam(required = false) String keyword,
-            @RequestParam(required = false) List<ColorCondition> colorConditions,
-            @RequestParam(required = false) PriceCondition priceCondition,
-            @RequestParam(required = false) Integer customMinPrice,
-            @RequestParam(required = false) Integer customMaxPrice,
-            @RequestParam(required = false) List<InfoSearch> infoSearches
+            @RequestParam(name = "page", defaultValue = "0") int page,
+            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "condition", required = false) Condition condition,
+            @RequestParam(name = "order", required = false) OrderBy order,
+            @RequestParam(name = "category", required = false) Long category,
+            @RequestParam(name = "keyword", required = false) String keyword,
+            @RequestParam(name = "colorConditions", required = false) List<ColorCondition> colorConditions,
+            @RequestParam(name = "priceCondition", required = false) PriceCondition priceCondition,
+            @RequestParam(name = "customMinPrice", required = false) Integer customMinPrice,
+            @RequestParam(name = "customMaxPrice", required = false) Integer customMaxPrice,
+            @RequestParam(name = "infoSearches", required = false) List<InfoSearch> infoSearches
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(productRepository.findUserProductListResponse(pageable, condition, order, category, keyword,
-                colorConditions,priceCondition,customMinPrice,customMaxPrice,infoSearches));
+        return ApiResponse.ok(
+                productRepository.findUserProductListResponse(
+                        pageable,
+                        condition,
+                        order,
+                        category,
+                        keyword,
+                        colorConditions,
+                        priceCondition,
+                        customMinPrice,
+                        customMaxPrice,
+                        infoSearches
+                )
+        );
     }
-
 }

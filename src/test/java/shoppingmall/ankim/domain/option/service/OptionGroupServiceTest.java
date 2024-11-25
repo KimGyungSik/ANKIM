@@ -28,6 +28,7 @@ import shoppingmall.ankim.domain.option.service.request.OptionValueCreateService
 import shoppingmall.ankim.domain.option.service.request.OptionValueUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +42,9 @@ import static org.mockito.Mockito.mock;
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class OptionGroupServiceTest {
+
+    @MockBean
+    InitProduct initProduct;
 
     @MockBean
     S3Service s3Service;

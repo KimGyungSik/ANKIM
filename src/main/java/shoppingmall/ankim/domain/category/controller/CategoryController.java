@@ -33,7 +33,7 @@ public class CategoryController {
 
     // 중분류, 소분류 삭제
     @DeleteMapping("/{categoryId}")
-    public ApiResponse<Void> deleteCategory(@PathVariable Long categoryId) {
+    public ApiResponse<Void> deleteCategory(@PathVariable("categoryId") Long categoryId) {
         categoryService.deleteCategory(categoryId);
         return ApiResponse.ok();
     }
@@ -41,7 +41,7 @@ public class CategoryController {
     // 카테고리 중분류 수정
     @PutMapping("/middle/{categoryId}")
     public ApiResponse<Void> updateMiddleCategory(
-            @PathVariable Long categoryId,
+            @PathVariable("categoryId") Long categoryId,
             @RequestBody @Valid CategoryUpdateRequest request) {
         categoryService.updateMiddleCategory(categoryId, request.toServiceRequest());
         return ApiResponse.ok();
@@ -50,7 +50,7 @@ public class CategoryController {
     // 카테고리 중분류 수정
     @PutMapping("/sub/{categoryId}") // 매핑 경로의 변수명을 "categoryId"로 변경
     public ApiResponse<Void> updateSubCategory(
-            @PathVariable Long categoryId, // 변수명도 "categoryId"로 유지
+            @PathVariable("categoryId") Long categoryId, // 변수명도 "categoryId"로 유지
             @RequestBody @Valid CategoryUpdateRequest request) {
         categoryService.updateSubCategory(categoryId, request.toServiceRequest());
         return ApiResponse.ok();
