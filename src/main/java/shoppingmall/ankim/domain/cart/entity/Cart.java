@@ -11,7 +11,7 @@ import shoppingmall.ankim.global.audit.BaseEntity;
 import java.time.LocalDateTime;
 
 @Entity
-@Getter @Setter
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Cart extends BaseEntity {
 
