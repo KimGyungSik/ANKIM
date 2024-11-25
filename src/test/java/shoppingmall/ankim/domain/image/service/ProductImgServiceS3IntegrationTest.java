@@ -8,6 +8,7 @@ import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.TestPropertySource;
@@ -18,6 +19,7 @@ import shoppingmall.ankim.domain.image.service.request.ProductImgCreateServiceRe
 import shoppingmall.ankim.domain.image.service.request.ProductImgUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -30,6 +32,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class ProductImgServiceS3IntegrationTest {
+
+    @MockBean
+    InitProduct initProduct;
 
     @Value("${itemImgLocation}")
     private String itemImgLocation;
