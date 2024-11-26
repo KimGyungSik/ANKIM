@@ -33,12 +33,17 @@ spring:
       maxFileSize: 20MB   # 파일 한 개당 최대 사이즈
       maxRequestSize: 100MB  # 요청당 최대 파일 크기
 
-  # 상품 이미지 업로드 경로
+  # 타임리프
+  thymeleaf:
+    prefix: classpath:/templates/
+    suffix: .html
+
+
+# 상품 이미지 업로드 경로
 itemImgLocation: C:/shop/item
 
-  # 리소스 업로드 경로
-uploadPath: file:///C:/shop/
-
+# 리소스 업로드 경로
+uploadPath: file:///Users/your-username/shop/
 # S3 설정
 cloud:
   aws:
@@ -51,6 +56,3 @@ cloud:
       static: ${cloud.aws.region.static}
     stack:
       auto: false
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html

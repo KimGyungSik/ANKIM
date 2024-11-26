@@ -31,7 +31,7 @@ public class JwtTokenProvider {
         return Jwts.builder()
                 .subject(userDetails.getUsername()) // loginId 저장
                 .claim("category", category)
-                .claim("name", userDetails.getUsername()) // 사용자 이름 저장
+                .claim("name", userDetails.getNickName()) // 사용자 이름 저장
                 .claim("roles", userDetails.getAuthorities()) // 권한 정보 저장
                 .issuedAt(now)
                 .expiration(new Date(now.getTime() + expirationTime))
@@ -87,7 +87,7 @@ public class JwtTokenProvider {
                     .parseSignedClaims(token)
                     .getPayload()
                     .getExpiration();
-            return expirationDate.before(new Date()); // expirationDate가 현재 시간보다 이전인지 확인
+            return expirationDate.before(new Date()); // expirationDate가 현재 시간보다 이전인지 확인(true:만료, false:유효)
     }
 
     // 토큰에서 사용자 이름(loginId) 추출

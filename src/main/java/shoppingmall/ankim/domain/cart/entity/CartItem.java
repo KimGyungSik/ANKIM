@@ -1,12 +1,8 @@
 package shoppingmall.ankim.domain.cart.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 import java.time.LocalDateTime;
@@ -27,7 +23,7 @@ public class CartItem extends BaseEntity {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_no", nullable = false)
-    private Item itemNo; // 상품 품목 번호
+    private Item item; // 상품 품목 번호
 
     @Column(name = "qty", nullable = false)
     private Integer qty; // 수량
@@ -37,4 +33,23 @@ public class CartItem extends BaseEntity {
 
     @Column(name = "active_yn", nullable = false)
     private String activeYn = "Y"; // 활성 상태
+
+    @Builder
+    public CartItem(Long no, Cart cart, Item item, Integer qty, LocalDateTime regDate, String activeYn) {
+        this.no = no;
+        this.cart = cart;
+        this.item = item;
+        this.qty = qty;
+        this.regDate = regDate == null? LocalDateTime.now() : regDate;
+        this.activeYn = activeYn == null ? "Y" : activeYn;
+    }
+
+    public static CartItem create(Cart cart, Item item, Integer qty, LocalDateTime regDate) {
+        return CartItem.builder()
+                .cart(cart)
+                .item(item)
+                .qty(qty)
+                .regDate(regDate)
+                .build();
+    }
 }

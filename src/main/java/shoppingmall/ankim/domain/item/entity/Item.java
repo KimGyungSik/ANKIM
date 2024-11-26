@@ -33,6 +33,9 @@ public class Item {
     @JoinColumn(name = "prod_no", nullable = false)
     private Product product;
 
+    @Column(name = "thumbnail_img_url")
+    private String thumbNailImgUrl; // 대표 이미지 경로
+
     // 품목옵션에 대한 필드 리스트
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ItemOption> itemOptions = new ArrayList<>();
@@ -74,6 +77,7 @@ public class Item {
         this.minQty = minQty;
         addItemOptions(optionValues); // ItemOption 관계 추가
         this.totalPrice = product.getSellPrice() + addPrice; // 총 가격 추가
+        this.thumbNailImgUrl = product.getThumbnailImgUrl(); // 썸네일 이미지 URL 설정
     }
 
     // 옵션 값에 따라 ItemOption을 생성하고 리스트에 추가
