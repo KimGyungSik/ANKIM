@@ -54,12 +54,13 @@ public class OrderItem extends BaseEntity {
                      Integer qty, Integer price,
                      Integer shipFee, Integer discPrice) {
         this.item = item;
-        this.productName = item.getProduct().getName();
-        this.thumbNailImgUrl = item.getThumbNailImgUrl();
+        this.productName = productName;
+        this.thumbNailImgUrl = thumbNailImgUrl;
         this.qty = qty;
         this.price = price; // 정상가격(원가) + 추가금액
         this.discPrice = calculateDiscPrice(item.getProduct().getSellPrice());
         this.shipFee = shipFee;
+        this.discPrice = discPrice;
     }
 
     public static OrderItem create(Item item, Integer qty) {
@@ -69,6 +70,8 @@ public class OrderItem extends BaseEntity {
 
         return OrderItem.builder()
                 .item(item)
+                .productName(item.getProduct().getName())
+                .thumbNailImgUrl(item.getThumbNailImgUrl())
                 .qty(qty)
                 .price(item.getTotalPrice())
                 .shipFee(item.getProduct().getShipFee())
