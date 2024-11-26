@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.delivery.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
@@ -9,6 +10,7 @@ import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class DeliveryService {
 
