@@ -5,6 +5,7 @@ import lombok.*;
 import shoppingmall.ankim.domain.address.entity.admin.AdminAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
+import shoppingmall.ankim.domain.delivery.entity.DeliveryStatus;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
@@ -16,6 +17,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.*;
+import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.CANCELED;
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 
 @Entity
@@ -29,6 +32,7 @@ public class Order extends BaseEntity {
     @Column(name = "ord_no")
     private Long ordNo;
 
+    @Setter
     @Column(name = "ord_code", length = 19)
     private String ordCode;
 
@@ -93,7 +97,7 @@ public class Order extends BaseEntity {
         this.orderStatus = orderStatus;
     }
 
-    public static Order create(List<OrderItem> orderItems, Member member, Delivery delivery,LocalDateTime regDate) {
+    public static Order create(List<OrderItem> orderItems, Member member, Delivery delivery, LocalDateTime regDate) {
         return Order.builder()
                 .orderStatus(INIT)
                 .member(member)
@@ -131,4 +135,14 @@ public class Order extends BaseEntity {
                 .sum();
     }
 
+    // 주문 취소 -> 배송 준비 상태일떄만 가능
+    public void cancelOrder(Order order) {
+        if (!delivery.getStatus().canCancel()) {
+            throw new IllegalStateException("배송이 이미 시작되어 주문을 취소할 수 없습니다.");
+        }
+
+        // 주문 및 배송 취소 처리
+        order.setOrderStatus(OrderStatus.CANCELED);
+        delivery.cancel();
+    }
 }

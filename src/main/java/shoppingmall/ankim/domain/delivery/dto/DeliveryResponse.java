@@ -22,7 +22,7 @@ public class DeliveryResponse {
     private Integer zipcode;        // 우편번호
     private String deliveryRequest; // 배송 요청사항
 
-    public static DeliveryResponse fromEntity(Delivery delivery) {
+    public static DeliveryResponse of(Delivery delivery) {
         return DeliveryResponse.builder()
                 .no(delivery.getNo())
                 .trackingNumber(delivery.getTrckNo())

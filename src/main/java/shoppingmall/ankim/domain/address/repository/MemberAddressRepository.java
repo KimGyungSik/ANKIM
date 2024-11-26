@@ -10,7 +10,8 @@ import java.util.List;
 import java.util.Optional;
 
 public interface MemberAddressRepository extends JpaRepository<MemberAddress, Long> {
-    List<MemberAddress> findByMember(Member member);
+    @Query("select ma from MemberAddress ma join fetch ma.member where ma.member = :member")
+    List<MemberAddress> findByMember(@Param("member") Member member);
 
     @Query("SELECT ma FROM MemberAddress ma WHERE ma.member = :member AND ma.defaultAddressYn = 'Y'")
     Optional<MemberAddress> findDefaultAddressByMember(@Param("member") Member member);
