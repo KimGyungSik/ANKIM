@@ -81,7 +81,7 @@ class PaymentServiceTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getOrderCode()).isEqualTo(orderCode);
+        assertThat(response.getOrderName()).isEqualTo(orderCode);
         assertThat(response.getCustomerEmail()).isEqualTo(mockMember.getLoginId());
         assertThat(response.getCustomerName()).isEqualTo(mockMember.getName());
         assertThat(response.getAmount()).isEqualTo(50000L);
