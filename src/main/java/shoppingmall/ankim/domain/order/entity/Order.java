@@ -47,27 +47,27 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "delivery_no")
     private Delivery delivery; // 배송 정보
 
-    @Column(name = "total_qty", nullable = false, columnDefinition = "INT DEFAULT 1")
+    @Column(name = "total_qty",columnDefinition = "INT DEFAULT 1")
     private Integer totalQty = 1; // 총 주문 수량
 
-    @Column(name = "total_price", nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(name = "total_price", columnDefinition = "INT DEFAULT 0")
     private Integer totalPrice = 0; // 총 상품 금액
 
-    @Column(name = "total_ship_fee", nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(name = "total_ship_fee", columnDefinition = "INT DEFAULT 0")
     private Integer totalShipFee = 0; // 총 배송비
 
-    @Column(name = "total_disc_price", nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(name = "total_disc_price", columnDefinition = "INT DEFAULT 0")
     private Integer totalDiscPrice = 0; // 총 할인 금액
 
-    @Column(name = "pay_amt", nullable = false, columnDefinition = "INT DEFAULT 0")
+    @Column(name = "pay_amt", columnDefinition = "INT DEFAULT 0")
     private Integer payAmt = 0; // 최종 결제 금액
 
-    @Column(name = "reg_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "reg_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime regDate = LocalDateTime.now(); // 주문 등록일
 
     private OrderStatus orderStatus; // 주문 상태
 
-    @Column(name = "mod_date", nullable = false, columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "mod_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime modDate = LocalDateTime.now(); // 주문 상태 변경일
 
 
@@ -84,14 +84,30 @@ public class Order extends BaseEntity {
     @Builder
     private Order(Member member, Delivery delivery, List<OrderItem> orderItems, LocalDateTime regDate, OrderStatus orderStatus) {
         this.member = member;
-        setDelivery(delivery);
-        for (OrderItem orderItem : orderItems) {
-            addOrderItem(orderItem);
+
+        // Delivery 설정
+        if (delivery != null) {
+            setDelivery(delivery);
         }
-        this.totalQty = calculateTotalQty(orderItems);
-        this.totalPrice = calculateTotalPrice(orderItems);
-        this.totalDiscPrice = calculateTotalDiscPrice(orderItems);
-        this.totalShipFee = calculateTotalShipFee(orderItems);
+
+        // OrderItem 리스트 설정
+        if (orderItems != null && !orderItems.isEmpty()) {
+            for (OrderItem orderItem : orderItems) {
+                addOrderItem(orderItem);
+            }
+            this.totalQty = calculateTotalQty(orderItems);
+            this.totalPrice = calculateTotalPrice(orderItems);
+            this.totalDiscPrice = calculateTotalDiscPrice(orderItems);
+            this.totalShipFee = calculateTotalShipFee(orderItems);
+        } else {
+            // 기본값 설정 (빈 리스트에 대한 방어 코드)
+            this.totalQty = 0;
+            this.totalPrice = 0;
+            this.totalDiscPrice = 0;
+            this.totalShipFee = 0;
+        }
+
+        // 기타 필드 초기화
         this.payAmt = totalPrice - totalDiscPrice;
         this.regDate = regDate;
         this.orderStatus = orderStatus;

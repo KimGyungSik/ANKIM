@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.payment.entity;
 import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.global.audit.BaseEntity;
@@ -11,6 +12,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
+@Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "Payment")
 public class Payment extends BaseEntity {
@@ -19,8 +21,8 @@ public class Payment extends BaseEntity {
     private Long no;
 
     @OneToOne(fetch = FetchType.LAZY)
-    @Column(name = "ord_no", nullable = false)
     private Order order;
+
     @Column(name = "pay_key")
     private String payKey; // 결제키
 
@@ -31,11 +33,13 @@ public class Payment extends BaseEntity {
     private Integer totalPrice; // 총 결제 금액
 
     private boolean paySuccessYN;
+
     @Column
     private String failReason; // 결제 실패 이유
 
     @Column
     private boolean cancelYN; // 결제 취소 여부
+
     @Column
     private String cancelReason; // 결제 취소 이유
 

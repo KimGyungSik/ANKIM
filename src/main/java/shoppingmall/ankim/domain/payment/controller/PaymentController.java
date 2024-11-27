@@ -22,9 +22,6 @@ public class PaymentController {
 
     @PostMapping("/toss")
     public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request) {
-        PaymentResponse response = paymentService.requestTossPayment(request.toServiceRequest());
-        response.setSuccessUrl(request.getYourSuccessUrl() == null ? tossPaymentConfig.getSuccessUrl() : request.getYourSuccessUrl());
-        response.setFailUrl(request.getYourFailUrl() == null ? tossPaymentConfig.getFailUrl() : request.getYourFailUrl());
-        return ApiResponse.ok(response);
+        return ApiResponse.ok(paymentService.requestTossPayment(request.toServiceRequest()));
     }
 }

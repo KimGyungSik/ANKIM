@@ -20,7 +20,7 @@ public class PaymentCreateRequest {
     @NotNull(message = "결제 타입은 필수 입력값 입니다.")
     private PayType payType;
     @NotNull(message = "결제 금액은 필수 입력값 입니다.")
-    private Long amount;
+    private Integer amount;
     @NotBlank(message = "주문 코드는 필수 입력값 입니다.")
     private String orderCode;
 
