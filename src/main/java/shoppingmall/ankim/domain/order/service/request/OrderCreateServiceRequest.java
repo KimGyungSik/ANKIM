@@ -20,6 +20,4 @@ public class OrderCreateServiceRequest {
     }
 
     private List<ItemOrder> items; // 품목 번호와 수량 리스트
-    private String delRep; // 배송 요청사항
-    private String courier; // 택배사
 }
