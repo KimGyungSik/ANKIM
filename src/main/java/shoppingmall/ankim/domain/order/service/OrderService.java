@@ -52,14 +52,21 @@ public class OrderService {
         String loginId = getLoginId(accessToken);
         Member member = getMember(accessToken);
 
+        // FIXME 넘어온 품목들이 실제로 장바구니에 존재하는지 확인  (장바구니 조회)
         // 품목 조회 & 주문품목 생성
         List<OrderItem> orderItems = getOrderItems(request);
 
         // 배송지 생성
         Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
 
+        // FIXME 재고 조회
+
         // 주문 생성
         Order order = orderRepository.save(Order.create(orderItems, member, delivery, registeredDateTime));
+
+        // FIXME 결제 생성
+
+        // FIXME 재고 차감
 
         // 주문 코드 생성 및 저장
         String ordCode = generateOrderCode(order.getOrdNo(), registeredDateTime);
