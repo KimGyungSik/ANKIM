@@ -41,7 +41,7 @@ public class Cart extends BaseEntity {
         this.regDate = regDate == null ? LocalDateTime.now() : regDate;
         this.activeYn = activeYn == null ? "Y" : activeYn;
 
-        this.cartItems = cartItems;
+        this.cartItems = cartItems == null ? new ArrayList<>() : cartItems;
     }
 
     public static Cart create(Member member, LocalDateTime regDate) {
@@ -54,5 +54,8 @@ public class Cart extends BaseEntity {
     // 장바구니에 품목을 추가하는 메서드
     public void addCartItem(CartItem cartItem) {
         cartItems.add(cartItem);
+        if (cartItem.getCart() != this) {
+            cartItem.linkToCart(this); // 양방향 관계 설정
+        }
     }
 }

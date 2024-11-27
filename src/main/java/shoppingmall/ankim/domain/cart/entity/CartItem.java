@@ -49,7 +49,16 @@ public class CartItem extends BaseEntity {
                 .cart(cart)
                 .item(item)
                 .qty(qty)
-                .regDate(regDate)
+                .regDate(regDate == null ? LocalDateTime.now() : regDate)
                 .build();
+    }
+
+    public void linkToCart(Cart cart) {
+        this.cart = cart; // cart 필드 설정
+    }
+
+    public void updateQty(int qty, LocalDateTime regDate) {
+        this.qty = qty;
+        this.regDate = regDate == null ? LocalDateTime.now() : regDate;
     }
 }

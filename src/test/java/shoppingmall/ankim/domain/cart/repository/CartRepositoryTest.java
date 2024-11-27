@@ -45,7 +45,7 @@ class CartRepositoryTest {
                 .build();
         memberRepository.save(member);
 
-        Cart cart = Cart.create(member);
+        Cart cart = Cart.create(member, LocalDateTime.now());
         cartRepository.save(cart);
 
         // when

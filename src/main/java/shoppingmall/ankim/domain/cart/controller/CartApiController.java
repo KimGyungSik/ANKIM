@@ -15,7 +15,10 @@ public class CartApiController {
 
     // 장바구니에 상품 담기 ( C )
     @PostMapping("/items")
-    public void addToCart(@RequestBody AddToCartRequest request,  @RequestHeader("access") String accessToken) {
+    public void addToCart(
+            @RequestBody AddToCartRequest request
+           ,@CookieValue(value = "access", required = true) String access // Cookie에서 access 토큰 가져오기
+    ) {
 
     }
 
