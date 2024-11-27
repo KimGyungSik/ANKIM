@@ -49,6 +49,12 @@ public enum ErrorCode {
     ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
     DISCOUNT_PRICE_INVALID(HttpStatus.BAD_REQUEST, "상품 원가 금액이 할인 적용된 상품 금액보다 작을 수 없습니다."),
 
+    // 결제
+    INVALID_PAYMENT_KEY(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 키입니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "결제 정보를 찾을 수 없습니다"),
+    PAYMENT_AMOUNT_EXP(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
+    ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "이미 승인된 결제입니다."),
+
     // 회원 주소
     ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 배송지를 찾을 수 없습니다."),
     DEFAULT_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 기본 배송지를 찾을 수 없습니다."),

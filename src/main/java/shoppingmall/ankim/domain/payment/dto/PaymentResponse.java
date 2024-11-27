@@ -17,7 +17,7 @@ public class PaymentResponse {
     private PayType payType; // 결제 타입 - 카드/현금/포인트
     private Integer amount; // 총 결제 금액
     private Long orderId; // 주문 아이디
-    private String orderCode; // 주문 코드
+    private String orderName; // 주문 코드
     private String customerEmail; // 고객 이메일
     private String customerName; // 고객 이름
     private String successUrl; // 성공 시 리다이렉트 될 URL
@@ -34,7 +34,7 @@ public class PaymentResponse {
                 .payType(payment.getType())
                 .amount(payment.getTotalPrice())
                 .orderId(payment.getOrder().getOrdNo())
-                .orderCode(payment.getOrder().getOrdCode())
+                .orderName(payment.getOrder().getOrdCode())
                 .customerEmail(payment.getOrder().getMember().getLoginId())
                 .customerName(payment.getOrder().getMember().getName())
                 .failReason(payment.getFailReason())

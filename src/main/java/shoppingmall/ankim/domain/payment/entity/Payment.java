@@ -6,10 +6,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.order.entity.Order;
+import shoppingmall.ankim.domain.payment.exception.InvalidPaymentKeyException;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
-import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_PAYMENT_KEY;
 
 @Entity
 @Getter
@@ -62,6 +62,19 @@ public class Payment extends BaseEntity {
                 .totalPrice(totalPrice)
                 .paySuccessYN(false)
                 .build();
+    }
+
+    public void setPaymentKey(String paymentKey, boolean paySuccessYN) {
+        if(paymentKey == null) {
+            throw new InvalidPaymentKeyException(INVALID_PAYMENT_KEY);
+        }
+        this.payKey = paymentKey;
+        this.paySuccessYN = paySuccessYN;
+    }
+
+    public void setFailReason(String message, boolean paySuccessYN) {
+        this.failReason = message;
+        this.paySuccessYN = paySuccessYN;
     }
 }
 
