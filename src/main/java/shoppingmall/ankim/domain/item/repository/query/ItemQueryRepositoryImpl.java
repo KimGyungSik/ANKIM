@@ -6,9 +6,14 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.entity.QItem;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
 import shoppingmall.ankim.domain.itemOption.entity.QItemOption;
+import shoppingmall.ankim.domain.product.entity.QProduct;
 
 import java.util.List;
+import java.util.Optional;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
 
 @Repository
 @RequiredArgsConstructor
@@ -25,35 +30,20 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         // Q 클래스 선언
         QItem item = QItem.item;
         QItemOption itemOption = QItemOption.itemOption;
+        QProduct product = QProduct.product;
 
-        return queryFactory
-                .selectFrom(item) // 메인 : Item을 조회
+        Item result =  queryFactory
+                .selectFrom(item) // ITEM 테이블에서 조회
+                .join(item.product, product).on(product.no.eq(productNo)) // PRODUCT 조인 및 조건 추가
+                .join(item.itemOptions, itemOption) // ITEM_OPTION 조인
                 .where(
-                        item.product.no.eq(productNo), // 조건 1 : 특정 상품 번호에 해당하는 품목-Item(해당 상품의 품목을 조회해야되기 때문)
-                        item.no.in( // 조건 2 : 서브쿼리 결과에 포함된 품목-Item의 번호만 조회
-                                JPAExpressions // 서브쿼리
-                                        .select(itemOption.item.no) // 품목옵션-itemOption에서 품목-Item의 번호만 선택
-                                        .from(itemOption) // 품목옵션-itemOption으로 부터 데이터를 조회
-                                        /*
-                                        * 서브쿼리 조건 1 : ItemOption이 특정 옵션 값 번호(optionValueNoList)들을 가지고 있어야 됨
-                                        * 예 : 옵션 값 번호 리스트가 [1, 3]인 경우, ItemOption이 1과 3인 데이터를 조회
-                                        * */
-                                        .where(itemOption.optionValue.no.in(optionValueNoList)) //
-                                        /*
-                                        * 서브쿼리 그룹핑 : 품목-Item 단위로 데이터를 묶음
-                                        * 같은 Item에 속한 옵션 값을 하나로 묶기 위해서 groupBy 사용
-                                        * 예 : 품목옵션-ItemOption에서 품목-Item 1이 옵션 값 1, 3을 가지면 그룹화 결과에 Item 1이 포함
-                                        * */
-                                        .groupBy(itemOption.item.no)
-                                        /*
-                                        * 서브쿼리 조건 2 : 그룹핑한 데이터에서 옵션 값의 개수가 List로 넘긴 옵션의 개수와 일치해야 됨
-                                        * - 예 : 옵션 값 리스트(optionValueNoList)가 [1, 3]인 경우,
-                                        * - 해당 품목-Item이 정확하게 2개의 옵션 값을 가지고 있어야 조회를 해야됨
-                                        * - 이 조건을 추가하지 않는다면? 알맞는 품목-Item을 조회 못할 수도 있음
-                                        * */
-                                        .having(itemOption.optionValue.no.count().eq((long) optionValueNoList.size()))
-                        )
+                        itemOption.optionValue.no.in(optionValueNoList) // 옵션 값 번호 조건
                 )
-                .fetchOne(); // 모든 조건에 맞는 품목-Item은 1개여야 되므로 단일 결과를 반환
+                .groupBy(item.no) // ITEM 단위로 그룹화
+                .having(itemOption.optionValue.no.count().eq((long) optionValueNoList.size())) // HAVING 조건
+                .fetchOne(); // 단일 결과 반환
+
+        return Optional.ofNullable(result)
+                .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
     }
 }

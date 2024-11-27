@@ -65,9 +65,10 @@ public class CartServiceImpl implements CartService {
         }
 
         // 품목 조회
-        Item item = itemRepository.findById(request.getProductNo())
-                .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
-
+        Item item = Optional.ofNullable(itemRepository.findItemByOptionValuesAndProduct(
+                request.getProductNo(),
+                request.getOptionValueNoList()
+        )).orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
 /*
         장바구니에 담으려는 수량이
         재고량보다 작은지 확인
@@ -103,7 +104,7 @@ public class CartServiceImpl implements CartService {
             if (existingCartItem.isPresent()) {
                 // 동일 품목 존재 시 수량 업데이트
                 CartItem cartItem = existingCartItem.get();
-                cartItem.updateQty(qty, now);
+                cartItem.updateQty(qty);
             } else {
                 // 동일 품목 미존재 시 새 품목 추가
                 CartItem newCartItem = CartItem.create(cart, item, qty, now);

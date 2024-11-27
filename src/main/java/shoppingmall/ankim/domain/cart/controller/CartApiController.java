@@ -5,6 +5,10 @@ import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.service.CartService;
+import shoppingmall.ankim.domain.security.exception.CookieNotIncludedException;
+import shoppingmall.ankim.global.response.ApiResponse;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
 
 @RestController
 @RequiredArgsConstructor
@@ -15,11 +19,16 @@ public class CartApiController {
 
     // 장바구니에 상품 담기 ( C )
     @PostMapping("/items")
-    public void addToCart(
+    public ApiResponse<String> addToCart(
             @RequestBody AddToCartRequest request
-           ,@CookieValue(value = "access", required = true) String access // Cookie에서 access 토큰 가져오기
+           ,@CookieValue(value = "access", required = false) String access // Cookie에서 access 토큰 가져오기
     ) {
+        if (access == null) {
+            throw new CookieNotIncludedException(COOKIE_NOT_INCLUDED);
+        }
+        cartService.addToCart(request.toServiceRequest(), access);
 
+        return ApiResponse.ok("장바구니에 상품이 담겼습니다.");
     }
 
     // 장바구니 페이지에 들어갈때 장바구니 읽어오기 ( R )

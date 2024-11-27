@@ -58,4 +58,12 @@ public class Cart extends BaseEntity {
             cartItem.linkToCart(this); // 양방향 관계 설정
         }
     }
+
+    // 장바구니 비활성화 메서드 : 삭제하지 않고 활성상태를 변경한다.
+    public void deactivate() {
+        this.activeYn = "N";
+        for (CartItem cartItem : cartItems) {
+            cartItem.deactivate();
+        }
+    }
 }

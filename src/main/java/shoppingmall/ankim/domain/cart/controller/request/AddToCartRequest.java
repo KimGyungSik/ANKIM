@@ -28,8 +28,6 @@ public class AddToCartRequest {
     /*
      * 대표 상품 이미지 경로 -> CartItem
      * */
-    @NotBlank
-    private String thumbNailImgUrl;
 
     /*
     * 구매수량 -> CartItem
@@ -37,11 +35,10 @@ public class AddToCartRequest {
     @NotNull
     private Integer qty;
 
-    AddToCartServiceRequest toServiceRequest() {
+    public AddToCartServiceRequest toServiceRequest() {
         return AddToCartServiceRequest.builder()
                 .productNo(productNo)
                 .optionValueNoList(optionValueNoList)
-                .thumbNailImgUrl(thumbNailImgUrl)
                 .qty(qty)
                 .build();
     }

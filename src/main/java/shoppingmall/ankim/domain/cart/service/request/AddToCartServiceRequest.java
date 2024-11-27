@@ -17,15 +17,12 @@ public class AddToCartServiceRequest {
 
     private List<Long> optionValueNoList;
 
-    private String thumbNailImgUrl;
-
     private Integer qty;
 
     @Builder
-    public AddToCartServiceRequest(Long productNo, List<Long> optionValueNoList, String thumbNailImgUrl, Integer qty) {
+    public AddToCartServiceRequest(Long productNo, List<Long> optionValueNoList, Integer qty) {
         this.productNo = productNo;
         this.optionValueNoList = optionValueNoList;
-        this.thumbNailImgUrl = thumbNailImgUrl;
         this.qty = qty;
     }
 }
