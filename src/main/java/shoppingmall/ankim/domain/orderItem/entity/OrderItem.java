@@ -58,7 +58,6 @@ public class OrderItem extends BaseEntity {
         this.thumbNailImgUrl = thumbNailImgUrl;
         this.qty = qty;
         this.price = price; // 정상가격(원가) + 추가금액
-        this.discPrice = calculateDiscPrice(item.getProduct().getSellPrice());
         this.shipFee = shipFee;
         this.discPrice = discPrice;
     }
@@ -68,7 +67,7 @@ public class OrderItem extends BaseEntity {
             throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID);
         }
 
-        return OrderItem.builder()
+        OrderItem orderItem = OrderItem.builder()
                 .item(item)
                 .productName(item.getProduct().getName())
                 .thumbNailImgUrl(item.getThumbNailImgUrl())
@@ -76,18 +75,21 @@ public class OrderItem extends BaseEntity {
                 .price(item.getTotalPrice())
                 .shipFee(item.getProduct().getShipFee())
                 .build();
+
+        // 할인 금액 계산
+        orderItem.calculateDiscPrice(item.getProduct().getSellPrice());
+
+        return orderItem;
     }
 
-    private Integer calculateDiscPrice(Integer sellPrice) {
+    private void calculateDiscPrice(Integer sellPrice) {
         // 할인 금액 계산
-        Integer discPrice = this.price - sellPrice;
+        discPrice = this.price - sellPrice;
 
         // 할인 금액이 음수인 경우 예외 발생
         if (discPrice < 0) {
             throw new DiscountPriceException(DISCOUNT_PRICE_INVALID);
         }
-
-        return discPrice;
     }
 
 
