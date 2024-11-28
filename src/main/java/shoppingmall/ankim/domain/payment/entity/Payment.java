@@ -76,5 +76,10 @@ public class Payment extends BaseEntity {
         this.failReason = message;
         this.paySuccessYN = paySuccessYN;
     }
+
+    public void setPaymentCancel(String cancelReason, boolean cancelYN) {
+        this.cancelReason = cancelReason;
+        this.cancelYN = cancelYN;
+    }
 }
 

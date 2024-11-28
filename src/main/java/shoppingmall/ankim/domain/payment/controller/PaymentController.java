@@ -2,9 +2,11 @@ package shoppingmall.ankim.domain.payment.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentSuccessRequest;
+import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
@@ -38,5 +40,13 @@ public class PaymentController {
             @RequestParam(value = "orderId") String orderId
     ) {
         return ApiResponse.ok(paymentService.tossPaymentFail(code, message, orderId));
+    }
+
+    @PostMapping("/toss/cancel")
+    public ApiResponse<PaymentCancelResponse> tossPaymentCancelPoint(
+            @RequestParam String paymentKey,
+            @RequestParam String cancelReason
+    ) {
+        return ApiResponse.ok(paymentService.cancelPaymentPoint(paymentKey, cancelReason));
     }
 }

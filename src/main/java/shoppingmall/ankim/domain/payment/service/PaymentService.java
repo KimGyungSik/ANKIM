@@ -7,11 +7,11 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
+import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
@@ -26,6 +26,7 @@ import shoppingmall.ankim.global.config.TossPaymentConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -70,6 +71,23 @@ public class PaymentService {
         return PaymentFailResponse.of(code, message, orderId);
     }
 
+    // 결제 취소 처리
+    public PaymentCancelResponse cancelPaymentPoint(String paymentKey, String cancelReason) {
+        Payment payment = paymentRepository.findByPayKey(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
+
+        payment.setPaymentCancel(cancelReason, true);
+        return tossPaymentCancel(paymentKey, cancelReason);
+    }
+
+    public PaymentCancelResponse tossPaymentCancel(String paymentKey, String cancelReason) {
+        HttpHeaders headers = getHeaders();
+        JSONObject params = new JSONObject();
+        params.put("cancelReason", cancelReason);
+
+        return restTemplate.postForObject(TossPaymentConfig.URL + paymentKey + "/cancel",
+                new HttpEntity<>(params, headers),
+                PaymentCancelResponse.class);
+    }
 
 
     private PaymentSuccessResponse requestPaymentAccept(String paymentKey, String orderId, Integer amount) {
