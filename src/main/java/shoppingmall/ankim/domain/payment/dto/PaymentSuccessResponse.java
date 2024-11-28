@@ -13,7 +13,7 @@ public class PaymentSuccessResponse {
     String orderName;
     String currency; // "KRW"
     String method; // 결제 수단
-    String totalAmount;
+    String amount;
     String balanceAmount;
     String suppliedAmount;
     String vat; // 부가가치세

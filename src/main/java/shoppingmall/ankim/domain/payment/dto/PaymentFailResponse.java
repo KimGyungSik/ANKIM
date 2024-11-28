@@ -12,9 +12,9 @@ import lombok.NoArgsConstructor;
 public class PaymentFailResponse {
     String errorCode;
     String errorMessage;
-    Long orderId;
+    String orderId;
 
-    public static PaymentFailResponse of(String errorCode, String errorMessage, Long orderId) {
+    public static PaymentFailResponse of(String errorCode, String errorMessage, String orderId) {
         return PaymentFailResponse.builder()
                 .errorCode(errorCode)
                 .errorMessage(errorMessage)

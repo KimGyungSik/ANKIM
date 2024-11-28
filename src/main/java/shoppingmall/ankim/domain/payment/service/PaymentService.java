@@ -7,6 +7,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
@@ -35,6 +36,7 @@ public class PaymentService {
     private final PaymentRepository paymentRepository;
     private final TossPaymentConfig tossPaymentConfig;
     private final OrderRepository orderRepository;
+    private final RestTemplate restTemplate;
 
     // 클라이언트 결제 요청처리
     public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request) {
@@ -54,7 +56,7 @@ public class PaymentService {
     }
 
     // 성공 시 처리
-    public PaymentSuccessResponse tossPaymentSuccess(String paymentKey, Long orderId, Integer amount) {
+    public PaymentSuccessResponse tossPaymentSuccess(String paymentKey, String orderId, Integer amount) {
         Payment payment = verifyPayment(orderId, amount);
         PaymentSuccessResponse result = requestPaymentAccept(paymentKey, orderId, amount);
         payment.setPaymentKey(paymentKey, true);
@@ -62,7 +64,7 @@ public class PaymentService {
     }
 
     // 실패 시 처리
-    public PaymentFailResponse tossPaymentFail(String code, String message, Long orderId) {
+    public PaymentFailResponse tossPaymentFail(String code, String message, String orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
         payment.setFailReason(message, false);
         return PaymentFailResponse.of(code, message, orderId);
@@ -70,8 +72,7 @@ public class PaymentService {
 
 
 
-    public PaymentSuccessResponse requestPaymentAccept(String paymentKey, Long orderId, Integer amount) {
-        RestTemplate restTemplate = new RestTemplate();
+    private PaymentSuccessResponse requestPaymentAccept(String paymentKey, String orderId, Integer amount) {
         HttpHeaders headers = getHeaders();
         JSONObject params = new JSONObject();
         params.put("orderId", orderId);
@@ -89,7 +90,7 @@ public class PaymentService {
         return result;
     }
 
-    public Payment verifyPayment(Long orderId, Integer amount) {
+    private Payment verifyPayment(String orderId, Integer amount) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
         if (!payment.getTotalPrice().equals(amount)) {
             throw new PaymentAmountNotEqualException(PAYMENT_AMOUNT_EXP);

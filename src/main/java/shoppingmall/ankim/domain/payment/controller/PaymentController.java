@@ -25,7 +25,7 @@ public class PaymentController {
     @GetMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
             @RequestParam String paymentKey,
-            @RequestParam Long orderId,
+            @RequestParam String orderId,
             @RequestParam Integer amount
     ) {
         return ApiResponse.ok(paymentService.tossPaymentSuccess(paymentKey, orderId, amount));
@@ -35,7 +35,7 @@ public class PaymentController {
     public ApiResponse<PaymentFailResponse> tossPaymentFail(
             @RequestParam String code,
             @RequestParam String message,
-            @RequestParam Long orderId
+            @RequestParam String orderId
     ) {
         return ApiResponse.ok(paymentService.tossPaymentFail(code, message, orderId));
     }
