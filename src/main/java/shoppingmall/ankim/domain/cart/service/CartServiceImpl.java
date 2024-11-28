@@ -35,7 +35,7 @@ public class CartServiceImpl implements CartService {
     private final CartRepository cartRepository; // 장바구니를 위한 Repository
 
 /*
-         TODO 장바구니 상품 추가
+         [장바구니 상품 추가]
          1. accessToken(JWT)에서 memberid 추출
          +. 품목 조회
          +. 품목의 최소/최대 수량 검증
@@ -118,4 +118,5 @@ public class CartServiceImpl implements CartService {
             cartRepository.save(cart); // 새 장바구니 저장
         }
     }
+
 }

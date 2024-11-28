@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.security.filter;
 
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.*;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +45,17 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         // 헤더에서 Access Token 추출
-        String access = request.getHeader("access");
+//        String access = request.getHeader("access");
+        String access = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("access")) {
+                    access = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
         if (access == null || access.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
             return;
@@ -75,9 +86,22 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         // 로그아웃 진행
-        // refresh을 DB에서 제거
+        // refresh를 DB에서 제거
         redisHandler.delete(access);
+        // 쿠키에서 access 제거
+        Cookie deleteCookie = deleteCookie("access", null);
+        response.addCookie(deleteCookie);
 
         response.setStatus(HttpServletResponse.SC_OK);
+    }
+
+    private Cookie deleteCookie(String key, String value) {
+        Cookie cookie = new Cookie(key, value);
+        // 쿠키 설정
+        cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
+        cookie.setMaxAge(0); // 쿠키 유효 시간 설정(초단위)
+        cookie.setSecure(true); // https 통신시 사용
+        cookie.setPath("/"); // cookie 적용 범위
+        return cookie;
     }
 }

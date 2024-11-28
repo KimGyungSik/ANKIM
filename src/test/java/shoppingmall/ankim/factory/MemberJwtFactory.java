@@ -1,5 +1,7 @@
 package shoppingmall.ankim.factory;
 
+import jakarta.persistence.EntityManager;
+import lombok.RequiredArgsConstructor;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
@@ -9,8 +11,9 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public class MemberJwtFactory {
-    public static Member createMember(String loginId) {
-        return Member.builder()
+
+    public static Member createMember(EntityManager entityManager, String loginId) {
+        Member member = Member.builder()
                 .loginId(loginId)
                 .pwd("password")
                 .name("홍길동")
@@ -21,6 +24,8 @@ public class MemberJwtFactory {
                 .joinDate(LocalDateTime.now())
                 .status(MemberStatus.ACTIVE)
                 .build();
+        entityManager.persist(member);
+        return member;
     }
 
     public static String createAccessToken(Member member, JwtTokenProvider jwtTokenProvider) {

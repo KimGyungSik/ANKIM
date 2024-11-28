@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.cart.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -47,6 +48,8 @@ import static org.mockito.BDDMockito.given;
 @SpringBootTest
 @Transactional
 class CartServiceTest {
+    @Autowired
+    EntityManager em;
 
     @Autowired
     private CartService cartService;
@@ -97,8 +100,7 @@ class CartServiceTest {
     void addToCart_ValidAccessToken_Success() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
-        memberRepository.save(member);
+        Member member = MemberJwtFactory.createMember(em, loginId);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
 
@@ -139,7 +141,7 @@ class CartServiceTest {
     void addToCart_ExistingActiveCart_AddsCartItem() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
@@ -178,7 +180,7 @@ class CartServiceTest {
     void addToCart_SameProduct_UpdatesExistingCartItem() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
@@ -222,7 +224,7 @@ class CartServiceTest {
     void addToCart_NonexistentItem_ThrowsItemNotFoundException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
@@ -244,7 +246,7 @@ class CartServiceTest {
     void addToCart_QuantityExceedsStock_ThrowsOutOfStockException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
@@ -282,7 +284,7 @@ class CartServiceTest {
     void addToCart_QuantityExceedsMaximum_ThrowsInvalidQuantityException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
@@ -319,7 +321,7 @@ class CartServiceTest {
     void addToCart_QuantityBelowMinimum_ThrowsInvalidQuantityException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(loginId);
+        Member member = MemberJwtFactory.createMember(em, loginId);
         memberRepository.save(member);
 
         String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);

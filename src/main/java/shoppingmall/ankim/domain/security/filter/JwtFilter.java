@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.security.filter;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -38,8 +39,17 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // header의 access 키에 담긴 토큰 추출
-        String accessToken = request.getHeader("access");
+        // 쿠키의 access 키에 담긴 토큰 추출
+//        String accessToken = request.getHeader("access");
+        String accessToken = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("access")) {
+                    accessToken = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         // 토큰이 없는 경우 다음 필터로
         if(accessToken == null) {

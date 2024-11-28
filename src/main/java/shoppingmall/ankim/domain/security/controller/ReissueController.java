@@ -24,8 +24,17 @@ public class ReissueController {
 
     @PostMapping("/reissue")
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-        // 헤더에서 Access Token 추출
-        String access = request.getHeader("access");
+        // 쿠키에서 Access Token 추출
+//        String access = request.getHeader("access");
+        String access = null;
+        if (request.getCookies() != null) {
+            for (Cookie cookie : request.getCookies()) {
+                if (cookie.getName().equals("access")) {
+                    access = cookie.getValue();
+                    break;
+                }
+            }
+        }
 
         if (access == null || access.isEmpty()) {
             return ApiResponse.of(ACCESS_TOKEN_NOT_FOUND);
