@@ -67,6 +67,7 @@ public class Order extends BaseEntity {
     @Column(name = "reg_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime regDate = LocalDateTime.now(); // 주문 등록일
 
+    @Enumerated(EnumType.STRING)
     private OrderStatus orderStatus; // 주문 상태
 
     @Column(name = "mod_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")

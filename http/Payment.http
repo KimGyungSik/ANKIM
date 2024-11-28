@@ -1,0 +1,15 @@
+### Toss 결제 요청
+POST http://localhost:8080/api/v1/payments/toss
+Content-Type: application/json
+
+{
+  "payType": "CARD",
+  "amount": 50000,
+  "orderName": "ORD20241125-1234567"
+}
+
+### Toss 결제 성공 시 요청
+GET http://localhost:8080/api/v1/payments/toss/success?paymentKey=tgen_202411281903521CDj9&orderId=ORD12345678&amount=50000
+
+### Toss 결제 실패 시 요청
+GET http://localhost:8080/api/v1/payments/toss/fail?code=INVALID_PAYMENT&message=Insufficient%20balance&orderId=ORD12345678
