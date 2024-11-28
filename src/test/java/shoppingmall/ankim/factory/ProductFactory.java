@@ -525,6 +525,7 @@ public class ProductFactory {
                 .discRate(10)
                 .origPrice(120000)
                 .qty(100)
+                .shipFee(2000)
                 .sellingStatus(ProductSellingStatus.SELLING)
                 .build();
         entityManager.persist(product);
@@ -601,7 +602,7 @@ public class ProductFactory {
                 .name("색상: 블랙, 사이즈: M")
                 .optionValues(List.of(black, medium))
                 .code("P001-BLK-M")
-                .addPrice(0)
+                .addPrice(2000)
                 .qty(50)
                 .safQty(10)
                 .maxQty(5)
@@ -612,7 +613,7 @@ public class ProductFactory {
                 .name("색상: 블랙, 사이즈: L")
                 .optionValues(List.of(black, large))
                 .code("P001-BLK-L")
-                .addPrice(0)
+                .addPrice(3000)
                 .qty(30)
                 .safQty(5)
                 .maxQty(3)

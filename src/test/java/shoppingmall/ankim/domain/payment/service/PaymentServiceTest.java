@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.payment.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -18,6 +19,7 @@ import shoppingmall.ankim.domain.payment.entity.PayType;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
+import shoppingmall.ankim.factory.OrderFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 
@@ -42,7 +44,7 @@ class PaymentServiceTest {
     @Autowired
     TossPaymentConfig tossPaymentConfig;
 
-    @MockBean
+    @Autowired
     private OrderRepository orderRepository;
 
     @Autowired
@@ -51,24 +53,21 @@ class PaymentServiceTest {
     @Autowired
     private PaymentRepository paymentRepository;
 
+    @Autowired
+    EntityManager entityManager;
+
     @DisplayName("클라이언트는 결제 요청을 보낼 수 있다.")
     @Test
-    void requestTossPayment_withMockedOrderAndMember() {
+    void requestTossPayment_withOrderFactory() {
         // given
         String orderCode = "ORD20241125-1234567";
 
-        // Mock Member 생성
-        Member mockMember = mock(Member.class);
-        given(mockMember.getName()).willReturn("김경식");
-        given(mockMember.getLoginId()).willReturn("0711kyung@naver.com");
+        // OrderFactory를 통해 Order 생성
+        Order mockOrder = OrderFactory.createOrder(entityManager);
+        mockOrder.setOrdCode(orderCode);
 
-        // Mock Order 생성
-        Order mockOrder = mock(Order.class);
-        given(mockOrder.getOrdCode()).willReturn(orderCode);
-        given(mockOrder.getMember()).willReturn(mockMember);
-
-        // Mock OrderRepository 동작 설정
-        given(orderRepository.findByOrderCodeWithMember(orderCode)).willReturn(Optional.of(mockOrder));
+        // 영속화
+        orderRepository.save(mockOrder);
 
         PaymentCreateServiceRequest request = PaymentCreateServiceRequest.builder()
                 .orderCode(orderCode)
@@ -82,19 +81,19 @@ class PaymentServiceTest {
         // then
         assertThat(response).isNotNull();
         assertThat(response.getOrderName()).isEqualTo(orderCode);
-        assertThat(response.getCustomerEmail()).isEqualTo(mockMember.getLoginId());
-        assertThat(response.getCustomerName()).isEqualTo(mockMember.getName());
+        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
+        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
         assertThat(response.getAmount()).isEqualTo(50000L);
         assertThat(response.getPayType()).isEqualTo(PayType.CARD);
         assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
         assertThat(response.getFailUrl()).isEqualTo(tossPaymentConfig.getFailUrl());
 
-//        // Payment 저장 검증
-//        List<Payment> payments = paymentRepository.findAll();
-//        assertThat(payments).hasSize(1);
-//        Payment savedPayment = payments.get(0);
-//        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo(orderCode);
-//        assertThat(savedPayment.getTotalPrice()).isEqualTo(50000L);
-//        assertThat(savedPayment.getType()).isEqualTo(PayType.CARD);
+        // Payment 저장 검증
+        List<Payment> payments = paymentRepository.findAll();
+        assertThat(payments).hasSize(1);
+        Payment savedPayment = payments.get(0);
+        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo(orderCode);
+        assertThat(savedPayment.getTotalPrice()).isEqualTo(50000L);
+        assertThat(savedPayment.getType()).isEqualTo(PayType.CARD);
     }
 }
