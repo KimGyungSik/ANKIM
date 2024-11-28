@@ -15,7 +15,7 @@ import shoppingmall.ankim.domain.payment.entity.PayType;
 public class PaymentCreateServiceRequest {
     private PayType payType;
     private Integer amount;
-    private String orderCode;
+    private String orderName;
     private String yourSuccessUrl;
     private String yourFailUrl;
 }

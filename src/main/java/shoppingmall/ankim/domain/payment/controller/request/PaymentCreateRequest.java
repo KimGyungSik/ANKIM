@@ -21,8 +21,8 @@ public class PaymentCreateRequest {
     private PayType payType;
     @NotNull(message = "결제 금액은 필수 입력값 입니다.")
     private Integer amount;
-    @NotBlank(message = "주문 코드는 필수 입력값 입니다.")
-    private String orderCode;
+    @NotBlank(message = "주문명은 필수 입력값 입니다.")
+    private String orderName; // 주문엔티티의 주문코드
 
     private String yourSuccessUrl;
     private String yourFailUrl;
@@ -31,7 +31,7 @@ public class PaymentCreateRequest {
         return PaymentCreateServiceRequest.builder()
                 .payType(this.payType)
                 .amount(this.amount)
-                .orderCode(this.orderCode)
+                .orderName(this.orderName)
                 .yourSuccessUrl(this.yourSuccessUrl)
                 .yourFailUrl(this.yourFailUrl)
                 .build();

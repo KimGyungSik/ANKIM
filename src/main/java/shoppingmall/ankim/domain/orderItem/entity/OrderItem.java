@@ -73,7 +73,7 @@ public class OrderItem extends BaseEntity {
                 .thumbNailImgUrl(item.getThumbNailImgUrl())
                 .qty(qty)
                 .price(item.getTotalPrice())
-                .shipFee(item.getProduct().getShipFee())
+                .shipFee(item.getProduct().getShipFee() != null ? item.getProduct().getShipFee() : 0)
                 .build();
 
         // 할인 금액 계산

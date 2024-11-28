@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.order.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.GenericGenerator;
 import shoppingmall.ankim.domain.address.entity.admin.AdminAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
@@ -28,9 +29,10 @@ import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 public class Order extends BaseEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ord_no")
-    private Long ordNo;
+    @GeneratedValue(generator = "uuid")
+    @GenericGenerator(name = "uuid", strategy = "uuid2") // Hibernate UUID 생성 전략
+    @Column(name = "ord_no", unique = true, nullable = false)
+    private String ordNo;
 
     @Setter
     @Column(name = "ord_code", length = 19)

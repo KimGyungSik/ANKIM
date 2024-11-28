@@ -70,7 +70,7 @@ class PaymentServiceTest {
         orderRepository.save(mockOrder);
 
         PaymentCreateServiceRequest request = PaymentCreateServiceRequest.builder()
-                .orderCode(orderCode)
+                .orderName(orderCode)
                 .payType(PayType.CARD)
                 .amount(50000)
                 .build();
@@ -84,7 +84,7 @@ class PaymentServiceTest {
         assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
         assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
         assertThat(response.getAmount()).isEqualTo(50000L);
-        assertThat(response.getPayType()).isEqualTo(PayType.CARD);
+        assertThat(response.getPayType()).isEqualTo("카드");
         assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
         assertThat(response.getFailUrl()).isEqualTo(tossPaymentConfig.getFailUrl());
 

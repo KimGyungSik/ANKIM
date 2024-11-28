@@ -70,6 +70,12 @@ dependencies {
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.0'
     // AWS S3
     implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+    //JSONObject
+    implementation 'net.minidev:json-smart:2.4.8'
+    // Mockito for testing
+    testImplementation 'org.mockito:mockito-core:5.5.0'
+    testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
 }
 
 tasks.named('test') {

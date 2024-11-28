@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 @Builder
 public class OrderResponse {
 
-    private Long orderNo;             // 주문 번호
+    private String orderNo;             // 주문 번호
     private String orderCode;         // 주문 코드
     private List<ItemResponse> items; // 주문 항목 리스트 FIXME ItemOrderResponse 정의해서 바꿔줄 것
     private DeliveryResponse delivery;          // 배송 정보

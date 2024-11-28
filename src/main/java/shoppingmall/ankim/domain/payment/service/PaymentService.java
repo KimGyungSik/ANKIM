@@ -39,7 +39,7 @@ public class PaymentService {
     // 클라이언트 결제 요청처리
     public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request) {
         // Order 조회 (fetch join으로 Member 로딩)
-        Order order = orderRepository.findByOrderCodeWithMember(request.getOrderCode())
+        Order order = orderRepository.findByOrderWithMember(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
         // Payment 생성 & 저장

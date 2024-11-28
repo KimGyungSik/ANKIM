@@ -75,7 +75,7 @@ public class OrderService {
         return OrderResponse.of(order);
     }
 
-    private String generateOrderCode(Long orderId, LocalDateTime registeredDateTime) {
+    private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {
         // 현재 날짜 (yyyyMMdd)
         String currentDate = registeredDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 

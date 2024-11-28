@@ -9,6 +9,6 @@ import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
     // orderCode로 member를 fetch join해서 Order 조회하는 쿼리
-    @Query("SELECT o FROM Order o JOIN FETCH o.member WHERE o.ordCode = :orderCode")
-    Optional<Order> findByOrderCodeWithMember(@Param("orderCode") String orderCode);
+    @Query("SELECT o FROM Order o JOIN FETCH o.member WHERE o.ordCode = :orderName")
+    Optional<Order> findByOrderWithMember(@Param("orderName") String orderName);
 }
