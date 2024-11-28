@@ -39,7 +39,7 @@ public enum ErrorCode {
     CANNOT_MODIFY_SELLING_PRODUCT(HttpStatus.BAD_REQUEST, "판매 중인 상품은 수정할 수 없습니다."),
 
     // 품목
-    ITEM_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 품목이 존재하지 않습니다."),
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 품목이 존재하지 않습니다."),
     OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
     QUANTITY_BELOW_MINIMUM(HttpStatus.BAD_REQUEST, "수량이 최소 허용 범위보다 적습니다."),
     QUANTITY_EXCEED_MAXIMUM(HttpStatus.BAD_REQUEST, "수량이 최대 허용 범위를 초과했습니다."),
@@ -48,15 +48,15 @@ public enum ErrorCode {
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
 
     // 인증 관련 에러 코드
-    ADMIN_ID_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 아이디입니다."),
+    ADMIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
     INVALID_LOGIN_ID(HttpStatus.BAD_REQUEST, "아이디가 검증되지 않았습니다."),
-    MEMBER_ID_DUPLICATE(HttpStatus.BAD_REQUEST, "이미 존재하는 이메일입니다."),
+    MEMBER_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 이메일입니다."),
     MAIL_SEND_FAIL(HttpStatus.INTERNAL_SERVER_ERROR,"서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."), // 메일 전송에 실패했습니다.
     VERIFICATION_CODE_MISMATCH(HttpStatus.BAD_REQUEST, "인증번호가 일치하지 않습니다."),
     MISSING_REQUIRED_ID(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."),
 
     // 회원정보 관련 에러 코드
-    NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."), // (member, admin 모두)
+    USER_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."), // (member, admin 모두)
     INVALID_CREDENTIALS(HttpStatus.NOT_FOUND, "아이디 또는 비밀번호가 일치하지 않습니다."),
     USER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
@@ -73,7 +73,10 @@ public enum ErrorCode {
     COOKIE_NOT_INCLUDED(HttpStatus.BAD_REQUEST, "쿠키가 요청에 포함되어 있지 않습니다."),
 
     // Redis 관련 에러 코드
-    REDIS_ID_VALIDATION_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    REDIS_ID_VALIDATION_SAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."),
+
+    // 장바구니 관련 에러 코드
+    CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장바구니 품목을 찾을 수 없습니다.")
     ;
 
     private final HttpStatus httpStatus;

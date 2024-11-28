@@ -25,7 +25,7 @@ import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.USER_STATUS_LOCKED;
-import static shoppingmall.ankim.global.exception.ErrorCode.NOT_FOUND_USER;
+import static shoppingmall.ankim.global.exception.ErrorCode.USER_NOT_FOUND;
 
 @Service
 @RequiredArgsConstructor
@@ -47,7 +47,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             // 사용자 정보 조회
             Member member = memberRepository.findByLoginId(username);
             if (member == null) {
-                throw new UserNotFoundException(NOT_FOUND_USER);
+                throw new UserNotFoundException(USER_NOT_FOUND);
             }
 
             // 로그인 시도 정보 확인
@@ -89,7 +89,7 @@ public class CustomUserDetailsService implements UserDetailsService {
             // 관리자 조회
             Admin admin = adminRepository.findByLoginId(username);
             if (admin == null) {
-                throw new UsernameNotFoundException(NOT_FOUND_USER.getMessage());
+                throw new UsernameNotFoundException(USER_NOT_FOUND.getMessage());
             }
 
             // 로그인 시도 정보 확인

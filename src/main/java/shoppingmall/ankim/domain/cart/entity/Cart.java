@@ -55,7 +55,7 @@ public class Cart extends BaseEntity {
     public void addCartItem(CartItem cartItem) {
         cartItems.add(cartItem);
         if (cartItem.getCart() != this) {
-            cartItem.linkToCart(this); // 양방향 관계 설정
+            cartItem.addCart(this); // 양방향 관계 설정
         }
     }
 
@@ -65,5 +65,9 @@ public class Cart extends BaseEntity {
         for (CartItem cartItem : cartItems) {
             cartItem.deactivate();
         }
+    }
+
+    public List<CartItem> getCartItems() {
+        return cartItems;
     }
 }

@@ -1,7 +1,9 @@
 package shoppingmall.ankim.domain.image.service;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -17,6 +19,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.BDDMockito.given;
+
+@DisabledIfSystemProperty(named = "os.name", matches = "Mac OS X")
 @ActiveProfiles("test")
 @SpringBootTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")

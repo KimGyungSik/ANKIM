@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.security.controller;
 
+import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -64,7 +65,7 @@ class ReissueControllerTest {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
-        request.addHeader("access", "validAccessToken");
+        request.setCookies(new Cookie("access", "validAccessToken"));
 
         when(reissueService.validateRefreshToken("validAccessToken")).thenReturn("validRefreshToken");
         doThrow(new JwtTokenException(ACCESS_TOKEN_NOT_FOUND))

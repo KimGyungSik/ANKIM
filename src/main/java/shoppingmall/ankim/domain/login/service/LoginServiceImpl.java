@@ -75,7 +75,7 @@ public class LoginServiceImpl implements LoginService {
 
         // 사용자가 없는 경우
         if(member == null) {
-            throw new MemberLoginFailedException(NOT_FOUND_USER);
+            throw new MemberLoginFailedException(USER_NOT_FOUND);
         }
 
         // 로그인 시도 기록 가져오기
@@ -132,7 +132,7 @@ public class LoginServiceImpl implements LoginService {
 
         // 사용자가 없는 경우
         if(admin == null) {
-            throw new AdminLoginFailedException(NOT_FOUND_USER);
+            throw new AdminLoginFailedException(USER_NOT_FOUND);
         }
 
         // 로그인 시도 기록 가져오기
