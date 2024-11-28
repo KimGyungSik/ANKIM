@@ -1,10 +1,14 @@
 package shoppingmall.ankim.domain.payment.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class PaymentSuccessResponse {
     String mid; // 가맹점 Id -> tosspayments
     String version; // Payment 객체 응답 버전

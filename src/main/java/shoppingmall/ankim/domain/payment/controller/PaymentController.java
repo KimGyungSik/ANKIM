@@ -24,18 +24,18 @@ public class PaymentController {
     }
     @GetMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
-            @RequestParam String paymentKey,
-            @RequestParam String orderId,
-            @RequestParam Integer amount
+            @RequestParam(value = "paymentKey") String paymentKey,
+            @RequestParam(value = "orderId") String orderId,
+            @RequestParam(value = "amount") Integer amount
     ) {
         return ApiResponse.ok(paymentService.tossPaymentSuccess(paymentKey, orderId, amount));
     }
 
     @GetMapping("/toss/fail")
     public ApiResponse<PaymentFailResponse> tossPaymentFail(
-            @RequestParam String code,
-            @RequestParam String message,
-            @RequestParam String orderId
+            @RequestParam(value = "code") String code,
+            @RequestParam(value = "message") String message,
+            @RequestParam(value = "orderId") String orderId
     ) {
         return ApiResponse.ok(paymentService.tossPaymentFail(code, message, orderId));
     }

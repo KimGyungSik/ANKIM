@@ -169,7 +169,7 @@ class PaymentServiceTest {
     }
 
     @Test
-    @DisplayName("결제 실패 시 PaymentFailResponse를 반환한다")
+    @DisplayName("결제 실패 시 에러코드와 에러메세지를 반환한다.")
     void tossPaymentFail_shouldReturnPaymentFailResponse() {
         // given
         String orderCode = "ORD20241125-1234567";
