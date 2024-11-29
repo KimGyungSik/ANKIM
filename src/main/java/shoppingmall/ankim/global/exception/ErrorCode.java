@@ -40,9 +40,9 @@ public enum ErrorCode {
 
     // 품목
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 품목이 존재하지 않습니다."),
-    OUT_OF_STOCK(HttpStatus.BAD_REQUEST, "재고가 부족합니다."),
-    QUANTITY_BELOW_MINIMUM(HttpStatus.BAD_REQUEST, "수량이 최소 허용 범위보다 적습니다."),
-    QUANTITY_EXCEED_MAXIMUM(HttpStatus.BAD_REQUEST, "수량이 최대 허용 범위를 초과했습니다."),
+    OUT_OF_STOCK(HttpStatus.CONFLICT, "재고가 부족합니다."),
+    QUANTITY_BELOW_MINIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최소 주문 수량 보다 적습니다."),
+    QUANTITY_EXCEED_MAXIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최대 주문 수량을 초과했습니다."),
 
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),

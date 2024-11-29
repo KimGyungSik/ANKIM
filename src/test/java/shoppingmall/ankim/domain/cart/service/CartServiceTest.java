@@ -44,8 +44,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.*;
+import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static shoppingmall.ankim.domain.cart.entity.QCartItem.cartItem;
 
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
@@ -177,7 +178,7 @@ class CartServiceTest {
 
         // then
         verify(cartRepository).findByMemberAndActiveYn(member, "Y"); // 활성화된 장바구니 조회 확인
-        verify(cartRepository, Mockito.never()).save(any(Cart.class)); // 새로운 Cart 저장이 호출되지 않음 확인
+        verify(cartRepository, never()).save(any(Cart.class)); // 새로운 Cart 저장이 호출되지 않음 확인
         verify(mockCart).addCartItem(any(CartItem.class)); // CartItem 추가 확인
     }
 
@@ -220,7 +221,7 @@ class CartServiceTest {
 
         // then
         verify(existingCartItem).updateQuantityWithDate(Mockito.eq(2)); // regDate를 any로 매칭
-        verify(cartRepository, Mockito.never()).save(any(Cart.class)); // 새로 저장하지 않음
+        verify(cartRepository, never()).save(any(Cart.class)); // 새로 저장하지 않음
     }
 
     @Test
@@ -498,7 +499,7 @@ class CartServiceTest {
 
     @Test
     @DisplayName("장바구니에 담긴 품목의 수량 변경을 성공한다.")
-    void test1() { // FIXME 테스트 작성 필요(when & then)
+    void updateCartItemQuantity_SUCCESS() { // FIXME 테스트 작성 필요(when & then)
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
@@ -536,22 +537,112 @@ class CartServiceTest {
 
         given(cartItemRepository.findByNoAndCart_Member(1L, member)).willReturn(Optional.of(mockCartItem));
 
-
         // when
+        Integer newQty = 1;
+        cartService.updateCartItemQuantity(accessToken, mockCartItem.getNo(), newQty);
 
         // then
-
+        verify(cartItemRepository, times(1)).findByNoAndCart_Member(mockCartItem.getNo(), member);
+        verify(mockCartItem, times(1)).changeQuantity(newQty); // 수량 변경 메서드 호출 확인
     }
 
     @Test
     @DisplayName("장바구니에 담긴 품목의 수량 변경하지만 재고보다 많이 요청하여 변경을 실패한다.")
-    void test2() { // FIXME 테스트 작성 필요
+    void updateCartItemQuantity_FailDueToOutOfStock() {
         // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
 
-        // when
+        // Mock Item
+        Item mockItem = mock(Item.class);
+        given(mockItem.getQty()).willReturn(50); // 재고를 50으로 설정
 
-        // then
+        // Mock CartItem
+        CartItem mockCartItem = mock(CartItem.class);
+        given(mockCartItem.getItem()).willReturn(mockItem);
 
+        // Mock CartItemRepository
+        given(cartItemRepository.findByNoAndCart_Member(1L, member)).willReturn(Optional.of(mockCartItem));
+
+        // 요청 수량이 재고보다 많음
+        Integer requestedQty = 60;
+
+        // when & then
+        OutOfStockException exception = assertThrows(OutOfStockException.class, () -> {
+            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+        });
+
+        // 검증
+        assertThat(exception.getMessage()).isEqualTo("재고가 부족합니다.");
+        verify(cartItemRepository, times(1)).findByNoAndCart_Member(1L, member);
+        verify(mockCartItem, never()).changeQuantity(anyInt()); // 수량 변경 메서드가 호출되지 않아야 함
     }
 
+    @Test
+    @DisplayName("장바구니에 담긴 품목의 수량 변경하지만 최소 주문 수량보다 적게 요청하여 변경을 실패한다.")
+    void updateCartItemQuantity_FailDueToQuantityBelowMinimum() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock Item
+        Item mockItem = mock(Item.class);
+        given(mockItem.getMinQty()).willReturn(1); // 최소 주문 수량 설정
+
+        // Mock CartItem
+        CartItem mockCartItem = mock(CartItem.class);
+        given(mockCartItem.getItem()).willReturn(mockItem);
+
+        // Mock CartItemRepository
+        given(cartItemRepository.findByNoAndCart_Member(1L, member)).willReturn(Optional.of(mockCartItem));
+
+        // 요청 수량이 최소 주문 수량보다 적음
+        Integer requestedQty = 0;
+
+        // when & then
+        InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> {
+            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+        });
+
+        // 검증
+        assertThat(exception.getMessage()).isEqualTo("최소 주문 수량 보다 적습니다.");
+        verify(cartItemRepository, times(1)).findByNoAndCart_Member(1L, member);
+        verify(mockCartItem, never()).changeQuantity(anyInt()); // 수량 변경 메서드가 호출되지 않아야 함
+    }
+
+    @Test
+    @DisplayName("장바구니에 담긴 품목의 수량 변경하지만 최대 주문 수량을 초과하여 변경을 실패한다.")
+    void updateCartItemQuantity_FailDueToQuantityExceedMaximum() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock Item
+        Item mockItem = mock(Item.class);
+        given(mockItem.getQty()).willReturn(50); // 재고를 50으로 설정
+        given(mockItem.getMaxQty()).willReturn(10); // 최대 주문 수량 설정
+
+        // Mock CartItem
+        CartItem mockCartItem = mock(CartItem.class);
+        given(mockCartItem.getItem()).willReturn(mockItem);
+
+        // Mock CartItemRepository
+        given(cartItemRepository.findByNoAndCart_Member(1L, member)).willReturn(Optional.of(mockCartItem));
+
+        // 요청 수량이 최대 주문 수량을 초과함
+        Integer requestedQty = 15;
+
+        // when & then
+        InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> {
+            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+        });
+
+        // 검증
+        assertThat(exception.getMessage()).isEqualTo("최대 주문 수량을 초과했습니다.");
+        verify(cartItemRepository, times(1)).findByNoAndCart_Member(1L, member);
+        verify(mockCartItem, never()).changeQuantity(anyInt()); // 수량 변경 메서드가 호출되지 않아야 함
+    }
 }
