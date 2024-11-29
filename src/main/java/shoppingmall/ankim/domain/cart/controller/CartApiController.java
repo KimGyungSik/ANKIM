@@ -62,10 +62,29 @@ public class CartApiController {
         return ApiResponse.ok("장바구니 품목 수량이 변경되었습니다.");
     }
 
-    // 장바구니에서 상품 삭제하기 ( D )
-    @DeleteMapping("/items/{itemNo}")
-    public void test4() {
+    // 장바구니에서 상품 삭제하기 ( D ) - 선택 삭제
+    @DeleteMapping("/items/selected")
+    public ApiResponse<String> deleteSelectedItems(
+            @CookieValue(value = "access", required = false) String access
+    ) {
+        if (access == null) {
+            throw new CookieNotIncludedException(COOKIE_NOT_INCLUDED);
+        }
 
+        return ApiResponse.ok("");
+    }
+
+    // 장바구니에서 상품 삭제하기 ( D ) - 선택 삭제
+    @DeleteMapping("/items/sole-out")
+    public ApiResponse<String> deleteSoldOutItems(
+            @CookieValue(value = "access", required = false) String access
+    ) {
+        if (access == null) {
+            throw new CookieNotIncludedException(COOKIE_NOT_INCLUDED);
+        }
+
+        cartService.deactivateOutOfStockItems(access);
+        return ApiResponse.ok("품절상품을 삭제 했습니다.");
     }
 
 

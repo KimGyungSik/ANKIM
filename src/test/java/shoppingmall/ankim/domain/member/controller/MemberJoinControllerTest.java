@@ -80,7 +80,7 @@ class MemberJoinControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(request)))
                 // then : 상태 코드와 오류 메시지 확인
-                .andExpect(status().isBadRequest())
+                .andExpect(status().isConflict())
                 .andExpect(jsonPath("$.message").value("이미 존재하는 이메일입니다."));  // ApiResponse 내의 메시지 필드 확인
     }
 

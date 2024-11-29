@@ -7,7 +7,9 @@ import shoppingmall.ankim.domain.cart.repository.query.CartItemQueryRepository;
 import shoppingmall.ankim.domain.cart.repository.query.CartQueryRepository;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface CartItemRepository extends JpaRepository<CartItem, Long>, CartItemQueryRepository {

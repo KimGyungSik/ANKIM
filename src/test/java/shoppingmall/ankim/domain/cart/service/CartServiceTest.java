@@ -22,6 +22,7 @@ import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
 import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
+import shoppingmall.ankim.domain.item.exception.NoOutOfStockException;
 import shoppingmall.ankim.domain.item.exception.OutOfStockException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
@@ -46,7 +47,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 import static org.mockito.internal.verification.VerificationModeFactory.times;
-import static shoppingmall.ankim.domain.cart.entity.QCartItem.cartItem;
+import static shoppingmall.ankim.global.exception.ErrorCode.NO_OUT_OF_STOCK_ITEMS;
 
 @ActiveProfiles("test")
 @TestPropertySource(properties = {
@@ -632,7 +633,7 @@ class CartServiceTest {
         // Mock CartItemRepository
         given(cartItemRepository.findByNoAndCart_Member(1L, member)).willReturn(Optional.of(mockCartItem));
 
-        // 요청 수량이 최대 주문 수량을 초과함
+        // 요청 수량이 최대 주문 수량을 초과
         Integer requestedQty = 15;
 
         // when & then
@@ -640,9 +641,110 @@ class CartServiceTest {
             cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
         });
 
-        // 검증
         assertThat(exception.getMessage()).isEqualTo("최대 주문 수량을 초과했습니다.");
         verify(cartItemRepository, times(1)).findByNoAndCart_Member(1L, member);
         verify(mockCartItem, never()).changeQuantity(anyInt()); // 수량 변경 메서드가 호출되지 않아야 함
     }
+
+    @Test
+    @DisplayName("재고가 0인 장바구니 품목을 비활성화한다.")
+    void deactivateOutOfStockItems() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock Items
+        Item mockItem1 = mock(Item.class);
+        given(mockItem1.getQty()).willReturn(0); // 재고 0으로 설정
+
+        Item mockItem2 = mock(Item.class);
+        given(mockItem2.getQty()).willReturn(0); // 재고 0으로 설정
+
+        // Mock CartItems
+        CartItem mockCartItem1 = mock(CartItem.class);
+        given(mockCartItem1.getItem()).willReturn(mockItem1);
+
+        CartItem mockCartItem2 = mock(CartItem.class);
+        given(mockCartItem2.getItem()).willReturn(mockItem2);
+
+        given(cartItemRepository.findOutOfStockItems(member))
+                .willReturn(List.of(mockCartItem1, mockCartItem2));
+
+        // when
+        cartService.deactivateOutOfStockItems(accessToken);
+
+        // then
+        verify(mockCartItem1, times(1)).deactivate();
+        verify(mockCartItem2, times(1)).deactivate();
+    }
+
+    @Test
+    @DisplayName("재고가 0인 품목만 비활성화하고, 재고가 0이 아닌 품목은 상태를 변경하지 않는다.")
+    void deactivateOutOfStockItems_ShouldOnlyDeactivateItemsWithZeroStock() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock Items
+        Item outOfStockItem1 = mock(Item.class);
+        given(outOfStockItem1.getQty()).willReturn(0); // 재고 0으로 설정
+
+        Item outOfStockItem2 = mock(Item.class);
+        given(outOfStockItem2.getQty()).willReturn(0); // 재고 0으로 설정
+
+        Item inStockItem = mock(Item.class);
+        given(inStockItem.getQty()).willReturn(10); // 재고 10으로 설정
+
+        // Mock CartItems
+        CartItem outOfStockCartItem1 = mock(CartItem.class);
+        given(outOfStockCartItem1.getItem()).willReturn(outOfStockItem1);
+
+        CartItem outOfStockCartItem2 = mock(CartItem.class);
+        given(outOfStockCartItem2.getItem()).willReturn(outOfStockItem2);
+
+        CartItem inStockCartItem = mock(CartItem.class);
+        given(inStockCartItem.getItem()).willReturn(inStockItem);
+
+        // Mock deactivate 동작 설정
+        doNothing().when(outOfStockCartItem1).deactivate();
+        doNothing().when(outOfStockCartItem2).deactivate();
+        doNothing().when(inStockCartItem).deactivate();
+
+        // Mock Repository
+        // CartItem의 상태가 변경이 안되는 것을 확인하기 위해서 inStockCartItem은 재고가 있지만 조회가 되었다고 가정하고 진행한다.
+        given(cartItemRepository.findOutOfStockItems(member))
+                .willReturn(List.of(outOfStockCartItem1, outOfStockCartItem2, inStockCartItem));
+
+        // when
+        cartService.deactivateOutOfStockItems(accessToken);
+
+        // then
+        verify(outOfStockCartItem1, times(1)).deactivate(); // 재고 0인 품목 상태 변경
+        verify(outOfStockCartItem2, times(1)).deactivate(); // 재고 0인 품목 상태 변경
+        verify(inStockCartItem, never()).deactivate(); // 재고 0이 아닌 품목 상태 변경 X
+    }
+
+    @Test
+    @DisplayName("품절된 상품이 없을 때 NoOutOfStockException이 발생한다.")
+    void deactivateOutOfStockItems_NoOutOfStockItems_ThrowsNoOutOfStockException() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock 품절 상품이 없는 상황
+        given(cartItemRepository.findOutOfStockItems(member)).willReturn(List.of());
+
+        // when & then
+        NoOutOfStockException exception = assertThrows(NoOutOfStockException.class, () -> {
+            cartService.deactivateOutOfStockItems(accessToken);
+        });
+
+        // 검증
+        assertThat(exception.getMessage()).isEqualTo(NO_OUT_OF_STOCK_ITEMS.getMessage());
+        verify(cartItemRepository, times(1)).findOutOfStockItems(member);
+    }
+
 }

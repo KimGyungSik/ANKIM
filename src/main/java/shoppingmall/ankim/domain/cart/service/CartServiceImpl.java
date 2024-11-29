@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
+import shoppingmall.ankim.domain.item.exception.NoOutOfStockException;
 import shoppingmall.ankim.domain.item.exception.OutOfStockException;
 import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
@@ -28,6 +29,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.domain.cart.entity.QCartItem.cartItem;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Service
@@ -146,6 +148,22 @@ public class CartServiceImpl implements CartService {
 
         cartItem.changeQuantity(qty);
         cartItemRepository.save(cartItem);
+    }
+
+    @Override
+    public void deactivateOutOfStockItems(String accessToken) {
+        Member member = getMember(accessToken);
+        List<CartItem> outOfStockItems = cartItemRepository.findOutOfStockItems(member);
+
+        if(outOfStockItems.isEmpty()) {
+            throw new NoOutOfStockException(NO_OUT_OF_STOCK_ITEMS);
+        }
+
+        for (CartItem cartItem : outOfStockItems) {
+            if (cartItem.getItem().getQty() == 0) { // 재고 확인
+                cartItem.deactivate(); // activeYn = 'N'으로 변경
+            }
+        }
     }
 
     private static void quantityComparison(Integer qty, Item item) {

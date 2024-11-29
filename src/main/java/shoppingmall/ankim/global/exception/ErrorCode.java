@@ -43,6 +43,7 @@ public enum ErrorCode {
     OUT_OF_STOCK(HttpStatus.CONFLICT, "재고가 부족합니다."),
     QUANTITY_BELOW_MINIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최소 주문 수량 보다 적습니다."),
     QUANTITY_EXCEED_MAXIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최대 주문 수량을 초과했습니다."),
+    NO_OUT_OF_STOCK_ITEMS(HttpStatus.NO_CONTENT, "품절된 상품이 없습니다."),
 
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
