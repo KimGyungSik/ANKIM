@@ -21,21 +21,21 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
-import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
+import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.entity.PayType;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.exception.AlreadyApprovedException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.factory.OrderFactory;
+import shoppingmall.ankim.factory.PaymentFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -254,5 +254,56 @@ class  PaymentServiceTest {
         // Mock 서버 검증
         mockServer.verify();
     }
+
+    @DisplayName("주문 번호로 결제 내역들을 조회할 수 있다.")
+    @Test
+    void findPaymentHistories() {
+        // given
+        int count = 5; // 결제 5개 생성
+
+        List<Payment> payments = PaymentFactory.createPayments(entityManager, count);
+        paymentRepository.saveAll(payments);
+
+        List<String> orderIds = payments.stream()
+                .map(payment -> payment.getOrder().getOrdNo())
+                .toList();
+
+        // 내림차순 정렬된 기대값 준비
+        List<Payment> sortedPayments = payments.stream()
+                .sorted(Comparator.comparing(Payment::getNo).reversed()) // paymentId 기준 내림차순
+                .toList();
+
+        // when
+        List<PaymentHistoryResponse> result = paymentService.findPaymentHistories(orderIds);
+
+        // then
+        assertThat(result).hasSize(5);
+
+        // 각 필드 검증 (내림차순 기준)
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::getPaymentId)
+                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getNo).toList());
+
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::getTotalPrice)
+                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getTotalPrice).toList());
+
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::getOrderName)
+                .containsExactlyElementsOf(sortedPayments.stream().map(payment -> payment.getOrder().getOrdCode()).toList());
+
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::getType)
+                .containsExactlyElementsOf(sortedPayments.stream().map(payment -> payment.getType().getDescription()).toList());
+
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::isPaySuccessYN)
+                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::isPaySuccessYN).toList());
+
+        assertThat(result)
+                .extracting(PaymentHistoryResponse::getCreatedAt)
+                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getCreatedAt).toList());
+    }
+
 
 }

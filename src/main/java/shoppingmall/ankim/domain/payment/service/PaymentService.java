@@ -12,10 +12,7 @@ import shoppingmall.ankim.domain.email.controller.MailApiController;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
-import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
+import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.exception.AlreadyApprovedException;
 import shoppingmall.ankim.domain.payment.exception.PaymentAmountNotEqualException;
@@ -25,9 +22,8 @@ import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceReq
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 
 import java.nio.charset.StandardCharsets;
-import java.util.Base64;
-import java.util.Collections;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -79,6 +75,21 @@ public class PaymentService {
         payment.setPaymentCancel(cancelReason, true);
         Map map = tossPaymentCancel(paymentKey, cancelReason);
         return PaymentCancelResponse.builder().details(map).build();
+    }
+
+    // 결제 내역
+    public List<PaymentHistoryResponse> findPaymentHistories(List<String> orderIds) {
+        // orderIds로 List<Order> 조회
+        List<Order> orders = orderRepository.findByOrdNoIn(orderIds);
+
+        // List<Order>로 List<Payment> 조회
+        List<Payment> payments = paymentRepository.findByOrderIn(orders);
+
+        // PaymentHistoryResponse로 맵핑 후 반환
+        return payments.stream()
+                .map(PaymentHistoryResponse::of)
+                .sorted(Comparator.comparing(PaymentHistoryResponse::getPaymentId).reversed()) // 내림차순 정렬
+                .collect(Collectors.toList());
     }
 
     private Map tossPaymentCancel(String paymentKey, String cancelReason) {
