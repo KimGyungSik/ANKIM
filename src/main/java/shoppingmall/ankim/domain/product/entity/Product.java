@@ -265,4 +265,13 @@ public class Product extends BaseEntity {
     public void changeSellingStatus(ProductSellingStatus productSellingStatus) {
         this.sellingStatus = productSellingStatus;
     }
+
+    public String getThumbnailImgUrl() {
+        return this.productImgs.stream()
+                .filter(productImg -> "Y".equals(productImg.getRepimgYn()) && productImg.getOrd() == 1) // 썸네일이면서 순서가 1인 이미지 필터링
+                .findFirst()
+                .map(ProductImg::getImgUrl) // 이미지 URL 반환
+                .orElse(null); // 조건에 맞는 이미지가 없으면 null 반환
+    }
+
 }

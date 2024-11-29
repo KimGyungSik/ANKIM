@@ -39,6 +39,25 @@ public enum ErrorCode {
     PRODUCT_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "상품명은 60자 이하로 입력해야 합니다."),
     CANNOT_MODIFY_SELLING_PRODUCT(HttpStatus.BAD_REQUEST, "판매 중인 상품은 수정할 수 없습니다."),
 
+    // 품목
+    ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "품목을 찾을 수 없습니다."),
+
+    // 주문
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+
+    // 주문 품목
+    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
+    DISCOUNT_PRICE_INVALID(HttpStatus.BAD_REQUEST, "상품 원가 금액이 할인 적용된 상품 금액보다 작을 수 없습니다."),
+
+    // 결제
+    INVALID_PAYMENT_KEY(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 키입니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "결제 정보를 찾을 수 없습니다"),
+    PAYMENT_AMOUNT_EXP(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
+    ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "이미 승인된 결제입니다."),
+
+    // 회원 주소
+    ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 배송지를 찾을 수 없습니다."),
+    DEFAULT_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 기본 배송지를 찾을 수 없습니다."),
 
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
@@ -55,6 +74,7 @@ public enum ErrorCode {
     NOT_FOUND_USER(HttpStatus.NOT_FOUND, "회원 정보를 찾을 수 없습니다."),
     INVALID_CREDENTIALS(HttpStatus.NOT_FOUND, "아이디 또는 비밀번호가 일치하지 않습니다."),
     USER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
+    INVALID_MEMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
 
     // Token 관련 에러 코드
     ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Access Token이 요청에 포함되지 않았습니다."),
@@ -62,6 +82,7 @@ public enum ErrorCode {
     REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다."),
     INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),
     TOKEN_REISSUE_FAILED(HttpStatus.BAD_REQUEST, "Token 재발급 중 오류 발생"),
+    TOKEN_VALIDATION_ERROR(HttpStatus.BAD_REQUEST,"유효하지 않은 토큰 입니다."),
 
     // 쿠키 관련 에러 코드
     COOKIE_NOT_INCLUDED(HttpStatus.BAD_REQUEST, "쿠키가 요청에 포함되어 있지 않습니다."),
