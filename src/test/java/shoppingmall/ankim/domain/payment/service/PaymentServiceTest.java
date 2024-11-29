@@ -11,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
@@ -45,6 +46,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @Transactional
+@ActiveProfiles("test")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class PaymentServiceTest {
     @MockBean
@@ -138,7 +140,7 @@ class PaymentServiceTest {
         // orderId에 order.getOrdNo()를 동적으로 삽입
         String expectedResponse = String.format("""
     {
-        "orderId": %s,
+        "orderId": "%s",
         "amount": 50000,
         "status": "SUCCESS"
     }
@@ -154,7 +156,7 @@ class PaymentServiceTest {
 
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getOrderId()).isEqualTo(orderCode);
+        assertThat(response.getOrderId()).isEqualTo(order.getOrdNo());
         assertThat(response.getAmount()).isEqualTo(amount.toString());
         assertThat(response.getStatus()).isEqualTo("SUCCESS");
 

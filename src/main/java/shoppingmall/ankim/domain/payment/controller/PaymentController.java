@@ -2,7 +2,6 @@ package shoppingmall.ankim.domain.payment.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentSuccessRequest;
@@ -47,6 +46,6 @@ public class PaymentController {
             @RequestParam String paymentKey,
             @RequestParam String cancelReason
     ) {
-        return ApiResponse.ok(paymentService.cancelPaymentPoint(paymentKey, cancelReason));
+        return ApiResponse.ok(paymentService.cancelPayment(paymentKey, cancelReason));
     }
 }

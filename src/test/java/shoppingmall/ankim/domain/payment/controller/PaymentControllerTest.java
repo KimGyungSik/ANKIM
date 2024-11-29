@@ -69,7 +69,6 @@ class PaymentControllerTest {
         given(paymentService.requestTossPayment(request.toServiceRequest())).willReturn(mockResponse);
 
         // when & then
-        // when & then
         mockMvc.perform(post("/api/v1/payments/toss")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("""
@@ -99,14 +98,19 @@ class PaymentControllerTest {
         given(paymentService.tossPaymentSuccess("paymentKey123", "ORD12345678", 50000)).willReturn(mockResponse);
 
         // when & then
-        mockMvc.perform((RequestBuilder) get("/api/v1/payments/toss/success")
-                        .queryParam("paymentKey", "paymentKey123")
-                        .queryParam("orderId", "ORD12345678")
-                        .queryParam("amount", "50000"))
+        mockMvc.perform(post("/api/v1/payments/toss/success")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "paymentKey": "paymentKey123",
+                            "orderId": "ORD12345678",
+                            "amount": "50000"
+                        }
+                        """))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"))
-                .andExpect(jsonPath("$.message").value("OK"))// 응답 HTTP 상태 코드 검증
+                .andExpect(jsonPath("$.message").value("OK")) // 응답 HTTP 상태 코드 검증
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 

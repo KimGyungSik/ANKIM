@@ -26,7 +26,6 @@ import shoppingmall.ankim.global.config.TossPaymentConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
-import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -72,7 +71,7 @@ public class PaymentService {
     }
 
     // 결제 취소 처리
-    public PaymentCancelResponse cancelPaymentPoint(String paymentKey, String cancelReason) {
+    public PaymentCancelResponse cancelPayment(String paymentKey, String cancelReason) {
         Payment payment = paymentRepository.findByPayKey(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 
         payment.setPaymentCancel(cancelReason, true);
