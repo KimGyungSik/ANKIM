@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.payment.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentSuccessRequest;
 import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
@@ -43,9 +44,8 @@ public class PaymentController {
 
     @PostMapping("/toss/cancel")
     public ApiResponse<PaymentCancelResponse> tossPaymentCancelPoint(
-            @RequestParam String paymentKey,
-            @RequestParam String cancelReason
+            @RequestBody  PaymentCancelRequest request
     ) {
-        return ApiResponse.ok(paymentService.cancelPayment(paymentKey, cancelReason));
+        return ApiResponse.ok(paymentService.cancelPayment(request.getPaymentKey(), request.getCancelReason()));
     }
 }

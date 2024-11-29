@@ -21,6 +21,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
+import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
@@ -48,7 +49,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 @Transactional
 @ActiveProfiles("test")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
-class PaymentServiceTest {
+class  PaymentServiceTest {
     @MockBean
     private S3Service s3Service;
 
@@ -186,7 +187,7 @@ class PaymentServiceTest {
         Payment payment = Payment.create(order, PayType.CARD, 50000);
         paymentRepository.save(payment);
 
-        String orderId = order.getOrdNo().toString(); // 실제 orderId로 설정
+        String orderId = order.getOrdNo(); // 실제 orderId로 설정
 
         // when
         PaymentFailResponse failResponse = paymentService.tossPaymentFail(errorCode, errorMessage, orderId);
@@ -203,4 +204,55 @@ class PaymentServiceTest {
         assertThat(failedPayment.getFailReason()).isEqualTo(errorMessage);
         assertThat(failedPayment.isPaySuccessYN()).isFalse();
     }
+
+
+    @DisplayName("결제 취소 시 성공적으로 PaymentCancelResponse을 반환한다.")
+    @Test
+    void cancelPayment() {
+        // given
+        String paymentKey = "test_payment_key";
+        String cancelReason = "사용자 요청";
+        String orderCode = "ORD20241125-1234567";
+
+        // Order와 Payment 데이터 생성 및 저장
+        Order order = OrderFactory.createOrder(entityManager);
+        order.setOrdCode(orderCode);
+        orderRepository.save(order);
+
+        Payment payment = Payment.create(order, PayType.CARD, 50000);
+        payment.setPaymentKey(paymentKey,true);
+        paymentRepository.save(payment);
+
+        String expectedResponse = """
+    {
+        "details": {
+            "cancelAmount": 50000,
+            "cancelDate": "2024-11-25T10:00:00+09:00",
+            "cancelReason": "사용자 요청"
+        }
+    }
+    """;
+
+        // Mock 서버 설정
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel"))
+                .andExpect(method(HttpMethod.POST))
+                .andExpect(content().json("""
+            {
+                "cancelReason": "사용자 요청"
+            }
+            """))
+                .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
+
+        // when
+        PaymentCancelResponse response = paymentService.cancelPayment(paymentKey, cancelReason);
+
+        // then
+        assertThat(response).isNotNull();
+        assertThat(response.getDetails()).containsEntry("cancelAmount", 50000);
+        assertThat(response.getDetails()).containsEntry("cancelReason", "사용자 요청");
+
+        // Mock 서버 검증
+        mockServer.verify();
+    }
+
 }

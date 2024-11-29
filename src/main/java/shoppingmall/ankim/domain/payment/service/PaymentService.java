@@ -8,6 +8,7 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import shoppingmall.ankim.domain.email.controller.MailApiController;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
@@ -26,6 +27,7 @@ import shoppingmall.ankim.global.config.TossPaymentConfig;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.Collections;
+import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -75,17 +77,18 @@ public class PaymentService {
         Payment payment = paymentRepository.findByPayKey(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 
         payment.setPaymentCancel(cancelReason, true);
-        return tossPaymentCancel(paymentKey, cancelReason);
+        Map map = tossPaymentCancel(paymentKey, cancelReason);
+        return PaymentCancelResponse.builder().details(map).build();
     }
 
-    public PaymentCancelResponse tossPaymentCancel(String paymentKey, String cancelReason) {
+    private Map tossPaymentCancel(String paymentKey, String cancelReason) {
         HttpHeaders headers = getHeaders();
         JSONObject params = new JSONObject();
         params.put("cancelReason", cancelReason);
 
         return restTemplate.postForObject(TossPaymentConfig.URL + paymentKey + "/cancel",
                 new HttpEntity<>(params, headers),
-                PaymentCancelResponse.class);
+                Map.class);
     }
 
 
