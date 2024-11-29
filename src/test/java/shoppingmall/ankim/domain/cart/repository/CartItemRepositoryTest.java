@@ -7,8 +7,12 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.context.annotation.Import;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.entity.QCartItem;
+import shoppingmall.ankim.domain.cart.repository.query.CartItemQueryRepositoryImpl;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -20,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class CartItemRepositoryTest {
 
@@ -93,4 +98,44 @@ class CartItemRepositoryTest {
         assertThat(foundCartItem.getItem().getName()).isEqualTo(mockCartItem.getItem().getName());
         assertThat(foundCartItem.getItem().getProduct().getName()).isEqualTo(mockCartItem.getItem().getProduct().getName());
     }
+
+
+    @Test
+    @DisplayName("활성 상태(Y)인 CartItem 개수를 정확히 반환한다")
+    void countActiveCartItems_ReturnsCorrectCount() {
+        // given
+        Integer expectedCount = 5; // Mock 데이터
+        QCartItem cartItem = QCartItem.cartItem;
+
+        Member mockMember = mock(Member.class);
+
+        given(cartItemRepository.countActiveCartItems(mockMember)).willReturn(expectedCount);
+
+        Cart mockCart = mock(Cart.class);
+        given(mockCart.getMember()).willReturn(mockMember);
+
+        // CartItem 5개 추가
+        int actualCount = 5;
+        for (int i = 0; i < actualCount; i++) {
+            cartItemRepository.save(CartItem.builder()
+                    .cart(mockCart) // 회원의 장바구니
+                    .activeYn("Y") // 활성 상태
+                    .build());
+        }
+        // 삭제된 CartItem 3개 추가
+        for (int i = 0; i < 3; i++) {
+            cartItemRepository.save(CartItem.builder()
+                    .cart(mockCart) // 회원의 장바구니
+                    .activeYn("N") // 활성 상태
+                    .build());
+        }
+
+        // when
+        Integer count = cartItemRepository.countActiveCartItems(mockMember);
+
+        // then
+        assertThat(count).isEqualTo(actualCount);
+    }
+
+
 }

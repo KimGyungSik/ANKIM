@@ -7,7 +7,9 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.exception.CartItemLimitExceededException;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
+import shoppingmall.ankim.domain.cart.exception.UnauthorizedCartItemAccessException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
 import shoppingmall.ankim.domain.item.exception.NoOutOfStockException;
@@ -42,6 +44,7 @@ public class CartServiceImpl implements CartService {
     private final ItemRepository itemRepository; // 품목 조회를 위한 Repository
     private final CartRepository cartRepository; // 장바구니를 위한 Repository
     private final CartItemRepository cartItemRepository; // 장바구니를 위한 Repository
+    private static final Integer MAX_COUNT_CART_ITEM = 100;
 
 /*
          [장바구니 상품 추가]
@@ -62,6 +65,13 @@ public class CartServiceImpl implements CartService {
     public void addToCart(AddToCartServiceRequest request, String accessToken) {
         LocalDateTime now = LocalDateTime.now();
         Member member = getMember(accessToken);
+
+        // 장바구니에 상품 개수 파악
+        Integer activeCartItemCount = cartItemRepository.countActiveCartItems(member);
+        if(activeCartItemCount > MAX_COUNT_CART_ITEM) {
+            throw new CartItemLimitExceededException(CART_ITEM_LIMIT_EXCEEDED);
+        }
+
 
         // 품목 조회
         Item item = Optional.ofNullable(itemRepository.findItemByOptionValuesAndProduct(
@@ -151,6 +161,24 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
+    public void deactivateSelectedItems(String accessToken, List<Long> cartItemNoList) {
+        Member member = getMember(accessToken);
+
+        List<CartItem> selectedItems = cartItemRepository.findAllById(cartItemNoList);
+
+        if(cartItemNoList.isEmpty() || selectedItems.isEmpty()) {
+            throw new CartItemNotFoundException(NO_SELECTED_CART_ITEM);
+        }
+
+        for (CartItem cartItem : selectedItems) {
+            if (!cartItem.getCart().getMember().equals(member)) {
+                throw new UnauthorizedCartItemAccessException(UNAUTHORIZED_CART_ITEM_ACCESS);
+            }
+            cartItem.deactivate(); // activeYn = 'N'
+        }
+    }
+
+    @Override
     public void deactivateOutOfStockItems(String accessToken) {
         Member member = getMember(accessToken);
         List<CartItem> outOfStockItems = cartItemRepository.findOutOfStockItems(member);
@@ -164,6 +192,15 @@ public class CartServiceImpl implements CartService {
                 cartItem.deactivate(); // activeYn = 'N'으로 변경
             }
         }
+    }
+
+    @Override
+    public Integer getCartItemCount(String accessToken) {
+        Member member = getMember(accessToken);
+
+        // 장바구니에 상품 개수 파악
+
+        return cartItemRepository.countActiveCartItems(member);
     }
 
     private static void quantityComparison(Integer qty, Item item) {

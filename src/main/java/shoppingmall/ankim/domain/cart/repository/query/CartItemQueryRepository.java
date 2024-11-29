@@ -8,5 +8,6 @@ import java.util.List;
 
 public interface CartItemQueryRepository {
     List<CartItem> findOutOfStockItems(Member member);
+    Integer countActiveCartItems(Member member);
 
 }

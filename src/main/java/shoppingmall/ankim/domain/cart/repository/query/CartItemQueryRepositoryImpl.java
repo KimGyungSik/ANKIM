@@ -7,7 +7,6 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.entity.QCartItem;
 import shoppingmall.ankim.domain.member.entity.Member;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
 
@@ -29,5 +28,19 @@ public class CartItemQueryRepositoryImpl implements CartItemQueryRepository {
                         QCartItem.cartItem.activeYn.eq("Y") // 활성화된 품목만 조회
                 )
                 .fetch();
+    }
+
+    @Override
+    public Integer countActiveCartItems(Member member) {
+        QCartItem cartItem = QCartItem.cartItem;
+        Long count = queryFactory
+                .select(cartItem.count())
+                .from(cartItem)
+                .where(
+                        cartItem.cart.member.eq(member)
+                                .and(cartItem.activeYn.eq("Y"))
+                )
+                .fetchOne();
+        return count != null ? Math.toIntExact(count) : 0; // Integer 타입으로 반환
     }
 }

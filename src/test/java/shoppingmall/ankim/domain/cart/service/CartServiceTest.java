@@ -15,6 +15,7 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.exception.CartItemLimitExceededException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
@@ -36,17 +37,16 @@ import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
-import java.util.Random;
+import java.util.*;
 
-import static org.assertj.core.api.Assertions.assertThat;
+        import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
+        import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
-import static org.mockito.internal.verification.VerificationModeFactory.times;
+        import static org.mockito.internal.verification.VerificationModeFactory.times;
+import static shoppingmall.ankim.global.exception.ErrorCode.CART_ITEM_LIMIT_EXCEEDED;
 import static shoppingmall.ankim.global.exception.ErrorCode.NO_OUT_OF_STOCK_ITEMS;
 
 @ActiveProfiles("test")
@@ -747,4 +747,78 @@ class CartServiceTest {
         verify(cartItemRepository, times(1)).findOutOfStockItems(member);
     }
 
+    @Test
+    @DisplayName("10개의 장바구니 품목 중 3개를 선택하여 삭제에 성공한다.")
+    void deactivateSelectedItems_RandomSelection_Success() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // Mock Cart 생성
+        Cart mockCart = mock(Cart.class);
+        given(mockCart.getMember()).willReturn(member);
+
+        // Mock 10개의 장바구니 품목 생성 + 품목 ID 리스트 생성 및 섞기
+        List<CartItem> allCartItems = new ArrayList<>();
+        List<Long> allIds = new ArrayList<>();
+        for (long i = 1; i <= 10; i++) {
+            CartItem cartItem = mock(CartItem.class);
+            given(cartItem.getCart()).willReturn(mockCart); // Mock Cart 연결
+            given(cartItem.getCart().getMember()).willReturn(member);
+            given(cartItem.getNo()).willReturn(i); // 품목 ID 설정
+
+            allCartItems.add(cartItem);
+            allIds.add(i);
+        }
+        Collections.shuffle(allIds); // ID 리스트 무작위 섞기
+
+        // 첫 3개 ID 선택
+        List<Long> selectedIds = allIds.subList(0, 3);
+
+        // Repository에서 선택된 품목만 반환되도록 설정
+        List<CartItem> selectedCartItems = allCartItems.stream()
+                .filter(cartItem -> selectedIds.contains(cartItem.getNo()))
+                .toList();
+        given(cartItemRepository.findAllById(selectedIds)).willReturn(selectedCartItems);
+
+        // when
+        cartService.deactivateSelectedItems(accessToken, selectedIds);
+
+        // then
+        // 선택된 품목만 상태 변경(deactivate) 확인
+        for (CartItem cartItem : allCartItems) {
+            if (selectedIds.contains(cartItem.getNo())) {
+                verify(cartItem, times(1)).deactivate();
+            } else {
+                verify(cartItem, never()).deactivate();
+            }
+        }
+    }
+
+    @Test
+    @DisplayName("장바구니 품목이 최대 개수를 초과하면 CART_ITEM_LIMIT_EXCEEDED 예외가 발생한다.")
+    void addToCart_ShouldThrowException_WhenCartItemLimitExceeded() {
+        // given
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+
+        // 장바구니의 최대 품목 개수
+        int maxCartItems = 100;
+
+        // Mock AddToCartServiceRequest 생성
+        AddToCartServiceRequest request = mock(AddToCartServiceRequest.class);
+        given(request.getProductNo()).willReturn(1L);
+        given(request.getOptionValueNoList()).willReturn(List.of(1L, 2L));
+        given(request.getQty()).willReturn(2);
+
+        // Mock 장바구니 품목 개수를 초과하도록 설정
+        when(cartItemRepository.countActiveCartItems(member)).thenReturn(maxCartItems + 1);
+
+        // when & then
+        assertThatThrownBy(() -> cartService.addToCart(request, accessToken))
+                .isInstanceOf(CartItemLimitExceededException.class)
+                .hasMessageContaining(CART_ITEM_LIMIT_EXCEEDED.getMessage());
+    }
 }
