@@ -14,7 +14,9 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
 import shoppingmall.ankim.domain.category.controller.CategoryController;
 import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
+import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
@@ -24,6 +26,9 @@ import shoppingmall.ankim.global.config.JpaAuditingConfig;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 import shoppingmall.ankim.global.config.RestTemplateConfig;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
@@ -135,6 +140,36 @@ class PaymentControllerTest {
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.message").value("OK"))// 응답 HTTP 상태 코드 검증
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
+
+    @Test
+    @DisplayName("결제 취소 시 PaymentCancelResponse를 반환한다")
+    void tossPaymentCancelPoint_shouldReturnPaymentCancelResponse() throws Exception {
+        // given
+        Map<String, String> request = new HashMap<>();
+        request.put("paymentKey","paymentKey123");
+        request.put("cancelReason","단순 변심");
+
+        PaymentCancelResponse mockResponse = PaymentCancelResponse.builder()
+                .details(request)
+                .build();
+
+        given(paymentService.cancelPayment("paymentKey123", "단순 변심")).willReturn(mockResponse);
+
+        // when & then
+        mockMvc.perform(post("/api/v1/payments/toss/cancel")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "paymentKey": "paymentKey123",
+                            "cancelReason" : "단순 변심"
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK")) // 응답 HTTP 상태 코드 검증
                 .andExpect(jsonPath("$.data").isNotEmpty());
     }
 
