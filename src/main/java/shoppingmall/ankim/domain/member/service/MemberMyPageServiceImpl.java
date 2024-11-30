@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceRequest;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.security.exception.JwtValidException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
@@ -40,6 +41,16 @@ public class MemberMyPageServiceImpl implements MemberMyPageService {
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_PASSWORD);
         }
+    }
+
+    /*
+    * TODO
+    * [비밀번호 변경]
+    *
+    * */
+    @Override
+    public void changePassword(String accessToken, ChangePasswordServiceRequest request) {
+
     }
 
     private Member getMember(String accessToken) {

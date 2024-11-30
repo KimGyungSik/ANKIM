@@ -9,6 +9,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
 import shoppingmall.ankim.domain.admin.repository.AdminRepository;
@@ -27,6 +28,8 @@ import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
+import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.handler.RedisHandler;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
@@ -37,16 +40,19 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler.handleStatusChange;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LoginServiceImpl implements LoginService {
 
     private final MemberRepository memberRepository;
     private final MemberLoginAttemptRepository memberLoginAttemptRepository;
     private final MemberLoginHistoryRepository memberLoginHistoryRepository;
+    private final MemberHistoryRepository memberHistoryRepository;
 
     private final AdminRepository adminRepository;
     private final AdminLoginAttemptRepository adminLoginAttemptRepository;
@@ -189,6 +195,9 @@ public class LoginServiceImpl implements LoginService {
 
         // 최대 실패 횟수 초과 시 계정 잠금
         if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
+            MemberHistory history = handleStatusChange(member, MemberStatus.LOCKED);
+            memberHistoryRepository.save(history);
+
             member.lock();
             loginAttempt.setLockTime(LOCK_TIME_MINUTES);
             memberRepository.save(member);
