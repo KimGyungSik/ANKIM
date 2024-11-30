@@ -47,7 +47,7 @@ public class Item {
     @Column(name = "add_price", precision = 10, scale = 2)
     private Integer addPrice; // 추가금액
 
-    private Integer totalPrice; // 판매가(할인률 적용된 가격) + 추가금액
+    private Integer totalPrice; // 정상가격(원가) + 추가금액
 
     private Integer qty; // 재고량
 
@@ -76,7 +76,7 @@ public class Item {
         this.maxQty = maxQty;
         this.minQty = minQty;
         addItemOptions(optionValues); // ItemOption 관계 추가
-        this.totalPrice = product.getSellPrice() + addPrice; // 총 가격 추가
+        this.totalPrice = product.getOrigPrice() + addPrice; // 총 가격 추가 (원가 + 추가금액)
         this.thumbNailImgUrl = product.getThumbnailImgUrl(); // 썸네일 이미지 URL 설정
     }
 

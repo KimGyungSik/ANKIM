@@ -14,6 +14,7 @@ public enum ErrorCode {
     CHILD_CATEGORY_EXISTS(HttpStatus.CONFLICT, "삭제할 중분류에 소분류가 존재하므로 삭제할 수 없습니다."),
     CATEGORY_LINKED_WITH_PRODUCT(HttpStatus.BAD_REQUEST, "해당 카테고리에 속한 상품이 존재하므로 삭제할 수 없습니다."),
 
+
     // 상품 이미지
     FILE_NOT_FOUND(HttpStatus.NOT_FOUND, "파일이 존재하지 않습니다."),
     FILE_UPLOAD_FAIL(HttpStatus.NOT_FOUND, "파일 업로드에 실패하였습니다."),
@@ -44,6 +45,23 @@ public enum ErrorCode {
     QUANTITY_BELOW_MINIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최소 주문 수량 보다 적습니다."),
     QUANTITY_EXCEED_MAXIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최대 주문 수량을 초과했습니다."),
     NO_OUT_OF_STOCK_ITEMS(HttpStatus.NOT_FOUND, "품절된 상품이 없습니다."),
+
+    // 주문
+    ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+
+    // 주문 품목
+    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
+    DISCOUNT_PRICE_INVALID(HttpStatus.BAD_REQUEST, "상품 원가 금액이 할인 적용된 상품 금액보다 작을 수 없습니다."),
+
+    // 결제
+    INVALID_PAYMENT_KEY(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 키입니다."),
+    PAYMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "결제 정보를 찾을 수 없습니다"),
+    PAYMENT_AMOUNT_EXP(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
+    ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "이미 승인된 결제입니다."),
+
+    // 회원 주소
+    ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 배송지를 찾을 수 없습니다."),
+    DEFAULT_ADDRESS_NOT_FOUND(HttpStatus.NOT_FOUND, "회원 기본 배송지를 찾을 수 없습니다."),
 
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),

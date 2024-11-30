@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.product.entity;
 
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 
@@ -153,6 +154,85 @@ class ProductTest {
         // then
         assertThat(product.getSearchKeywords())
                 .contains("#00FF00", "#FFFF00"); // 색상 코드 검증
+    }
+
+    @DisplayName("썸네일이면서 순서가 1인 이미지를 가져올 수 있다.")
+    @Test
+    void getThumbnailImgUrl_withRepImgAndOrd1() {
+        // given
+        Product product = Product.builder()
+                .name("테스트 상품")
+                .origPrice(20000)
+                .discRate(10)
+                .build();
+
+        // 썸네일 이미지 추가 (조건: 썸네일이면서 순서가 1)
+        ProductImg thumbnailImg = ProductImg.create(
+                "img1.jpg",
+                "original1.jpg",
+                "/images/img1.jpg",
+                "Y", // 썸네일 여부
+                1,  // 순서
+                product
+        );
+
+        // 순서가 2인 썸네일 이미지 추가 (조건에 맞지 않음)
+        ProductImg nonMatchingImg = ProductImg.create(
+                "img2.jpg",
+                "original2.jpg",
+                "/images/img2.jpg",
+                "Y",
+                2,
+                product
+        );
+
+        product.addProductImg(thumbnailImg);
+        product.addProductImg(nonMatchingImg);
+
+        // when
+        String thumbnailUrl = product.getThumbnailImgUrl();
+
+        // then
+        assertThat(thumbnailUrl).isEqualTo("/images/img1.jpg"); // 썸네일이면서 ord=1인 이미지 URL
+    }
+
+    @DisplayName("썸네일이 없거나 조건에 맞는 이미지가 없을 경우 null을 반환한다.")
+    @Test
+    void getThumbnailImgUrl_whenNoMatchingImage() {
+        // given
+        Product product = Product.builder()
+                .name("테스트 상품")
+                .origPrice(20000)
+                .discRate(10)
+                .build();
+
+        // 썸네일이 아니거나 순서가 1이 아닌 이미지 추가
+        ProductImg nonThumbnailImg = ProductImg.create(
+                "img1.jpg",
+                "original1.jpg",
+                "/images/img1.jpg",
+                "N", // 썸네일 아님
+                1,
+                product
+        );
+
+        ProductImg nonMatchingOrdImg = ProductImg.create(
+                "img2.jpg",
+                "original2.jpg",
+                "/images/img2.jpg",
+                "Y", // 썸네일
+                2,  // 순서가 1이 아님
+                product
+        );
+
+        product.addProductImg(nonThumbnailImg);
+        product.addProductImg(nonMatchingOrdImg);
+
+        // when
+        String thumbnailUrl = product.getThumbnailImgUrl();
+
+        // then
+        assertThat(thumbnailUrl).isNull(); // 조건에 맞는 이미지가 없으므로 null 반환
     }
 
 

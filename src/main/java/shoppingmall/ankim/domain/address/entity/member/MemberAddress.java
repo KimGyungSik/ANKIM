@@ -41,4 +41,16 @@ public class MemberAddress extends BaseEntity {
 
         @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
         private String activeYn = "Y";
+
+        // 팩토리 메서드
+        public static MemberAddress create(Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
+                MemberAddress memberAddress = new MemberAddress();
+                memberAddress.member = member;
+                memberAddress.addressName = addressName;
+                memberAddress.baseAddress = baseAddress;
+                memberAddress.phoneNumber = phoneNumber;
+                memberAddress.emergencyPhoneNumber = emergencyPhoneNumber;
+                memberAddress.defaultAddressYn = defaultAddressYn != null ? defaultAddressYn : "N"; // 기본값 처리
+                return memberAddress;
+        }
 }

@@ -42,8 +42,9 @@ spring:
 # 상품 이미지 업로드 경로
 itemImgLocation: C:/shop/item
 
-# 리소스 업로드 경로
-uploadPath: file:///Users/your-username/shop/
+  # 리소스 업로드 경로
+uploadPath: file:///C:/shop/
+
 # S3 설정
 cloud:
   aws:
@@ -56,3 +57,11 @@ cloud:
       static: ${cloud.aws.region.static}
     stack:
       auto: false
+
+# 토스페이먼츠
+payment:
+    toss:
+      test_client_api_key : test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm
+      test_secrete_api_key : test_gsk_docs_OaPz8L5KdmQXkzRz3y47BMw6
+      success_url : "http://localhost:8080/api/v1/payments/toss/success"
+      fail_url : "http://localhost:8080/api/v1/payments/toss/fail"

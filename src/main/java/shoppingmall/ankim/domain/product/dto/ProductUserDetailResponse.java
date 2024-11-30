@@ -39,7 +39,7 @@ public class ProductUserDetailResponse {
     private Integer viewCnt;
     private Integer rvwCnt;
     private Integer qnaCnt;
-
+    // FIXME 추가금액 필드도 추가해야할듯 Item.addPrice
     private CategoryResponse categoryResponse;
     private List<ProductImgUrlResponse> productImgs;
     private List<OptionGroupResponse> optionGroups;
