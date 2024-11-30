@@ -22,4 +22,7 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberQue
     // 회원의 아이디가 존재하는지 어떤 상태인지 조회한다.
     Member findByLoginIdAndStatus(String loginId, MemberStatus status);
 
+    // 회원의 비밀번호를 조회한다.
+    Member findByLoginIdAndPwd(Member member, String pwd);
+
 }

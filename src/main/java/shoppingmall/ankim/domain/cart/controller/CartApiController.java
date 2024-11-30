@@ -90,7 +90,6 @@ public class CartApiController {
         return ApiResponse.ok(Map.of("cartItemsCount", cartItemsCount));
     }
 
-
     // 쿠키에서 access 토큰이 넘어왔는지 확인하는 것 이므로 컨트롤러 단에 유지
     private static void isExistAccessToken(String access) {
         if (access == null) {

@@ -24,9 +24,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
 
-@WebMvcTest(MemberJoinController.class)
+@WebMvcTest(MemberJoinApiController.class)
 @AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
-class MemberJoinControllerTest {
+class MemberJoinApiControllerTest {
 
     @Autowired
     private MockMvc mockMvc;

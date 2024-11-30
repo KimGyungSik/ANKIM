@@ -22,7 +22,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.MEMBER_ID_DUPLICATE;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MemberServiceImpl implements MemberService {
+public class MemberServiceImpl implements MemberService {  // FIXME 클래스명 변경(-> MemberJoinServiceImpl)
 
     private final TermsQueryService termsQueryService;
 

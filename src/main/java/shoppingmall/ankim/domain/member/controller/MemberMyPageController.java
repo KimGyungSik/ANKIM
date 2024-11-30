@@ -19,7 +19,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.MISSING_REQUIRED_ID;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/my")
+@RequestMapping("/mypage")
 public class MemberMyPageController {
 
     private final MemberService memberService;
