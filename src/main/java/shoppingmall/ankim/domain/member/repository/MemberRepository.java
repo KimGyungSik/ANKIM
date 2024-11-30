@@ -14,12 +14,15 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberQue
     Boolean existsByLoginId(String loginId);
 
     // loginId(Email)을 조회한다.(소셜 로그인 기능 추가하게 되면 social_login 테이블에서 Email 조회 진행)
-    Member findByLoginId(String loginId);
+    Member findByLoginId(String loginId); // FIXME Member -> Optional<Member>로 변경 고려
 
     // 모든 회원 정보를 불러온다.
     List<Member> findAll();
 
     // 회원의 아이디가 존재하는지 어떤 상태인지 조회한다.
     Member findByLoginIdAndStatus(String loginId, MemberStatus status);
+
+    // 회원의 비밀번호를 조회한다.
+    Member findByLoginIdAndPwd(Member member, String pwd);
 
 }

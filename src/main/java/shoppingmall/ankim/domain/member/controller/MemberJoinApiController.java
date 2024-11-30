@@ -15,7 +15,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RequestMapping("/api/member")
 @SessionAttributes("termsAgreements")
-public class MemberJoinController {
+public class MemberJoinApiController {
 
     private final MemberService memberService;
 

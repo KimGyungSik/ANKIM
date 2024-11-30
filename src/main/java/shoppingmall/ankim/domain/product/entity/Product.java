@@ -22,9 +22,9 @@ import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NAME_TOO_LONG;
 
 /*
-    * 상품 정책
-    * 상품명 -> 최대 60자까지
-    * 상세설명 -> 50자까지
+ * 상품 정책
+ * 상품명 -> 최대 60자까지
+ * 상세설명 -> 50자까지
 
  */
 
@@ -114,9 +114,9 @@ public class Product extends BaseEntity {
 
     @Builder
     private Product(Category category, List<ProductImg> productImgs, List<Item> items, List<OptionGroup> optionGroups, String name, String code,
-                   String desc, Integer discRate, Integer origPrice,
-                   String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String handMadeYn,
-                   String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip,
+                    String desc, Integer discRate, Integer origPrice,
+                    String optYn, String restockYn, Integer qty, ProductSellingStatus sellingStatus, String handMadeYn,
+                    String freeShip, Integer shipFee, String searchKeywords, String relProdCode, String cauProd, String cauOrd, String cauShip,
                     Integer avgR, Integer wishCnt, Integer viewCnt, Integer rvwCnt,Integer qnaCnt, Integer dispOrd) {
         this.category = category;
         this.productImgs = productImgs != null ? productImgs : new ArrayList<>();
@@ -171,10 +171,10 @@ public class Product extends BaseEntity {
     }
 
     public static Product create(
-          Category category,String name, String code, String desc
-        , Integer discRate, Integer origPrice, String optYn, String restockYn
-        , Integer qty, String handMadeYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode
-        , String cauProd, String cauOrd, String cauShip)
+            Category category,String name, String code, String desc
+            , Integer discRate, Integer origPrice, String optYn, String restockYn
+            , Integer qty, String handMadeYn, String freeShip, Integer shipFee, String searchKeywords, String relProdCode
+            , String cauProd, String cauOrd, String cauShip)
     {
         return Product.builder()
                 .category(category)
