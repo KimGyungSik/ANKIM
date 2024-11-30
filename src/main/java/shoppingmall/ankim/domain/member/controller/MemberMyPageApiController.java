@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.member.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.apache.http.HttpStatus;
 import org.springframework.stereotype.Controller;
@@ -34,7 +35,7 @@ public class MemberMyPageApiController {
 
     @PutMapping("/change-password")
     public ApiResponse<String> changePassword(
-            @RequestParam ChangePasswordRequest request,
+            @Valid @RequestBody ChangePasswordRequest request,
             @CookieValue(value = "access", required = false) String access
     ) {
         isExistAccessToken(access);

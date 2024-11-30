@@ -79,7 +79,10 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다."),
     USER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요."),
+    CURRENT_PASSWORD_INVALID(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
+    PASSWORD_CONFIRMATION_MISMATCH(HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
+    PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "현재와 다른 비밀번호를 입력해주시기 바랍니다."),
 
     // 마이페이지 관련 에러 코드
 
