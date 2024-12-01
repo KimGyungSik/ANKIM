@@ -5,23 +5,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
-import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceRequest;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.exception.JwtValidException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
-import shoppingmall.ankim.domain.terms.entity.Terms;
-import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
-import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
-
-import java.util.List;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -29,7 +21,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class MemberMyPageServiceImpl implements MemberMyPageService {
+public class MemberEditServiceImpl implements MemberEditService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;

@@ -3,34 +3,25 @@ package shoppingmall.ankim.domain.cart.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
-import org.hibernate.annotations.Array;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
-import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
-import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
-import shoppingmall.ankim.domain.member.repository.MemberRepository;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 
-import java.util.Arrays;
 import java.util.List;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.BDDMockito.given;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -67,7 +58,7 @@ class CartApiControllerTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         AddToCartRequest request = new AddToCartRequest();
         request.setProductNo(1L);
@@ -91,7 +82,7 @@ class CartApiControllerTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         Cookie cookie = new Cookie("access", accessToken);
 

@@ -4,19 +4,13 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
-import shoppingmall.ankim.domain.admin.exception.AdminRegistrationException;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
@@ -29,20 +23,19 @@ import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @SpringBootTest
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 @Transactional
-class MemberMyPageServiceTest {
+class MemberEditServiceTest {
 
     @Autowired
     EntityManager em;
 
     @Autowired
-    private MemberMyPageService memberMyPageService;
+    private MemberEditService memberEditService;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -72,10 +65,10 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // when & then
-        assertDoesNotThrow(() -> memberMyPageService.isValidPassword(accessToken, rawPassword));
+        assertDoesNotThrow(() -> memberEditService.isValidPassword(accessToken, rawPassword));
     }
 
     @Test
@@ -87,10 +80,10 @@ class MemberMyPageServiceTest {
         String wrongPassword = "wrongPassword456";
 
         Member secureMember = MemberJwtFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(secureMember, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(secureMember, jwtTokenProvider);
 
         // when & then
-        assertThatThrownBy(() -> memberMyPageService.isValidPassword(accessToken, wrongPassword))
+        assertThatThrownBy(() -> memberEditService.isValidPassword(accessToken, wrongPassword))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(INVALID_PASSWORD.getMessage());
     }
@@ -105,7 +98,7 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -116,7 +109,7 @@ class MemberMyPageServiceTest {
         String encodeNewPassword = bCryptPasswordEncoder.encode(newPassword);
 
         // when
-        assertDoesNotThrow(() -> memberMyPageService.changePassword(accessToken, request));
+        assertDoesNotThrow(() -> memberEditService.changePassword(accessToken, request));
 
         // then
         Member findMember = memberRepository.findByLoginId(loginId);
@@ -135,7 +128,7 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(wrongOldPassword)
@@ -144,7 +137,7 @@ class MemberMyPageServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberMyPageService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(CURRENT_PASSWORD_INVALID.getMessage());
     }
@@ -158,7 +151,7 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -167,7 +160,7 @@ class MemberMyPageServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberMyPageService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(PASSWORD_SAME_AS_OLD.getMessage());
     }
@@ -183,7 +176,7 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -192,7 +185,7 @@ class MemberMyPageServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberMyPageService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(PASSWORD_CONFIRMATION_MISMATCH.getMessage());
     }
