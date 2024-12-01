@@ -6,6 +6,12 @@ import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
+import shoppingmall.ankim.domain.cart.entity.Cart;
+import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
+import shoppingmall.ankim.domain.cart.exception.CartNotFoundException;
+import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
+import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
@@ -28,7 +34,9 @@ import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -42,38 +50,68 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final DeliveryService deliveryService;
+    private final CartRepository cartRepository;
+    private final CartItemRepository cartItemRepository;
 
-    public OrderResponse createOrder(OrderCreateServiceRequest request,
-                            DeliveryCreateServiceRequest deliveryRequest,
-                            MemberAddressCreateServiceRequest addressRequest,
-                            LocalDateTime registeredDateTime,
-                            String accessToken) {
+    public void createOrder(OrderCreateServiceRequest request,
+                                     LocalDateTime registeredDateTime,
+                                     String accessToken) {
         // 회원 조회
         String loginId = getLoginId(accessToken);
         Member member = getMember(accessToken);
 
-        // FIXME 넘어온 품목들이 실제로 장바구니에 존재하는지 확인  (장바구니 조회)
-        // 품목 조회 & 주문품목 생성
-        List<OrderItem> orderItems = getOrderItems(request);
+        // 장바구니에 존재하는 유효한 품목 확인 및 반환
+        List<OrderCreateServiceRequest.ItemOrder> validItems = existCartInItemAndQty(request, member);
 
-        // 배송지 생성
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
+        // 유효한 품목들을 기반으로 OrderItem 생성
+        List<OrderItem> orderItems = getOrderItems(validItems);
 
-        // FIXME 재고 조회
+        // 품목 재고 조회
+
+
+
 
         // 주문 생성
-        Order order = orderRepository.save(Order.create(orderItems, member, delivery, registeredDateTime));
-
-        // FIXME 결제 생성
-
-        // FIXME 재고 차감
+//        Order order = orderRepository.save(Order.create(orderItems, member, delivery, registeredDateTime));
 
         // 주문 코드 생성 및 저장
-        String ordCode = generateOrderCode(order.getOrdNo(), registeredDateTime);
-        order.setOrdCode(ordCode);
-
-        return OrderResponse.of(order);
+//        String ordCode = generateOrderCode(order.getOrdNo(), registeredDateTime);
+//        order.setOrdCode(ordCode);
+//
+//        return OrderResponse.of(order);
     }
+
+
+    private List<OrderCreateServiceRequest.ItemOrder> existCartInItemAndQty(OrderCreateServiceRequest request, Member member) {
+        Cart cart = cartRepository.findByMemberAndActiveYn(member, "Y")
+                .orElseThrow(() -> new CartNotFoundException(CART_NOT_FOUND));
+
+        // 유효한 품목 리스트를 담을 변수
+        List<OrderCreateServiceRequest.ItemOrder> validItems = new ArrayList<>();
+
+        // 넘어온 품목들이 실제로 장바구니에 존재하는지 확인
+        List<OrderCreateServiceRequest.ItemOrder> items = request.getItems();
+        for (OrderCreateServiceRequest.ItemOrder itemOrder : items) {
+            Long itemNumber = itemOrder.getItemNumber();
+            Integer quantity = itemOrder.getQuantity();
+
+            // 품목 객체 조회 (Item 엔티티 필요)
+            Item item = itemRepository.findById(itemNumber)
+                    .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
+
+            // 장바구니 항목 확인
+            Optional<CartItem> cartItem = cartItemRepository.findByCartAndItemAndQty(cart, item, quantity);
+            if (cartItem.isEmpty()) {
+                throw new CartItemNotFoundException(CART_ITEM_NOT_FOUND);
+            }
+
+            // 유효한 품목 추가
+            validItems.add(itemOrder);
+        }
+
+        return validItems;
+    }
+
 
     private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {
         // 현재 날짜 (yyyyMMdd)
@@ -87,8 +125,8 @@ public class OrderService {
     }
 
 
-    private List<OrderItem> getOrderItems(OrderCreateServiceRequest request) {
-        return request.getItems().stream()
+    private List<OrderItem> getOrderItems(List<OrderCreateServiceRequest.ItemOrder> validItems) {
+        return validItems.stream()
                 .map(itemOrder -> {
                     // 품목 조회
                     Item item = itemRepository.findById(itemOrder.getItemNumber())

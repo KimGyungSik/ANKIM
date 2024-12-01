@@ -8,6 +8,8 @@ import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
+import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.email.controller.MailApiController;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
@@ -37,10 +39,15 @@ public class PaymentService {
     private final RestTemplate restTemplate;
 
     // 클라이언트 결제 요청처리
-    public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request) {
+    public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
+                                              DeliveryCreateServiceRequest deliveryRequest,
+                                              MemberAddressCreateServiceRequest addressRequest) {
         // Order 조회 (fetch join으로 Member 로딩)
         Order order = orderRepository.findByOrderWithMember(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+
+//        // 배송지 생성
+//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
 
         // Payment 생성 & 저장
         Payment payment = paymentRepository.save(Payment.create(order, request.getPayType(), request.getAmount()));

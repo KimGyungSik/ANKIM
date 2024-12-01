@@ -118,7 +118,7 @@ public class Order extends BaseEntity {
 
     public static Order create(List<OrderItem> orderItems, Member member, Delivery delivery, LocalDateTime regDate) {
         return Order.builder()
-                .orderStatus(INIT)
+                .orderStatus(PENDING_PAYMENT)
                 .member(member)
                 .orderItems(orderItems)
                 .delivery(delivery)

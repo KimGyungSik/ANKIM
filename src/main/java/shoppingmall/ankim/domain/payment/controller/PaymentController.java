@@ -19,10 +19,11 @@ import shoppingmall.ankim.global.response.ApiResponse;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/toss")
-    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request) {
-        return ApiResponse.ok(paymentService.requestTossPayment(request.toServiceRequest()));
-    }
+//    @PostMapping("/toss")
+//    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request) {
+////        return ApiResponse.ok(paymentService.requestTossPayment(request.toServiceRequest()));
+//    }
+
     @PostMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
             @RequestBody PaymentSuccessRequest paymentSuccessRequest) {

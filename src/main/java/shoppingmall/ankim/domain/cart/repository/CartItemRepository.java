@@ -17,4 +17,6 @@ public interface CartItemRepository extends JpaRepository<CartItem, Long>, CartI
     Optional<CartItem> findByCartAndItemNo(Cart cart, Item item); // 특정 장바구니에 담은 품목이 존재하는지 확인한다.
     Optional<CartItem> findByNoAndCart_Member(Long cartItemNo, Member member); // 로그인한 회원의 장바구니 품목을 조회한다.
 
+    Optional<CartItem> findByCartAndItemAndQty(Cart cart, Item item,Integer qty);
+
 }

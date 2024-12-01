@@ -101,6 +101,7 @@ public enum ErrorCode {
     // 장바구니 관련 에러 코드
     CART_ITEM_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "장바구니에 담을 수 있는 상품 개수를 초과했습니다."),
     CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장바구니 품목을 찾을 수 없습니다."),
+    CART_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장바구니를 찾을 수 없습니다."),
     NO_SELECTED_CART_ITEM(HttpStatus.NO_CONTENT,"상품을 선택해 주세요."),
     UNAUTHORIZED_CART_ITEM_ACCESS(HttpStatus.FORBIDDEN,"본인의 장바구니 품목만 삭제할 수 있습니다.")
     ;
