@@ -9,6 +9,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.delivery.entity.Delivery;
+import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.email.controller.MailApiController;
 import shoppingmall.ankim.domain.order.entity.Order;
@@ -37,17 +39,14 @@ public class PaymentService {
     private final TossPaymentConfig tossPaymentConfig;
     private final OrderRepository orderRepository;
     private final RestTemplate restTemplate;
+    private final DeliveryService deliveryService;
 
-    // 클라이언트 결제 요청처리
-    public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
-                                              DeliveryCreateServiceRequest deliveryRequest,
-                                              MemberAddressCreateServiceRequest addressRequest) {
+    // 클라이언트 결제 요청처리 & 재고 감소
+    public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request) {
         // Order 조회 (fetch join으로 Member 로딩)
         Order order = orderRepository.findByOrderWithMember(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
-//        // 배송지 생성
-//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
 
         // Payment 생성 & 저장
         Payment payment = paymentRepository.save(Payment.create(order, request.getPayType(), request.getAmount()));
@@ -60,22 +59,31 @@ public class PaymentService {
         return response;
     }
 
-    // 성공 시 처리
-    public PaymentSuccessResponse tossPaymentSuccess(String paymentKey, String orderId, Integer amount) {
+    // 결제 성공 시 처리 & 배송지 저장 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
+    public PaymentSuccessResponse tossPaymentSuccess(String paymentKey, String orderId, Integer amount,
+                                                     DeliveryCreateServiceRequest deliveryRequest,
+                                                     MemberAddressCreateServiceRequest addressRequest,
+                                                     String loginId
+    ) {
+        // 배송지 생성
+        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
+
+        // 주문 상태 및 배송지 업데이트
+
         Payment payment = verifyPayment(orderId, amount);
         PaymentSuccessResponse result = requestPaymentAccept(paymentKey, orderId, amount);
         payment.setPaymentKey(paymentKey, true);
         return result;
     }
 
-    // 실패 시 처리
+    // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패)
     public PaymentFailResponse tossPaymentFail(String code, String message, String orderId) {
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
         payment.setFailReason(message, false);
         return PaymentFailResponse.of(code, message, orderId);
     }
 
-    // 결제 취소 처리
+    // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소)
     public PaymentCancelResponse cancelPayment(String paymentKey, String cancelReason) {
         Payment payment = paymentRepository.findByPayKey(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 

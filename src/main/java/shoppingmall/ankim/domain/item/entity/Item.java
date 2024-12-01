@@ -143,8 +143,16 @@ public class Item {
 
     public void deductQuantity(int qty) {
         if (isQuantityLessThan(qty)) {
-            throw new IllegalArgumentException("차감할 재고 수량이 없습니다."); // FIXME
+            throw new IllegalArgumentException("차감할 재고 수량이 없습니다.");
         }
         this.qty -= qty;
+    }
+
+    // 재고 복구 메서드
+    public void restoreQuantity(int qty) {
+        if (qty <= 0) {
+            throw new IllegalArgumentException("복구할 재고 수량은 0보다 커야 합니다.");
+        }
+        this.qty += qty;
     }
 }
