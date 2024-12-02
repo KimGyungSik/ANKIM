@@ -19,7 +19,9 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -137,5 +139,37 @@ class CartItemRepositoryTest {
         assertThat(count).isEqualTo(actualCount);
     }
 
+    @Test
+    @DisplayName("특정 CartItemNo 리스트로 CartItems 조회를 성공한다.")
+    void findByNoIn_CartItemsRetrievedSuccessfully() {
+        // given
+        Member mockMember = mock(Member.class);
+        Cart mockCart = mock(Cart.class);
+        given(mockCart.getMember()).willReturn(mockMember);
+
+        Product mockProduct = mock(Product.class);
+        Item mockItem = mock(Item.class);
+        given(mockItem.getProduct()).willReturn(mockProduct);
+
+        // Mock CartItems
+        CartItem cartItem1 = CartItem.builder().cart(mockCart).item(mockItem).no(1L).qty(2).build();
+        CartItem cartItem2 = CartItem.builder().cart(mockCart).item(mockItem).no(2L).qty(3).build();
+        List<CartItem> cartItems = List.of(cartItem1, cartItem2);
+        List<Long> cartItemNos = cartItems.stream().map(CartItem::getNo).collect(Collectors.toList());
+
+        given(cartItemRepository.findByNoIn(cartItemNos)).willReturn(cartItems);
+
+        // when
+        List<CartItem> foundCartItems = cartItemRepository.findByNoIn(cartItemNos);
+
+        // then
+        assertThat(foundCartItems).isNotNull();
+        assertThat(foundCartItems.size()).isEqualTo(cartItems.size());
+
+        for (int i = 0; i < cartItems.size(); i++) {
+            assertThat(foundCartItems.get(i).getNo()).isEqualTo(cartItems.get(i).getNo());
+            assertThat(foundCartItems.get(i).getQty()).isEqualTo(cartItems.get(i).getQty());
+        }
+    }
 
 }

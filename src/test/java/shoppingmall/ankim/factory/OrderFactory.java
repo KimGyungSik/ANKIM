@@ -17,6 +17,30 @@ import java.util.List;
 
 public class OrderFactory {
 
+    public static List<Order> createTempOrders(EntityManager entityManager, int count) {
+        // Member를 하나만 생성
+        Member member = MemberJwtFactory.createMember(entityManager, "test@example.com");
+
+        // Product 및 관련 데이터 생성
+        Product product = ProductFactory.createProduct(entityManager);
+
+        // Item 추출
+        Item item1 = product.getItems().get(0); // 첫 번째 품목
+        Item item2 = product.getItems().get(1); // 두 번째 품목
+
+        // Order 생성
+        OrderItem orderItem1 = OrderItem.create(item1, 2); // 수량 2
+        OrderItem orderItem2 = OrderItem.create(item2, 3); // 수량 3
+
+        // 여러 개의 주문 생성
+        List<Order> orders = new ArrayList<>();
+        for (int i = 0; i < count; i++) {
+            Order order = makeOrders(entityManager, member,List.of(orderItem1,orderItem2)); // 동일한 Member 사용
+            orders.add(order);
+        }
+        return orders;
+    }
+
     public static List<Order> createOrders(EntityManager entityManager, int count) {
         // Member를 하나만 생성
         Member member = MemberJwtFactory.createMember(entityManager, "0711kyungh@naver.com");
@@ -57,6 +81,38 @@ public class OrderFactory {
 
         return order;
     }
+
+    public static Order createTempOrder(EntityManager entityManager) {
+        // Product 및 관련 데이터 생성
+        Product product = ProductFactory.createProduct(entityManager);
+
+        // Item 추출
+        Item item1 = product.getItems().get(0); // 첫 번째 품목
+        Item item2 = product.getItems().get(1); // 두 번째 품목
+
+        // Order 생성
+        OrderItem orderItem1 = OrderItem.create(item1, 2); // 수량 2
+        OrderItem orderItem2 = OrderItem.create(item2, 3); // 수량 3
+
+        // Member 생성
+        Member member = MemberJwtFactory.createMember(entityManager, "test@example.com");
+
+        // Delivery 생성
+        Delivery delivery = createDelivery(entityManager, member);
+
+        // Order 생성
+        Order order = Order.create(
+                List.of(orderItem1, orderItem2),
+                member,
+                delivery,
+                LocalDateTime.now()
+        );
+
+        entityManager.persist(order);
+
+        return order;
+    }
+
 
     public static Order createOrder(EntityManager entityManager) {
         // Product 및 관련 데이터 생성

@@ -16,7 +16,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
 @RequestMapping("api/address")
 public class MemberAddressRegisterController {
 
-
     private final MemberAddressService memberAddressService;
 
     @PutMapping("/edit")

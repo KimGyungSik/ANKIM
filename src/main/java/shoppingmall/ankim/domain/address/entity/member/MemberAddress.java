@@ -38,7 +38,7 @@ public class MemberAddress extends BaseEntity {
         private String defaultAddressYn; // 기본 배송지 여부
 
         @Column(name = "active_yn", nullable = false)
-        private String activeYn; // 활성 상태
+        private String activeYn = "N"; // 활성 상태
 
         @Builder
         public MemberAddress(Long no, Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn, String activeYn) {

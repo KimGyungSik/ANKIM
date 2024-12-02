@@ -14,4 +14,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderWithMember(@Param("orderName") String orderName);
 
     List<Order> findByOrdNoIn(@Param("ordNo") List<String> ordNo);
+
+    boolean existsByOrdCode(String ordCode); // 주문번호 확인
 }

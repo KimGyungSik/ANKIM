@@ -1,11 +1,15 @@
 package shoppingmall.ankim.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
+import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
+import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
@@ -19,19 +23,29 @@ import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
+import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.order.service.request.OrderCreateServiceRequest;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
+import shoppingmall.ankim.domain.orderItem.exception.InvalidOrderItemQtyException;
 import shoppingmall.ankim.domain.security.exception.JwtValidException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
+@Slf4j
 @Service
 @Transactional
 @RequiredArgsConstructor
@@ -42,76 +56,110 @@ public class OrderService {
     private final MemberRepository memberRepository;
     private final JwtTokenProvider jwtTokenProvider;
     private final DeliveryService deliveryService;
+    private final CartItemRepository cartItemRepository;
 
-    public OrderResponse createOrder(OrderCreateServiceRequest request,
-                            DeliveryCreateServiceRequest deliveryRequest,
-                            MemberAddressCreateServiceRequest addressRequest,
-                            LocalDateTime registeredDateTime,
-                            String accessToken) {
+    public OrderResponse createTempOrder(String accessToken, List<Long> cartItemNoList) {
+        LocalDateTime registeredDateTime = LocalDateTime.now();
+
         // 회원 조회
-        String loginId = getLoginId(accessToken);
         Member member = getMember(accessToken);
+        String loginId = member.getLoginId();
 
-        // FIXME 넘어온 품목들이 실제로 장바구니에 존재하는지 확인  (장바구니 조회)
-        // 품목 조회 & 주문품목 생성
-        List<OrderItem> orderItems = getOrderItems(request);
+        // 장바구니 품목 조회
+        List<CartItem> cartItemList = cartItemRepository.findByNoIn(cartItemNoList);
+        if (cartItemList.isEmpty() || cartItemList.size() != cartItemNoList.size()) {
+            throw new CartItemNotFoundException(CART_ITEM_NOT_FOUND);
+        }
 
-        // 배송지 생성
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
+        // 장바구니 품목테이블에서 품목(Item) 추출하여 OrderItem 생성
+        List<OrderItem> orderItemList = getOrderItems(cartItemList);
 
-        // FIXME 재고 조회
-
-        // 주문 생성
-        Order order = orderRepository.save(Order.create(orderItems, member, delivery, registeredDateTime));
-
-        // FIXME 결제 생성
-
-        // FIXME 재고 차감
+        // 임시 주문 생성
+        Order order1 = Order.tempCreate(orderItemList, member, registeredDateTime);
+        Order order = orderRepository.save(order1);
+        log.info("Order create : {}", order.getOrdNo());
+        log.info("Order UUID : {}", order.getOrdNo());
 
         // 주문 코드 생성 및 저장
         String ordCode = generateOrderCode(order.getOrdNo(), registeredDateTime);
+        log.info("ordCode: {}", ordCode);
         order.setOrdCode(ordCode);
 
-        return OrderResponse.of(order);
+        return OrderResponse.tempOf(order);
     }
 
     private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {
-        // 현재 날짜 (yyyyMMdd)
-        String currentDate = registeredDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
+        try {
+            // 현재 날짜 (yyyyMMdd)
+            String currentDate = registeredDateTime.format(DateTimeFormatter.ofPattern("yyyyMMdd"));
 
-        // 일련번호 추가
-        String serialNumber = String.format("%07d", orderId); // orderId를 7자리로 포맷팅
+            String ordCode;
+            boolean isDuplicate;
+            // 중복되지 않은 주문 코드를 생성할 때까지 반복(do-while)
+            do {
+                // UUID에서 '-' 제거
+                String compactUUID = orderId.replaceAll("-", "");
 
-        // 최종 코드 생성
-        return "ORD" + currentDate + "-" + serialNumber;
+                // SHA-256 해싱
+                MessageDigest digest = MessageDigest.getInstance("SHA-256");
+                byte[] hash = digest.digest(compactUUID.getBytes());
+
+                // 해시값 -> BigInteger 변환
+                BigInteger bigInt = new BigInteger(1, hash);
+
+                // BigInteger값을 7자리로 변환하기 위해서 10^targetLength로 나머지 연산
+                BigInteger divisor = BigInteger.TEN.pow(7); // 10^7
+                BigInteger compressedValue = bigInt.mod(divisor);
+                String serialNumber = String.format("%07d", compressedValue); // 7자리 포맷
+                // 최종 주문 코드 생성
+                ordCode = "ORD" + currentDate + "-" + serialNumber;
+
+                // 중복 확인
+                isDuplicate = orderRepository.existsByOrdCode(ordCode);
+
+                if (isDuplicate) {
+                    // NOTE 중복 확인 -> 희박한 확률로 중복이 나올 수 있기 때문에 확인해줄 필요가 있다고 판단하였다.
+                    log.warn("중복된 주문 코드 발견: {}. 새로운 주문 코드를 생성합니다.", ordCode);
+                    // 새로운 UUID 생성 -> 새로운 주문번호 생성을 위함
+                    orderId = UUID.randomUUID().toString();
+                }
+            } while (isDuplicate); // 중복이 아니면 종료
+            // 최종적으로 중복되지 않은 주문 코드 반환
+            return ordCode;
+        } catch (NoSuchAlgorithmException e) {
+            throw new OrderCodeGenerationException(ORDER_CODE_GENERATE_FAIL);
+        }
     }
 
-
-    private List<OrderItem> getOrderItems(OrderCreateServiceRequest request) {
-        return request.getItems().stream()
-                .map(itemOrder -> {
-                    // 품목 조회
-                    Item item = itemRepository.findById(itemOrder.getItemNumber())
-                            .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
-                    // OrderItem 생성
-                    return OrderItem.create(item, itemOrder.getQuantity());
+    private List<OrderItem> getOrderItems(List<CartItem> cartItemList) {
+        return cartItemList.stream()
+                .map(cartItem -> {
+                    Item item = cartItem.getItem();
+                    Integer qty = cartItem.getQty();
+                    // Item 검증
+                    if (item == null) {
+                        throw new ItemNotFoundException(ITEM_NOT_FOUND); // Item이 null일 경우 예외 발생
+                    }
+                    // Qty 검증
+                    if (qty == null || qty <= 0) {
+                        throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID); // 수량이 유효하지 않은 경우 예외 발생
+                    }
+                    return OrderItem.create(item, qty); // 유효한 Item과 Qty로 OrderItem 생성
                 })
-                .toList();
+                .collect(Collectors.toList());
     }
 
-    private String getLoginId(String accessToken) {
+
+    private Member getMember(String accessToken) {
         // 토큰 유효성 검사(만료 검사도 들어있음)
         if (!jwtTokenProvider.isTokenValidate(accessToken)) {
             throw new JwtValidException(TOKEN_VALIDATION_ERROR);
         }
         // member의 loginId 추출
-        return jwtTokenProvider.getUsernameFromToken(accessToken);
-    }
-
-    private Member getMember(String loginId) {
+        String loginId = jwtTokenProvider.getUsernameFromToken(accessToken);
         // loginId를 가지고 member엔티티의 no 조회
         Member member = memberRepository.findByLoginId(loginId);
-        if(member == null) {
+        if (member == null) {
             throw new InvalidMemberException(INVALID_MEMBER);
         }
         return member;
