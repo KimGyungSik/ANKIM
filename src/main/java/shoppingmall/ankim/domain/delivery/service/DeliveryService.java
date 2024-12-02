@@ -36,6 +36,7 @@ public class DeliveryService {
         Member member = getMember(loginId);
 
         // 주소 조회 또는 생성 로직
+        // 기존 주소가 있으면 기존 주소로, 없으면 신규 생성
         MemberAddress memberAddress = request.getAddressId() != null
                 ? memberAddressRepository.findById(request.getAddressId())
                 .orElseThrow(() -> new AddressNotFoundException(ADDRESS_NOT_FOUND))
@@ -47,7 +48,6 @@ public class DeliveryService {
         // 배송 생성
         return Delivery.create(memberAddress, request.getCourier(), request.getDelReq(), trackingNumberGenerator);
     }
-
     private Member getMember(String loginId) {
         // loginId를 가지고 member엔티티의 no 조회
         Member member = memberRepository.findByLoginId(loginId);

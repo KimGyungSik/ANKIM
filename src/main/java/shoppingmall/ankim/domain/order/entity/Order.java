@@ -84,6 +84,13 @@ public class Order extends BaseEntity {
         delivery.setOrder(this);
     }
 
+    private void removeDelivery() {
+        if (this.delivery != null) {
+            this.delivery.setOrder(null); // Delivery와의 연관 관계 해제
+            this.delivery = null;
+        }
+    }
+
     @Builder
     private Order(Member member, Delivery delivery, List<OrderItem> orderItems, LocalDateTime regDate, OrderStatus orderStatus) {
         this.member = member;
@@ -154,14 +161,25 @@ public class Order extends BaseEntity {
                 .sum();
     }
 
-    // 주문 취소 -> 배송 준비 상태일떄만 가능
-    public void cancelOrder(Order order) {
+    // 결제 취소 -> 배송 준비 상태일떄만 가능
+    public void cancelOrder() {
         if (!delivery.getStatus().canCancel()) {
             throw new IllegalStateException("배송이 이미 시작되어 주문을 취소할 수 없습니다.");
         }
 
         // 주문 및 배송 취소 처리
-        order.setOrderStatus(OrderStatus.CANCELED);
+        this.setOrderStatus(OrderStatus.CANCELED);
         delivery.cancel();
+    }
+
+    // 결제 성공 시 주문 상태 처리
+    public void successOrder() {
+        this.setOrderStatus(PAID);
+    }
+
+    // 결제 실패 시 주문 상태와 배송지를 삭제
+    public void failOrderWithOutDelivery() {
+        this.setOrderStatus(FAILED_PAYMENT);
+        this.removeDelivery();
     }
 }

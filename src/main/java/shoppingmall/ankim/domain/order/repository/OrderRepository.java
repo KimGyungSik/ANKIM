@@ -9,9 +9,25 @@ import java.util.List;
 import java.util.Optional;
 
 public interface OrderRepository extends JpaRepository<Order, Long> {
-    // orderCode로 member를 fetch join해서 Order 조회하는 쿼리
-    @Query("SELECT o FROM Order o JOIN FETCH o.member WHERE o.ordCode = :orderName")
-    Optional<Order> findByOrderWithMember(@Param("orderName") String orderName);
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.member " +
+            "JOIN FETCH o.orderItems oi " +
+            "JOIN FETCH oi.item " +
+            "WHERE o.ordCode = :orderName")
+    Optional<Order> findByOrderNameWithMemberAndOrderItemsAndItem(@Param("orderName") String orderName);
 
+
+    @Query("SELECT DISTINCT o FROM Order o JOIN FETCH o.member JOIN FETCH o.orderItems WHERE o.ordNo = :orderId")
+    Optional<Order> findByOrderIdWithMemberAndOrderItems(@Param("orderId") String orderId);
+
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.member " +
+            "JOIN FETCH o.delivery " +
+            "JOIN FETCH o.orderItems oi " +
+            "JOIN FETCH oi.item " +
+            "WHERE o.ordNo = :orderId")
+    Optional<Order> findByOrderIdWithMemberAndDeliveryAndOrderItemsAndItem(@Param("orderId") String orderId);
+
+    Optional<Order> findByOrdNo(String ordNo);
     List<Order> findByOrdNoIn(@Param("ordNo") List<String> ordNo);
 }

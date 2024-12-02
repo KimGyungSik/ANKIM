@@ -29,7 +29,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-@Profile("local")
+@Profile("!test")
 @Component
 @RequiredArgsConstructor
 public class InitProduct {
