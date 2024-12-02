@@ -64,8 +64,6 @@ public class MemberAddress extends BaseEntity {
         public void registerAddress(BaseAddress baseAddress) {
                 this.baseAddress = baseAddress;
         }
-        @Column(name = "active_yn", nullable = false, columnDefinition = "CHAR(1) DEFAULT 'Y'")
-        private String activeYn = "Y";
 
         // 팩토리 메서드
         public static MemberAddress create(Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
