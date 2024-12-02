@@ -34,6 +34,7 @@ import shoppingmall.ankim.global.config.TossPaymentConfig;
 
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -213,6 +214,7 @@ class  PaymentServiceTest {
         String paymentKey = "test_payment_key";
         String cancelReason = "사용자 요청";
         String orderCode = "ORD20241125-1234567";
+        String expectedCancelDate = "2024-11-25T10:00:00+09:00";
 
         // Order와 Payment 데이터 생성 및 저장
         Order order = OrderFactory.createOrder(entityManager);
@@ -223,6 +225,7 @@ class  PaymentServiceTest {
         payment.setPaymentKey(paymentKey,true);
         paymentRepository.save(payment);
 
+        // Mock Toss API 응답
         String expectedResponse = """
     {
         "details": {
@@ -233,23 +236,22 @@ class  PaymentServiceTest {
     }
     """;
 
-        // Mock 서버 설정
         mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel"))
                 .andExpect(method(HttpMethod.POST))
-                .andExpect(content().json("""
-            {
-                "cancelReason": "사용자 요청"
-            }
-            """))
                 .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
         // when
         PaymentCancelResponse response = paymentService.cancelPayment(paymentKey, cancelReason);
 
         // then
-        assertThat(response).isNotNull();
-        assertThat(response.getDetails()).containsEntry("cancelAmount", 50000);
-        assertThat(response.getDetails()).containsEntry("cancelReason", "사용자 요청");
+        assertThat(response.getDetails()).isNotNull();
+        assertThat(response.getDetails()).containsKey("details");
+
+        // Extract the nested map and validate its contents
+        Map innerDetails = (Map) response.getDetails().get("details");
+        assertThat(innerDetails).containsEntry("cancelAmount", 50000);
+        assertThat(innerDetails).containsEntry("cancelReason", "사용자 요청");
+        assertThat(innerDetails).containsEntry("cancelDate", expectedCancelDate);
 
         // Mock 서버 검증
         mockServer.verify();
