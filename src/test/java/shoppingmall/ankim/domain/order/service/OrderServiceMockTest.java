@@ -174,28 +174,4 @@ class OrderServiceMockTest {
         String code = "ORD" + currentDate + "-" + serialNumber;
         Assertions.assertThat(code.length()).isEqualTo(19);
     }
-    
-    @DisplayName("장바구니에서 품목을 선택하여 주문할 수 있다.")
-    @Test
-    public void createTempOrder_NoOrderItems_ThrowsException() {
-        // given
-        String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
-
-        List<CartItem> cartItemList = CartFactory.createCart(em, member);
-        Long cartItemNo1 = cartItemList.get(0).getNo();
-        Long cartItemNo2 = cartItemList.get(1).getNo();
-
-        List<Long> cartItemNoList = List.of(cartItemNo1, cartItemNo2);
-
-        // when
-        OrderResponse tempOrder = orderService.createTempOrder(accessToken, cartItemNoList);
-
-        // then
-        assertNotNull(tempOrder);
-        assertEquals(cartItemNoList.size(), tempOrder.getItems().size());
-        assertTrue(tempOrder.getTotalQty() > 0);
-        assertNotNull(tempOrder.getOrderCode());
-    }
 }

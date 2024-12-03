@@ -87,5 +87,4 @@ public class LoginApiController {
         return cookie;
     }
 
-
 }

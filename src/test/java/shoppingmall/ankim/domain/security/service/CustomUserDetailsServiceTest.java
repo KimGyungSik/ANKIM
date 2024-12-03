@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.core.userdetails.UserDetails;
 import shoppingmall.ankim.domain.login.entity.BaseLoginAttempt;
 import shoppingmall.ankim.domain.login.entity.member.loginHistory.MemberLoginAttempt;
@@ -14,6 +15,7 @@ import shoppingmall.ankim.domain.login.repository.member.MemberLoginAttemptRepos
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.exception.AccountStatusLockedException;
 import shoppingmall.ankim.domain.security.exception.UserNotFoundException;
@@ -31,6 +33,9 @@ class CustomUserDetailsServiceTest {
 
     @Mock
     private MemberRepository memberRepository;
+
+    @Mock
+    private MemberHistoryRepository memberHistoryRepository;
 
     @Mock
     private MemberLoginAttemptRepository memberLoginAttemptRepository;
