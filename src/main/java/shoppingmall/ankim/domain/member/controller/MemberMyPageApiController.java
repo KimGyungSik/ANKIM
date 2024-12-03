@@ -20,7 +20,7 @@ public class MemberMyPageApiController {
 
     @PostMapping("/confirm-password") // FIXME 마이 페이지 비밀번호 재확인
     public ApiResponse<String> confirmPassword(
-            @RequestParam String password,
+            @RequestBody String password,
             @CookieValue(value = "access", required = false) String access
     ) {
         isExistAccessToken(access);
