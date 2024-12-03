@@ -66,7 +66,9 @@ public class OrderService {
         String loginId = member.getLoginId();
 
         // 장바구니 품목 조회
+        log.info("cartItemNolist size is : {}", cartItemNoList.size());
         List<CartItem> cartItemList = cartItemRepository.findByNoIn(cartItemNoList);
+        log.info("cartItemList size is : {}", cartItemList.size());
         if (cartItemList.isEmpty() || cartItemList.size() != cartItemNoList.size()) {
             throw new CartItemNotFoundException(CART_ITEM_NOT_FOUND);
         }

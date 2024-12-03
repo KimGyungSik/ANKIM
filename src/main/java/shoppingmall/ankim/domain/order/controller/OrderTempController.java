@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.order.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import shoppingmall.ankim.domain.order.dto.OrderResponse;
 import shoppingmall.ankim.domain.order.service.OrderService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
@@ -21,15 +22,13 @@ public class OrderTempController {
      * 2. 전달받은 cartItemNo를 이용하여 cartItem을 조회 -> itemNo(품목번호)를 받아온다.
      **/
     @PostMapping
-    public ApiResponse<String> createTempOrder(
+    public ApiResponse<OrderResponse> createTempOrder(
             @CookieValue(value = "access", required = false) String access,
             @RequestBody List<Long> cartItemNoList
     ) {
 
-
-
-//        String orderNo = orderService.createTempOrder(cartItemList);
-        return ApiResponse.ok("");
+        OrderResponse tempOrder = orderService.createTempOrder(access, cartItemNoList);
+        return ApiResponse.ok(tempOrder);
     }
 
 }
