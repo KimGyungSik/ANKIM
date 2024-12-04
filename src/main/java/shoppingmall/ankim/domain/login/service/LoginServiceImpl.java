@@ -76,7 +76,7 @@ public class LoginServiceImpl implements LoginService {
     private long REFRESH_TOKEN_REMEBER_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 O)
 
     @Override
-    public Map<String, String> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+    public Map<String, Object> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 사용자 조회 (status에 따라서 상태를 반환해줘야 됨)
         Member member = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
 
@@ -133,7 +133,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Map<String, String> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+    public Map<String, Object> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 퇴사하지 않은 사용자 조회
         Admin admin = adminRepository.findByLoginIdExcludingResigned(loginServiceRequest.getLoginId());
 
@@ -293,16 +293,17 @@ public class LoginServiceImpl implements LoginService {
     }
 
     // 로그인 성공
-    private Map<String, String> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
+    private Map<String, Object> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
         String access = jwtTokenProvider.generateAccessToken(userDetails, "access");
 
         long expireTime = autoLogin.equals("rememberMe") ? REFRESH_TOKEN_REMEBER_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME;
 
         String refresh = jwtTokenProvider.generateRefreshToken(userDetails, "refresh", expireTime);
 
-        Map<String, String> token = new HashMap<>();
+        Map<String, Object> token = new HashMap<>();
         token.put("access", access);
         token.put("refresh", refresh);
+        token.put("expireTime", expireTime);
 
         addRefreshToken(access, refresh, autoLogin);
 
@@ -320,11 +321,11 @@ public class LoginServiceImpl implements LoginService {
 
     private Cookie createCookie(String key, String value) {
         Cookie cookie = new Cookie(key, value);
-        cookie.setMaxAge(24*60*60);
-        //cookie.setSecure(true);
-        //cookie.setPath("/");
-        cookie.setHttpOnly(true);
-
+        // 쿠키 설정
+        cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
+        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정(초단위)
+        cookie.setSecure(true); // https 통신시 사용
+        cookie.setPath("/"); // cookie 적용 범위
         return cookie;
     }
 }

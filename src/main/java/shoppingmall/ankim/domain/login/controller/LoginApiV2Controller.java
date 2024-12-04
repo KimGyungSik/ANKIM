@@ -26,16 +26,10 @@ import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_CREDENTIALS;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/login")
-public class LoginApiController {
+@RequestMapping("/api/v2/login")
+public class LoginApiV2Controller {
 
     private final LoginService loginService;
-
-    @Value("${jwt.refresh.token.expire.time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME;
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성기
 
     @PostMapping("/member") // FIXME 회원 로그인 로직 version 2
     public ApiResponse<?> memberLoginV2(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
@@ -66,36 +60,6 @@ public class LoginApiController {
         cookie.setMaxAge((int) expireTime / 1000); // 쿠키 유효 시간 설정(초단위)
 //        cookie.setSecure(true); // https 통신시 사용
 //        cookie.setPath("/"); // cookie 적용 범위
-        return cookie;
-    }
-
-    @PostMapping("/admin") // FIXME 관리자 로그인 로직
-    public ApiResponse<?> adminLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
-        try {
-            // LoginService를 통해 인증 처리
-            Map<String, Object> jwtToken = loginService.adminLogin(loginRequest.toServiceRequest(), request);
-            String access = (String) jwtToken.get("access");
-
-            // 성공 시 토큰 반환
-            // 응답 설정
-            Cookie accessCookie = createCookie("access", access);
-            response.addCookie(accessCookie);
-            response.setStatus(HttpStatus.OK.value());
-
-            return ApiResponse.ok("로그인 성공");
-
-        } catch (BadCredentialsException ex) {
-            throw new AdminLoginFailedException(INVALID_CREDENTIALS);
-        }
-    }
-
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        // 쿠키 설정
-        cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정(초단위)
-        cookie.setSecure(true); // https 통신시 사용
-        cookie.setPath("/"); // cookie 적용 범위
         return cookie;
     }
 
