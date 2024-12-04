@@ -30,8 +30,8 @@ public class MemberAddressServiceImpl implements MemberAddressService {
 
 
     @Override
-    public String saveOrUpdateAddress(String accessToken, MemberAddressRegisterServiceRequest request) {
-        Member member = getMember(accessToken);
+    public String saveOrUpdateAddress(String loginId, MemberAddressRegisterServiceRequest request) {
+        Member member = getMember(loginId);
 
         // member의 no를 가지고 기본주소 존재 여부 조회
         Optional<MemberAddress> existingDefaultAddress = memberAddressRepository.findDefaultAddressByMemberNo(member.getNo());
@@ -53,14 +53,7 @@ public class MemberAddressServiceImpl implements MemberAddressService {
         return message;
     }
 
-    private Member getMember(String accessToken) {
-        // 토큰 유효성 검사(만료 검사도 들어있음)
-        if (!jwtTokenProvider.isTokenValidate(accessToken)) {
-            throw new JwtValidException(TOKEN_VALIDATION_ERROR);
-        }
-        // member의 loginId 추출
-        String loginId = jwtTokenProvider.getUsernameFromToken(accessToken);
-        // loginId를 가지고 member엔티티의 no 조회
+    private Member getMember(String loginId) {
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {
             throw new InvalidMemberException(INVALID_MEMBER);

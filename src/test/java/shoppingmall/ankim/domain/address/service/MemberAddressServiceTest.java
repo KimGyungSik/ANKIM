@@ -15,6 +15,7 @@ import shoppingmall.ankim.domain.address.service.request.MemberAddressRegisterSe
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 
 import java.util.Optional;
@@ -50,8 +51,7 @@ class MemberAddressServiceTest {
     void saveOrUpdateAddress_whenNoDefaultAddress() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         MemberAddressRegisterServiceRequest request = MemberAddressRegisterServiceRequest.builder()
                 .zipCode(12345)
@@ -62,7 +62,7 @@ class MemberAddressServiceTest {
         MemberAddress expectedAddress = request.toEntity(member);
 
         // when
-        memberAddressService.saveOrUpdateAddress(accessToken, request);
+        memberAddressService.saveOrUpdateAddress(loginId, request);
 
         // then
         Optional<MemberAddress> findAddress = memberAddressRepository.findDefaultAddressByMemberNo(member.getNo());
@@ -77,8 +77,7 @@ class MemberAddressServiceTest {
     void saveOrUpdateAddress_whenDefaultAddressExists() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // 기존 기본 배송지 설정
         MemberAddress existingAddress = MemberAddress.builder()
@@ -105,7 +104,7 @@ class MemberAddressServiceTest {
                 .build();
 
         // when
-        memberAddressService.saveOrUpdateAddress(accessToken, request);
+        memberAddressService.saveOrUpdateAddress(loginId, request);
 
         // then
         Optional<MemberAddress> updatedAddress = memberAddressRepository.findDefaultAddressByMemberNo(member.getNo());

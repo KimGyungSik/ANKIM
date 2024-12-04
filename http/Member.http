@@ -77,3 +77,14 @@ access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI
 {
   "pwd": "TestPassword123!"
 }
+
+### 마이페이지에서 회원이 자신의 주소를 등록한다.
+PUT http://localhost:8080/api/address/edit
+Content-Type: application/json
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+
+{
+  "zipCode": "12345",
+  "addressMain": "서울특별시 강남구 미왕빌딩",
+  "addressDetail": "10층"
+}
