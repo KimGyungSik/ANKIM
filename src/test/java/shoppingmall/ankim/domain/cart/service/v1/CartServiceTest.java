@@ -111,7 +111,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -151,7 +151,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -188,7 +188,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -230,7 +230,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         AddToCartServiceRequest request = AddToCartServiceRequest.builder()
                 .productNo(1L)
@@ -250,7 +250,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -286,7 +286,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -321,7 +321,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -356,7 +356,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         given(cartRepository.findByMemberAndActiveYn(member, "Y")).willReturn(Optional.empty());
 
@@ -374,7 +374,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         Cart cart = Cart.create(member, LocalDateTime.now());
         em.persist(cart);
@@ -418,7 +418,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -503,7 +503,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Product
         Product mockProduct = mock(Product.class);
@@ -552,7 +552,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -585,7 +585,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -618,7 +618,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -651,7 +651,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Items
         Item mockItem1 = mock(Item.class);
@@ -684,7 +684,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Items
         Item outOfStockItem1 = mock(Item.class);
@@ -731,7 +731,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock 품절 상품이 없는 상황
         given(cartItemRepository.findOutOfStockItems(member)).willReturn(List.of());
@@ -752,7 +752,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // Mock Cart 생성
         Cart mockCart = mock(Cart.class);
@@ -801,7 +801,7 @@ class CartServiceTest {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // 장바구니의 최대 품목 개수
         int maxCartItems = 100;

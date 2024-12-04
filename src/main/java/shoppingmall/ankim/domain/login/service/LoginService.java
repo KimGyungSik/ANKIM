@@ -7,7 +7,7 @@ import java.util.Map;
 
 public interface LoginService {
 
-    Map<String, String> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request);
-    Map<String, String> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request);
+    Map<String, Object> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request);
+    Map<String, Object> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request);
 
 }

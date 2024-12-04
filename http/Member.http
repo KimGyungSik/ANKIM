@@ -34,7 +34,7 @@ POST http://localhost:8080/api/member/email-check
 Content-Type: application/json
 
 {
-  "id": "test@example.com"
+  "id": "gnstm831@gmail.com"
 }
 
 ### 이메일 인증번호 발송
@@ -46,7 +46,26 @@ Content-Type: application/json
 }
 
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
-POST http://localhost:8080/api/member/email-next?loginId=test@example.com
+POST http://localhost:8080/member/register
 Content-Type: application/json
+
+{
+  "id": "gnstm831@gmail.com",
+  "pwd": "Wjdgns123!",
+  "name": "안정훈",
+  "phoneNum": "010-1234-5678",
+  "birth": "1999-01-01",
+  "gender": "F"
+}
+
+### 로그인 한다.
+POST http://localhost:8080/api/login/member
+Content-Type: application/json
+
+{
+  "loginId": "gnstm831@gmail.com",
+  "pwd": "Wjdgns123!",
+  "autoLogin" : ""
+}
 
 

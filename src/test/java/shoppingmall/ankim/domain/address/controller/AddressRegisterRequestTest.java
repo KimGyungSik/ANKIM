@@ -4,13 +4,11 @@ import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
 import jakarta.validation.ValidatorFactory;
-import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
+import shoppingmall.ankim.domain.address.controller.request.AddressRegisterRequest;
 
-import java.time.LocalDate;
 import java.util.Set;
 
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;

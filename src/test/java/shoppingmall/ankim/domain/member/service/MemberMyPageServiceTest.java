@@ -65,7 +65,7 @@ class MemberMyPageServiceTest {
 
         // Member 생성 및 저장
         Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
         // when & then
         assertDoesNotThrow(() -> memberMyPageService.isValidPassword(accessToken, rawPassword));
@@ -80,7 +80,7 @@ class MemberMyPageServiceTest {
         String wrongPassword = "wrongPassword456";
 
         Member secureMember = MemberJwtFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(secureMember, jwtTokenProvider);
+        String accessToken = MemberJwtFactory.createToken(secureMember, jwtTokenProvider);
 
         // when & then
         assertThatThrownBy(() -> memberMyPageService.isValidPassword(accessToken, wrongPassword))

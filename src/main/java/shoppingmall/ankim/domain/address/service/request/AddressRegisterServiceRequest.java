@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.admin.AdminAddress;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 
 import java.time.LocalDateTime;
 
@@ -24,16 +25,5 @@ public class AddressRegisterServiceRequest {
         this.addressDetail = addressDetail;
     }
 
-//    public AdminAddress create() {
-//        return AdminAddress.builder()
-//                .baseAddress(
-//                        BaseAddress.builder()
-//                                .zipCode(this.zipCode)
-//                                .addressMain(this.addressMain)
-//                                .addressDetail(this.addressDetail)
-//                                .registrationDate(LocalDateTime.now())
-//                                .build()
-//                )
-//                .build();
-//    }
+
 }

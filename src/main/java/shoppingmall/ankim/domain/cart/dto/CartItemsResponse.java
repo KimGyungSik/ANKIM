@@ -16,6 +16,7 @@ public class CartItemsResponse {
 
     private Long cartNo; // 장바구니 번호 (CartItem)
     private Long cartItemNo; // 장바구니 품목 번호 (CartItem)
+    private Long itemNo; // 상품 번호(Item)
     private String productName; // 상품명 (Product)
     private String itemName; // 품목명 (CartItem)
     private String thumbNailImgUrl; // 썸네일 이미지 (CartItem) -> (Item)
@@ -36,6 +37,7 @@ public class CartItemsResponse {
         return CartItemsResponse.builder()
                 .cartNo(cart.getNo())
                 .cartItemNo(cartItem.getNo())
+                .itemNo(cartItem.getItem().getNo())
                 .productName(cartItem.getProduct().getName())
                 .itemName(cartItem.getItemName())
                 .thumbNailImgUrl(cartItem.getItem().getThumbNailImgUrl())

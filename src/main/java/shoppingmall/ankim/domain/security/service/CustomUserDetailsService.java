@@ -17,6 +17,8 @@ import shoppingmall.ankim.domain.login.repository.member.MemberLoginAttemptRepos
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
+import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.exception.AccountStatusLockedException;
 import shoppingmall.ankim.domain.security.exception.UserNotFoundException;
@@ -24,6 +26,7 @@ import shoppingmall.ankim.domain.security.exception.UserNotFoundException;
 import java.time.LocalDateTime;
 import java.util.regex.Pattern;
 
+import static shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler.handleStatusChange;
 import static shoppingmall.ankim.global.exception.ErrorCode.USER_STATUS_LOCKED;
 import static shoppingmall.ankim.global.exception.ErrorCode.USER_NOT_FOUND;
 
@@ -33,6 +36,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
     private final MemberRepository memberRepository;
     private final MemberLoginAttemptRepository memberLoginAttemptRepository;
+    private final MemberHistoryRepository memberHistoryRepository;
     private final AdminRepository adminRepository;
     private final AdminLoginAttemptRepository adminLoginAttemptRepository;
 
@@ -60,7 +64,12 @@ public class CustomUserDetailsService implements UserDetailsService {
                         loginAttempt.getLoginAttemptDetails().getUnlockTime().isBefore(LocalDateTime.now())) {
 
                     // UnlockTime이 지났으므로 계정 상태 업데이트 및 초기화
+                    // 회원 이력에도 상태 변경 기록
+                    MemberHistory history = handleStatusChange(member, MemberStatus.ACTIVE);
+                    memberHistoryRepository.save(history);
+
                     member.activate(); // 계정 활성화
+
                     memberRepository.save(member);
 
                     MemberLoginAttempt updatedLoginAttempt = MemberLoginAttempt.builder()

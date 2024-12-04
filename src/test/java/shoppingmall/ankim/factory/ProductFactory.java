@@ -505,7 +505,6 @@ public class ProductFactory {
 
     public static Product createProduct(EntityManager entityManager) {
         // 카테고리 생성 및 저장
-
         Category subCategory = Category.builder()
                 .name("코트")
                 .build();
@@ -620,11 +619,40 @@ public class ProductFactory {
                 .minQty(1)
                 .product(product)
                 .build();
+        Item item3 = Item.builder()
+                .name("색상: 그레이, 사이즈: M")
+                .optionValues(List.of(gray, medium))
+                .code("P001-BLK-M")
+                .addPrice(0)
+                .qty(50)
+                .safQty(10)
+                .maxQty(10)
+                .minQty(1)
+                .product(product)
+                .build();
+        Item item4 = Item.builder()
+                .name("색상: 그레이, 사이즈: L")
+                .optionValues(List.of(gray, large))
+                .code("P001-BLK-M")
+                .addPrice(0)
+                .qty(50)
+                .safQty(10)
+                .maxQty(10)
+                .minQty(1)
+                .product(product)
+                .build();
+
         entityManager.persist(item1);
         entityManager.persist(item2);
+        entityManager.persist(item3);
+        entityManager.persist(item4);
+
 
         product.addItem(item1);
         product.addItem(item2);
+        product.addItem(item3);
+        product.addItem(item4);
+
 
         return product;
     }
