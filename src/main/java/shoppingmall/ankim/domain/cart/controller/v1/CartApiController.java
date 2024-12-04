@@ -1,10 +1,10 @@
-package shoppingmall.ankim.domain.cart.controller;
+package shoppingmall.ankim.domain.cart.controller.v1;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
-import shoppingmall.ankim.domain.cart.service.CartService;
+import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.domain.security.exception.CookieNotIncludedException;
 import shoppingmall.ankim.global.response.ApiResponse;
 
@@ -13,7 +13,7 @@ import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
 
-@RestController
+@RestController("v1CartApiController")
 @RequiredArgsConstructor
 @RequestMapping("/api/cart")
 public class CartApiController {

@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.cart.controller;
+package shoppingmall.ankim.domain.cart.controller.v1;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
@@ -17,8 +17,12 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
+<<<<<<< Updated upstream:src/test/java/shoppingmall/ankim/domain/cart/controller/CartApiControllerTest.java
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.service.CartService;
+=======
+import shoppingmall.ankim.domain.cart.service.v1.CartService;
+>>>>>>> Stashed changes:src/test/java/shoppingmall/ankim/domain/cart/controller/v1/CartApiControllerTest.java
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
