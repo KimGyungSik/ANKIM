@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.cart.service;
+package shoppingmall.ankim.domain.cart.service.v1;
 
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;

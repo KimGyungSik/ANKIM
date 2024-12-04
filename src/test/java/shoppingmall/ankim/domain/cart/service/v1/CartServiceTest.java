@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.cart.service;
+package shoppingmall.ankim.domain.cart.service.v1;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -83,14 +83,13 @@ class CartServiceTest {
     @MockBean
     private S3Service s3Service;
 
-
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this); // Mockito 초기화
     }
 
     @Test
-    @DisplayName("유효하지 않은 accessToken으로 장바구니에 상품을 담으려 할 때 예외 발생")
+    @DisplayName("유효하지 않은 accessToken으로 장바구니에 상품을 담으려 할 때 예외가 발생한다.")
     void addToCart_InvalidAccessToken_ThrowsJwtValidException() {
         // given
         String loginId = "test@ankim.com";
