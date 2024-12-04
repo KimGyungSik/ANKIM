@@ -51,21 +51,29 @@ Content-Type: application/json
 
 {
   "id": "gnstm831@gmail.com",
-  "pwd": "Wjdgns123!",
+  "pwd": "TestPassword123!",
   "name": "안정훈",
   "phoneNum": "010-1234-5678",
   "birth": "1999-01-01",
   "gender": "F"
 }
 
-### 로그인 한다.
+### 회원가입한 아이디와 비밀번호로 로그인 한다.
 POST http://localhost:8080/api/login/member
 Content-Type: application/json
 
 {
   "loginId": "gnstm831@gmail.com",
-  "pwd": "Wjdgns123!",
+  "pwd": "TestPassword123!",
   "autoLogin" : ""
 }
 
 
+### 마이페이지의 회원정보 페이지에 들어가서 비밀번호를 재입력하여 인증을 한다.
+POST http://localhost:8080/api/mypage/confirm-password
+Content-Type: application/json
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+
+{
+  "pwd": "TestPassword123!"
+}
