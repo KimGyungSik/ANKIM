@@ -2,7 +2,6 @@ package shoppingmall.ankim.domain.cart.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.persistence.EntityManager;
-import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,12 +14,11 @@ import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
-import shoppingmall.ankim.domain.cart.service.v1.CartService;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.MemberFactory;
-import shoppingmall.ankim.factory.MemberJwtFactory;
 
 import java.util.List;
 

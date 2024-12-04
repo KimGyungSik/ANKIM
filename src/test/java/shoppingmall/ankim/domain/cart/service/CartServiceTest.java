@@ -14,7 +14,6 @@ import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
-import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.factory.MemberFactory;

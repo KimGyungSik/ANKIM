@@ -6,7 +6,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
-import shoppingmall.ankim.domain.cart.service.v1.CartService;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;

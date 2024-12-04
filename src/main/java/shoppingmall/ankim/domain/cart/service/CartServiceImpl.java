@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.cart.service.v2;
+package shoppingmall.ankim.domain.cart.service;
 
 
 import lombok.RequiredArgsConstructor;
@@ -11,18 +11,18 @@ import shoppingmall.ankim.domain.cart.exception.CartItemLimitExceededException;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
 import shoppingmall.ankim.domain.cart.exception.UnauthorizedCartItemAccessException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
+import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
+import shoppingmall.ankim.domain.item.exception.NoOutOfStockException;
+import shoppingmall.ankim.domain.item.exception.OutOfStockException;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
+import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
+import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
 import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
-import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.exception.NoOutOfStockException;
-import shoppingmall.ankim.domain.item.exception.OutOfStockException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
-import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
-import shoppingmall.ankim.domain.product.entity.Product;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -34,7 +34,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Service
 @Transactional
 @RequiredArgsConstructor
-public class V2CartServiceImpl implements V2CartService {
+public class CartServiceImpl implements CartService {
 
     private final MemberRepository memberRepository; // Member 조회를 위한 Repository
     private final ItemRepository itemRepository; // 품목 조회를 위한 Repository
@@ -124,9 +124,9 @@ public class V2CartServiceImpl implements V2CartService {
         Member member = getMember(loginId);
 
         /*
-        * 장바구니에 상품을 추가한 적이 없을 수도 있으므로 null값을 반환하는 경우
-        * 비어있는 장바구니를 생성해준다.
-        * */
+         * 장바구니에 상품을 추가한 적이 없을 수도 있으므로 null값을 반환하는 경우
+         * 비어있는 장바구니를 생성해준다.
+         * */
         Cart cart = cartRepository.findByMemberAndActiveYn(member, "Y")
                 .orElseGet(() -> {
                     Cart newCart = Cart.create(member, now);
@@ -221,4 +221,5 @@ public class V2CartServiceImpl implements V2CartService {
         }
         return member;
     }
+
 }

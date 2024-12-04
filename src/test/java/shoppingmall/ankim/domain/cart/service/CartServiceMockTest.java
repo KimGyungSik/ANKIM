@@ -19,7 +19,6 @@ import shoppingmall.ankim.domain.cart.exception.CartItemLimitExceededException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
-import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
