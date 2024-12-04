@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.cart.service.v1;
+package shoppingmall.ankim.domain.cart.service;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
@@ -19,6 +19,7 @@ import shoppingmall.ankim.domain.cart.exception.CartItemLimitExceededException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
+import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.InvalidQuantityException;
@@ -31,9 +32,8 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
-import shoppingmall.ankim.domain.security.exception.JwtValidException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
-import shoppingmall.ankim.factory.MemberJwtFactory;
+import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 
 import java.time.LocalDateTime;
@@ -55,7 +55,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.NO_OUT_OF_STOCK_ITEM
 })
 @SpringBootTest
 @Transactional
-class CartServiceTest {
+class CartServiceMockTest {
     @Autowired
     EntityManager em;
 
@@ -88,30 +88,29 @@ class CartServiceTest {
         MockitoAnnotations.openMocks(this); // Mockito 초기화
     }
 
-    @Test
-    @DisplayName("유효하지 않은 accessToken으로 장바구니에 상품을 담으려 할 때 예외가 발생한다.")
-    void addToCart_InvalidAccessToken_ThrowsJwtValidException() {
-        // given
-        String loginId = "test@ankim.com";
-        String invalidAccessToken = "jwt.token.invalid";
-
-        AddToCartServiceRequest request = AddToCartServiceRequest.builder()
-                .productNo(1L)
-                .optionValueNoList(List.of(1L, 3L))
-                .qty(2)
-                .build();
-
-        // when & then
-        assertThrows(JwtValidException.class, () -> cartService.addToCart(request, invalidAccessToken));
-    }
+//    @Test
+//    @DisplayName("유효하지 않은 accessToken으로 장바구니에 상품을 담으려 할 때 예외가 발생한다.")
+//    void addToCart_InvalidAccessToken_ThrowsJwtValidException() {
+//        // given
+//        String loginId = "test@ankim.com";
+//        String invalidAccessToken = "jwt.token.invalid";
+//
+//        AddToCartServiceRequest request = AddToCartServiceRequest.builder()
+//                .productNo(1L)
+//                .optionValueNoList(List.of(1L, 3L))
+//                .qty(2)
+//                .build();
+//
+//        // when & then
+//        assertThrows(JwtValidException.class, () -> cartService.addToCart(request, invalidAccessToken));
+//    }
 
     @Test
     @DisplayName("유효한 accessToken으로 장바구니에 상품을 처음 담는다.")
     void addToCart_ValidAccessToken_Success() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -137,7 +136,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(mockItem);
 
         // when
-        cartService.addToCart(request, validAccessToken);
+        cartService.addToCart(request, loginId);
 
         // then
         verify(cartRepository).findByMemberAndActiveYn(member, "Y"); // 활성화된 장바구니 조회 확인
@@ -150,8 +149,7 @@ class CartServiceTest {
     void addToCart_ExistingActiveCart_AddsCartItem() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -174,7 +172,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(mockItem);
 
         // when
-        cartService.addToCart(request, validAccessToken);
+        cartService.addToCart(request, loginId);
 
         // then
         verify(cartRepository).findByMemberAndActiveYn(member, "Y"); // 활성화된 장바구니 조회 확인
@@ -187,8 +185,7 @@ class CartServiceTest {
     void addToCart_SameProduct_UpdatesExistingCartItem() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -217,7 +214,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(mockItem);
 
         // when
-        cartService.addToCart(request, validAccessToken);
+        cartService.addToCart(request, loginId);
 
         // then
         verify(existingCartItem).updateQuantityWithDate(Mockito.eq(2)); // regDate를 any로 매칭
@@ -229,8 +226,7 @@ class CartServiceTest {
     void addToCart_NonexistentItem_ThrowsItemNotFoundException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         AddToCartServiceRequest request = AddToCartServiceRequest.builder()
                 .productNo(1L)
@@ -241,7 +237,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(null);
 
         // when & then
-        assertThrows(ItemNotFoundException.class, () -> cartService.addToCart(request, validAccessToken));
+        assertThrows(ItemNotFoundException.class, () -> cartService.addToCart(request, loginId));
     }
 
     @Test
@@ -249,8 +245,7 @@ class CartServiceTest {
     void addToCart_QuantityExceedsStock_ThrowsOutOfStockException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -277,7 +272,7 @@ class CartServiceTest {
 
 
         // when & then
-        assertThrows(OutOfStockException.class, () -> cartService.addToCart(request, validAccessToken));
+        assertThrows(OutOfStockException.class, () -> cartService.addToCart(request, loginId));
     }
 
     @Test
@@ -285,8 +280,7 @@ class CartServiceTest {
     void addToCart_QuantityExceedsMaximum_ThrowsInvalidQuantityException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -312,7 +306,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(mockItem);
 
         // when & then
-        assertThrows(InvalidQuantityException.class, () -> cartService.addToCart(request, validAccessToken));
+        assertThrows(InvalidQuantityException.class, () -> cartService.addToCart(request, loginId));
     }
 
     @Test
@@ -320,8 +314,7 @@ class CartServiceTest {
     void addToCart_QuantityBelowMinimum_ThrowsInvalidQuantityException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -347,7 +340,7 @@ class CartServiceTest {
         given(itemRepository.findItemByOptionValuesAndProduct(request.getProductNo(), request.getOptionValueNoList())).willReturn(mockItem);
 
         // when & then
-        assertThrows(InvalidQuantityException.class, () -> cartService.addToCart(request, validAccessToken));
+        assertThrows(InvalidQuantityException.class, () -> cartService.addToCart(request, loginId));
     }
 
     @Test
@@ -355,13 +348,12 @@ class CartServiceTest {
     void shouldCreateNewCartIfNoActiveCart() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         given(cartRepository.findByMemberAndActiveYn(member, "Y")).willReturn(Optional.empty());
 
         // when
-        List<CartItemsResponse> cartItems = cartService.getCartItems(accessToken);
+        List<CartItemsResponse> cartItems = cartService.getCartItems(loginId);
 
         // then
         assertThat(cartItems).isEmpty(); // 빈 장바구니 반환 확인
@@ -373,8 +365,7 @@ class CartServiceTest {
     void shouldReturnCartItemsResponseWhenActiveCartExists() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         Cart cart = Cart.create(member, LocalDateTime.now());
         em.persist(cart);
@@ -388,7 +379,7 @@ class CartServiceTest {
         given(cartRepository.findByMemberAndActiveYn(member, "Y")).willReturn(Optional.of(cart));
 
         // when
-        List<CartItemsResponse> cartItemsResponses = cartService.getCartItems(accessToken);
+        List<CartItemsResponse> cartItemsResponses = cartService.getCartItems(loginId);
 
         // then
         assertThat(cartItemsResponses).hasSize(1); // 품목 개수 확인
@@ -417,8 +408,7 @@ class CartServiceTest {
     void shouldReturnAllCartItemsResponseWhenActiveCartHasMoreThanTenItems() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Cart
         Cart mockCart = Mockito.mock(Cart.class);
@@ -467,7 +457,7 @@ class CartServiceTest {
         given(cartRepository.findByMemberAndActiveYn(member, "Y")).willReturn(Optional.of(mockCart));
 
         // when
-        List<CartItemsResponse> cartItemsResponses = cartService.getCartItems(accessToken);
+        List<CartItemsResponse> cartItemsResponses = cartService.getCartItems(loginId);
 
         // then
         assertThat(cartItemsResponses).hasSize(mockCartItems.size());
@@ -502,8 +492,7 @@ class CartServiceTest {
     void updateCartItemQuantity_SUCCESS() { // FIXME 테스트 작성 필요(when & then)
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = mock(Product.class);
@@ -539,7 +528,7 @@ class CartServiceTest {
 
         // when
         Integer newQty = 1;
-        cartService.updateCartItemQuantity(accessToken, mockCartItem.getNo(), newQty);
+        cartService.updateCartItemQuantity(loginId, mockCartItem.getNo(), newQty);
 
         // then
         verify(cartItemRepository, times(1)).findByNoAndCart_Member(mockCartItem.getNo(), member);
@@ -551,8 +540,7 @@ class CartServiceTest {
     void updateCartItemQuantity_FailDueToOutOfStock() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -570,7 +558,7 @@ class CartServiceTest {
 
         // when & then
         OutOfStockException exception = assertThrows(OutOfStockException.class, () -> {
-            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+            cartService.updateCartItemQuantity(loginId, 1L, requestedQty);
         });
 
         // 검증
@@ -584,8 +572,7 @@ class CartServiceTest {
     void updateCartItemQuantity_FailDueToQuantityBelowMinimum() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -603,7 +590,7 @@ class CartServiceTest {
 
         // when & then
         InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> {
-            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+            cartService.updateCartItemQuantity(loginId, 1L, requestedQty);
         });
 
         // 검증
@@ -617,8 +604,7 @@ class CartServiceTest {
     void updateCartItemQuantity_FailDueToQuantityExceedMaximum() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Item
         Item mockItem = mock(Item.class);
@@ -637,7 +623,7 @@ class CartServiceTest {
 
         // when & then
         InvalidQuantityException exception = assertThrows(InvalidQuantityException.class, () -> {
-            cartService.updateCartItemQuantity(accessToken, 1L, requestedQty);
+            cartService.updateCartItemQuantity(loginId, 1L, requestedQty);
         });
 
         assertThat(exception.getMessage()).isEqualTo("최대 주문 수량을 초과했습니다.");
@@ -650,8 +636,7 @@ class CartServiceTest {
     void deactivateOutOfStockItems() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Items
         Item mockItem1 = mock(Item.class);
@@ -671,7 +656,7 @@ class CartServiceTest {
                 .willReturn(List.of(mockCartItem1, mockCartItem2));
 
         // when
-        cartService.deactivateOutOfStockItems(accessToken);
+        cartService.deactivateOutOfStockItems(loginId);
 
         // then
         verify(mockCartItem1, times(1)).deactivate();
@@ -683,8 +668,7 @@ class CartServiceTest {
     void deactivateOutOfStockItems_ShouldOnlyDeactivateItemsWithZeroStock() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Items
         Item outOfStockItem1 = mock(Item.class);
@@ -717,7 +701,7 @@ class CartServiceTest {
                 .willReturn(List.of(outOfStockCartItem1, outOfStockCartItem2, inStockCartItem));
 
         // when
-        cartService.deactivateOutOfStockItems(accessToken);
+        cartService.deactivateOutOfStockItems(loginId);
 
         // then
         verify(outOfStockCartItem1, times(1)).deactivate(); // 재고 0인 품목 상태 변경
@@ -730,15 +714,14 @@ class CartServiceTest {
     void deactivateOutOfStockItems_NoOutOfStockItems_ThrowsNoOutOfStockException() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock 품절 상품이 없는 상황
         given(cartItemRepository.findOutOfStockItems(member)).willReturn(List.of());
 
         // when & then
         NoOutOfStockException exception = assertThrows(NoOutOfStockException.class, () -> {
-            cartService.deactivateOutOfStockItems(accessToken);
+            cartService.deactivateOutOfStockItems(loginId);
         });
 
         // 검증
@@ -751,8 +734,7 @@ class CartServiceTest {
     void deactivateSelectedItems_RandomSelection_Success() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Cart 생성
         Cart mockCart = mock(Cart.class);
@@ -782,7 +764,7 @@ class CartServiceTest {
         given(cartItemRepository.findAllById(selectedIds)).willReturn(selectedCartItems);
 
         // when
-        cartService.deactivateSelectedItems(accessToken, selectedIds);
+        cartService.deactivateSelectedItems(loginId, selectedIds);
 
         // then
         // 선택된 품목만 상태 변경(deactivate) 확인
@@ -800,8 +782,7 @@ class CartServiceTest {
     void addToCart_ShouldThrowException_WhenCartItemLimitExceeded() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // 장바구니의 최대 품목 개수
         int maxCartItems = 100;
@@ -816,7 +797,7 @@ class CartServiceTest {
         when(cartItemRepository.countActiveCartItems(member)).thenReturn(maxCartItems + 1);
 
         // when & then
-        assertThatThrownBy(() -> cartService.addToCart(request, accessToken))
+        assertThatThrownBy(() -> cartService.addToCart(request, loginId))
                 .isInstanceOf(CartItemLimitExceededException.class)
                 .hasMessageContaining(CART_ITEM_LIMIT_EXCEEDED.getMessage());
     }

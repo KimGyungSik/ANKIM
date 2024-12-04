@@ -38,14 +38,13 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class CartServiceImpl implements CartService {
 
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberRepository memberRepository; // Member 조회를 위한 Repository
     private final ItemRepository itemRepository; // 품목 조회를 위한 Repository
     private final CartRepository cartRepository; // 장바구니를 위한 Repository
     private final CartItemRepository cartItemRepository; // 장바구니를 위한 Repository
     private static final Integer MAX_COUNT_CART_ITEM = 100;
 
-/*
+    /*
          [장바구니 상품 추가]
          1. accessToken(JWT)에서 memberid 추출
          +. 품목 조회
@@ -61,9 +60,9 @@ public class CartServiceImpl implements CartService {
                 2.2.1. Cart 생성 후 CartItem에 품목번호 등 필수 값 삽입
  */
     @Override
-    public void addToCart(AddToCartServiceRequest request, String accessToken) {
+    public void addToCart(AddToCartServiceRequest request, String loginId) {
         LocalDateTime now = LocalDateTime.now();
-        Member member = getMember(accessToken);
+        Member member = getMember(loginId);
 
         // 장바구니에 상품 개수 파악
         Integer activeCartItemCount = cartItemRepository.countActiveCartItems(member);
@@ -71,12 +70,12 @@ public class CartServiceImpl implements CartService {
             throw new CartItemLimitExceededException(CART_ITEM_LIMIT_EXCEEDED);
         }
 
-
         // 품목 조회
         Item item = Optional.ofNullable(itemRepository.findItemByOptionValuesAndProduct(
                 request.getProductNo(),
                 request.getOptionValueNoList()
         )).orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
+
 /*
         장바구니에 담으려는 수량이
         재고량보다 작은지 확인
@@ -120,15 +119,16 @@ public class CartServiceImpl implements CartService {
         }
     }
 
+    // 장바구니 페이지 들어가는 경우 회원의 장바구니 품목을 보여주기 위한 메서드
     @Override
-    public List<CartItemsResponse> getCartItems(String accessToken) {
+    public List<CartItemsResponse> getCartItems(String loginId) {
         LocalDateTime now = LocalDateTime.now();
-        Member member = getMember(accessToken);
+        Member member = getMember(loginId);
 
         /*
-        * 장바구니에 상품을 추가한 적이 없을 수도 있으므로 null값을 반환하는 경우
-        * 비어있는 장바구니를 생성해준다.
-        * */
+         * 장바구니에 상품을 추가한 적이 없을 수도 있으므로 null값을 반환하는 경우
+         * 비어있는 장바구니를 생성해준다.
+         * */
         Cart cart = cartRepository.findByMemberAndActiveYn(member, "Y")
                 .orElseGet(() -> {
                     Cart newCart = Cart.create(member, now);
@@ -143,9 +143,9 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void updateCartItemQuantity(String accessToken, Long itemNo, Integer qty) {
+    public void updateCartItemQuantity(String loginId, Long itemNo, Integer qty) {
         LocalDateTime now = LocalDateTime.now();
-        Member member = getMember(accessToken);
+        Member member = getMember(loginId);
 
         // 회원 장바구니에서 품목 조회
         CartItem cartItem = cartItemRepository.findByNoAndCart_Member(itemNo, member)
@@ -160,8 +160,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deactivateSelectedItems(String accessToken, List<Long> cartItemNoList) {
-        Member member = getMember(accessToken);
+    public void deactivateSelectedItems(String loginId, List<Long> cartItemNoList) {
+        Member member = getMember(loginId);
 
         List<CartItem> selectedItems = cartItemRepository.findAllById(cartItemNoList);
 
@@ -178,8 +178,8 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public void deactivateOutOfStockItems(String accessToken) {
-        Member member = getMember(accessToken);
+    public void deactivateOutOfStockItems(String loginId) {
+        Member member = getMember(loginId);
         List<CartItem> outOfStockItems = cartItemRepository.findOutOfStockItems(member);
 
         if(outOfStockItems.isEmpty()) {
@@ -194,11 +194,10 @@ public class CartServiceImpl implements CartService {
     }
 
     @Override
-    public Integer getCartItemCount(String accessToken) {
-        Member member = getMember(accessToken);
+    public Integer getCartItemCount(String loginId) {
+        Member member = getMember(loginId);
 
         // 장바구니에 상품 개수 파악
-
         return cartItemRepository.countActiveCartItems(member);
     }
 
@@ -216,23 +215,7 @@ public class CartServiceImpl implements CartService {
         }
     }
 
-    private Member getMemberV2(String loginId) {
-        // loginId를 가지고 member엔티티의 no 조회
-        Member member = memberRepository.findByLoginId(loginId);
-        if (member == null) {
-            throw new InvalidMemberException(INVALID_MEMBER);
-        }
-        return member;
-    }
-
-
-    private Member getMember(String accessToken) {
-        // 토큰 유효성 검사(만료 검사도 들어있음)
-        if (!jwtTokenProvider.isTokenValidate(accessToken)) {
-            throw new JwtValidException(TOKEN_VALIDATION_ERROR);
-        }
-        // member의 loginId 추출
-        String loginId = jwtTokenProvider.getUsernameFromToken(accessToken);
+    private Member getMember(String loginId) {
         // loginId를 가지고 member엔티티의 no 조회
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {

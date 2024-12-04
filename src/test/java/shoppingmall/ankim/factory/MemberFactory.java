@@ -67,15 +67,7 @@ public class MemberFactory {
                 .build();
         entityManager.persist(member);
 
-        log.info("loginId:{}", loginId);
-
         Product product = ProductFactory.createProduct(entityManager);
-
-        log.info("product:{}", product.getName());
-        int size = product.getItems().size();
-        for (int i = 0; i < size; i++) {
-            log.info("product item option1 : {} & option2 : {}",product.getItems().get(i).getItemOptions().get(0).getOptionValue().getNo(), product.getItems().get(i).getItemOptions().get(1).getOptionValue().getNo());
-        }
 
         entityManager.flush(); // DB로 반영
         entityManager.clear(); // 영속성 컨텍스트 초기화

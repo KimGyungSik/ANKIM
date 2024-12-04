@@ -1,24 +1,23 @@
-package shoppingmall.ankim.domain.cart.controller.v2;
+package shoppingmall.ankim.domain.cart.controller;
 
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
-import shoppingmall.ankim.domain.cart.service.v2.V2CartService;
+import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
 import java.util.Map;
 
-@Slf4j
+@RestController("v1CartApiController")
 @RequiredArgsConstructor
-@RequestMapping("/api/v2/cart")
-public class V2CartApiController {
+@RequestMapping("/api/cart")
+public class CartApiController {
 
-    private final V2CartService v2CartService;
+    private final CartService cartService;
 
     // 장바구니에 상품 담기 ( C )
     @PostMapping("/items")
@@ -27,7 +26,7 @@ public class V2CartApiController {
     ) {
         String loginId = getLoginId();
 
-        v2CartService.addToCart(request.toServiceRequest(), loginId);
+        cartService.addToCart(request.toServiceRequest(), loginId);
 
         return ApiResponse.ok("장바구니에 상품이 담겼습니다.");
     }
@@ -37,7 +36,7 @@ public class V2CartApiController {
     public ApiResponse<List<CartItemsResponse>> getCartItems() {
         String loginId = getLoginId();
 
-        List<CartItemsResponse> response = v2CartService.getCartItems(loginId);
+        List<CartItemsResponse> response = cartService.getCartItems(loginId);
 
         return ApiResponse.ok(response);
     }
@@ -51,7 +50,7 @@ public class V2CartApiController {
         String loginId = getLoginId();
 
         // service
-        v2CartService.updateCartItemQuantity(loginId, cartItemNo, quantity);
+        cartService.updateCartItemQuantity(loginId, cartItemNo, quantity);
 
         return ApiResponse.ok("장바구니 품목 수량이 변경되었습니다.");
     }
@@ -63,18 +62,17 @@ public class V2CartApiController {
     ) {
         String loginId = getLoginId();
 
-        v2CartService.deactivateSelectedItems(loginId, cartItemNoList);
+        cartService.deactivateSelectedItems(loginId, cartItemNoList);
         return ApiResponse.ok("선택상품을 삭제 했습니다.");
     }
 
     // 장바구니에서 품절상품 삭제하기 ( D ) -> 완전삭제X 상태만 변경
     @DeleteMapping("/items/sold-out")
     public ApiResponse<String> deleteSoldOutItems(
-            @CookieValue(value = "access", required = false) String access
     ) {
         String loginId = getLoginId();
 
-        v2CartService.deactivateOutOfStockItems(access);
+        cartService.deactivateOutOfStockItems(loginId);
         return ApiResponse.ok("품절상품을 삭제 했습니다.");
     }
 
@@ -83,7 +81,7 @@ public class V2CartApiController {
     public ApiResponse<Map<String, Integer>> getCartItemsCount() {
         String loginId = getLoginId();
 
-        Integer cartItemsCount = v2CartService.getCartItemCount(loginId);
+        Integer cartItemsCount = cartService.getCartItemCount(loginId);
 
         return ApiResponse.ok(Map.of("cartItemsCount", cartItemsCount));
     }
@@ -93,4 +91,5 @@ public class V2CartApiController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         return authentication.getName(); // 로그인 ID
     }
+
 }

@@ -1,36 +1,28 @@
-package shoppingmall.ankim.domain.cart.service.v2;
+package shoppingmall.ankim.domain.cart.service;
 
 import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.entity.Cart;
-import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
+import shoppingmall.ankim.domain.cart.service.v1.CartService;
 import shoppingmall.ankim.domain.image.service.S3Service;
-import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.item.repository.ItemRepository;
-import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.factory.MemberFactory;
-import shoppingmall.ankim.factory.MemberJwtFactory;
 
 import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 @ActiveProfiles("test")
@@ -41,12 +33,12 @@ import static org.mockito.Mockito.verify;
 @Transactional
 //        (isolation = Isolation.READ_COMMITTED)
 @DirtiesContext(classMode = DirtiesContext.ClassMode.AFTER_EACH_TEST_METHOD) // 테스트 간 독립성 확보
-class V2CartServiceTest {
+class CartServiceTest {
     @Autowired
     private EntityManager em;
 
     @Autowired
-    private V2CartService v2CartService;
+    private CartService cartService;
 
     @Autowired
     private CartRepository cartRepository;
@@ -70,7 +62,7 @@ class V2CartServiceTest {
                 .build();
 
         // when
-        v2CartService.addToCart(request, loginId);
+        cartService.addToCart(request, loginId);
 
         em.flush();
         em.clear();
@@ -107,9 +99,9 @@ class V2CartServiceTest {
                 .build();
 
         // when
-        v2CartService.addToCart(request1, loginId);
-        v2CartService.addToCart(request2, loginId);
-        v2CartService.addToCart(request3, loginId);
+        cartService.addToCart(request1, loginId);
+        cartService.addToCart(request2, loginId);
+        cartService.addToCart(request3, loginId);
         em.flush();
         em.clear();
 
@@ -137,7 +129,7 @@ class V2CartServiceTest {
                     .qty(randQty) // 새로 추가할 수량
                     .build();
             // when
-            v2CartService.addToCart(request, loginId);
+            cartService.addToCart(request, loginId);
 
             if(i == size) lastQty = randQty;
         }
@@ -161,7 +153,7 @@ class V2CartServiceTest {
         assertThat(cart).isEmpty(); // 장바구니가 비어있는 상태 확인
 
         // when
-        List<CartItemsResponse> cartItems = v2CartService.getCartItems(loginId);
+        List<CartItemsResponse> cartItems = cartService.getCartItems(loginId);
         em.flush();
         em.clear();
 
@@ -183,13 +175,13 @@ class V2CartServiceTest {
                 .qty(2) // 새로 추가할 수량
                 .build();
 
-        v2CartService.addToCart(request, loginId);
+        cartService.addToCart(request, loginId);
 
         em.flush();
         em.clear();
 
         // when
-        List<CartItemsResponse> cartItems = v2CartService.getCartItems(loginId);
+        List<CartItemsResponse> cartItems = cartService.getCartItems(loginId);
 
         // then
         assertThat(cartItems).isNotEmpty();
