@@ -18,6 +18,7 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceRequest;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
@@ -64,11 +65,10 @@ class MemberEditServiceTest {
         String rawPassword = "password123";
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertDoesNotThrow(() -> memberEditService.isValidPassword(accessToken, rawPassword));
+        assertDoesNotThrow(() -> memberEditService.isValidPassword(loginId, rawPassword));
     }
 
     @Test
@@ -79,11 +79,10 @@ class MemberEditServiceTest {
         String correctPassword = "securePassword123";
         String wrongPassword = "wrongPassword456";
 
-        Member secureMember = MemberJwtFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(secureMember, jwtTokenProvider);
+        Member secureMember = MemberFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertThatThrownBy(() -> memberEditService.isValidPassword(accessToken, wrongPassword))
+        assertThatThrownBy(() -> memberEditService.isValidPassword(loginId, wrongPassword))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(INVALID_PASSWORD.getMessage());
     }
@@ -97,8 +96,7 @@ class MemberEditServiceTest {
         String newPassword = "newPassword123!";
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -109,7 +107,7 @@ class MemberEditServiceTest {
         String encodeNewPassword = bCryptPasswordEncoder.encode(newPassword);
 
         // when
-        assertDoesNotThrow(() -> memberEditService.changePassword(accessToken, request));
+        assertDoesNotThrow(() -> memberEditService.changePassword(loginId, request));
 
         // then
         Member findMember = memberRepository.findByLoginId(loginId);
@@ -127,8 +125,7 @@ class MemberEditServiceTest {
         String newPassword = "newPassword123!";
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(wrongOldPassword)
@@ -137,7 +134,7 @@ class MemberEditServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(loginId, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(CURRENT_PASSWORD_INVALID.getMessage());
     }
@@ -150,8 +147,7 @@ class MemberEditServiceTest {
         String rawPassword = "password123"; // 기존 비밀번호와 동일
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -160,7 +156,7 @@ class MemberEditServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(loginId, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(PASSWORD_SAME_AS_OLD.getMessage());
     }
@@ -175,8 +171,7 @@ class MemberEditServiceTest {
         String confirmPassword = "mismatchPassword123!"; // 불일치
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         ChangePasswordServiceRequest request = ChangePasswordServiceRequest.builder()
                 .oldPassword(rawPassword)
@@ -185,7 +180,7 @@ class MemberEditServiceTest {
                 .build();
 
         // when & then
-        assertThatThrownBy(() -> memberEditService.changePassword(accessToken, request))
+        assertThatThrownBy(() -> memberEditService.changePassword(loginId, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(PASSWORD_CONFIRMATION_MISMATCH.getMessage());
     }

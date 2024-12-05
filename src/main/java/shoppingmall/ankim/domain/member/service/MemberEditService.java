@@ -5,8 +5,8 @@ import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceReq
 public interface MemberEditService {
 
     // 비밀번호 일치여부 검증
-    void isValidPassword(String accessToken, String password);
+    void isValidPassword(String loginId, String password);
 
     // 비밀번호 변경
-    void changePassword(String accessToken, ChangePasswordServiceRequest request);
+    void changePassword(String loginId, ChangePasswordServiceRequest request);
 }

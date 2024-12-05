@@ -29,8 +29,8 @@ public class MemberEditServiceImpl implements MemberEditService {
     private final MemberHistoryRepository memberHistoryRepository;
 
     @Override
-    public void isValidPassword(String accessToken, String pwd) {
-        Member member = getMember(accessToken);
+    public void isValidPassword(String loginId, String pwd) {
+        Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
         boolean isPasswordValid = bCryptPasswordEncoder.matches(pwd, member.getPwd());
@@ -49,8 +49,8 @@ public class MemberEditServiceImpl implements MemberEditService {
     * 5. 변경 이력 테이블에 변경 전/후 입력
     * */
     @Override
-    public void changePassword(String accessToken, ChangePasswordServiceRequest request) {
-        Member member = getMember(accessToken);
+    public void changePassword(String loginId, ChangePasswordServiceRequest request) {
+        Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
         boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPwd());
@@ -80,13 +80,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         memberHistoryRepository.save(history);
     }
 
-    private Member getMember(String accessToken) {
-        // 토큰 유효성 검사(만료 검사도 들어있음)
-        if (!jwtTokenProvider.isTokenValidate(accessToken)) {
-            throw new JwtValidException(TOKEN_VALIDATION_ERROR);
-        }
-        // member의 loginId 추출
-        String loginId = jwtTokenProvider.getUsernameFromToken(accessToken);
+    private Member getMember(String loginId) {
         // loginId를 가지고 member엔티티의 no 조회
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {
