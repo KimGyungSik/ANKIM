@@ -1,11 +1,14 @@
 package shoppingmall.ankim.domain.payment.service;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import net.minidev.json.JSONObject;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
@@ -17,11 +20,14 @@ import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
+import shoppingmall.ankim.domain.item.repository.ItemRepository;
+import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
+import shoppingmall.ankim.domain.order.service.OrderQueryService;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
-import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.dto.*;
@@ -31,7 +37,9 @@ import shoppingmall.ankim.domain.payment.exception.PaymentAmountNotEqualExceptio
 import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
+import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
+import shoppingmall.ankim.global.config.lock.LockHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
@@ -41,26 +49,33 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Service
 @Transactional
+@Slf4j
 @RequiredArgsConstructor
 public class PaymentServiceImpl implements PaymentService {
     private final PaymentRepository paymentRepository;
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
+    private final ItemRepository itemRepository;
     private final OrderItemRepository orderItemRepository;
     private final TossPaymentConfig tossPaymentConfig;
     private final RestTemplate restTemplate;
+    private final OrderQueryService orderQueryService;
     private final DeliveryService deliveryService;
+    private final ItemService itemService;
+    private final LockHandler lockHandler;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
+//    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
                                               DeliveryCreateServiceRequest deliveryRequest,
                                               MemberAddressCreateServiceRequest addressRequest) {
         // Order 조회 (fetch join으로 Member 로딩)
-        Order order = orderRepository.findByOrderNameWithMemberAndOrderItemsAndItem(request.getOrderName())
+        Order order = orderRepository.findByOrderNameWithMemberAndOrderItems(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+
         // 결제 대기중 상태가 아니라면 이미 승인된 결제이므로 예외 발생
-        if(order.getOrderStatus() != PENDING_PAYMENT) {
+        if (order.getOrderStatus() != PENDING_PAYMENT) {
             throw new AlreadyApprovedException(ALREADY_APPROVED);
         }
 
@@ -71,8 +86,23 @@ public class PaymentServiceImpl implements PaymentService {
         Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
         order.setDelivery(delivery);
 
-        // 재고 감소
-        reduceStock(order.getOrderItems());
+        // OrderItem별로 처리
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Long itemNo = orderItem.getItem().getNo();
+            Integer quantity = orderItem.getQty();
+            log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
+            String key = String.valueOf(itemNo);
+            try {
+                // 아이템별 락
+                lockHandler.lock(key);
+
+                // 아이템 단위로 재고 감소
+                itemService.reduceStock(itemNo, quantity);
+            } finally {
+                // 락 해제
+                lockHandler.unlock(key);
+            }
+        }
 
         // Payment 생성 & 저장
         Payment payment = paymentRepository.save(Payment.create(order, request.getPayType(), request.getAmount()));
@@ -118,7 +148,7 @@ public class PaymentServiceImpl implements PaymentService {
     @Override
     public PaymentFailResponse tossPaymentFail(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
-        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItemsAndItem(orderId)
+        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
         order.failOrderWithOutDelivery();
 
@@ -136,7 +166,7 @@ public class PaymentServiceImpl implements PaymentService {
     public PaymentCancelResponse cancelPayment(String paymentKey, String cancelReason) {
         Payment payment = paymentRepository.findByPayKeyWithOrder(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 
-        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItemsAndItem(payment.getOrder().getOrdNo())
+        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(payment.getOrder().getOrdNo())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));;
         // 단, 결제 취소 시 배송 상태가 배송 준비 상태일때만 가능
         order.cancelOrder(); // 주문 및 배송 취소 처리
@@ -149,41 +179,18 @@ public class PaymentServiceImpl implements PaymentService {
         Map map = tossPaymentCancel(paymentKey, cancelReason);
         return PaymentCancelResponse.builder().details(map).build();
     }
-    private void reduceStock(List<OrderItem> orderItems) {
-        // OrderItem ID 목록 생성
-        List<Long> orderItemIds = orderItems.stream()
-                .map(OrderItem::getNo)
-                .toList();
 
-        // Item과 주문 수량 조회
-        List<Object[]> itemsAndQuantities = orderItemRepository.findItemsAndQuantitiesByOrderItemIds(orderItemIds);
-
-        // 재고 감소
-        for (Object[] result : itemsAndQuantities) {
-            Item item = (Item) result[0];
-            Integer quantity = (Integer) result[1];
-
-            item.deductQuantity(quantity); // Item 엔티티의 재고 감소 메서드 호출
-        }
-    }
 
     private void restoreStock(List<OrderItem> orderItems) {
-        // OrderItem ID 목록 생성
-        List<Long> orderItemIds = orderItems.stream()
-                .map(OrderItem::getNo)
-                .toList();
-
-        // Item과 주문 수량 조회
-        List<Object[]> itemsAndQuantities = orderItemRepository.findItemsAndQuantitiesByOrderItemIds(orderItemIds);
-
-        // 재고 복구 처리
-        for (Object[] result : itemsAndQuantities) {
-            Item item = (Item) result[0];
-            Integer quantity = (Integer) result[1];
-
-            item.restoreQuantity(quantity); // Item 엔티티의 복구 메서드 호출
+        for (OrderItem orderItem : orderItems) {
+            // 비관적 락으로 Item 조회
+            Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())
+                    .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
+            Integer quantity = orderItem.getQty(); // 주문 수량 가져오기
+            item.restoreQuantity(quantity); // Item의 재고 복구 메서드 호출
         }
     }
+
 
     private Map tossPaymentCancel(String paymentKey, String cancelReason) {
         HttpHeaders headers = getHeaders();

@@ -1,30 +1,50 @@
 spring:
   datasource:
-    url: jdbc:h2:tcp://localhost/~/test;MODE=MySQL;DATABASE_TO_LOWER=TRUE
+    url: jdbc:h2:tcp://localhost/~/test;MODE=MySQL;DATABASE_TO_LOWER=TRUE;LOCK_TIMEOUT=10000;
     driver-class-name: org.h2.Driver
     username: sa
     password:
-
+    hikari:
+      minimum-idle: 10 # 최소 유휴 커넥션
+      maximum-pool-size: 1000 # 커넥션 풀 크기
+      idle-timeout: 30000 # 유휴 커넥션 최대 유지 시간 (밀리초)
+      connection-timeout: 60000 # 최대 연결 대기 시간 (밀리초)
+      max-lifetime: 1800000 # 커넥션 최대 수명 (밀리초)
+      data-source-properties:
+        isolationLevel: READ_COMMITTED # 트랜잭션 격리 수준 (READ_COMMITTED 사용)
+        lockTimeout: 10000 # 잠금 대기 시간 (밀리초)
   jpa:
     hibernate:
-      ddl-auto: create
-#    show-sql: true
+      ddl-auto: create # 애플리케이션 시작 시 테이블 재생성
+      naming-strategy: org.hibernate.cfg.ImprovedNamingStrategy
     properties:
+      hibernate.dialect: org.hibernate.dialect.H2Dialect
       hibernate:
-        format_sql: true
-        default_batch_fetch_size: 1000
-
+        connection.isolation: 2 # JDBC Isolation Level (READ_COMMITTED)
+        format_sql: true # SQL 포맷 활성화
+        default_batch_fetch_size: 1000 # 배치 조회 크기
+        jdbc:
+          fetch_size: 50 # JDBC 페치 크기
+          batch_size: 30 # JDBC 배치 크기
+        generate_statistics: true # Hibernate 통계 활성화
+        use_sql_comments: true # SQL 주석 활성화
+        order_updates: true # 업데이트 명령 정렬
+        order_inserts: true # 삽입 명령 정렬
+        jdbc.time_zone: UTC # JDBC 시간대 설정
   h2:
     console:
       enabled: true
+      path: /h2-console
+      settings:
+        trace: true # H2 SQL Trace 활성화
+        web-allow-others: true # 외부 접속 허용
 
-  # Redis 설정
+
   data:
     redis:
       host: localhost
       port: 6379
-
-
+      timeout: 3000 # Redis 연결 타임아웃 (밀리초)
 
 logging:
   level:
@@ -32,13 +52,29 @@ logging:
       springframework:
         orm:
           jpa: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
+    com.zaxxer.hikari.HikariConfig: DEBUG # HikariCP 디버깅
 
 decorator:
   datasource:
     p6spy:
       enable-logging: 'true'
 
-# S3 설정
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # 모든 관리 엔드포인트 활성화
+
+actuator:
+  metrics:
+    enable:
+      all: true
+  traces:
+    max-trace-count: 100 # 요청 및 응답 추적 제한
+
 cloud:
   aws:
     credentials:
@@ -51,15 +87,12 @@ cloud:
     stack:
       auto: false
 
-
-# 로그인 설정
 login:
   attempt:
     max: 5
   lock:
     time: 10
 
-# 토큰 설정
 jwt:
   secret: 23aca2ed0815953971212551d4abbfe1ce73b58230ef7be989f3a32f79a0d360
   access:
@@ -69,13 +102,10 @@ jwt:
   refresh:
     token:
       expire:
-        #        time: 604800000 # 7일( 1000 * 60 * 60 * 24 * 7 )
         time: 600000 # 10분
       remember:
         time: 604800000 # 7일
 
-# 이메일 설정
-#Email 인증
 mail:
   host: smtp.gmail.com
   port: 587
@@ -92,3 +122,13 @@ mail:
         timeout: 5000
         writetimeout: 5000
   auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30?
+
+server:
+  tomcat:
+    threads:
+      max: 200 # 생성할 수 있는 thread의 총 개수
+      min-spare: 10 # 항상 활성화 되어있는(idle) thread의 개수
+    max-connections: 8192 # 수립가능한 connection의 총 개수
+    accept-count: 100 # 작업큐의 사이즈
+    connection-timeout: 20000 # timeout 판단 기준 시간, 20초
+  port: 8080 # 서버를 띄울 포트번호

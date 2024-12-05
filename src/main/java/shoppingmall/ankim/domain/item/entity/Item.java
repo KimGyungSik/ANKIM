@@ -1,10 +1,7 @@
 package shoppingmall.ankim.domain.item.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
@@ -49,6 +46,7 @@ public class Item {
 
     private Integer totalPrice; // 정상가격(원가) + 추가금액
 
+    @Setter
     private Integer qty; // 재고량
 
     @Column(name = "saf_qty")

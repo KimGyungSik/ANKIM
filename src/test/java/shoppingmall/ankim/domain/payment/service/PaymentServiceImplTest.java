@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.payment.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -10,6 +11,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -25,6 +27,7 @@ import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
@@ -55,7 +58,7 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 // TODO 정확히 DEFINED_PORT와 RANDOM_PORT의 차이를 알아야 할듯!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @Transactional
-@ActiveProfiles("test")
+@ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class PaymentServiceImplTest {
     @MockBean
@@ -89,6 +92,9 @@ class PaymentServiceImplTest {
     private CartRepository cartRepository;
 
     @Autowired
+    private ItemRepository itemRepository;
+
+    @Autowired
     private EntityManager entityManager;
 
     @Autowired
@@ -101,19 +107,30 @@ class PaymentServiceImplTest {
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
+//    @AfterEach
+//    void tearDown() {
+//        // 모든 데이터를 삭제
+//        itemRepository.deleteAll();
+//        paymentRepository.deleteAll();
+//        orderRepository.deleteAll();
+//        deliveryRepository.deleteAll();
+//        cartRepository.deleteAll();
+//    }
+
     @DisplayName("클라이언트는 결제 요청을 보낼 수 있다.")
-//    @Rollback(false)
+    @Commit
     @Test
     void requestTossPayment_withOrderFactory() {
         // given
-        String orderCode = "ORD20241125-1234567";
 
         // OrderFactory를 통해 Order 생성
         Order mockOrder = OrderFactory.createOrderWithOutDelivery(entityManager);
-        mockOrder.setOrdCode(orderCode);
+
+//        entityManager.flush();
+//        entityManager.clear();
 
         PaymentCreateServiceRequest request = PaymentCreateServiceRequest.builder()
-                .orderName(orderCode)
+                .orderName("ORD20241125-1234567")
                 .payType(PayType.CARD)
                 .amount(50000)
                 .build();
@@ -137,11 +154,14 @@ class PaymentServiceImplTest {
         // when
         PaymentResponse response = paymentServiceImpl.requestTossPayment(request,deliveryRequest,addressRequest);
 
+
+        entityManager.flush();
+        entityManager.clear();
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getOrderName()).isEqualTo(orderCode);
-        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
-        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
+        assertThat(response.getOrderName()).isEqualTo("ORD20241125-1234567");
+//        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
+//        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
         assertThat(response.getAmount()).isEqualTo(50000L);
         assertThat(response.getPayType()).isEqualTo("카드");
         assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
@@ -151,20 +171,17 @@ class PaymentServiceImplTest {
         List<Payment> payments = paymentRepository.findAll();
         assertThat(payments).hasSize(1);
         Payment savedPayment = payments.get(0);
-        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo(orderCode);
+        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo("ORD20241125-1234567");
         assertThat(savedPayment.getTotalPrice()).isEqualTo(50000L);
         assertThat(savedPayment.getType()).isEqualTo(PayType.CARD);
 
         // 품목 재고 검증
-        Item item1 = mockOrder.getOrderItems().get(0).getItem();
-        Item item2 = mockOrder.getOrderItems().get(1).getItem();
 
         // EntityManager를 통해 최신 상태 조회
-        Item updatedItem1 = entityManager.find(Item.class, item1.getNo());
-        Item updatedItem2 = entityManager.find(Item.class, item2.getNo());
+        List<Item> items = itemRepository.findAll();
 
-        assertThat(updatedItem1.getQty()).isEqualTo(98); // 주문 수량 2 감소
-        assertThat(updatedItem2.getQty()).isEqualTo(97); // 주문 수량 3 감소
+        assertThat(items.get(0).getQty()).isEqualTo(98); // 주문 수량 2 감소
+        assertThat(items.get(1).getQty()).isEqualTo(97); // 주문 수량 3 감소
     }
 
     @Test

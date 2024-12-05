@@ -3,15 +3,126 @@ spring:
     url: jdbc:mysql://localhost:3306/ankim?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: root
     password: 1234
-    driver-class-name: com.mysql.cj.jdbc.Driver
+    hikari:
+      minimum-idle: 10
+      maximum-pool-size: 1000
+      idle-timeout: 30000
+      connection-timeout: 60000
+      max-lifetime: 1800000
+      data-source-properties:
+        isolationLevel: READ_COMMITTED
+        lockTimeout: 10000
 
   jpa:
     hibernate:
-      ddl-auto: none
+      ddl-auto: update # 자동으로 엔티티에 맞는 테이블 업데이트
     show-sql: true
     properties:
       hibernate:
-        jdbc:
+      jdbc:
           lob:
             non_contextual_creation: true
-        format_sql: true
+          connection.isolation: 2
+          format_sql: true
+          default_batch_fetch_size: 1000
+          jdbc:
+          fetch_size: 50
+          batch_size: 30
+          generate_statistics: true
+          use_sql_comments: true
+          order_updates: true
+          order_inserts: true
+          jdbc.time_zone: UTC
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      timeout: 3000 # Redis 연결 타임아웃 (밀리초)
+
+logging:
+  level:
+    org:
+      springframework:
+        orm:
+          jpa: DEBUG
+      hibernate:
+        SQL: DEBUG
+        type: TRACE
+    com.zaxxer.hikari.HikariConfig: DEBUG # HikariCP 디버깅
+
+decorator:
+  datasource:
+    p6spy:
+      enable-logging: 'true'
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*" # 모든 관리 엔드포인트 활성화
+
+actuator:
+  metrics:
+    enable:
+      all: true
+  traces:
+    max-trace-count: 100 # 요청 및 응답 추적 제한
+
+cloud:
+  aws:
+    credentials:
+      access-key: ${cloud.aws.credentials.access-key}
+      secret-key: ${cloud.aws.credentials.secret-key}
+    s3:
+      bucket: ${cloud.aws.s3.bucket}
+    region:
+      static: ${cloud.aws.region.static}
+    stack:
+      auto: false
+
+login:
+  attempt:
+    max: 5
+  lock:
+    time: 10
+
+jwt:
+  secret: 23aca2ed0815953971212551d4abbfe1ce73b58230ef7be989f3a32f79a0d360
+  access:
+    token:
+      expire:
+        time: 3600000 # 1시간( 1000 * 60 * 60 )
+  refresh:
+    token:
+      expire:
+        time: 600000 # 10분
+      remember:
+        time: 604800000 # 7일
+
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: "jh96.dev@gmail.com"
+  password: "fell fchr vphm xvfl"
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+  auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
+
+server:
+  tomcat:
+    threads:
+      max: 200 # 생성할 수 있는 thread의 총 개수
+      min-spare: 10 # 항상 활성화 되어있는(idle) thread의 개수
+    max-connections: 8192 # 수립가능한 connection의 총 개수
+    accept-count: 100 # 작업큐의 사이즈
+    connection-timeout: 20000 # timeout 판단 기준 시간, 20초
+  port: 8080 # 서버를 띄울 포트번호

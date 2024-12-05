@@ -63,6 +63,7 @@ public class OrderFactory {
     public static Order createOrderWithOutDelivery(EntityManager entityManager) {
         // Product 및 관련 데이터 생성
         Product product = ProductFactory.createProduct(entityManager);
+        entityManager.persist(product);
 
         // Item 추출
         Item item1 = product.getItems().get(0); // 첫 번째 품목
@@ -82,8 +83,14 @@ public class OrderFactory {
                 null,
                 LocalDateTime.now()
         );
+        String orderCode = "ORD20241125-1234567";
+
+        order.setOrdCode(orderCode);
 
         entityManager.persist(order);
+        entityManager.flush();
+        entityManager.clear();
+//        entityManager.getTransaction().commit();
 
         return order;
     }

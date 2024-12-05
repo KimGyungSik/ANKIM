@@ -12,4 +12,9 @@ import java.util.Optional;
 public interface OrderItemRepository extends JpaRepository<OrderItem,Long> {
     @Query("SELECT o.item, o.qty FROM OrderItem o WHERE o.no IN :orderItemIds")
     List<Object[]> findItemsAndQuantitiesByOrderItemIds(@Param("orderItemIds") List<Long> orderItemIds);
+
+    @Query("SELECT oi FROM OrderItem oi " +
+            "JOIN FETCH oi.item " +
+            "WHERE oi.order.ordNo = :orderNo")
+    List<OrderItem> findOrderItemsWithItemsByOrderNo(@Param("orderNo") String orderNo);
 }

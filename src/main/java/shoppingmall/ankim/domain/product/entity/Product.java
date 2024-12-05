@@ -62,54 +62,69 @@ public class Product extends BaseEntity {
 
     private String code; // 상품코드
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", name = "description")
     private String desc; // 상세설명
 
-    @Column
+    @Column(name = "discount_rate")
     private Integer discRate; // 할인율
 
-    @Column
+    @Column(name = "sell_price")
     private Integer sellPrice; // 판매가격 (할인율 적용)
 
-    @Column
+    @Column(name = "orig_price")
     private Integer origPrice; // 정상가격
 
-    @Column
-    private String optYn; // 옵션여부
+    @Column(name = "option_available")
+    private String optYn; // 옵션 여부
 
-    @Column
-    private String restockYn; // 재입고알림여부
+    @Column(name = "restock_available")
+    private String restockYn; // 재입고 알림 여부
 
-    private Integer qty; // 재고량 -> 옵션없을 경우 (단품)
+    private Integer qty; // 재고량 (단품)
 
     @Enumerated(EnumType.STRING)
     private ProductSellingStatus sellingStatus; // 판매 상태
 
+    @Column(name = "handmade")
     private String handMadeYn; // 핸드메이드 상품 여부
 
+    @Column(name = "free_shipping")
     private String freeShip; // 무료배송 여부
 
+    @Column(name = "ship_fee")
     private Integer shipFee; // 배송비
 
-    @Column(columnDefinition = "TEXT")
+    @Column(columnDefinition = "TEXT", name = "search_keywords")
     private String searchKeywords; // 검색 키워드
 
+    @Column(name = "rel_prod_code")
     private String relProdCode; // 연관 상품코드
 
-    @Lob
+    @Column(name = "caution_product")
     private String cauProd; // 상품 유의사항
 
-    @Lob
+    @Column(name = "caution_order")
     private String cauOrd; // 주문 유의사항
 
-    @Lob
+    @Column(name = "caution_shipping")
     private String cauShip; // 배송 유의사항
 
+    @Column(name = "avg_rating")
     private Integer avgR; // 평균 별점
-    private Integer wishCnt; // 찜횟수
+
+    @Column(name = "wish_count")
+    private Integer wishCnt; // 찜 횟수
+
+    @Column(name = "view_count")
     private Integer viewCnt; // 조회수
-    private Integer rvwCnt; // 리뷰수
-    private Integer qnaCnt; // 문의수
+
+    @Column(name = "review_count")
+    private Integer rvwCnt; // 리뷰 수
+
+    @Column(name = "qna_count")
+    private Integer qnaCnt; // 문의 수
+
+    @Column(name = "display_order")
     private Integer dispOrd; // 노출 우선순위
 
     @Builder

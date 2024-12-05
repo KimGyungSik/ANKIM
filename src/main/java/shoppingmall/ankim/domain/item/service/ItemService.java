@@ -1,11 +1,13 @@
 package shoppingmall.ankim.domain.item.service;
 
-import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import shoppingmall.ankim.domain.item.dto.ItemPreviewResponse;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.request.ItemCreateServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
@@ -14,6 +16,7 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
+import org.springframework.transaction.annotation.Propagation;
 import shoppingmall.ankim.domain.option.service.OptionGroupService;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
@@ -24,8 +27,10 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
 import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 
 // 옵션 조합 생성 -> 조합 결과 반환 -> 세부 값 입력 및 저장
@@ -39,6 +44,15 @@ public class ItemService {
     private final ProductRepository productRepository;
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
+
+    // 재고 감소
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void reduceStock(Long itemNo, Integer quantity) {
+        // 재고 감소 로직
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.deductQuantity(quantity);
+    }
 
     /**
      * 옵션 조합 생성 및 미리보기 반환
