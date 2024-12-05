@@ -30,7 +30,7 @@ public class ReissueServiceImpl implements ReissueService {
     public String validateRefreshToken(String access) {
         String refresh = (String) redisHandler.get(access);
         if(refresh == null || refresh.isEmpty()) {
-            throw new JwtTokenException(REFRESH_TOKEN_NOT_FOUND);
+            throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND); // access 토큰이 존재하지 않기 때문에 발생
         }
 
         // 만료 여부 확인

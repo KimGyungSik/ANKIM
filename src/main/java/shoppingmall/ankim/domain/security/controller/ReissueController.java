@@ -25,53 +25,8 @@ public class ReissueController {
     @Value("${jwt.refresh.token.expire.time}")
     private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 X)
 
-    @PostMapping("/reissue")
+    @PostMapping("/reissue") // FIXME 토큰 재발행 및 헤더,쿠키,레디스에 토큰 저장
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
-        // 쿠키에서 Access Token 추출
-//        String access = request.getHeader("access");
-        String access = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("access")) {
-                    access = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        if (access == null || access.isEmpty()) {
-            return ApiResponse.of(ACCESS_TOKEN_NOT_FOUND);
-        }
-
-        try {
-            // Redis에서 Refresh Token 검증
-            String refresh = reissueService.validateRefreshToken(access);
-            if (refresh == null || refresh.isEmpty()) {
-                return ApiResponse.of(REFRESH_TOKEN_EXPIRED);
-            }
-
-            // Redis에 access token이 저장되어 있는지 확인
-            reissueService.isAccessTokenExist(access);
-
-            // 새로운 Access Token 재발급
-            Map<String, String> token = reissueService.reissueToken(access, refresh);
-            String newAccess = token.get("access");
-            String newRefresh = token.get("refresh");
-
-            // 응답 헤더에 Access Token 추가
-            response.setHeader("access", newAccess);
-//            response.addCookie(createCookie("refresh", newRefresh));
-
-            return ApiResponse.ok("토큰 재발급 완료");
-        } catch (JwtTokenException e) {
-            return ApiResponse.of(e.getErrorCode());
-        } catch (Exception e) {
-            return ApiResponse.of(HttpStatus.INTERNAL_SERVER_ERROR, e.getMessage());
-        }
-    }
-
-    @PostMapping("v2/reissue") // FIXME 토큰 재발행 및 헤더,쿠키,레디스에 토큰 저장
-    public ApiResponse<?> reissueV2(HttpServletRequest request, HttpServletResponse response) {
         // 헤더에서 Access Token 추출
         String access = request.getHeader("access");
 
@@ -90,7 +45,7 @@ public class ReissueController {
             }
         }
 
-        // refresh 토큰이 존재하지 않는 경우
+        // refresh 토큰이 쿠키에 존재하지 않는 경우
         if (refreshCookie == null || refreshCookie.isEmpty()) {
             return ApiResponse.of(REFRESH_TOKEN_NOT_FOUND);
         }
