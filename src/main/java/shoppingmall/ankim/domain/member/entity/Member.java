@@ -111,4 +111,8 @@ public class Member extends BaseEntity {
         this.status = MemberStatus.LOCKED;
     }
 
+    public void changePassword(String newPassword) {
+        this.pwd = newPassword;
+    }
+
 }

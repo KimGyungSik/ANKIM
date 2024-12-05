@@ -9,6 +9,6 @@ import java.util.List;
 public interface MemberMyPageService {
 
     // 비밀번호 일치여부 검증
-    void isValidPassword(String accessToken, String password);
+    void isValidPassword(String loginId, String password);
 
 }

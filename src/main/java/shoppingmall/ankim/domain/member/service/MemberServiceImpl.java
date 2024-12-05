@@ -60,6 +60,7 @@ public class MemberServiceImpl implements MemberService {  // FIXME 클래스명
 
         // 비밀번호 암호화
         String encodePwd = bCryptPasswordEncoder.encode(request.getPwd());
+        log.info("회원가입을 위해 암호화된 비밀번호 : {}", encodePwd);
 
         Member member = request.create(encodePwd, agreeTerms);
         memberRepository.save(member); // 회원가입과 동시에 TermsHistory도 저장!

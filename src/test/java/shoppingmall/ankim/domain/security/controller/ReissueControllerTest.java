@@ -60,14 +60,14 @@ class ReissueControllerTest {
     }
 
     @Test
-    @DisplayName("Redis에 Access Token이 없으면 ACCESS_TOKEN_NOT_FOUND를 반환한다.")
+    @DisplayName("Redis에 헤더에 담긴 Access Token이 없으면 ACCESS_TOKEN_NOT_FOUND를 반환한다.")
     void reissue_accessTokenNotInRedis() {
         // given
         MockHttpServletRequest request = new MockHttpServletRequest();
         MockHttpServletResponse response = new MockHttpServletResponse();
-        request.setCookies(new Cookie("access", "validAccessToken"));
+        request.addHeader("access", "validAccessToken");
+        request.setCookies(new Cookie("refresh", "validRefreshToken"));
 
-        when(reissueService.validateRefreshToken("validAccessToken")).thenReturn("validRefreshToken");
         doThrow(new JwtTokenException(ACCESS_TOKEN_NOT_FOUND))
                 .when(reissueService).isAccessTokenExist("validAccessToken");
 
@@ -77,8 +77,9 @@ class ReissueControllerTest {
         // then
         assertThat(result.getStatus()).isEqualTo(ACCESS_TOKEN_NOT_FOUND.getHttpStatus());
         assertThat(result.getMessage()).isEqualTo(ACCESS_TOKEN_NOT_FOUND.getMessage());
-        verify(reissueService, times(1)).validateRefreshToken("validAccessToken");
+
         verify(reissueService, times(1)).isAccessTokenExist("validAccessToken");
+        verify(reissueService, never()).validateRefreshToken(anyString());
     }
 
 }

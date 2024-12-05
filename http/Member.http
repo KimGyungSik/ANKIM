@@ -34,7 +34,7 @@ POST http://localhost:8080/api/member/email-check
 Content-Type: application/json
 
 {
-  "id": "test@example.com"
+  "id": "gnstm831@gmail.com"
 }
 
 ### 이메일 인증번호 발송
@@ -46,7 +46,45 @@ Content-Type: application/json
 }
 
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
-POST http://localhost:8080/api/member/email-next?loginId=test@example.com
+POST http://localhost:8080/member/register
 Content-Type: application/json
 
+{
+  "id": "gnstm831@gmail.com",
+  "pwd": "TestPassword123!",
+  "name": "안정훈",
+  "phoneNum": "010-1234-5678",
+  "birth": "1999-01-01",
+  "gender": "F"
+}
 
+### 회원가입한 아이디와 비밀번호로 로그인 한다.
+POST http://localhost:8080/api/login/member
+Content-Type: application/json
+
+{
+  "loginId": "gnstm831@gmail.com",
+  "pwd": "TestPassword123!",
+  "autoLogin" : ""
+}
+
+
+### 마이페이지의 회원정보 페이지에 들어가서 비밀번호를 재입력하여 인증을 한다.
+POST http://localhost:8080/api/mypage/confirm-password
+Content-Type: application/json
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+
+{
+  "pwd": "TestPassword123!"
+}
+
+### 마이페이지에서 회원이 자신의 주소를 등록한다.
+PUT http://localhost:8080/api/address/edit
+Content-Type: application/json
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+
+{
+  "zipCode": "12345",
+  "addressMain": "서울특별시 강남구 미왕빌딩",
+  "addressDetail": "10층"
+}

@@ -20,7 +20,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
 @DataJpaTest
 @Import(QuerydslConfig.class)
-class MemberRepositoryTest {
+class MemberHistoryRepositoryTest {
 
     @Autowired
     EntityManager em;

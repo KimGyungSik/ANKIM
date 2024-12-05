@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface ItemQueryRepository {
     Item findItemByOptionValuesAndProduct(Long productNo, List<Long> optionValueNoList);
+    List<Item> findItemsByProductNo(Long productNo);
 }

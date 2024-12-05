@@ -7,135 +7,68 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.entity.QCartItem;
-import shoppingmall.ankim.domain.cart.repository.query.CartItemQueryRepositoryImpl;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.factory.CartFactory;
+import shoppingmall.ankim.factory.MemberJwtFactory;
+import shoppingmall.ankim.global.config.QuerydslConfig;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verify;
 
+@DataJpaTest
+@Import(QuerydslConfig.class)
 class CartItemRepositoryTest {
 
-    @Mock
-    private MemberRepository memberRepository;
+    @Autowired
+    private EntityManager em;
 
-    @Mock
+    @MockBean
+    private JwtTokenProvider jwtTokenProvider;
+
+    @Autowired
     private CartItemRepository cartItemRepository;
 
-    @Mock
-    private CartRepository cartRepository;
-
-    @Mock
-    private ProductRepository productRepository;
-
-    @InjectMocks
-    private CartItemRepositoryTest cartItemRepositoryTest;
-
-    @BeforeEach
-    void setUp() {
-        MockitoAnnotations.openMocks(this);
-    }
-
     @Test
-    @DisplayName("회원의 장바구니에서 특정 품목을 Mock으로 조회한다.")
-    void findByIdAndCart_Member_Success_WithMock() {
-        // Mock Member
-        Member mockMember = mock(Member.class);
-
-        given(memberRepository.findById(1L)).willReturn(Optional.of(mockMember));
-
-        // Mock Product
-        Product mockProduct = mock(Product.class);
-        given(mockProduct.getNo()).willReturn(1L);
-        given(mockProduct.getName()).willReturn("테스트 상품");
-        given(productRepository.findById(1L)).willReturn(Optional.of(mockProduct));
-
-        // Mock Item
-        Item mockItem = mock(Item.class);
-        given(mockItem.getNo()).willReturn(1L);
-        given(mockItem.getProduct()).willReturn(mockProduct);
-        given(mockItem.getName()).willReturn("색상: 블랙, 사이즈: L");
-        given(mockItem.getQty()).willReturn(50); // 재고
-        given(mockItem.getMinQty()).willReturn(1); // 최소 수량
-        given(mockItem.getMaxQty()).willReturn(10); // 최대 수량
-
-        // Mock Cart
-        Cart mockCart = mock(Cart.class);
-        given(mockCart.getMember()).willReturn(mockMember);
-
-        given(cartRepository.findById(1L)).willReturn(Optional.of(mockCart));
-
-        // Mock CartItem
-        CartItem mockCartItem = mock(CartItem.class);
-        given(mockCartItem.getProduct()).willReturn(mockProduct);
-        given(mockCartItem.getNo()).willReturn(1L);
-        given(mockCartItem.getItem()).willReturn(mockItem);
-        given(mockCartItem.getItemName()).willReturn("테스트 품목");
-        given(mockCartItem.getCart()).willReturn(mockCart);
-        given(mockCartItem.getQty()).willReturn(3);
-
-        given(cartItemRepository.findByNoAndCart_Member(1L, mockMember)).willReturn(Optional.of(mockCartItem));
-
-        // when
-        CartItem foundCartItem = cartItemRepository.findByNoAndCart_Member(1L, mockMember)
-                .orElse(null);
-
-        // then
-        assertThat(foundCartItem).isNotNull();
-        assertThat(foundCartItem.getQty()).isEqualTo(mockCartItem.getQty());
-        assertThat(foundCartItem.getItem().getName()).isEqualTo(mockCartItem.getItem().getName());
-        assertThat(foundCartItem.getItem().getProduct().getName()).isEqualTo(mockCartItem.getItem().getProduct().getName());
-    }
-
-
-    @Test
-    @DisplayName("활성 상태(Y)인 CartItem 개수를 정확히 반환한다")
-    void countActiveCartItems_ReturnsCorrectCount() {
+    public void test() {
         // given
-        Integer expectedCount = 5; // Mock 데이터
-        QCartItem cartItem = QCartItem.cartItem;
+        String loginId = "test@ankim.com";
+        Member member = MemberJwtFactory.createMember(em, loginId);
+        String accessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
 
-        Member mockMember = mock(Member.class);
+        List<CartItem> cartItemList = CartFactory.createCart(em, member);
+        Long cartItemNo1 = cartItemList.get(0).getNo();
+        Long cartItemNo2 = cartItemList.get(1).getNo();
+        System.out.println("cartItemNo1 = " + cartItemNo1 + "; cartItemNo2 = " + cartItemNo2);
 
-        given(cartItemRepository.countActiveCartItems(mockMember)).willReturn(expectedCount);
-
-        Cart mockCart = mock(Cart.class);
-        given(mockCart.getMember()).willReturn(mockMember);
-
-        // CartItem 5개 추가
-        int actualCount = 5;
-        for (int i = 0; i < actualCount; i++) {
-            cartItemRepository.save(CartItem.builder()
-                    .cart(mockCart) // 회원의 장바구니
-                    .activeYn("Y") // 활성 상태
-                    .build());
-        }
-        // 삭제된 CartItem 3개 추가
-        for (int i = 0; i < 3; i++) {
-            cartItemRepository.save(CartItem.builder()
-                    .cart(mockCart) // 회원의 장바구니
-                    .activeYn("N") // 활성 상태
-                    .build());
-        }
+        List<Long> cartItemNoList = List.of(cartItemNo1, cartItemNo2);
 
         // when
-        Integer count = cartItemRepository.countActiveCartItems(mockMember);
+        List<CartItem> byNoIn = cartItemRepository.findByNoIn(cartItemNoList);
 
         // then
-        assertThat(count).isEqualTo(actualCount);
-    }
+        assertThat(byNoIn).isNotNull();
+        assertThat(byNoIn.size()).isEqualTo(cartItemNoList.size());
+        for (CartItem cartItem : byNoIn) {
+            System.out.println("cartItem.getItemName() = " + cartItem.getItemName());
+        }
 
+    }
 
 }

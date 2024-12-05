@@ -25,3 +25,15 @@ Content-Type: application/json
   "addressMain": "서울특별시 강남구 미왕빌딩",
   "addressDetail": "10층"
 }
+
+### 관리자 로그인
+POST http://localhost:8080/api/login/admin
+Content-Type: application/json
+
+{
+  "loginId": "admin123",
+  "pwd": "AdminPass123!",
+  "autoLogin" : ""
+}
+
+
