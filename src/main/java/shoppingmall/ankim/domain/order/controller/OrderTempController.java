@@ -2,6 +2,8 @@ package shoppingmall.ankim.domain.order.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
 import shoppingmall.ankim.domain.order.service.OrderService;
@@ -23,12 +25,19 @@ public class OrderTempController {
      **/
     @PostMapping
     public ApiResponse<OrderResponse> createTempOrder(
-            @CookieValue(value = "access", required = false) String access,
             @RequestBody List<Long> cartItemNoList
     ) {
 
-        OrderResponse tempOrder = orderService.createTempOrder(access, cartItemNoList);
+        String loginId = getLoginId();
+
+        OrderResponse tempOrder = orderService.createTempOrder(loginId, cartItemNoList);
         return ApiResponse.ok(tempOrder);
+    }
+
+    private static String getLoginId() {
+        // SecurityContext에서 인증된 사용자 정보 가져오기
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return authentication.getName(); // 로그인 ID
     }
 
 }

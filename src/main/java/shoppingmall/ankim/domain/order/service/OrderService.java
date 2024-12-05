@@ -58,17 +58,19 @@ public class OrderService {
     private final DeliveryService deliveryService;
     private final CartItemRepository cartItemRepository;
 
-    public OrderResponse createTempOrder(String accessToken, List<Long> cartItemNoList) {
+    public OrderResponse createTempOrder(String loginId, List<Long> cartItemNoList) {
         LocalDateTime registeredDateTime = LocalDateTime.now();
 
         // 회원 조회
-        Member member = getMember(accessToken);
-        String loginId = member.getLoginId();
+        Member member = getMember(loginId);
+
+        // 선택한 품목이 있는지 확인
+        if(cartItemNoList.isEmpty()) {
+            throw new CartItemNotFoundException(NO_SELECTED_CART_ITEM);
+        }
 
         // 장바구니 품목 조회
-        log.info("cartItemNolist size is : {}", cartItemNoList.size());
         List<CartItem> cartItemList = cartItemRepository.findByNoIn(cartItemNoList);
-        log.info("cartItemList size is : {}", cartItemList.size());
         if (cartItemList.isEmpty() || cartItemList.size() != cartItemNoList.size()) {
             throw new CartItemNotFoundException(CART_ITEM_NOT_FOUND);
         }
@@ -77,10 +79,8 @@ public class OrderService {
         List<OrderItem> orderItemList = getOrderItems(cartItemList);
 
         // 임시 주문 생성
-        Order order1 = Order.tempCreate(orderItemList, member, registeredDateTime);
-        Order order = orderRepository.save(order1);
-        log.info("Order create : {}", order.getOrdNo());
-        log.info("Order UUID : {}", order.getOrdNo());
+        Order tempOrder = Order.tempCreate(orderItemList, member, registeredDateTime);
+        Order order = orderRepository.save(tempOrder);
 
         // 주문 코드 생성 및 저장
         String ordCode = generateOrderCode(order.getOrdNo(), registeredDateTime);
@@ -152,13 +152,7 @@ public class OrderService {
     }
 
 
-    private Member getMember(String accessToken) {
-        // 토큰 유효성 검사(만료 검사도 들어있음)
-        if (!jwtTokenProvider.isTokenValidate(accessToken)) {
-            throw new JwtValidException(TOKEN_VALIDATION_ERROR);
-        }
-        // member의 loginId 추출
-        String loginId = jwtTokenProvider.getUsernameFromToken(accessToken);
+    private Member getMember(String loginId) {
         // loginId를 가지고 member엔티티의 no 조회
         Member member = memberRepository.findByLoginId(loginId);
         if (member == null) {

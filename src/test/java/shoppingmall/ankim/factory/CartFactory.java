@@ -28,6 +28,8 @@ public class CartFactory {
         // Item 추출
         Item item1 = product.getItems().get(0); // 첫 번째 품목
         Item item2 = product.getItems().get(1); // 두 번째 품목
+        Item item3 = product.getItems().get(2); // 세 번째 품목
+        Item item4 = product.getItems().get(3); // 세 번째 품목
 
         // Cart 생성
         LocalDateTime registerDate = LocalDateTime.now();
@@ -38,19 +40,24 @@ public class CartFactory {
         // Product 정보 추출
         Product product1 = item1.getProduct();
         Product product2 = item2.getProduct();
-//        Product product3 = item3.getProduct();
+        Product product3 = item3.getProduct();
+        Product product4 = item4.getProduct();
 
         CartItem cartItem1 = CartItem.create(cart, product1, item1, 2, registerDate);
         CartItem cartItem2 = CartItem.create(cart, product2, item2, 3, registerDate);
-//        CartItem cartItem3 = CartItem.create(cart, product3, item3, 1, registerDate);
+        CartItem cartItem3 = CartItem.create(cart, product3, item3, 1, registerDate);
+        CartItem cartItem4 = CartItem.create(cart, product4, item4, 2, registerDate);
 
         entityManager.persist(cartItem1);
         entityManager.persist(cartItem2);
-//        entityManager.persist(cartItem3);
+        entityManager.persist(cartItem3);
+        entityManager.persist(cartItem4);
 
         List<CartItem> cartItems = new ArrayList<>();
         cartItems.add(cartItem1);
         cartItems.add(cartItem2);
+        cartItems.add(cartItem3);
+        cartItems.add(cartItem4);
 
         return cartItems;
     }

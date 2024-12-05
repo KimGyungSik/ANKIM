@@ -28,6 +28,7 @@ import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.CartFactory;
+import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 
 import java.math.BigInteger;
@@ -92,8 +93,7 @@ class OrderServiceMockTest {
     void addToCart_ValidAccessToken_Success() {
         // given
         String loginId = "test@ankim.com";
-        Member member = MemberJwtFactory.createMember(em, loginId);
-        String validAccessToken = MemberJwtFactory.createToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createMember(em, loginId);
 
         // Mock Product
         Product mockProduct = Mockito.mock(Product.class);
@@ -132,7 +132,7 @@ class OrderServiceMockTest {
         });
 
         // when
-        OrderResponse orderResponse = orderService.createTempOrder(validAccessToken, cartItemNoList);
+        OrderResponse orderResponse = orderService.createTempOrder(loginId, cartItemNoList);
 
         System.out.println("OrderResponse items size: " + orderResponse.getItems().size());
         orderResponse.getItems().forEach(item -> System.out.println("Item: " + item.getName()));
