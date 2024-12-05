@@ -318,14 +318,4 @@ public class LoginServiceImpl implements LoginService {
             redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);
         }
     }
-
-    private Cookie createCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
-        // 쿠키 설정
-        cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
-        cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정(초단위)
-        cookie.setSecure(true); // https 통신시 사용
-        cookie.setPath("/"); // cookie 적용 범위
-        return cookie;
-    }
 }
