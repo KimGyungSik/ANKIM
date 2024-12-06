@@ -11,7 +11,25 @@ import java.util.Optional;
 
 public interface TermsHistoryRepository extends JpaRepository<Terms, Long>, TermsHistoryQueryRepository {
 
-    @Query("SELECT th FROM TermsHistory th WHERE th.member.no = :memberNo AND th.terms.no = :termsNo AND th.activeYn = 'Y'")
+    // 특정 회원의 약관 동의 이력 중 활성화된 동의 이력을 조회한다.
+    @Query("SELECT th FROM TermsHistory th " +
+            "WHERE th.member.no = :memberNo " +
+            "AND th.terms.no = :termsNo " +
+            "AND th.activeYn = 'Y'")
     Optional<TermsHistory> findByMemberAndTerms(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
 
+    // 특정 회원이 특정한 약관에 대해 동의한 상태(activate_yn = 'Y')인지 확인한다.
+    @Query("SELECT COUNT(th) > 0 FROM TermsHistory th " +
+            "WHERE th.member.no = :memberNo " +
+            "AND th.terms.no = :termsNo " +
+            "AND th.agreeYn = 'Y'" +
+            "AND th.activeYn = 'Y'")
+    boolean isAgreed(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
+
+    // 특정 회원이 특정한 약관에 대해 동의를 철회한 상태(activate_yn = 'N')인지 확인한다.
+    @Query("SELECT COUNT(th) > 0 FROM TermsHistory th " +
+            "WHERE th.member.no = :memberNo " +
+            "AND th.terms.no = :termsNo " +
+            "AND th.agreeYn = 'N'")
+    boolean isRevoked(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
 }

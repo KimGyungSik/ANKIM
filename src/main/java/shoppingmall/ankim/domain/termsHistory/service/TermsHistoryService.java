@@ -9,6 +9,6 @@ import java.util.List;
 
 public interface TermsHistoryService {
 
-    void updateTermsAgreement(TermsUpdateServiceRequest request);
+    void updateTermsAgreement(String loginId, List<TermsUpdateServiceRequest> requestList);
 
 }

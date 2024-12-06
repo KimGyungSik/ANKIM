@@ -7,13 +7,17 @@ import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.exception.TermsMandatoryNotAgreeException;
+import shoppingmall.ankim.domain.terms.exception.TermsNotFoundException;
 import shoppingmall.ankim.domain.terms.repository.TermsRepository;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.REQUIRED_TERMS_NOT_AGREED;
+import static shoppingmall.ankim.global.exception.ErrorCode.TERMS_NOT_FOUND;
 
 @Transactional(readOnly = true)
 @Service
@@ -54,20 +58,42 @@ public class TermsQueryServiceImpl implements TermsQueryService {
 
     // Terms로 변환하여 하위 약관 추가
     private List<Terms> addSubTermsIfNeeded(List<TermsAgreement> termsAgreements) {
-        List<Terms> allTerms = new ArrayList<>();
+        // 중복 제거를 위해 Set 사용
+        Set<Terms> allTermsSet = new HashSet<>();
 
         for (TermsAgreement agreement : termsAgreements) {
-            if (needsSubTerms(agreement)) {
-                // 선택한 약관 추가 및 하위 약관이 존재한다면 하위 약관을 포함하여 추가
-                allTerms.addAll(termsRepository.findSubTermsIncludingParent(agreement.getNo(), agreement.getLevel(), "Y"));
+            if (agreement.getAgreeYn().equals("Y")) {
+                // 현재 동의한 약관 추가
+                Terms currentTerms = termsRepository.findById(agreement.getNo())
+                        .orElseThrow(() -> new TermsNotFoundException(TERMS_NOT_FOUND));
+                allTermsSet.add(currentTerms);
+
+                // 하위 약관 탐색 및 추가
+                addAllSubTermsRecursively(currentTerms, allTermsSet);
             }
         }
-        return allTerms;
+
+        // Set을 List로 변환하여 반환
+        return new ArrayList<>(allTermsSet);
     }
 
-    // 레벨2 약관이고 동의한 상태인지 확인
+    // 재귀적으로 하위 약관 탐색 및 추가
+    private void addAllSubTermsRecursively(Terms parentTerms, Set<Terms> allTermsSet) {
+        List<Terms> subTerms = termsRepository.findAllSubTermsIncludingParent(parentTerms.getNo(), "Y");
+
+        for (Terms subTerm : subTerms) {
+            // 중복 방지를 위해 Set에 추가
+            if (allTermsSet.add(subTerm)) {
+                // 새로 추가된 약관에 대해 하위 약관 탐색
+                addAllSubTermsRecursively(subTerm, allTermsSet);
+            }
+        }
+    }
+
+    // 레벨2이거나 레벨3 약관이고 동의한 상태인지 확인
     private boolean needsSubTerms(TermsAgreement agreement) {
-        return agreement.getAgreeYn().equals("Y") && agreement.getLevel().equals(2);
+        return agreement.getAgreeYn().equals("Y") &&
+                (agreement.getLevel().equals(2) || agreement.getLevel().equals(3));
     }
 
 }

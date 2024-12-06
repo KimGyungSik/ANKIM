@@ -24,7 +24,7 @@ Content-Type: application/json
     "no" : 5,
     "name" : "광고성 정보 수신 동의",
     "agreeYn" : "Y",
-    "level" : 2,
+    "level" : 3,
     "termsYn" : "N"
   }
 ]
