@@ -7,13 +7,11 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.util.ReflectionTestUtils;
 import org.springframework.transaction.annotation.Transactional;
-import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
-import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
@@ -22,7 +20,6 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 

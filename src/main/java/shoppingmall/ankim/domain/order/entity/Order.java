@@ -35,7 +35,7 @@ public class Order extends BaseEntity {
     private String ordNo;
 
     @Setter
-    @Column(name = "ord_code", length = 19)
+    @Column(name = "ord_code", unique = true, length = 19) // 주문번호 중복 방지위해서 unique 추가
     private String ordCode;
 
     @OneToMany(mappedBy = "order", cascade = CascadeType.ALL)
@@ -114,6 +114,15 @@ public class Order extends BaseEntity {
         this.payAmt = totalPrice - totalDiscPrice;
         this.regDate = regDate;
         this.orderStatus = orderStatus;
+    }
+
+    public static Order tempCreate(List<OrderItem> orderItems, Member member, LocalDateTime regDate) {
+        return Order.builder()
+                .orderStatus(INIT)
+                .member(member)
+                .orderItems(orderItems)
+                .regDate(regDate)
+                .build();
     }
 
     public static Order create(List<OrderItem> orderItems, Member member, Delivery delivery, LocalDateTime regDate) {

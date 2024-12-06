@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.address.dto;
+package shoppingmall.ankim.domain.address.service.request;
 
 import lombok.Builder;
 import lombok.Data;

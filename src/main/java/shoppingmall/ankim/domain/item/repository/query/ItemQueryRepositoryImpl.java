@@ -46,4 +46,18 @@ public class ItemQueryRepositoryImpl implements ItemQueryRepository {
         return Optional.ofNullable(result)
                 .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
     }
+
+    /*
+     * 상품 번호를 기반으로 Item 리스트 조회
+     */
+    public List<Item> findItemsByProductNo(Long productNo) {
+        QItem item = QItem.item;
+        QProduct product = QProduct.product;
+
+        return queryFactory
+                .selectFrom(item)
+                .join(item.product, product)
+                .where(product.no.eq(productNo)) // productNo 조건
+                .fetch(); // 리스트로 반환
+    }
 }

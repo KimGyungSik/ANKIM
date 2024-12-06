@@ -1,7 +1,6 @@
 package shoppingmall.ankim.factory;
 
 import jakarta.persistence.EntityManager;
-import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
@@ -46,7 +45,7 @@ public class MemberJwtFactory {
         return member;
     }
 
-    public static String createAccessToken(Member member, JwtTokenProvider jwtTokenProvider) {
+    public static String createToken(Member member, JwtTokenProvider jwtTokenProvider) {
         CustomUserDetails userDetails = new CustomUserDetails(member);
         return jwtTokenProvider.generateAccessToken(userDetails, "access");
     }

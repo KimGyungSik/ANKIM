@@ -50,4 +50,22 @@ public class OrderResponse {
                 .orderStatus(order.getOrderStatus())
                 .build();
     }
+
+    public static OrderResponse tempOf(Order order) {
+        return OrderResponse.builder()
+                .orderNo(order.getOrdNo())
+                .orderCode(order.getOrdCode())
+                .items(order.getOrderItems().stream()
+                        .map(orderItem -> ItemResponse.of(orderItem.getItem()))
+                        .collect(Collectors.toList()))
+                .totalQty(order.getTotalQty())
+                .totalPrice(order.getTotalPrice())
+                .totalShipFee(order.getTotalShipFee())
+                .totalDiscPrice(order.getTotalDiscPrice())
+                .payAmt(order.getPayAmt())
+                .regDate(order.getRegDate())
+                .modDate(order.getModDate())
+                .orderStatus(order.getOrderStatus())
+                .build();
+    }
 }

@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.login.service;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -9,6 +10,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
 import shoppingmall.ankim.domain.admin.repository.AdminRepository;
@@ -27,6 +29,8 @@ import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
+import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
 import shoppingmall.ankim.domain.security.handler.RedisHandler;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
@@ -37,16 +41,19 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+import static shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler.handleStatusChange;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Slf4j
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class LoginServiceImpl implements LoginService {
 
     private final MemberRepository memberRepository;
     private final MemberLoginAttemptRepository memberLoginAttemptRepository;
     private final MemberLoginHistoryRepository memberLoginHistoryRepository;
+    private final MemberHistoryRepository memberHistoryRepository;
 
     private final AdminRepository adminRepository;
     private final AdminLoginAttemptRepository adminLoginAttemptRepository;
@@ -69,7 +76,7 @@ public class LoginServiceImpl implements LoginService {
     private long REFRESH_TOKEN_REMEBER_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 O)
 
     @Override
-    public Map<String, String> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+    public Map<String, Object> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 사용자 조회 (status에 따라서 상태를 반환해줘야 됨)
         Member member = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
 
@@ -126,7 +133,7 @@ public class LoginServiceImpl implements LoginService {
     }
 
     @Override
-    public Map<String, String> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
+    public Map<String, Object> adminLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 퇴사하지 않은 사용자 조회
         Admin admin = adminRepository.findByLoginIdExcludingResigned(loginServiceRequest.getLoginId());
 
@@ -189,6 +196,9 @@ public class LoginServiceImpl implements LoginService {
 
         // 최대 실패 횟수 초과 시 계정 잠금
         if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
+            MemberHistory history = handleStatusChange(member, MemberStatus.LOCKED);
+            memberHistoryRepository.save(history);
+
             member.lock();
             loginAttempt.setLockTime(LOCK_TIME_MINUTES);
             memberRepository.save(member);
@@ -283,16 +293,17 @@ public class LoginServiceImpl implements LoginService {
     }
 
     // 로그인 성공
-    private Map<String, String> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
+    private Map<String, Object> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
         String access = jwtTokenProvider.generateAccessToken(userDetails, "access");
 
         long expireTime = autoLogin.equals("rememberMe") ? REFRESH_TOKEN_REMEBER_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME;
 
         String refresh = jwtTokenProvider.generateRefreshToken(userDetails, "refresh", expireTime);
 
-        Map<String, String> token = new HashMap<>();
+        Map<String, Object> token = new HashMap<>();
         token.put("access", access);
         token.put("refresh", refresh);
+        token.put("expireTime", expireTime);
 
         addRefreshToken(access, refresh, autoLogin);
 

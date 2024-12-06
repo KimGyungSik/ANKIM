@@ -39,17 +39,9 @@ public class JwtFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        // 쿠키의 access 키에 담긴 토큰 추출
-//        String accessToken = request.getHeader("access");
-        String accessToken = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("access")) {
-                    accessToken = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        // 헤더의 access 키에 담긴 토큰 추출
+        String accessToken = request.getHeader("access");
+        log.info("Access token: {}", accessToken);
 
         // 토큰이 없는 경우 다음 필터로
         if(accessToken == null) {
@@ -73,6 +65,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰이 access인지 확인 (발급 시 페이로드에 명시)
         String category = jwtTokenProvider.getCategoryFromToken(accessToken);
+        log.info("Category: {}", category);
 
         if(!category.equals("access")) {
             // response body
@@ -86,6 +79,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // 토큰에서 username(id) 추출
         String username = jwtTokenProvider.getUsernameFromToken(accessToken);
+        log.info("Username: {}", username);
 
         // Member 엔티티 생성
         Member member = Member.builder()
