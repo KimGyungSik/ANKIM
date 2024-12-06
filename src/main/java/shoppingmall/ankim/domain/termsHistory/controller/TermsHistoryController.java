@@ -9,17 +9,18 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsHistoryCreateRequest;
+import shoppingmall.ankim.domain.termsHistory.controller.request.TermsUpdateRequest;
 import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/terms-history")
+@RequestMapping("/api/terms")
 public class TermsHistoryController {
 
     // 약관 동의 처리
-    @PostMapping("/create")
-    public ApiResponse<String> termsAgree(@Valid @RequestBody TermsHistoryCreateRequest request) {
+    @PostMapping("/update")
+    public ApiResponse<String> termsAgree(@Valid @RequestBody TermsUpdateRequest request) {
 
 
         return ApiResponse.ok("OK");

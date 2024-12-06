@@ -34,11 +34,15 @@ public class TermsHistory extends BaseEntity {
     @Column(name = "agree_date", nullable = false)
     private LocalDateTime agreeDate; // 동의 일자
 
+    @Column(name = "active_yn", length = 1, nullable = false)
+    private String activeYn; // 활성화 상태
+
     @Builder
-    public TermsHistory(Member member, Terms terms, String agreeYn, LocalDateTime agreeDate) {
+    public TermsHistory(Member member, Terms terms, String agreeYn, LocalDateTime agreeDate, String activeYn) {
         this.member = member;
         this.terms = terms;
         this.agreeYn = agreeYn;
         this.agreeDate = agreeDate;
+        this.activeYn = activeYn == null ? "Y" : activeYn;
     }
 }

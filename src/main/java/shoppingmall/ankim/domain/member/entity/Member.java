@@ -98,7 +98,7 @@ public class Member extends BaseEntity {
         // termsList -> termsHistory 변환 및 설정
         this.termsHistory = (termsList != null) ?
                 termsList.stream()
-                        .map(terms -> new TermsHistory(this, terms, "Y", this.joinDate)) // agreeYn = "Y", agreeDate = joinDate
+                        .map(terms -> new TermsHistory(this, terms, "Y", this.joinDate, "Y")) // agreeYn = "Y", agreeDate = joinDate
                         .collect(Collectors.toList())
                 : new ArrayList<>();
     }
