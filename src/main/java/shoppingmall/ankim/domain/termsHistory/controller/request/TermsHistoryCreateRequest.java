@@ -2,38 +2,34 @@ package shoppingmall.ankim.domain.termsHistory.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.termsHistory.service.request.TermsHistoryCreateServiceRequest;
 
 import java.time.LocalDate;
 
+@Data
+@NoArgsConstructor
 public class TermsHistoryCreateRequest {
 
-    @NotBlank
-    private Long memNo;
-    
     @NotBlank
     private Long termsNo;
     
     @NotBlank
     private String agreeYn;
 
-    private LocalDate agreeDate;
 
     @Builder
-    public TermsHistoryCreateRequest(Long memNo, Long termsNo, String agreeYn) {
-        this.memNo = memNo;
+    public TermsHistoryCreateRequest(Long termsNo, String agreeYn) {
         this.termsNo = termsNo;
         this.agreeYn = agreeYn;
-        this.agreeDate = LocalDate.now();
     }
 
     // Service단 Reqeust로 변경
     public TermsHistoryCreateServiceRequest toServiceRequest() {
         return TermsHistoryCreateServiceRequest.builder()
-                .memNo(memNo)
                 .termsNo(termsNo)
                 .agreeYn(agreeYn)
-                .agreeDate(agreeDate)
                 .build();
     }
     

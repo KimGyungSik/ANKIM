@@ -15,6 +15,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.admin.exception.AdminRegistrationException;
 import shoppingmall.ankim.domain.image.service.S3Service;
@@ -22,6 +23,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
@@ -32,6 +34,7 @@ import static org.mockito.Mockito.mock;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @SpringBootTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 @Transactional
 class MemberMyPageServiceTest {
@@ -44,9 +47,6 @@ class MemberMyPageServiceTest {
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
-
-    @Autowired
-    private JwtTokenProvider jwtTokenProvider;
 
     @MockBean
     private S3Service s3Service;
@@ -64,11 +64,10 @@ class MemberMyPageServiceTest {
         String rawPassword = "password123";
 
         // Member 생성 및 저장
-        Member member = MemberJwtFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(member, jwtTokenProvider);
+        Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertDoesNotThrow(() -> memberMyPageService.isValidPassword(accessToken, rawPassword));
+        assertDoesNotThrow(() -> memberMyPageService.isValidPassword(loginId, rawPassword));
     }
 
     @Test
@@ -79,11 +78,10 @@ class MemberMyPageServiceTest {
         String correctPassword = "securePassword123";
         String wrongPassword = "wrongPassword456";
 
-        Member secureMember = MemberJwtFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
-        String accessToken = MemberJwtFactory.createAccessToken(secureMember, jwtTokenProvider);
+        Member secureMember = MemberFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertThatThrownBy(() -> memberMyPageService.isValidPassword(accessToken, wrongPassword))
+        assertThatThrownBy(() -> memberMyPageService.isValidPassword(loginId, wrongPassword))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(INVALID_PASSWORD.getMessage());
     }

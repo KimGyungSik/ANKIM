@@ -66,20 +66,15 @@ public class AdminServiceImpl implements AdminService {
 
         // 비밀번호 암호화
         String encodePwd = bCryptPasswordEncoder.encode(request.getPwd());
-        log.info("Encrypted password: {}", encodePwd);
 
         // Admin 엔티티 생성
         Admin admin = request.toAdminEntity(encodePwd);
-        log.info("Starting register process for admin: {}", request);
 
         // DB에 저장
-        log.info("Saving admin: {}", admin);
         adminRepository.save(admin);
-        log.info("Admin successfully saved to DB: {}", admin);
 
         // Redis에서 검증된 로그인 아이디 제거
         redisHandler.delete(redisKey);
-        log.info("회원가입 완료 및 Redis 검증 데이터 삭제: {}", loginId);
     }
 
 }

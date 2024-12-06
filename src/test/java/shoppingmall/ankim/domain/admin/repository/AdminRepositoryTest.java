@@ -8,6 +8,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
 import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
@@ -21,6 +22,7 @@ import java.time.LocalDate;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 class AdminRepositoryTest {
 

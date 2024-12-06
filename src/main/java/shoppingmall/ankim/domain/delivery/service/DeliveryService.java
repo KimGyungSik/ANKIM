@@ -3,12 +3,11 @@ package shoppingmall.ankim.domain.delivery.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.exception.AddressNotFoundException;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
-import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
@@ -16,8 +15,6 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
-
-import java.util.List;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 

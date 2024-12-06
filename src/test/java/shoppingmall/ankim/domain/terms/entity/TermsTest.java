@@ -5,11 +5,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.terms.repository.TermsRepository;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class TermsTest {
 
     @Autowired

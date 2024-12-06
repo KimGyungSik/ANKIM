@@ -19,7 +19,7 @@ import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
-import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;

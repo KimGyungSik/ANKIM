@@ -1,6 +1,6 @@
 package shoppingmall.ankim.domain.payment.controller.port;
 
-import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;

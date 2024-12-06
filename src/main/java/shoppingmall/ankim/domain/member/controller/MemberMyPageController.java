@@ -31,4 +31,9 @@ public class MemberMyPageController {
         return "welcome"; // FIXME 마이 페이지
     }
 
+    @GetMapping("/edit/info")
+    public String editInfo() {
+        return "회원정보 수정"; // FIXME 회원정보 수정 페이지
+    }
+
 }

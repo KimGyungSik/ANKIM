@@ -48,6 +48,7 @@ public enum ErrorCode {
 
     // 주문
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
+    ORDER_CODE_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "주문번호 생성을 실패했습니다."),
 
     // 주문 품목
     ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
@@ -65,6 +66,7 @@ public enum ErrorCode {
 
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
+    TERMS_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 약관이 존재하지 않습니다."),
 
     // 인증 관련 에러 코드
     ADMIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
@@ -79,10 +81,13 @@ public enum ErrorCode {
     INVALID_CREDENTIALS(HttpStatus.UNAUTHORIZED, "아이디 또는 비밀번호가 일치하지 않습니다."),
     USER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
-    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요"),
+    INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요."),
+    CURRENT_PASSWORD_INVALID(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
+    PASSWORD_CONFIRMATION_MISMATCH(HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
+    PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "현재와 다른 비밀번호를 입력해주시기 바랍니다."),
 
-    // 마이페이지 관련 에러 코드
-
+    // 주소 관련 에러 코드
+    ADDRESS_REGISTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "주소 등록 중 에러가 발생했습니다."),
 
     // Token 관련 에러 코드
     ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Access Token이 요청에 포함되지 않았습니다."),
