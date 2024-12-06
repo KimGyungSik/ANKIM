@@ -46,7 +46,7 @@ Content-Type: application/json
 }
 
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
-POST http://localhost:8080/member/register
+POST http://localhost:8080/api/member/register
 Content-Type: application/json
 
 {
@@ -72,7 +72,7 @@ Content-Type: application/json
 ### 마이페이지의 회원정보 페이지에 들어가서 비밀번호를 재입력하여 인증을 한다.
 POST http://localhost:8080/api/mypage/confirm-password
 Content-Type: application/json
-access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzOTQ4NDEsImV4cCI6MTczMzM5ODQ0MX0.Qw9ccImp68IlQYNYFK0IYHs8S3teIBFR0HYGJ1XSOGM_48s0IHjVgkeQK1NAxi3WKQ-MspTarEEO9b1LzB32Lw
 
 {
   "pwd": "TestPassword123!"
@@ -81,7 +81,7 @@ access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI
 ### 마이페이지에서 회원이 자신의 주소를 등록한다.
 PUT http://localhost:8080/api/address/edit
 Content-Type: application/json
-access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzMTU1MjcsImV4cCI6MTczMzMxOTEyN30.yZ8D14zIx2sd24P6cVGIOwEetUrqjheJju_o4Y4DSKseVlR3-wFyYKKnM3GvkhkHZIcgPjmo8S-LC7oBqE8kqA
+access: eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiJnbnN0bTgzMUBnbWFpbC5jb20iLCJjYXRlZ29yeSI6ImFjY2VzcyIsIm5hbWUiOiLslYjsoJXtm4giLCJyb2xlcyI6W3siYXV0aG9yaXR5IjoiUk9MRV9VU0VSIn1dLCJpYXQiOjE3MzMzOTQ4NDEsImV4cCI6MTczMzM5ODQ0MX0.Qw9ccImp68IlQYNYFK0IYHs8S3teIBFR0HYGJ1XSOGM_48s0IHjVgkeQK1NAxi3WKQ-MspTarEEO9b1LzB32Lw
 
 {
   "zipCode": "12345",

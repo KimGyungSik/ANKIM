@@ -48,29 +48,19 @@ public class MemberFactory {
         return member;
     }
 
-    public static String createToken(Member member, JwtTokenProvider jwtTokenProvider) {
-        CustomUserDetails userDetails = new CustomUserDetails(member);
-        return jwtTokenProvider.generateAccessToken(userDetails, "access");
-    }
-
     public static Member createMemberAndProduct(EntityManager entityManager, String loginId) {
-        Member member = Member.builder()
-                .loginId(loginId)
-                .pwd("password")
-                .name("홍길동")
-                .phoneNum("010-1234-5678")
-                .birth(LocalDate.of(1990, 1, 1))
-                .grade(50)
-                .gender("M")
-                .joinDate(LocalDateTime.now())
-                .status(MemberStatus.ACTIVE)
-                .build();
-        entityManager.persist(member);
+        Member member = createMember(entityManager, loginId);
 
-        Product product = ProductFactory.createProduct(entityManager);
+        ProductFactory.createProduct(entityManager);
 
         entityManager.flush(); // DB로 반영
         entityManager.clear(); // 영속성 컨텍스트 초기화
+
+        return member;
+    }
+
+    public static Member createMemberAndTerms(EntityManager entityManager, String loginId) {
+        Member member = createMember(entityManager, loginId);
 
         return member;
     }
