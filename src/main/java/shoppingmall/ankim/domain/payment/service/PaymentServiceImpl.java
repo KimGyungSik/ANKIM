@@ -7,8 +7,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
@@ -26,9 +24,7 @@ import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
-import shoppingmall.ankim.domain.order.service.OrderQueryService;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
-import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.entity.Payment;
@@ -37,7 +33,6 @@ import shoppingmall.ankim.domain.payment.exception.PaymentAmountNotEqualExceptio
 import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
-import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 import shoppingmall.ankim.global.config.lock.LockHandler;
 
@@ -56,10 +51,8 @@ public class PaymentServiceImpl implements PaymentService {
     private final OrderRepository orderRepository;
     private final CartRepository cartRepository;
     private final ItemRepository itemRepository;
-    private final OrderItemRepository orderItemRepository;
     private final TossPaymentConfig tossPaymentConfig;
     private final RestTemplate restTemplate;
-    private final OrderQueryService orderQueryService;
     private final DeliveryService deliveryService;
     private final ItemService itemService;
     private final LockHandler lockHandler;
@@ -82,7 +75,21 @@ public class PaymentServiceImpl implements PaymentService {
         Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
         order.setDelivery(delivery);
 
-        // OrderItem별로 처리
+        // 재고 차감
+        reduceStock(order);
+
+        // Payment 생성 & 저장
+        Payment payment = paymentRepository.save(Payment.create(order, request.getPayType(), request.getAmount()));
+
+        // PaymentResponse 변환
+        PaymentResponse response = PaymentResponse.of(payment);
+        response.setSuccessUrl(request.getYourSuccessUrl() == null ? tossPaymentConfig.getSuccessUrl() : request.getYourSuccessUrl());
+        response.setFailUrl(request.getYourFailUrl() == null ? tossPaymentConfig.getFailUrl() : request.getYourFailUrl());
+
+        return response;
+    }
+
+    private void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
@@ -99,16 +106,6 @@ public class PaymentServiceImpl implements PaymentService {
                 lockHandler.unlock(key);
             }
         }
-
-        // Payment 생성 & 저장
-        Payment payment = paymentRepository.save(Payment.create(order, request.getPayType(), request.getAmount()));
-
-        // PaymentResponse 변환
-        PaymentResponse response = PaymentResponse.of(payment);
-        response.setSuccessUrl(request.getYourSuccessUrl() == null ? tossPaymentConfig.getSuccessUrl() : request.getYourSuccessUrl());
-        response.setFailUrl(request.getYourFailUrl() == null ? tossPaymentConfig.getFailUrl() : request.getYourFailUrl());
-
-        return response;
     }
 
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
@@ -140,7 +137,7 @@ public class PaymentServiceImpl implements PaymentService {
         return result;
     }
 
-    // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송 삭제
+    // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
     @Override
     public PaymentFailResponse tossPaymentFail(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
@@ -149,7 +146,22 @@ public class PaymentServiceImpl implements PaymentService {
         order.failOrderWithOutDelivery();
 
         // 재고 복구
-        restoreStock(order.getOrderItems());
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Long itemNo = orderItem.getItem().getNo();
+            Integer quantity = orderItem.getQty();
+            log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
+            String key = String.valueOf(itemNo);
+            try {
+                // 아이템별 락
+                lockHandler.lock(key);
+
+                // 아이템 단위로 재고 감소
+                itemService.restoreStock(itemNo, quantity);
+            } finally {
+                // 락 해제
+                lockHandler.unlock(key);
+            }
+        }
 
         // 결제 실패 시 처리
         Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
@@ -168,23 +180,27 @@ public class PaymentServiceImpl implements PaymentService {
         order.cancelOrder(); // 주문 및 배송 취소 처리
 
         // 재고 복구
-        restoreStock(order.getOrderItems());
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Long itemNo = orderItem.getItem().getNo();
+            Integer quantity = orderItem.getQty();
+            log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
+            String key = String.valueOf(itemNo);
+            try {
+                // 아이템별 락
+                lockHandler.lock(key);
+
+                // 아이템 단위로 재고 감소
+                itemService.restoreStock(itemNo, quantity);
+            } finally {
+                // 락 해제
+                lockHandler.unlock(key);
+            }
+        }
 
         // 결제 취소 시 처리
         payment.setPaymentCancel(cancelReason, true);
         Map map = tossPaymentCancel(paymentKey, cancelReason);
         return PaymentCancelResponse.builder().details(map).build();
-    }
-
-
-    private void restoreStock(List<OrderItem> orderItems) {
-        for (OrderItem orderItem : orderItems) {
-            // 비관적 락으로 Item 조회
-            Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())
-                    .orElseThrow(() -> new ItemNotFoundException(ITEM_NOT_FOUND));
-            Integer quantity = orderItem.getQty(); // 주문 수량 가져오기
-            item.restoreQuantity(quantity); // Item의 재고 복구 메서드 호출
-        }
     }
 
 

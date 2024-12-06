@@ -45,14 +45,22 @@ public class ItemService {
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
 
-    // 재고 감소
+    // 재고 차감
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void reduceStock(Long itemNo, Integer quantity) {
-        // 재고 감소 로직
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.deductQuantity(quantity);
     }
+
+    // 재고 복구
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void restoreStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.restoreQuantity(quantity);
+    }
+
 
     /**
      * 옵션 조합 생성 및 미리보기 반환

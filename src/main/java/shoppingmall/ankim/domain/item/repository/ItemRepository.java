@@ -12,13 +12,6 @@ import java.util.List;
 import java.util.Optional;
 
 public interface ItemRepository extends JpaRepository<Item,Long>, ItemQueryRepository {
-
-    @Query(value = "SELECT GET_LOCK(:key, 30)", nativeQuery = true)
-    Long getLock(@Param("key") String key);
-
-    @Query(value = "SELECT RELEASE_LOCK(:key)", nativeQuery = true)
-    void releaseLock(@Param("key") String key);
-
     List<Item> findByProduct_No(Long prodNo);
 
     long countByProduct(Product product);
