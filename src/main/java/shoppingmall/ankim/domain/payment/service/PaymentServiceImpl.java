@@ -65,7 +65,6 @@ public class PaymentServiceImpl implements PaymentService {
     private final LockHandler lockHandler;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
-//    @Transactional(isolation = Isolation.READ_UNCOMMITTED)
     @Override
     public PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
                                               DeliveryCreateServiceRequest deliveryRequest,
@@ -79,11 +78,8 @@ public class PaymentServiceImpl implements PaymentService {
             throw new AlreadyApprovedException(ALREADY_APPROVED);
         }
 
-        // Member LoginId 조회
-        String loginId = order.getMember().getLoginId();
-
         // 배송지 생성
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, loginId);
+        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
         order.setDelivery(delivery);
 
         // OrderItem별로 처리
@@ -242,6 +238,4 @@ public class PaymentServiceImpl implements PaymentService {
         headers.setAccept(Collections.singletonList(MediaType.APPLICATION_JSON));
         return headers;
     }
-
-
 }

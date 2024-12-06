@@ -83,15 +83,6 @@ public class OrderFactory {
                 null,
                 LocalDateTime.now()
         );
-        String orderCode = "ORD20241125-1234567";
-
-        order.setOrdCode(orderCode);
-
-        entityManager.persist(order);
-        entityManager.flush();
-        entityManager.clear();
-//        entityManager.getTransaction().commit();
-
         return order;
     }
 

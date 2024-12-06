@@ -16,6 +16,7 @@ import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.dto.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.cart.entity.Cart;
@@ -45,10 +46,7 @@ import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.mock;
@@ -57,7 +55,6 @@ import static org.springframework.test.web.client.response.MockRestResponseCreat
 // TODO DEFINED_PORT로 돌리게 되면 Application 서버가 로딩되면서 InitProduct클래스가 로딩된다.
 // TODO 정확히 DEFINED_PORT와 RANDOM_PORT의 차이를 알아야 할듯!
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Transactional
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class PaymentServiceImplTest {
@@ -100,6 +97,9 @@ class PaymentServiceImplTest {
     @Autowired
     private RestTemplate restTemplate;
 
+    @Autowired
+    private TransactionTemplate transactionTemplate;
+
     private MockRestServiceServer mockServer;
 
     @BeforeEach
@@ -107,27 +107,27 @@ class PaymentServiceImplTest {
         mockServer = MockRestServiceServer.createServer(restTemplate);
     }
 
-//    @AfterEach
-//    void tearDown() {
-//        // 모든 데이터를 삭제
-//        itemRepository.deleteAll();
-//        paymentRepository.deleteAll();
-//        orderRepository.deleteAll();
-//        deliveryRepository.deleteAll();
-//        cartRepository.deleteAll();
-//    }
-
     @DisplayName("클라이언트는 결제 요청을 보낼 수 있다.")
-    @Commit
     @Test
     void requestTossPayment_withOrderFactory() {
         // given
+        String orderCode = "ORD20241125-1234567";
 
-        // OrderFactory를 통해 Order 생성
-        Order mockOrder = OrderFactory.createOrderWithOutDelivery(entityManager);
+        Order mockOrder = transactionTemplate.execute(status -> {
+            Order order = OrderFactory.createOrderWithOutDelivery(entityManager);
+            // 영속성 컨텍스트에 포함시키기
+            entityManager.persist(order);
 
-//        entityManager.flush();
-//        entityManager.clear();
+            // OrderCode 설정
+            order.setOrdCode(orderCode);
+
+            // 변경 사항 DB에 반영
+            entityManager.flush();
+            entityManager.clear();
+            return order;
+        });
+
+        assert mockOrder != null; // null 여부 확인
 
         PaymentCreateServiceRequest request = PaymentCreateServiceRequest.builder()
                 .orderName("ORD20241125-1234567")
@@ -155,23 +155,20 @@ class PaymentServiceImplTest {
         PaymentResponse response = paymentServiceImpl.requestTossPayment(request,deliveryRequest,addressRequest);
 
 
-        entityManager.flush();
-        entityManager.clear();
         // then
         assertThat(response).isNotNull();
-        assertThat(response.getOrderName()).isEqualTo("ORD20241125-1234567");
-//        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
-//        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
+        assertThat(response.getOrderName()).isEqualTo(orderCode);
+        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
+        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
         assertThat(response.getAmount()).isEqualTo(50000L);
         assertThat(response.getPayType()).isEqualTo("카드");
         assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
         assertThat(response.getFailUrl()).isEqualTo(tossPaymentConfig.getFailUrl());
 
         // Payment 저장 검증
-        List<Payment> payments = paymentRepository.findAll();
-        assertThat(payments).hasSize(1);
-        Payment savedPayment = payments.get(0);
-        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo("ORD20241125-1234567");
+        Payment savedPayment = paymentRepository.findByOrderNameWithOrder(orderCode).orElseThrow();
+        assertThat(savedPayment).isNotNull();
+        assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo(orderCode);
         assertThat(savedPayment.getTotalPrice()).isEqualTo(50000L);
         assertThat(savedPayment.getType()).isEqualTo(PayType.CARD);
 
@@ -185,6 +182,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("결제 성공 시 올바른 응답을 반환한다")
     void tossPaymentSuccess() {
         // given
@@ -258,6 +256,7 @@ class PaymentServiceImplTest {
     }
 
     @Test
+    @Transactional
     @DisplayName("결제 실패 시 에러코드와 에러메세지를 반환하며 주문 상태와 재고 복구가 이루어진다.")
     void tossPaymentFail_shouldReturnPaymentFailResponse() {
         // given
@@ -312,6 +311,7 @@ class PaymentServiceImplTest {
 
     @DisplayName("결제 취소 시 성공적으로 PaymentCancelResponse을 반환한다.")
     @Test
+    @Transactional
     void cancelPayment() {
         // given
         String paymentKey = "test_payment_key";
@@ -392,6 +392,7 @@ class PaymentServiceImplTest {
 
     @DisplayName("주문 번호로 결제 내역들을 조회할 수 있다.")
     @Test
+    @Transactional
     void findPaymentHistories() {
         // given
         int count = 5; // 결제 5개 생성

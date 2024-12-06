@@ -51,7 +51,6 @@ import java.util.concurrent.Executors;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Transactional
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 public class PaymentConcurrencyTest {
@@ -91,54 +90,46 @@ public class PaymentConcurrencyTest {
     private EntityManager entityManager;
 
     @Autowired
-    private PlatformTransactionManager transactionManager;
-
-    @Autowired
     private TransactionTemplate transactionTemplate;
 
     @BeforeEach
     void setUp() {
-//        transactionTemplate.execute(status -> {
-//            // Member와 Product 생성
-//            Member member = MemberJwtFactory.createMember(entityManager, "test-user@domain.com");
-//            Product product = ProductFactory.createProduct(entityManager);
-//            entityManager.persist(product);
-//
-//            Item item = product.getItems().get(0);
+        transactionTemplate.execute(status -> {
+            try {
+                // Member와 Product 생성
+                Member member = MemberJwtFactory.createMember(entityManager, "test-user@domain.com");
+                Product product = ProductFactory.createProduct(entityManager);
+                entityManager.persist(product);
 
-            for (int i = 0; i < 100; i++) {
-//                OrderItem orderItem = OrderItem.create(item, 1);
-//                entityManager.persist(orderItem);
+                Item item = product.getItems().get(0);
 
-                String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
-                orderNames.add(dynamicOrderName);
+                for (int i = 0; i < 100; i++) {
+                    OrderItem orderItem = OrderItem.create(item, 1);
+                    entityManager.persist(orderItem);
 
-//                Order order = Order.create(List.of(orderItem), member, null, LocalDateTime.now());
-//                order.setOrdCode(dynamicOrderName);
-//
-//                orderRepository.save(order);
+                    String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
+                    orderNames.add(dynamicOrderName);
+
+                    Order order = Order.create(List.of(orderItem), member, null, LocalDateTime.now());
+                    order.setOrdCode(dynamicOrderName);
+
+                    orderRepository.save(order);
+                }
+
+                // flush를 통해 DB에 반영
+                entityManager.flush();
+                entityManager.clear();
+            } catch (Exception e) {
+                // 예외가 발생하면 rollback
+                status.setRollbackOnly();
+                throw e;
             }
-//
-//            // flush를 통해 DB에 반영
-//            entityManager.flush();
-//            entityManager.clear();
-//
-//            return null; // execute는 Void를 반환하기 때문에 null 반환
-//        });
+            return null;
+        });
     }
-
-    @AfterEach
-    void tearDown() {
-        // 순서에 유의하여 삭제
-        paymentRepository.deleteAll();
-        deliveryRepository.deleteAll();
-    }
-
-
 
     @DisplayName("100명의 사용자가 결제 요청 시 첫 번째 품목의 재고 차감에 대한 동시성 제어가 가능하다.")
     @Test
-    @Commit
     void requestTossPayment() throws InterruptedException {
         int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
@@ -182,7 +173,7 @@ public class PaymentConcurrencyTest {
         latch.await();
 
         Item item = itemRepository.findById(1L).orElseThrow();
-        assertThat(item.getQty()).isEqualTo(150);
+        assertThat(item.getQty()).isEqualTo(0);
     }
 
 
