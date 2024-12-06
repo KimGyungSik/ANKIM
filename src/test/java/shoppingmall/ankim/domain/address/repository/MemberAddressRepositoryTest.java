@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.member.entity.Member;
@@ -19,6 +20,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class)
 class MemberAddressRepositoryTest {
 

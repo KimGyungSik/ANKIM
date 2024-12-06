@@ -12,7 +12,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
-import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.INIT;
+import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAYMENT;
 
 class OrderTest {
 
@@ -111,7 +111,7 @@ class OrderTest {
         assertThat(order.getPayAmt()).isEqualTo(25000); // (30000 - 5000)
     }
 
-    @DisplayName("주문 생성 시 주문 상태는 INIT이다.")
+    @DisplayName("주문 생성 시 주문 상태는 PENDING_PAYMENT 상태이다.")
     @Test
     void init() {
         // given
@@ -128,7 +128,7 @@ class OrderTest {
         Order order = Order.create(orderItems, member, delivery, regDate);
 
         // then
-        assertThat(order.getOrderStatus()).isEqualTo(INIT);
+        assertThat(order.getOrderStatus()).isEqualTo(PENDING_PAYMENT);
     }
 
     @DisplayName("주문 생성 시 등록 시간을 기록한다.")

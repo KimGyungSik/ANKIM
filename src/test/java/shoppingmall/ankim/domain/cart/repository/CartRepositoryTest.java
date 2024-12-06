@@ -5,6 +5,7 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
@@ -29,6 +30,7 @@ import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @DataJpaTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class)
 class CartRepositoryTest {
 

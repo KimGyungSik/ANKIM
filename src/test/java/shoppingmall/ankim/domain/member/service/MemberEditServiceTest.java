@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
@@ -28,6 +29,7 @@ import static org.mockito.Mockito.mock;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @SpringBootTest
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 @Import(QuerydslConfig.class) // QuerydslConfig를 테스트에 추가
 @Transactional
 class MemberEditServiceTest {

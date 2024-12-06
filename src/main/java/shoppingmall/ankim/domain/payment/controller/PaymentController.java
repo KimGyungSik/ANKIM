@@ -1,16 +1,13 @@
 package shoppingmall.ankim.domain.payment.controller;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
-import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentSuccessRequest;
 import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
-import shoppingmall.ankim.domain.payment.service.PaymentService;
+import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 @RestController
@@ -19,10 +16,11 @@ import shoppingmall.ankim.global.response.ApiResponse;
 public class PaymentController {
     private final PaymentService paymentService;
 
-    @PostMapping("/toss")
-    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request) {
-        return ApiResponse.ok(paymentService.requestTossPayment(request.toServiceRequest()));
-    }
+//    @PostMapping("/toss")
+//    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request) {
+////        return ApiResponse.ok(paymentService.requestTossPayment(request.toServiceRequest()));
+//    }
+
     @PostMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
             @RequestBody PaymentSuccessRequest paymentSuccessRequest) {

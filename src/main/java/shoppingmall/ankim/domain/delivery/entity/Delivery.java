@@ -24,7 +24,10 @@ public class Delivery {
     private String trckNo; // 송장 번호
 
     private String courier; // 택배사
+
+    @Enumerated(EnumType.STRING)
     private DeliveryStatus status; // 배송 상태
+
     private String receiver; // 수령인 이름
 
     @Column(name = "receiver_phone")

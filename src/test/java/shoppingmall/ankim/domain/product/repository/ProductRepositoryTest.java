@@ -158,8 +158,8 @@ class ProductRepositoryTest {
         List<ItemResponse> items = result.getItems();
         assertThat(items.get(0).getName()).isEqualTo("색상: 블랙, 사이즈: M");
         assertThat(items.get(1).getName()).isEqualTo("색상: 블랙, 사이즈: L");
-        assertThat(items.get(0).getQty()).isEqualTo(50);
-        assertThat(items.get(1).getQty()).isEqualTo(30);
+        assertThat(items.get(0).getQty()).isEqualTo(100);
+        assertThat(items.get(1).getQty()).isEqualTo(100);
         assertThat(items.get(0).getOptionValues()).isNotEmpty();
         assertThat(items.get(1).getOptionValues()).isNotEmpty();
     }

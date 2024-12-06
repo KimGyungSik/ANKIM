@@ -16,7 +16,7 @@
       <GradleProjectSettings>
         <option name="testRunner" value="PLATFORM" />
         <option name="externalProjectPath" value="$PROJECT_DIR$/ANKIM" />
-        <option name="gradleJvm" value="17" />
+        <option name="gradleJvm" value="#JAVA_HOME" />
         <option name="modules">
           <set>
             <option value="$PROJECT_DIR$/ANKIM" />

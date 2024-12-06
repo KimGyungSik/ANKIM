@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.entity.QCartItem;
@@ -35,6 +36,7 @@ import static org.mockito.Mockito.verify;
 
 @DataJpaTest
 @Import(QuerydslConfig.class)
+@TestPropertySource(properties = "spring.sql.init.mode=never")
 class CartItemRepositoryMockTest {
 
     @Autowired
