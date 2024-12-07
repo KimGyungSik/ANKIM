@@ -28,6 +28,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     Optional<Order> findByOrderIdWithMemberAndDeliveryAndOrderItems(@Param("orderId") String orderId);
 
     Optional<Order> findByOrdNo(String ordNo);
+
+    @Query("SELECT o FROM Order o WHERE o.ordCode = :orderName")
+    Optional<Order> findByOrdName(@Param("orderName") String orderName);
     List<Order> findByOrdNoIn(@Param("ordNo") List<String> ordNo);
 
     boolean existsByOrdCode(String ordCode); // 주문번호 확인

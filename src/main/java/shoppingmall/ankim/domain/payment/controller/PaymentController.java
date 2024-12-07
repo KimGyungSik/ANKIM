@@ -13,19 +13,20 @@ import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
+import shoppingmall.ankim.domain.payment.service.PaymentFacade;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/payments")
 public class PaymentController {
-    private final PaymentService paymentService;
+    private final PaymentFacade paymentFacade;
 
     @PostMapping("/toss")
     public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequest request,
                                                            @RequestBody @Valid DeliveryCreateRequest deliveryRequest,
                                                            @RequestBody @Valid MemberAddressCreateRequest addressRequest) {
-        return ApiResponse.ok(paymentService.requestTossPayment(
+        return ApiResponse.ok(paymentFacade.createPaymentWithNamedLock(
                 request.toServiceRequest(),
                 deliveryRequest.toServiceRequest(),
                 addressRequest.toServiceRequest()));
@@ -34,7 +35,7 @@ public class PaymentController {
     @PostMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
             @RequestBody PaymentSuccessRequest paymentSuccessRequest) {
-        return ApiResponse.ok(paymentService.tossPaymentSuccess(
+        return ApiResponse.ok(paymentFacade.toSuccessRequest(
                 paymentSuccessRequest.getPaymentKey(),
                 paymentSuccessRequest.getOrderId(),
                 paymentSuccessRequest.getAmount()
@@ -47,13 +48,13 @@ public class PaymentController {
             @RequestParam(value = "message") String message,
             @RequestParam(value = "orderId") String orderId
     ) {
-        return ApiResponse.ok(paymentService.tossPaymentFail(code, message, orderId));
+        return ApiResponse.ok(paymentFacade.toFailRequest(code, message, orderId));
     }
 
     @PostMapping("/toss/cancel")
     public ApiResponse<PaymentCancelResponse> tossPaymentCancelPoint(
             @RequestBody  PaymentCancelRequest request
     ) {
-        return ApiResponse.ok(paymentService.cancelPayment(request.getPaymentKey(), request.getCancelReason()));
+        return ApiResponse.ok(paymentFacade.toCancelRequest(request.getPaymentKey(), request.getCancelReason()));
     }
 }
