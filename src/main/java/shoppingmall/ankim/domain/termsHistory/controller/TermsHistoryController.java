@@ -12,9 +12,13 @@ import org.springframework.web.bind.annotation.RestController;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsHistoryCreateRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsUpdateRequest;
+import shoppingmall.ankim.domain.termsHistory.dto.TermsHistoryUpdateResponse;
 import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
+import shoppingmall.ankim.domain.termsHistory.service.request.TermsUpdateServiceRequest;
 import shoppingmall.ankim.global.response.ApiResponse;
 
+import java.sql.Array;
+import java.util.ArrayList;
 import java.util.List;
 
 @RestController
@@ -22,14 +26,21 @@ import java.util.List;
 @RequestMapping("/api/terms")
 public class TermsHistoryController {
 
+    private final TermsHistoryService termsHistoryService;
+
     // 약관 동의 처리
     @PostMapping("/update")
-    public ApiResponse<String> termsAgree(@Valid @RequestBody List<TermsUpdateRequest> request) {
+    public ApiResponse<TermsHistoryUpdateResponse> termsAgree(@Valid @RequestBody List<TermsUpdateRequest> request) {
         String loginId = getLoginId();
 
         // service
+        List<TermsUpdateServiceRequest> serviceRequestList = new ArrayList<>();
+        for (TermsUpdateRequest termsUpdateRequest : request) {
+            serviceRequestList.add(termsUpdateRequest.toServiceRequest());
+        }
+        TermsHistoryUpdateResponse termsHistoryUpdateResponse = termsHistoryService.updateTermsAgreement(loginId, serviceRequestList);
 
-        return ApiResponse.ok("OK");
+        return ApiResponse.ok(termsHistoryUpdateResponse);
     }
 
     private static String getLoginId() {

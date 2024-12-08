@@ -59,9 +59,9 @@ public class TermsHistoryFactory {
 
         Terms subTerm2 = Terms.builder()
                 .parentTerms(mainTerms)
-                .name("광고 수신 동의")
+                .name("마케팅 수신 동의")
                 .category(category)
-                .contents("광고성 연락 수신 동의")
+                .contents("마케팅 목적의 개인정보 수집 및 이용 동의")
                 .termsYn("Y")
                 .termsVersion("v1")
                 .level(2)
@@ -70,31 +70,44 @@ public class TermsHistoryFactory {
 
         entityManager.persist(subTerm2);
 
-        Terms sub2SubTerm1 = Terms.builder()
+        Terms sub2SubTerm = Terms.builder()
                 .parentTerms(subTerm2)
+                .name("광고 수신 동의")
+                .category(category)
+                .contents("광고성 연락 수신 동의")
+                .termsYn("Y")
+                .termsVersion("v1")
+                .level(3)
+                .activeYn("Y")
+                .build();
+
+        entityManager.persist(sub2SubTerm);
+
+        Terms subSub2SubTerm1 = Terms.builder()
+                .parentTerms(sub2SubTerm)
                 .name("문자 수신 동의")
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
                 .termsVersion("v1")
-                .level(3)
+                .level(4)
                 .activeYn("Y")
                 .build();
 
-        entityManager.persist(sub2SubTerm1);
+        entityManager.persist(subSub2SubTerm1);
 
-        Terms sub2SubTerm2 = Terms.builder()
-                .parentTerms(subTerm2)
+        Terms subSub2SubTerm2 = Terms.builder()
+                .parentTerms(sub2SubTerm)
                 .name("이메일 수신 동의")
                 .category(category)
                 .contents("광고성 이메일 수신 동의")
                 .termsYn("Y")
                 .termsVersion("v1")
-                .level(3)
+                .level(4)
                 .activeYn("Y")
                 .build();
 
-        entityManager.persist(sub2SubTerm2);
+        entityManager.persist(subSub2SubTerm2);
 
         // 최상위 약관 생성
         Terms mainTerms2 = Terms.builder()
@@ -118,24 +131,24 @@ public class TermsHistoryFactory {
 
         TermsHistory termsAgreement1 = TermsHistory.builder()
                 .member(member)
-                .terms(sub1SubTerm1)
+                .terms(sub1SubTerm1) // 만 14세 이상
                 .agreeDate(now)
                 .build();
 
         entityManager.persist(termsAgreement1);
         termsAgreements.add(termsAgreement1);
 
-        TermsHistory termsAgreement2 = TermsHistory.builder()
-                .member(member)
-                .terms(subTerm2)
-                .agreeDate(now)
-                .build();
-
-        entityManager.persist(termsAgreement2);
-        termsAgreements.add(termsAgreement2);
-
-        entityManager.flush();
-        entityManager.clear();
+//        TermsHistory termsAgreement2 = TermsHistory.builder()
+//                .member(member)
+//                .terms(subSub2SubTerm1) // 문자 수신 동의
+//                .agreeDate(now)
+//                .build();
+//
+//        entityManager.persist(termsAgreement2);
+//        termsAgreements.add(termsAgreement2);
+//
+//        entityManager.flush();
+//        entityManager.clear();
 
         return termsAgreements;
     }

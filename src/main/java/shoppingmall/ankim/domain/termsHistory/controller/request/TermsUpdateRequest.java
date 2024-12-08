@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.termsHistory.controller.request;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import shoppingmall.ankim.domain.termsHistory.service.request.TermsUpdateServiceRequest;
 
 @Data
 @NoArgsConstructor
@@ -19,8 +20,8 @@ public class TermsUpdateRequest {
         this.terms_hist_agreeYn = terms_hist_agreeYn;
     }
 
-    TermsUpdateRequest toServiceRequest() {
-        return TermsUpdateRequest.builder()
+    public TermsUpdateServiceRequest toServiceRequest() {
+        return TermsUpdateServiceRequest.builder()
                 .terms_no(terms_no)
                 .terms_hist_no(terms_hist_no)
                 .terms_hist_agreeYn(terms_hist_agreeYn)

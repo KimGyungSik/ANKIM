@@ -15,9 +15,9 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 public class TermsUpdateServiceRequest {
 
-    private Long terms_no;
-    private Long terms_hist_no;
-    private String terms_hist_agreeYn;
+    private Long terms_no; // 약관 번호
+    private Long terms_hist_no; // 약관 이력 번호
+    private String terms_hist_agreeYn; // 동의/철회 여부
 
     @Builder
     public TermsUpdateServiceRequest(Long terms_no, Long terms_hist_no, String terms_hist_agreeYn) {

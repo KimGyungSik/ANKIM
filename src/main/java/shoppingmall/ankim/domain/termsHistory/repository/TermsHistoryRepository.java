@@ -7,9 +7,10 @@ import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.domain.termsHistory.repository.query.TermsHistoryQueryRepository;
 
+import java.util.List;
 import java.util.Optional;
 
-public interface TermsHistoryRepository extends JpaRepository<Terms, Long>, TermsHistoryQueryRepository {
+public interface TermsHistoryRepository extends JpaRepository<TermsHistory, Long>, TermsHistoryQueryRepository {
 
     // 특정 회원의 약관 동의 이력 중 활성화된 동의 이력을 조회한다.
     @Query("SELECT th FROM TermsHistory th " +
@@ -32,4 +33,12 @@ public interface TermsHistoryRepository extends JpaRepository<Terms, Long>, Term
             "AND th.terms.no = :termsNo " +
             "AND th.agreeYn = 'N'")
     boolean isRevoked(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
+
+    // 특정 회원의 활성화된 약관 동의 중 특정 약관 번호로 조회한다.
+    @Query("SELECT th FROM TermsHistory th " +
+            "WHERE th.member.no = :memberNo " +
+            "AND th.activeYn = 'Y' " +
+            "AND th.terms.no = :termsNo")
+    Optional<TermsHistory> findActiveByMemberAndTerms(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
+
 }

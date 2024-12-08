@@ -12,4 +12,8 @@ import java.util.List;
 public interface TermsRepository extends JpaRepository<Terms, Long>, TermsQueryRepository {
     @Query("SELECT t FROM Terms t WHERE t.parentTerms.no = :parentNo AND t.activeYn = 'Y'")
     List<Terms> findAllSubTerms(@Param("parentNo") Long parentNo);
+
+    // 이름에 특정 키워드가 포함된 약관을 조회
+    @Query("SELECT t FROM Terms t WHERE t.name LIKE %:keyword%")
+    List<Terms> findTermsByNameKeyword(@Param("keyword") String keyword);
 }
