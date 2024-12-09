@@ -67,6 +67,7 @@ public enum ErrorCode {
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
     TERMS_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 약관이 존재하지 않습니다."),
+    EMPTY_TERMS_UPDATE_REQUEST(HttpStatus.BAD_REQUEST, "요청 데이터가 비어 있습니다."),
 
     // 인증 관련 에러 코드
     ADMIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),

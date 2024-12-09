@@ -13,6 +13,7 @@ import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsHistoryCreateRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsUpdateRequest;
 import shoppingmall.ankim.domain.termsHistory.dto.TermsHistoryUpdateResponse;
+import shoppingmall.ankim.domain.termsHistory.exception.EmptyTermsUpdateRequestException;
 import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
 import shoppingmall.ankim.domain.termsHistory.service.request.TermsUpdateServiceRequest;
 import shoppingmall.ankim.global.response.ApiResponse;
@@ -20,6 +21,8 @@ import shoppingmall.ankim.global.response.ApiResponse;
 import java.sql.Array;
 import java.util.ArrayList;
 import java.util.List;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.EMPTY_TERMS_UPDATE_REQUEST;
 
 @RestController
 @RequiredArgsConstructor
@@ -32,6 +35,11 @@ public class TermsHistoryController {
     @PostMapping("/update")
     public ApiResponse<TermsHistoryUpdateResponse> termsAgree(@Valid @RequestBody List<TermsUpdateRequest> request) {
         String loginId = getLoginId();
+
+
+        if(request == null || request.isEmpty()){
+            throw new EmptyTermsUpdateRequestException(EMPTY_TERMS_UPDATE_REQUEST);
+        }
 
         // service
         List<TermsUpdateServiceRequest> serviceRequestList = new ArrayList<>();

@@ -15,6 +15,7 @@ import shoppingmall.ankim.domain.termsHistory.controller.request.TermsHistoryCre
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsUpdateRequest;
 import shoppingmall.ankim.domain.termsHistory.dto.TermsHistoryUpdateResponse;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
+import shoppingmall.ankim.domain.termsHistory.exception.EmptyTermsUpdateRequestException;
 import shoppingmall.ankim.domain.termsHistory.repository.TermsHistoryRepository;
 import shoppingmall.ankim.domain.termsHistory.service.request.TermsHistoryCreateServiceRequest;
 import shoppingmall.ankim.domain.termsHistory.service.request.TermsUpdateServiceRequest;
@@ -22,8 +23,7 @@ import shoppingmall.ankim.domain.termsHistory.service.request.TermsUpdateService
 import java.time.LocalDateTime;
 import java.util.*;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_MEMBER;
-import static shoppingmall.ankim.global.exception.ErrorCode.TERMS_NOT_FOUND;
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Slf4j
 @Service
@@ -58,7 +58,6 @@ public class TermsHistoryServiceImpl implements TermsHistoryService {
     public TermsHistoryUpdateResponse updateTermsAgreement(String loginId, List<TermsUpdateServiceRequest> requestList) {
         LocalDateTime now = LocalDateTime.now();
         Member member = getMember(loginId);
-
 
         // 약관 이름 수집을 위한 리스트
         List<String> termsNames = new ArrayList<>();
