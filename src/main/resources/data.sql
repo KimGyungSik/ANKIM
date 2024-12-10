@@ -13,7 +13,7 @@ INSERT INTO category (name, level, parent_no) VALUES ('블라우스', 'SUB', 2);
 INSERT INTO category (name, level, parent_no) VALUES ('니트', 'SUB', 2);
 
 -- 상품 데이터
-INSERT INTO product (name, desc, disc_rate, orig_price, qty, selling_status, category_no)
+INSERT INTO product (name, description, discount_rate, orig_price, qty, selling_status, category_no)
 VALUES
     ('캐시미어 코트', '부드럽고 고급스러운 캐시미어 코트', 10, 120000, 100, 'SELLING', 3),
     ('울 자켓', '보온성이 뛰어난 울 자켓', 15, 80000, 150, 'SELLING', 4),
@@ -70,13 +70,13 @@ INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, leve
 VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적으로 개인정보를 수집 및 이용하는 것에 대한 동의입니다.', 'N', 'v1', 2, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 2, 'Y');
+VALUES (4, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
+VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
+VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
