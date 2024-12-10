@@ -45,6 +45,15 @@ Content-Type: application/json
   "id": "gnstm831@gmail.com"
 }
 
+### 이메일 인증번호 확인
+POST http://localhost:8080/api/mail/verify
+Content-Type: application/json
+
+{
+  "loginId": "gnstm831@gmail.com",
+  "verificationCode": "79GHS2"
+}
+
 ### 이메일 입력 후 다음 회원가입 절차로 넘어간다.
 POST http://localhost:8080/api/member/register
 Content-Type: application/json
