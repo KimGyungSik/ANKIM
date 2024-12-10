@@ -35,7 +35,10 @@ import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAY
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 // TODO Facade패턴 구현하면서 결제 상태 변경 내역 엔티티도 고려해봐야함
+// TODO 결제를 하고 나서 결제를 취소했을 때 내역이 있어야 하나?
+// TODO 배송 상태 이력 테이블도 고려해야함 -> 배송 상태가 바뀔 때마다 이력이 쌓이도록
 // TODO 트랜잭션 경계에 맞춰서 결제 처리 실패시 재고 차감, 복구도 같이 롤백 시켜야하는 문제도 고려해봐야함
+// TODO 결제를 요청하고 나서 재고차감을 했는데 결제 요청 API에서 에러 발생 시 재고 감소 롤백 말하는거임
 @Service
 @Slf4j
 @Transactional

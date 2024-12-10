@@ -3,10 +3,29 @@ POST http://localhost:8080/api/v1/payments/toss
 Content-Type: application/json
 
 {
-  "payType": "CARD",
-  "amount": 50000,
-  "orderName": "ORD20241125-1234567"
+  "paymentRequest": {
+    "payType": "CARD",
+    "amount": 50000,
+    "orderName": "ORD20241125-1234567",
+    "yourSuccessUrl": "https://your-success-url.com",
+    "yourFailUrl": "https://your-fail-url.com"
+  },
+  "deliveryRequest": {
+    "addressId": null,
+    "courier": "FastCourier",
+    "delReq": "문 앞에 놓아주세요"
+  },
+  "addressRequest": {
+    "addressMain": "서울특별시 강남구 테헤란로 123",
+    "addressName": "집",
+    "addressDetail": "1층",
+    "zipCode": 12345,
+    "phoneNumber": "010-1234-5678",
+    "emergencyPhoneNumber": "010-5678-1234",
+    "defaultAddressYn": "Y"
+  }
 }
+
 
 ### Toss 결제 성공 시 요청
 GET http://localhost:8080/api/v1/payments/toss/success?paymentKey=tgen_202411281903521CDj9&orderId=ORD12345678&amount=50000
@@ -19,6 +38,6 @@ POST http://localhost:8080/api/v1/payments/toss/cancel
 Content-Type: application/json
 
 {
-  "paymentKey": "tgen_20241129204602E8ld7",
+  "paymentKey": "tgen_202412101938120dwg2",
   "cancelReason": "단순 변심"
 }
