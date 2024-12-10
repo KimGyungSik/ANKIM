@@ -42,7 +42,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PaymentSynchronizedFacade {
+public class PaymentFacadeWithSynchronized {
     private final LockHandler lockHandler;
     private final ItemService itemService;
     private final DeliveryService deliveryService;
@@ -134,7 +134,7 @@ public class PaymentSynchronizedFacade {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            itemService.reduceStock(itemNo, quantity);
+            itemService.reduceStockWithSynchronized(itemNo, quantity);
         }
     }
     private void restoreStock(Order order) {
@@ -142,7 +142,7 @@ public class PaymentSynchronizedFacade {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            itemService.restoreStock(itemNo, quantity);
+            itemService.restoreStockWithSynchronized(itemNo, quantity);
         }
     }
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {

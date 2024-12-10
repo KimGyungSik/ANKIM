@@ -43,7 +43,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class PaymentFacade {
+public class PaymentFacadeWithNamedLock {
     private final LockHandler lockHandler;
     private final ItemService itemService;
     private final DeliveryService deliveryService;

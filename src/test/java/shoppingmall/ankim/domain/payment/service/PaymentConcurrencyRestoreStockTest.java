@@ -72,10 +72,10 @@ public class PaymentConcurrencyRestoreStockTest {
     private OrderRepository orderRepository;
 
     @Autowired
-    private PaymentFacade paymentFacade;
+    private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
     @Autowired
-    private PaymentSynchronizedFacade paymentSynchronizedFacade;
+    private PaymentFacadeWithSynchronized paymentFacadeWithSynchronized;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -202,7 +202,7 @@ public class PaymentConcurrencyRestoreStockTest {
             String orderId = orderIds.get(i);
             executorService.submit(() -> {
                 try {
-                    paymentSynchronizedFacade.toFailRequestWithSynchronized(code, message, orderId);
+                    paymentFacadeWithSynchronized.toFailRequestWithSynchronized(code, message, orderId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -234,7 +234,7 @@ public class PaymentConcurrencyRestoreStockTest {
             String paymentKey = paymentkeys.get(i);
             executorService.submit(() -> {
                 try {
-                    paymentSynchronizedFacade.toCancelRequestWithSynchronized(paymentKey, cancelReason);
+                    paymentFacadeWithSynchronized.toCancelRequestWithSynchronized(paymentKey, cancelReason);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

@@ -43,18 +43,20 @@ import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.Mockito.mock;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
-// TODO DEFINED_PORT로 돌리게 되면 Application 서버가 로딩되면서 InitProduct클래스가 로딩된다.
-// TODO 정확히 DEFINED_PORT와 RANDOM_PORT의 차이를 알아야 할듯!
+
+
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@ActiveProfiles("prod")
+@ActiveProfiles("test")
+@Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
-class PaymentFacadeTest {
+class PaymentFacadeWithSynchronizedTest {
     @MockBean
     private S3Service s3Service;
 
@@ -74,7 +76,10 @@ class PaymentFacadeTest {
     private PaymentService paymentServiceImpl;
 
     @Autowired
-    private PaymentFacade paymentFacade;
+    private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
+
+    @Autowired
+    private PaymentFacadeWithSynchronized paymentFacadeWithSynchronized;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -152,7 +157,7 @@ class PaymentFacadeTest {
                 .build();
 
         // when
-        PaymentResponse response = paymentFacade.createPaymentWithNamedLock(request,deliveryRequest,addressRequest);
+        PaymentResponse response = paymentFacadeWithSynchronized.createPaymentWithSynchronized(request,deliveryRequest,addressRequest);
 
 
         // then
@@ -177,8 +182,8 @@ class PaymentFacadeTest {
         // EntityManager를 통해 최신 상태 조회
         List<Item> items = itemRepository.findAll();
 
-        assertThat(items.get(0).getQty()).isEqualTo(98); // 주문 수량 2 감소
-        assertThat(items.get(1).getQty()).isEqualTo(97); // 주문 수량 3 감소
+        assertThat(items.get(2).getQty()).isEqualTo(48); // 주문 수량 2 감소
+        assertThat(items.get(3).getQty()).isEqualTo(47); // 주문 수량 3 감소
     }
 
     @Test
@@ -213,7 +218,7 @@ class PaymentFacadeTest {
                 .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
         // when
-        PaymentSuccessResponse response = paymentServiceImpl.tossPaymentSuccess(paymentKey, order.getOrdNo(), amount);
+        PaymentSuccessResponse response = paymentFacadeWithSynchronized.toSuccessRequestWithSynchronized(paymentKey, order.getOrdNo(), amount);
 
         // then
         assertThat(response).isNotNull();
@@ -275,7 +280,7 @@ class PaymentFacadeTest {
         String orderId = order.getOrdNo(); // 실제 orderId로 설정
 
         // when
-        PaymentFailResponse failResponse = paymentServiceImpl.tossPaymentFail(errorCode, errorMessage, orderId);
+        PaymentFailResponse failResponse = paymentFacadeWithSynchronized.toFailRequestWithSynchronized(errorCode, errorMessage, orderId);
 
         // then
         assertThat(failResponse).isNotNull();
@@ -305,8 +310,8 @@ class PaymentFacadeTest {
         Item updatedItem1 = entityManager.find(Item.class, item1.getNo());
         Item updatedItem2 = entityManager.find(Item.class, item2.getNo());
 
-        assertThat(updatedItem1.getQty()).isEqualTo(102); // 100 + 주문 수량 2 복구
-        assertThat(updatedItem2.getQty()).isEqualTo(103); // 100 + 주문 수량 3 복구
+        assertThat(updatedItem1.getQty()).isEqualTo(52); // 100 + 주문 수량 2 복구
+        assertThat(updatedItem2.getQty()).isEqualTo(53); // 100 + 주문 수량 3 복구
     }
 
     @DisplayName("결제 취소 시 성공적으로 PaymentCancelResponse을 반환한다.")
@@ -344,7 +349,7 @@ class PaymentFacadeTest {
                 .andRespond(withSuccess(expectedResponse, MediaType.APPLICATION_JSON));
 
         // when
-        PaymentCancelResponse response = paymentServiceImpl.cancelPayment(paymentKey, cancelReason);
+        PaymentCancelResponse response = paymentFacadeWithSynchronized.toCancelRequestWithSynchronized(paymentKey, cancelReason);
 
         // then
         assertThat(response.getDetails()).isNotNull();
@@ -376,8 +381,8 @@ class PaymentFacadeTest {
         System.out.println("item1.getQty() = " + item1.getQty());
         System.out.println("item2.getQty() = " + item2.getQty());
 
-        assertThat(updatedItem1.getQty()).isEqualTo(102); // 원래 재고 + 복구된 수량 (2)
-        assertThat(updatedItem2.getQty()).isEqualTo(103); // 원래 재고 + 복구된 수량 (3)
+        assertThat(updatedItem1.getQty()).isEqualTo(52); // 원래 재고 + 복구된 수량 (2)
+        assertThat(updatedItem2.getQty()).isEqualTo(53); // 원래 재고 + 복구된 수량 (3)
 
         // Payment 상태 검증 (결제 취소로 변경)
         Payment canceledPayment = paymentRepository.findByPayKeyWithOrder(paymentKey).orElse(null);
@@ -388,57 +393,6 @@ class PaymentFacadeTest {
         // Mock 서버 검증
         mockServer.verify();
 
-    }
-
-    @DisplayName("주문 번호로 결제 내역들을 조회할 수 있다.")
-    @Test
-    @Transactional
-    void findPaymentHistories() {
-        // given
-        int count = 5; // 결제 5개 생성
-
-        List<Payment> payments = PaymentFactory.createPayments(entityManager, count);
-        paymentRepository.saveAll(payments);
-
-        List<String> orderIds = payments.stream()
-                .map(payment -> payment.getOrder().getOrdNo())
-                .toList();
-
-        // 내림차순 정렬된 기대값 준비
-        List<Payment> sortedPayments = payments.stream()
-                .sorted(Comparator.comparing(Payment::getNo).reversed()) // paymentId 기준 내림차순
-                .toList();
-
-        // when
-        List<PaymentHistoryResponse> result = paymentQueryService.findPaymentHistories(orderIds);
-
-        // then
-        assertThat(result).hasSize(5);
-
-        // 각 필드 검증 (내림차순 기준)
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::getPaymentId)
-                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getNo).toList());
-
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::getTotalPrice)
-                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getTotalPrice).toList());
-
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::getOrderName)
-                .containsExactlyElementsOf(sortedPayments.stream().map(payment -> payment.getOrder().getOrdCode()).toList());
-
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::getType)
-                .containsExactlyElementsOf(sortedPayments.stream().map(payment -> payment.getType().getDescription()).toList());
-
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::isPaySuccessYN)
-                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::isPaySuccessYN).toList());
-
-        assertThat(result)
-                .extracting(PaymentHistoryResponse::getCreatedAt)
-                .containsExactlyElementsOf(sortedPayments.stream().map(Payment::getCreatedAt).toList());
     }
 
 

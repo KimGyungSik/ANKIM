@@ -44,9 +44,27 @@ public class ItemService {
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
 
+
     // 재고 차감
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public synchronized void reduceStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.deductQuantity(quantity);
+    }
+
+    // 재고 복구
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public synchronized void restoreStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.restoreQuantity(quantity);
+    }
+
+
+
+    // 재고 차감
+    public synchronized void reduceStockWithSynchronized(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.deductQuantity(quantity);
@@ -54,8 +72,7 @@ public class ItemService {
     }
 
     // 재고 복구
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public synchronized void restoreStock(Long itemNo, Integer quantity) {
+    public synchronized void restoreStockWithSynchronized(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.restoreQuantity(quantity);

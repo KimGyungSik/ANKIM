@@ -67,10 +67,10 @@ public class PaymentConcurrencyReduceStockTest {
     private OrderRepository orderRepository;
 
     @Autowired
-    private PaymentFacade paymentFacade;
+    private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
     @Autowired
-    private PaymentSynchronizedFacade paymentSynchronizedFacade;
+    private PaymentFacadeWithSynchronized paymentFacadeWithSynchronized;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -182,7 +182,7 @@ public class PaymentConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentSynchronizedFacade.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
+                    PaymentResponse paymentWithSynchronized = paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
