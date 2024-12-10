@@ -7,20 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
-import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
-import org.springframework.test.web.client.match.MockRestRequestMatchers;
-import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
-import shoppingmall.ankim.domain.address.entity.BaseAddress;
-import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
-import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
@@ -33,9 +26,8 @@ import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentQueryService;
-import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
+import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.entity.PayType;
-import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
@@ -44,7 +36,6 @@ import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
-import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.time.LocalDateTime;
@@ -77,6 +68,9 @@ public class PaymentConcurrencyReduceStockTest {
 
     @Autowired
     private PaymentFacade paymentFacade;
+
+    @Autowired
+    private PaymentSynchronizedFacade paymentSynchronizedFacade;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -188,7 +182,7 @@ public class PaymentConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacade.createPaymentWithNamedLock(paymentRequest, deliveryRequest, addressRequest);
+                    PaymentResponse paymentWithSynchronized = paymentSynchronizedFacade.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -201,5 +195,11 @@ public class PaymentConcurrencyReduceStockTest {
 
         Item item = itemRepository.findById(1L).orElseThrow();
         assertThat(item.getQty()).isEqualTo(0);
+    }
+
+    @Test
+    @DisplayName("재고가 29개인 상품을 10개의 스레드가 3개씩 동시에 구매했을 때 하나의 구매가 실패한다.")
+    void testConcurrentBuyProduct() throws Exception{
+
     }
 }

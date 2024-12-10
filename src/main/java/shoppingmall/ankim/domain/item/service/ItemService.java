@@ -37,7 +37,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 // 옵션 조합 생성 후 품목 반환 → 각 품목에 대한 세부 값 입력 및 저장
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemService {
 
     private final ItemRepository itemRepository;
@@ -46,19 +45,21 @@ public class ItemService {
     private final OptionValueRepository optionValueRepository;
 
     // 재고 차감
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void reduceStock(Long itemNo, Integer quantity) {
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public synchronized void reduceStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.deductQuantity(quantity);
+        itemRepository.saveAndFlush(item);
     }
 
     // 재고 복구
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void restoreStock(Long itemNo, Integer quantity) {
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public synchronized void restoreStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.restoreQuantity(quantity);
+        itemRepository.saveAndFlush(item);
     }
 
 

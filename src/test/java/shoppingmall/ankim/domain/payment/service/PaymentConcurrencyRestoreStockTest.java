@@ -19,10 +19,8 @@ import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
-import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
-import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
@@ -33,11 +31,9 @@ import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentQueryService;
-import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.entity.PayType;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
-import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.factory.MemberJwtFactory;
@@ -77,6 +73,9 @@ public class PaymentConcurrencyRestoreStockTest {
 
     @Autowired
     private PaymentFacade paymentFacade;
+
+    @Autowired
+    private PaymentSynchronizedFacade paymentSynchronizedFacade;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -203,7 +202,7 @@ public class PaymentConcurrencyRestoreStockTest {
             String orderId = orderIds.get(i);
             executorService.submit(() -> {
                 try {
-                    paymentFacade.toFailRequest(code, message, orderId);
+                    paymentSynchronizedFacade.toFailRequestWithSynchronized(code, message, orderId);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -235,7 +234,7 @@ public class PaymentConcurrencyRestoreStockTest {
             String paymentKey = paymentkeys.get(i);
             executorService.submit(() -> {
                 try {
-                    paymentFacade.toCancelRequest(paymentKey, cancelReason);
+                    paymentSynchronizedFacade.toCancelRequestWithSynchronized(paymentKey, cancelReason);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
