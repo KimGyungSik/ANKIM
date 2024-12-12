@@ -38,7 +38,7 @@ public class LoginApiController {
     private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성기
 
     @PostMapping("/member")
-    public ApiResponse<?> memberLoginV2(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
+    public ApiResponse<?> memberLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
         try {
             // LoginService를 통해 인증 처리
             Map<String, Object> jwtToken = loginService.memberLogin(loginRequest.toServiceRequest(), request);
