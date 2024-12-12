@@ -1,9 +1,7 @@
 package shoppingmall.ankim.domain.payment.service;
 
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,7 +48,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
-public class PaymentConcurrencyReduceStockTest {
+@TestInstance(TestInstance.Lifecycle.PER_CLASS)
+public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
     @MockBean
     private S3Service s3Service;
 
@@ -69,8 +68,6 @@ public class PaymentConcurrencyReduceStockTest {
     @Autowired
     private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
-    @Autowired
-    private PaymentFacadeWithSynchronized paymentFacadeWithSynchronized;
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -111,7 +108,7 @@ public class PaymentConcurrencyReduceStockTest {
     private List<String> orderIds = new ArrayList<>();
     private List<String> paymentkeys = new ArrayList<>();
 
-    @BeforeEach
+    @BeforeAll
     void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         transactionTemplate.execute(status -> {
@@ -125,7 +122,7 @@ public class PaymentConcurrencyReduceStockTest {
                 Item item2 = product.getItems().get(1);
 
                 // 결제 요청에 대한 더미 (재고 감소)
-                for (int i = 0; i < 100; i++) {
+                for (int i = 0; i < 150; i++) {
                     OrderItem orderItem = OrderItem.create(item, 1);
                     entityManager.persist(orderItem);
 
@@ -182,7 +179,7 @@ public class PaymentConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
+                    PaymentResponse paymentWithSynchronized = paymentFacadeWithNamedLock.createPaymentWithNamedLock(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -198,8 +195,62 @@ public class PaymentConcurrencyReduceStockTest {
     }
 
     @Test
-    @DisplayName("재고가 29개인 상품을 10개의 스레드가 3개씩 동시에 구매했을 때 하나의 구매가 실패한다.")
-    void testConcurrentBuyProduct() throws Exception{
+    @DisplayName("재고가 100개인 상품을 101개의 스레드가 1개씩 동시에 구매했을 때 하나의 구매가 실패한다.")
+    void testConcurrentBuyProduct() throws Exception {
+        int threadCount = 101;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
 
+        DeliveryCreateServiceRequest deliveryRequest = DeliveryCreateServiceRequest.builder()
+                .addressId(null)
+                .courier("FastCourier")
+                .delReq("문 앞에 놓아주세요")
+                .build();
+
+        MemberAddressCreateServiceRequest addressRequest = MemberAddressCreateServiceRequest.builder()
+                .addressMain("서울특별시 강남구 테헤란로 123")
+                .addressName("집")
+                .addressDetail("1층")
+                .zipCode(12345)
+                .phoneNumber("010-1234-5678")
+                .emergencyPhoneNumber("010-5678-1234")
+                .defaultAddressYn("Y")
+                .build();
+
+        // 예외 발생 카운트
+        List<Exception> exceptions = new ArrayList<>();
+
+        for (int i = 0; i < threadCount; i++) {
+            String orderName = orderNames.get(i);
+            executorService.submit(() -> {
+                try {
+                    PaymentCreateServiceRequest paymentRequest = PaymentCreateServiceRequest.builder()
+                            .orderName(orderName)
+                            .payType(PayType.CARD)
+                            .amount(10000)
+                            .build();
+
+                    paymentFacadeWithNamedLock.createPaymentWithNamedLock(paymentRequest, deliveryRequest, addressRequest);
+                } catch (Exception e) {
+                    synchronized (exceptions) {
+                        exceptions.add(e);
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+
+        // 재고 검증
+        Item item = itemRepository.findById(1L).orElseThrow();
+        assertThat(item.getQty()).isEqualTo(0);
+
+        // 예외 검증 (1개의 구매 실패가 발생해야 함)
+        assertThat(exceptions.size()).isEqualTo(1);
+        assertThat(exceptions.get(0))
+                .isInstanceOf(IllegalArgumentException.class)
+                .hasMessage("차감할 재고 수량이 없습니다.");
     }
 }

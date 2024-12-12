@@ -55,7 +55,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
-public class PaymentConcurrencyRestoreStockTest {
+public class PaymentFacadeWithSynchronizedConcurrencyRestoreStockTest {
     @MockBean
     private S3Service s3Service;
 
