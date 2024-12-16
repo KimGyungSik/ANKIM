@@ -10,6 +10,7 @@ spring:
       connection-timeout: 60000
       max-lifetime: 1800000
       data-source-properties:
+        connectionInitSql: SET GLOBAL innodb_print_all_deadlocks=1
         isolationLevel: READ_COMMITTED
         lockTimeout: 10000
 
@@ -43,13 +44,15 @@ spring:
 logging:
   level:
     org:
-      springframework:
-        orm:
-          jpa: DEBUG
       hibernate:
         SQL: DEBUG
         type: TRACE
-    com.zaxxer.hikari.HikariConfig: DEBUG # HikariCP 디버깅
+        engine:
+          transaction:
+            internal:
+              TransactionImpl: DEBUG
+          spi: TRACE
+        event: TRACE
 
 decorator:
   datasource:

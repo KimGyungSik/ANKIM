@@ -1,6 +1,8 @@
 package shoppingmall.ankim.domain.item.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,25 +46,6 @@ public class ItemService {
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
 
-
-    // 재고 차감
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public synchronized void reduceStock(Long itemNo, Integer quantity) {
-        Item item = itemRepository.findByNo(itemNo)
-                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
-        item.deductQuantity(quantity);
-    }
-
-    // 재고 복구
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public synchronized void restoreStock(Long itemNo, Integer quantity) {
-        Item item = itemRepository.findByNo(itemNo)
-                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
-        item.restoreQuantity(quantity);
-    }
-
-
-
     // 재고 차감
     public synchronized void reduceStockWithSynchronized(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
@@ -79,6 +62,21 @@ public class ItemService {
         itemRepository.saveAndFlush(item);
     }
 
+    // 재고 차감
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public synchronized void reduceStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.deductQuantity(quantity);
+    }
+
+    // 재고 복구
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public synchronized void restoreStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.restoreQuantity(quantity);
+    }
 
     /**
      * 옵션 조합 생성 및 미리보기 반환
