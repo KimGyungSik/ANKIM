@@ -115,4 +115,8 @@ public class Member extends BaseEntity {
         this.pwd = newPassword;
     }
 
+    public void changeLoginIdToRandom() {
+        this.loginId = UUID.randomUUID().toString();
+    }
+
 }
