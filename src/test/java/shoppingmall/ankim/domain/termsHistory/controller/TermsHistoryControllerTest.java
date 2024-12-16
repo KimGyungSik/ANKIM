@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.web.servlet.MockMvc;
+import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.domain.termsHistory.service.TermsHistoryService;
 import shoppingmall.ankim.global.config.SecurityConfig;
 
@@ -30,6 +31,9 @@ class TermsHistoryControllerTest {
 
     @MockBean
     private TermsHistoryService termsHistoryService;
+
+    @MockBean
+    private SecurityContextHelper securityContextHelper;
 
     @Test
     @DisplayName("요청 데이터가 비어 있는 경우 400 에러와 EMPTY_TERMS_UPDATE_REQUEST 코드를 반환한다.")
