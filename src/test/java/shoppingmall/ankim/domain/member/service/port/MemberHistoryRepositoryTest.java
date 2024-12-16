@@ -216,7 +216,7 @@ class MemberHistoryRepositoryTest {
                 .grade(50)
                 .gender("F")
                 .joinDate(LocalDateTime.now())
-                .status(MemberStatus.WITHDRAWN) // WITHDRAWN 상태
+                .status(MemberStatus.LEAVE) // WITHDRAWN 상태
                 .build();
 
         memberRepository.save(activeMember);
@@ -243,7 +243,7 @@ class MemberHistoryRepositoryTest {
                 .grade(50)
                 .gender("F")
                 .joinDate(LocalDateTime.now())
-                .status(MemberStatus.WITHDRAWN) // WITHDRAWN 상태
+                .status(MemberStatus.LEAVE) // WITHDRAWN 상태
                 .build();
 
         memberRepository.save(withdrawnMember);
