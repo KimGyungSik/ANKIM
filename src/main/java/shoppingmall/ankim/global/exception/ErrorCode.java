@@ -86,6 +86,9 @@ public enum ErrorCode {
     INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
     PASSWORD_CONFIRMATION_MISMATCH(HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "현재와 다른 비밀번호를 입력해주시기 바랍니다."),
+    DUPLICATE_MAIL_VERIFICATION_REQUEST(HttpStatus.BAD_REQUEST, "이메일 인증이 진행 중 입니다. 잠시 후 다시 시도해주세요."),
+    TOO_MANY_MAIL_CODE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."),
+    MAIL_VERIFICATION_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
 
     // 탈퇴 관련 에러코드
     LEAVE_REASON_NOT_FOUND(HttpStatus.BAD_REQUEST, "탈퇴 사유를 찾을 수 없습니다."),

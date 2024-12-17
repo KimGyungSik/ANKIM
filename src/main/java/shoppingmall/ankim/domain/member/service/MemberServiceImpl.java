@@ -5,6 +5,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.email.exception.MailVerificationNotCompletedException;
+import shoppingmall.ankim.domain.email.handler.MailVerificationHandler;
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
@@ -16,6 +18,7 @@ import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.util.List;
 
+import static shoppingmall.ankim.global.exception.ErrorCode.MAIL_VERIFICATION_NOT_COMPLETED;
 import static shoppingmall.ankim.global.exception.ErrorCode.MEMBER_ID_DUPLICATE;
 
 @Slf4j
@@ -28,6 +31,8 @@ public class MemberServiceImpl implements MemberService {  // FIXME 클래스명
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
+
+    private final MailVerificationHandler mailVerificationHandler;
 
     private String verifiedEmailId; // 인증된 이메일 ID 저장
 
@@ -55,6 +60,12 @@ public class MemberServiceImpl implements MemberService {  // FIXME 클래스명
     * */
     // 회원가입 로직
     public MemberResponse registerMember(MemberRegisterServiceRequest request, List<TermsAgreement> termsAgreements) {
+        // 이메일 인증 여부 확인
+        String loginId = request.getLoginId();
+        if (!mailVerificationHandler.isVerified(loginId)) {
+            throw new MailVerificationNotCompletedException(MAIL_VERIFICATION_NOT_COMPLETED);
+        }
+
         // termsAgreements를 Terms로 변환
         List<Terms> agreeTerms = termsQueryService.validateAndAddSubTerms(termsAgreements);
 
@@ -64,6 +75,9 @@ public class MemberServiceImpl implements MemberService {  // FIXME 클래스명
 
         Member member = request.create(encodePwd, agreeTerms);
         memberRepository.save(member); // 회원가입과 동시에 TermsHistory도 저장!
+
+        // Redis 데이터 삭제
+        mailVerificationHandler.deleteVerificationData(loginId);
 
         log.info("회원가입 완료");
         return MemberResponse.of(member);
