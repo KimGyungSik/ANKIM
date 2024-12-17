@@ -1,5 +1,7 @@
 package shoppingmall.ankim.domain.memberLeave.controller.request;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.NotNull;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -10,7 +12,7 @@ import shoppingmall.ankim.domain.memberLeave.validation.ValidLeaveMessage;
 @NoArgsConstructor
 @ValidLeaveMessage // 커스텀 유효성 검사 적용
 public class LeaveRequest {
-    @NotBlank(message = "탈퇴 사유를 선택 해주세요.")
+    @NotNull(message = "탈퇴 사유를 선택 해주세요.")
     private Long leaveReasonNo; // 선택한 탈퇴 사유 ID
 
     private String leaveReason; // 선택한 탈퇴 사유명

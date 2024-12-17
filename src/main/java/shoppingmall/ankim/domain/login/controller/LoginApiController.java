@@ -54,8 +54,10 @@ public class LoginApiController {
 
             return ApiResponse.ok("로그인 성공");
 
-        } catch (BadCredentialsException ex) {
+        } catch (BadCredentialsException e) {
             throw new MemberLoginFailedException(INVALID_CREDENTIALS);
+        } catch (MemberLoginFailedException e) {
+            return ApiResponse.of(e.getErrorCode());
         }
     }
 

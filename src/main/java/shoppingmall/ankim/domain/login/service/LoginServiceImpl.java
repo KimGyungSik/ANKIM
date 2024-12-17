@@ -42,6 +42,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler.handleStatusChange;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -83,14 +84,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public Map<String, Object> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 사용자 조회 (status에 따라서 상태를 반환해줘야 됨)
-        Member member = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
-
-        log.info("사용자 status : {}", member.getStatus());
+        Optional<Member> findMember = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
 
         // 사용자가 없는 경우
-        if(member == null) {
+        if(findMember.isEmpty()) {
             throw new MemberLoginFailedException(USER_NOT_FOUND);
         }
+
+        Member member = findMember.get();
 
         // 로그인 시도 기록 가져오기
         MemberLoginAttempt loginAttempt = memberLoginAttemptRepository
