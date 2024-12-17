@@ -2,35 +2,29 @@ package shoppingmall.ankim.domain.memberLeave.service;
 
 import com.mysema.commons.lang.Pair;
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.test.annotation.Commit;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.leaveReason.entity.LeaveReason;
 import shoppingmall.ankim.domain.leaveReason.entity.LeaveReasonNotFoundException;
 import shoppingmall.ankim.domain.leaveReason.repository.LeaveReasonRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
+import shoppingmall.ankim.domain.memberLeave.entity.MemberLeave;
+import shoppingmall.ankim.domain.memberLeave.repository.MemberLeaveRepository;
 import shoppingmall.ankim.domain.memberLeave.service.request.LeaveServiceRequest;
-import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.util.List;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static shoppingmall.ankim.factory.MemberFactory.createMemberAndLeaveReason;
-import static shoppingmall.ankim.factory.MemberFactory.createSecureMember;
 
 @SpringBootTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -45,6 +39,9 @@ class MemberLeaveServiceTest {
 
     @Autowired
     private LeaveReasonRepository leaveReasonRepository;
+
+    @Autowired
+    private MemberLeaveRepository memberLeaveRepository;
 
     @Autowired
     private EntityManager em;
@@ -98,18 +95,32 @@ class MemberLeaveServiceTest {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("기타 사유가 존재하지 않습니다."));
 
+        String leaveMessage = "탈퇴 테스트 사유입니다.";
+
         LeaveServiceRequest request = LeaveServiceRequest.builder()
                 .password(validPassword)
                 .leaveReasonNo(etcReason.getNo())
+                .leaveMessage(leaveMessage)
                 .build();
 
         // when
         memberLeaveService.leaveMember(loginId, request);
 
         // then
+        Member updatedMember = memberRepository.findById(member.getNo()).orElseThrow();
+        assertThat(updatedMember.getLoginId()).isNotEqualTo(loginId); // loginId 변경 확인
+        assertThat(updatedMember.getStatus()).isEqualTo(MemberStatus.LEAVE); // 상태 변경 확인
 
+        // MemberLeave 테이블에 저장된 이력 검증
+        List<MemberLeave> leaveHistory = memberLeaveRepository.findAll();
+        assertThat(leaveHistory).hasSize(1); // 탈퇴이력이 저장되어야 됨
 
-        // 추가적으로 탈퇴 처리가 되었는지 검증할 수 있음
+        MemberLeave savedLeave = leaveHistory.get(0);
+
+        assertThat(savedLeave.getMember().getLoginId()).isNotEqualTo(loginId); // 로그인 ID 검증
+        assertThat(savedLeave.getLeaveReason().getReason()).isEqualTo("기타"); // 탈퇴 사유 검증
+        assertThat(savedLeave.getLeaveMsg()).isEqualTo(leaveMessage); // 기타 사유 메시지 검증
+        assertThat(savedLeave.getLeaveAt()).isNotNull(); // 탈퇴 날짜 검증
     }
 
 }

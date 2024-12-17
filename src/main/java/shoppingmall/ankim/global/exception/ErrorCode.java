@@ -89,6 +89,7 @@ public enum ErrorCode {
 
     // 탈퇴 관련 에러코드
     LEAVE_REASON_NOT_FOUND(HttpStatus.BAD_REQUEST, "탈퇴 사유를 찾을 수 없습니다."),
+    MEMBER_LEAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"회원 탈퇴 중 오류가 발생했습니다."),
 
     // 주소 관련 에러 코드
     ADDRESS_REGISTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "주소 등록 중 에러가 발생했습니다."),

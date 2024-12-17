@@ -1,49 +1,28 @@
-package shoppingmall.ankim.domain.security.filter;
+package shoppingmall.ankim.global.handler;
 
 import io.jsonwebtoken.ExpiredJwtException;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.boot.autoconfigure.cache.CacheProperties;
-import org.springframework.web.filter.GenericFilterBean;
-import shoppingmall.ankim.domain.security.exception.JwtTokenException;
+import org.springframework.stereotype.Component;
 import shoppingmall.ankim.domain.security.handler.RedisHandler;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
-import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.io.IOException;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.*;
-
 @Slf4j
+@Component
 @RequiredArgsConstructor
-public class CustomLogoutFilter extends GenericFilterBean {
+public class LogoutHandler {
 
     private final JwtTokenProvider jwtTokenProvider;
     private final RedisHandler redisHandler;
 
-    @Override
-    public void doFilter(ServletRequest servletRequest, ServletResponse servletResponse, FilterChain filterChain) throws IOException, ServletException {
-        doFilter((HttpServletRequest) servletRequest, (HttpServletResponse) servletResponse, filterChain);
-    }
-
-    private void doFilter(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws IOException, ServletException {
-
-        // 로그아웃 경로 요청인지 검증
-        String requestUri = request.getRequestURI();
-        if (!requestUri.matches("^\\/logout$")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-        String requestMethod = request.getMethod();
-        if (!requestMethod.equalsIgnoreCase("POST")) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
+    public void logout(HttpServletRequest request, HttpServletResponse response) {
         // 헤더에서 Access Token 추출
         String access = request.getHeader("access");
 

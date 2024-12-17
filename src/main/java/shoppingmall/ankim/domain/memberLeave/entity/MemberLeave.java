@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.memberLeave.entity;
 import jakarta.persistence.*;
 import lombok.*;
 import shoppingmall.ankim.domain.leaveReason.entity.LeaveReason;
+import shoppingmall.ankim.domain.member.entity.Member;
 
 import java.time.LocalDateTime;
 
@@ -17,6 +18,10 @@ public class MemberLeave {
     private Long no;
 
     @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "mem_no", nullable = false)
+    private Member member;
+
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "leave_rsn_no", nullable = false)
     private LeaveReason leaveReason;
 
@@ -26,4 +31,12 @@ public class MemberLeave {
     @Column(name = "leave_at", updatable = false)
     private LocalDateTime leaveAt; // 탈퇴일
 
+    @Builder
+    public MemberLeave(Long no, Member member, LeaveReason leaveReason, String leaveMsg, LocalDateTime leaveAt) {
+        this.no = no;
+        this.member = member;
+        this.leaveReason = leaveReason;
+        this.leaveMsg = leaveMsg;
+        this.leaveAt = leaveAt == null ? LocalDateTime.now() : leaveAt;
+    }
 }

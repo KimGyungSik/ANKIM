@@ -32,7 +32,7 @@ public class LeaveRequest {
         this.password = password;
     }
 
-    LeaveServiceRequest toServiceRequest() {
+    public LeaveServiceRequest toServiceRequest() {
         return LeaveServiceRequest.builder()
                 .leaveReasonNo(leaveReasonNo)
                 .leaveMessage(leaveMessage)
