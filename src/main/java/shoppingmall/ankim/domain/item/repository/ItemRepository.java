@@ -25,7 +25,13 @@ public interface ItemRepository extends JpaRepository<Item,Long>, ItemQueryRepos
     Optional<Item> findByIdWithPessimisticLock(@Param("itemNo") Long itemNo);
 
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query(value = "UPDATE Item i SET i.qty = i.qty - :quantity WHERE i.no = :itemNo AND i.qty >= :quantity")
-    void reduceStock(@Param("quantity") Integer quantity, @Param("itemNo") Long itemNo);
+    int reduceStock(@Param("quantity") Integer quantity, @Param("itemNo") Long itemNo);
+
+    @Modifying(clearAutomatically = true)
+    @Query(value = "UPDATE Item i SET i.qty = i.qty + :quantity " +
+            "WHERE i.no = :itemNo")
+    void restoreStock(@Param("quantity") Integer quantity, @Param("itemNo") Long itemNo);
+
 }

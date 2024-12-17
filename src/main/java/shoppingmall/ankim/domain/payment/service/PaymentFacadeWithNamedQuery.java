@@ -1,6 +1,6 @@
 package shoppingmall.ankim.domain.payment.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -12,6 +12,10 @@ import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
+import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.item.exception.InvalidStockQuantityException;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
+import shoppingmall.ankim.domain.item.exception.ShortageItemStockException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
@@ -126,18 +130,21 @@ public class PaymentFacadeWithNamedQuery {
 
     private void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
-            Long itemNo = orderItem.getItem().getNo();
+            Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+                    .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
             Integer quantity = orderItem.getQty();
-            log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            itemRepository.reduceStock(quantity, itemNo);
+            int updateResult = itemRepository.reduceStock(quantity, item.getNo());
+            // 결과값이 0이면 반영된 행(row)이 없는것이므로 재고부족 예외 발생
+            if (updateResult == 0) throw new ShortageItemStockException(SHORTAGE_ITEM_STOCK);
         }
     }
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
-            Long itemNo = orderItem.getItem().getNo();
+            Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+                    .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
             Integer quantity = orderItem.getQty();
-            log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            itemService.restoreStockWithSynchronized(itemNo, quantity);
+            if(quantity<=0) throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
+            itemRepository.restoreStock(quantity, item.getNo());
         }
     }
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {
