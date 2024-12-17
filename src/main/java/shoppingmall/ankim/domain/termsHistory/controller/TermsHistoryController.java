@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
+import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsHistoryCreateRequest;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsUpdateRequest;
 import shoppingmall.ankim.domain.termsHistory.dto.TermsHistoryUpdateResponse;
@@ -30,12 +31,12 @@ import static shoppingmall.ankim.global.exception.ErrorCode.EMPTY_TERMS_UPDATE_R
 public class TermsHistoryController {
 
     private final TermsHistoryService termsHistoryService;
+    private final SecurityContextHelper securityContextHelper;
 
     // 약관 동의 처리
     @PostMapping("/update")
     public ApiResponse<TermsHistoryUpdateResponse> termsAgree(@Valid @RequestBody List<TermsUpdateRequest> request) {
-        String loginId = getLoginId();
-
+        String loginId = securityContextHelper.getLoginId();
 
         if(request == null || request.isEmpty()){
             throw new EmptyTermsUpdateRequestException(EMPTY_TERMS_UPDATE_REQUEST);
@@ -49,11 +50,5 @@ public class TermsHistoryController {
         TermsHistoryUpdateResponse termsHistoryUpdateResponse = termsHistoryService.updateTermsAgreement(loginId, serviceRequestList);
 
         return ApiResponse.ok(termsHistoryUpdateResponse);
-    }
-
-    private static String getLoginId() {
-        // SecurityContext에서 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName(); // 로그인 ID
     }
 }

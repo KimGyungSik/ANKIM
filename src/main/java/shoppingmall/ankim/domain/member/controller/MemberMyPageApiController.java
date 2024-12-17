@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.member.controller.request.PasswordRequest;
 import shoppingmall.ankim.domain.member.service.MemberMyPageService;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.security.exception.CookieNotIncludedException;
+import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
@@ -20,22 +21,17 @@ import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
 public class MemberMyPageApiController {
 
     private final MemberMyPageService memberMyPageService;
+    private final SecurityContextHelper securityContextHelper;
 
     @PostMapping("/confirm-password") // FIXME 마이 페이지 비밀번호 재확인
     public ApiResponse<String> confirmPassword(
             @RequestBody PasswordRequest passwordRequest
     ) {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         memberMyPageService.isValidPassword(loginId, passwordRequest.getPwd());
 
         return ApiResponse.ok("비밀번호 검증에 성공했습니다.");
-    }
-
-    private static String getLoginId() {
-        // SecurityContext에서 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName(); // 로그인 ID
     }
 
 }

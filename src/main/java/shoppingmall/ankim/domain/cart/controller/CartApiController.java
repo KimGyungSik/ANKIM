@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.service.CartService;
+import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
@@ -18,13 +19,14 @@ import java.util.Map;
 public class CartApiController {
 
     private final CartService cartService;
+    private final SecurityContextHelper securityContextHelper;
 
     // 장바구니에 상품 담기 ( C )
     @PostMapping("/items")
     public ApiResponse<String> addToCart(
             @RequestBody AddToCartRequest request
     ) {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         cartService.addToCart(request.toServiceRequest(), loginId);
 
@@ -34,7 +36,7 @@ public class CartApiController {
     // 장바구니 페이지에 들어갈때 장바구니 읽어오기 ( R )
     @GetMapping
     public ApiResponse<List<CartItemsResponse>> getCartItems() {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         List<CartItemsResponse> response = cartService.getCartItems(loginId);
 
@@ -47,7 +49,7 @@ public class CartApiController {
             @PathVariable Long cartItemNo,
             @RequestParam Integer quantity
     ) {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         // service
         cartService.updateCartItemQuantity(loginId, cartItemNo, quantity);
@@ -60,7 +62,7 @@ public class CartApiController {
     public ApiResponse<String> deleteSelectedItems(
             @RequestBody List<Long> cartItemNoList
     ) {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         cartService.deactivateSelectedItems(loginId, cartItemNoList);
         return ApiResponse.ok("선택상품을 삭제 했습니다.");
@@ -70,7 +72,7 @@ public class CartApiController {
     @DeleteMapping("/items/sold-out")
     public ApiResponse<String> deleteSoldOutItems(
     ) {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         cartService.deactivateOutOfStockItems(loginId);
         return ApiResponse.ok("품절상품을 삭제 했습니다.");
@@ -79,17 +81,11 @@ public class CartApiController {
     // 장바구니 수 비동기로 카운팅
     @GetMapping("/count")
     public ApiResponse<Map<String, Integer>> getCartItemsCount() {
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         Integer cartItemsCount = cartService.getCartItemCount(loginId);
 
         return ApiResponse.ok(Map.of("cartItemsCount", cartItemsCount));
-    }
-
-    private static String getLoginId() {
-        // SecurityContext에서 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName(); // 로그인 ID
     }
 
 }

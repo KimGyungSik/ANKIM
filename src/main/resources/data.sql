@@ -104,3 +104,12 @@ INSERT INTO member (
              '2024-11-18T23:59:59',     -- join_date (현재 시간)
              'ACTIVE'                   -- status
          );
+
+-- 탈퇴사유
+INSERT INTO leave_rsn (reason, active_yn) VALUES
+                                              ('탈퇴 후 재가입을 위해서', 'Y'),
+                                              ('사고 싶은 상품이 없어서', 'Y'),
+                                              ('자주 이용하지 않아서', 'Y'),
+                                              ('서비스 및 고객지원이 만족스럽지 않아서', 'Y'),
+                                              ('광고성 알림이 너무 많이 와서', 'Y'),
+                                              ('기타', 'Y');
