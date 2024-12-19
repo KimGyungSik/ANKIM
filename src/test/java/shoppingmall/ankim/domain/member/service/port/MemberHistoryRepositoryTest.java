@@ -15,6 +15,7 @@ import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 
@@ -216,18 +217,19 @@ class MemberHistoryRepositoryTest {
                 .grade(50)
                 .gender("F")
                 .joinDate(LocalDateTime.now())
-                .status(MemberStatus.WITHDRAWN) // WITHDRAWN 상태
+                .status(MemberStatus.LEAVE) // WITHDRAWN 상태
                 .build();
 
         memberRepository.save(activeMember);
         memberRepository.save(withdrawnMember);
 
         // when
-        Member foundMember = memberRepository.findByLoginIdExcludingWithdrawn("activeUser@example.com");
+        Optional<Member> findMember = memberRepository.findByLoginIdExcludingWithdrawn("activeUser@example.com");
+        Member member = findMember.get();
 
         // then
-        assertThat(foundMember).isNotNull();
-        assertThat(foundMember.getLoginId()).isEqualTo("activeUser@example.com");
+        assertThat(member).isNotNull();
+        assertThat(member.getLoginId()).isEqualTo("activeUser@example.com");
     }
 
     @Test
@@ -243,15 +245,15 @@ class MemberHistoryRepositoryTest {
                 .grade(50)
                 .gender("F")
                 .joinDate(LocalDateTime.now())
-                .status(MemberStatus.WITHDRAWN) // WITHDRAWN 상태
+                .status(MemberStatus.LEAVE) // WITHDRAWN 상태
                 .build();
 
         memberRepository.save(withdrawnMember);
 
         // when
-        Member foundMember = memberRepository.findByLoginIdExcludingWithdrawn("withdrawnUser@example.com");
+        Optional<Member> findMember = memberRepository.findByLoginIdExcludingWithdrawn("withdrawnUser@example.com");
 
         // then
-        assertThat(foundMember).isNull(); // 결과가 없어야 됨
+        assertThat(findMember).isEmpty(); // 결과가 없어야 됨
     }
 }

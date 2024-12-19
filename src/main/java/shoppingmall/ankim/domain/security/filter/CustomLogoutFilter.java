@@ -45,16 +45,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
         }
 
         // 헤더에서 Access Token 추출
-//        String access = request.getHeader("access");
-        String access = null;
-        if (request.getCookies() != null) {
-            for (Cookie cookie : request.getCookies()) {
-                if (cookie.getName().equals("access")) {
-                    access = cookie.getValue();
-                    break;
-                }
-            }
-        }
+        String access = request.getHeader("access");
 
         if (access == null || access.isEmpty()) {
             response.setStatus(HttpServletResponse.SC_BAD_REQUEST);

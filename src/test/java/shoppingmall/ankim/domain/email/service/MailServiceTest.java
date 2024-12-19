@@ -11,10 +11,16 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestPropertySource;
+import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
-import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.email.handler.MailVerificationHandler;
+import shoppingmall.ankim.domain.image.service.S3Service;
 
 import static org.mockito.Mockito.*;
 
@@ -24,30 +30,49 @@ import java.util.regex.Pattern;
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@SpringBootTest
+@Transactional
+@TestPropertySource(properties = "spring.sql.init.mode=never")
+@ActiveProfiles("test")
 class MailServiceTest {
 
     @Captor
     ArgumentCaptor<String> contentCaptor; // 메서드 호출시 인수 캡쳐
 
-    @Mock
-    private JavaMailSender javaMailSender; // 가짜로 메일을 보내는 객체 생성(모의 객체)
+    @MockBean
+    private MailVerificationHandler mailVerificationHandler;
 
-    @Mock
+    @MockBean
+    private JavaMailSender javaMailSender; // @MockBean으로 명확히 설정
+
     private MimeMessage mimeMessage;
 
     private Validator validator;
 
-    @InjectMocks // 인터페이스 주입 X
-    private MailServiceImpl mailService; // 모의 객체를 MailService에 주입
+    @Autowired // 인터페이스 주입 X
+    private MailService mailService; // 모의 객체를 MailService에 주입
 
     @MockBean
-    private JwtTokenProvider jwtTokenProvider;
+    private S3Service s3Service;
 
     @BeforeEach
     void setUp() {
-        MockitoAnnotations.openMocks(this); // 모의 객체와 주입된 객체를 초기화
+        MockitoAnnotations.openMocks(this); // Mock 객체 초기화
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-        validator = factory.getValidator(); // 유효성 검사 객체 생성
+        validator = factory.getValidator();
+
+        mimeMessage = mock(MimeMessage.class); // MimeMessage 명확하게 초기화
+        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage);
+
+        // MimeMessageHelper가 내부적으로 호출하는 메서드를 명확히 처리
+        try {
+            doNothing().when(mimeMessage).setFrom(any(Address.class));
+            doNothing().when(mimeMessage).setRecipient(any(MimeMessage.RecipientType.class), any(Address.class));
+            doNothing().when(mimeMessage).setContent(anyString(), eq("text/html;charset=UTF-8"));
+            doNothing().when(mimeMessage).setSubject(anyString());
+        } catch (Exception e) {
+            throw new RuntimeException("MimeMessage Mock 설정 오류", e);
+        }
     }
 
     /*
@@ -114,19 +139,23 @@ class MailServiceTest {
     public void verifyCodeSuccessTest() {
         // given
         String email = "test@example.com";
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
-
         String code = mailService.generateCode();
 
-        mailService.createMail(email, code); // 내부적으로 인증번호를 저장했다고 가정
+        // saveVerificationCode 호출 시 동작하도록 EmailVerificationHandler Mock 설정
+        doNothing().when(mailVerificationHandler).saveVerificationCode(email, code);
+        when(mailVerificationHandler.getVerificationCode(email)).thenReturn(code);
+
+        // 인증번호 저장
+        mailService.createMail(email, code);
 
         MailRequest mailRequest = new MailRequest(email, code);
 
-        // when
-        Count isValid = mailService.verifyCode(mailRequest.getLoginId(), mailRequest.getVerificationCode());
+        // when: 올바른 인증번호 입력
+        Count result = mailService.verifyCode(mailRequest.getLoginId(), mailRequest.getVerificationCode());
 
         // then
-        assertThat(isValid).isEqualTo(Count.SUCCESS);
+        assertThat(result).isEqualTo(Count.SUCCESS); // 인증 성공 확인
+        verify(mailVerificationHandler, times(1)).getVerificationCode(email);
     }
 
 
@@ -160,20 +189,31 @@ class MailServiceTest {
     public void verifyCodeRetryAfterThreeFailuresTest() {
         // given
         String email = "test@example.com";
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
         String correctCode = mailService.generateCode();
-        mailService.createMail(email, correctCode); // 내부적으로 인증번호를 저장했다고 가정
 
-        // when: 3회 잘못된 인증번호 입력
-        for (int i = 0; i < 3; i++) {
-            mailService.verifyCode(email, "wrongCode");
+        // 실패 횟수를 추적하는 변수
+        final int[] failCount = {0};
+
+        // EmailVerificationHandler 동작 설정
+        doNothing().when(mailVerificationHandler).saveVerificationCode(email, correctCode);
+        when(mailVerificationHandler.getVerificationCode(email)).thenReturn(correctCode);
+
+        // 실패 횟수 증가 시 동작 설정
+        // Mock 객체는 상태를 저장하지 않기 때문에 실패 횟수를 추적하기 위해 int[] failCount 배열을 사용
+        // thenAnswer : 입력값을 기반으로 다른 값을 반환
+        when(mailVerificationHandler.incrementFailCount(email)).thenAnswer(invocation -> ++failCount[0]);
+
+        // when: 2회 잘못된 인증번호 입력
+        for (int i = 0; i < 2; i++) {
+            Count result = mailService.verifyCode(email, "wrongCode");
+            assertThat(result).isEqualTo(Count.FAIL); // 실패인 경우
         }
 
-        // 4번째 실패 시 RETRY 응답
+        // 3번째 실패 시 RETRY 응답 확인
         Count result = mailService.verifyCode(email, "wrongCode");
 
         // then
-        assertThat(result).isEqualTo(Count.RETRY);
+        assertThat(result).isEqualTo(Count.RETRY); // 4번째 실패는 RETRY 반환
     }
 
     @Test
@@ -181,28 +221,29 @@ class MailServiceTest {
     public void verifyCodeAfterRetryWithNewCodeTest() {
         // given
         String email = "test@example.com";
-        when(javaMailSender.createMimeMessage()).thenReturn(mimeMessage); // JavaMailSender의 createMimeMessage가 mock된 mimeMessage 반환
         String correctCode = mailService.generateCode();
-        mailService.createMail(email, correctCode); // 내부적으로 인증번호를 저장했다고 가정
 
-        // when: 3회 잘못된 인증번호 입력
+        // emailVerificationHandler의 동작 설정
+        doNothing().when(mailVerificationHandler).saveVerificationCode(email, correctCode);
+        when(mailVerificationHandler.getVerificationCode(email))
+                .thenReturn(correctCode)
+                .thenReturn(correctCode); // 새 코드 요청 후에도 반환값 설정
+
+        // 기존 코드 검증 실패 시 3번 시도
         for (int i = 0; i < 3; i++) {
             mailService.verifyCode(email, "wrongCode");
         }
 
-        Count result = mailService.verifyCode(email, "wrongCode");
-        assertThat(result).isEqualTo(Count.RETRY); // 성공 메시지가 반환되는지 확인
-
-        // when: 3회 실패 후 새로운 인증번호 발급 요청
+        // 새로운 인증번호 발급 요청
         String newCode = mailService.generateCode();
-        mailService.createMail(email, newCode); // 새로운 인증번호 생성 및 저장
+        doNothing().when(mailVerificationHandler).saveVerificationCode(email, newCode);
+        when(mailVerificationHandler.getVerificationCode(email)).thenReturn(newCode);
 
-        // 새로운 인증번호로 성공적인 검증
-        Count newResult = mailService.verifyCode(email, newCode);
-        System.out.println("newResult = " + newResult);
+        // when: 새로운 코드로 인증 성공 시도
+        Count result = mailService.verifyCode(email, newCode);
 
         // then
-        assertThat(newResult).isEqualTo(Count.SUCCESS); // 성공 메시지가 반환되는지 확인
+        assertThat(result).isEqualTo(Count.SUCCESS);
     }
 
 }

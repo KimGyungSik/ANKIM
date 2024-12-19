@@ -1,12 +1,16 @@
 package shoppingmall.ankim.domain.member.service;
 
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.email.handler.MailVerificationHandler;
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -22,6 +26,7 @@ import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
 
 @SpringBootTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -39,6 +44,16 @@ class MemberServiceTest {
 
     @Autowired
     private TermsRepository termsRepository;
+
+    @MockBean
+    private MailVerificationHandler mailVerificationHandler;
+
+    @BeforeEach
+    void setUp() {
+        // 이메일 인증을 Mock으로 처리
+        Mockito.when(mailVerificationHandler.isVerified(anyString()))
+                .thenReturn(true); // 항상 인증 완료 상태로 설정
+    }
 
     @Test
     @DisplayName("회원가입 정보가 Member 테이블에 정상적으로 저장된다.")

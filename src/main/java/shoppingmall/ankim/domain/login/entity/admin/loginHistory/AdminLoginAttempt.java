@@ -42,13 +42,15 @@ public class AdminLoginAttempt extends BaseEntity {
                 .build();
     }
 
-    public void increaseFailCount() {
+    public int increaseFailCount() {
+        int failCount = this.loginAttemptDetails.getFailCount() + 1;
         this.loginAttemptDetails = BaseLoginAttempt.builder()
-                .failCount(this.loginAttemptDetails.getFailCount() + 1)
+                .failCount(failCount)
                 .lastAttemptTime(LocalDateTime.now())
                 .unlockTime(this.loginAttemptDetails.getUnlockTime())
                 .activeYn(this.loginAttemptDetails.getActiveYn())
                 .build();
+        return failCount;
     }
 
     public void setLockTime(int lockMinutes) {

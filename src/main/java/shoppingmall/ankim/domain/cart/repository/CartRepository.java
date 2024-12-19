@@ -12,7 +12,11 @@ import java.util.Optional;
 public interface CartRepository extends JpaRepository<Cart, Long>, CartQueryRepository {
 
     // 특정 회원의 활성화된 장바구니가 있는지 확인한다.(null값 체크가 잦을꺼 같아서 Optional로 작성)
-    @Query("SELECT c FROM Cart c JOIN FETCH c.cartItems WHERE c.member = :member AND c.activeYn = :activeYn")
+    @Query("SELECT c FROM Cart c " +
+            "JOIN FETCH c.cartItems ci " +
+            "WHERE c.member = :member " +
+            "AND c.activeYn = :activeYn " +
+            "AND ci.activeYn = 'Y'")
     Optional<Cart> findByMemberAndActiveYn(@Param("member") Member member, @Param("activeYn") String activeYn);
 
 }
