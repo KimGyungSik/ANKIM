@@ -9,7 +9,7 @@ include::{snippets}/mail-send/query-parameters.adoc[]
 include::{snippets}/mail-send/http-response.adoc[]
 include::{snippets}/mail-send/response-fields.adoc[]
 
-
+[[mail-verify]]
 === 이메일 인증 코드 입력
 ==== HTTP Request
 include::{snippets}/mail-verify/http-request.adoc[]
