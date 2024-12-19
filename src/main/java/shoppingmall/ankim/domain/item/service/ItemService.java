@@ -64,7 +64,7 @@ public class ItemService {
 
     // 재고 차감
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public synchronized void reduceStock(Long itemNo, Integer quantity) {
+    public void reduceStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.deductQuantity(quantity);
@@ -72,7 +72,7 @@ public class ItemService {
 
     // 재고 복구
     @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public synchronized void restoreStock(Long itemNo, Integer quantity) {
+    public void restoreStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.restoreQuantity(quantity);

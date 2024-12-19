@@ -1,9 +1,10 @@
 package shoppingmall.ankim.domain.payment.service;
 
-import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
@@ -15,7 +16,6 @@ import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceR
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.InvalidStockQuantityException;
 import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.exception.ShortageItemStockException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
@@ -42,7 +42,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Slf4j
 @Transactional
 @RequiredArgsConstructor
-public class PaymentFacadeWithNamedQuery {
+public class PaymentFacadeWithPessimisticLock {
     private final ItemService itemService;
     private final ItemRepository itemRepository;
     private final DeliveryService deliveryService;
@@ -52,11 +52,11 @@ public class PaymentFacadeWithNamedQuery {
     private final CartRepository cartRepository;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
-    public PaymentResponse createPaymentWithNamedQuery(PaymentCreateServiceRequest request,
+    public PaymentResponse createPaymentWithPessimisticLock(PaymentCreateServiceRequest request,
                                                          DeliveryCreateServiceRequest deliveryRequest,
                                                          MemberAddressCreateServiceRequest addressRequest) {
         // Order 조회 (fetch join으로 Member 로딩)
-        Order order = orderRepository.findByOrderNameWithMemberAndOrderItemsAndItem(request.getOrderName())
+        Order order = orderRepository.findByOrderNameWithMemberAndOrderItems(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
         // 결제 대기중 상태가 아니라면 이미 승인된 결제이므로 예외 발생
@@ -77,7 +77,7 @@ public class PaymentFacadeWithNamedQuery {
 
     @Transactional
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
-    public PaymentSuccessResponse toSuccessRequestWithNamedQuery(String paymentKey, String orderId, Integer amount) {
+    public PaymentSuccessResponse toSuccessRequestWithPessimisticLock(String paymentKey, String orderId, Integer amount) {
         // 주문상태를 결제완료로 수정
         Order order = orderRepository.findByOrderIdWithMemberAndOrderItems(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
@@ -100,7 +100,7 @@ public class PaymentFacadeWithNamedQuery {
     }
 
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
-    public PaymentFailResponse toFailRequestWithNamedQuery(String code, String message, String orderId) {
+    public PaymentFailResponse toFailRequestWithPessimisticLock(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
@@ -113,7 +113,7 @@ public class PaymentFacadeWithNamedQuery {
         return paymentService.tossPaymentFail(code,message,orderId);
     }
     // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소) & 배송 상태 (배송 취소)
-    public PaymentCancelResponse toCancelRequestWithNamedQuery(String paymentKey, String cancelReason) {
+    public PaymentCancelResponse toCancelRequestWithPessimisticLock(String paymentKey, String cancelReason) {
         Payment payment = paymentRepository.findByPayKeyWithOrder(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(payment.getOrder().getOrdNo())
@@ -127,26 +127,23 @@ public class PaymentFacadeWithNamedQuery {
 
         return paymentService.cancelPayment(paymentKey,cancelReason);
     }
-
-    private void reduceStock(Order order) {
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
-            Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+            Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())
                     .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
-            Integer quantity = orderItem.getQty();
-            int updateResult = itemRepository.reduceStock(quantity, item.getNo());
-            // 결과값이 0이면 반영된 행(row)이 없는것이므로 재고부족 예외 발생
-            if (updateResult == 0) throw new ShortageItemStockException(SHORTAGE_ITEM_STOCK);
+            item.deductQuantity(orderItem.getQty());
         }
     }
+
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
-            Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+            Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())
                     .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
-            Integer quantity = orderItem.getQty();
-            if(quantity<=0) throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
-            itemRepository.restoreStock(quantity, item.getNo());
+            item.restoreQuantity(orderItem.getQty());
         }
     }
+
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {
         return cartItem.getItem().getNo().equals(orderItem.getItem().getNo()) // 품목 번호 일치
                 && cartItem.getQty().equals(orderItem.getQty());        // 수량 일치

@@ -14,6 +14,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "JOIN FETCH o.orderItems oi " +
             "JOIN FETCH oi.item " +
             "WHERE o.ordCode = :orderName")
+    Optional<Order> findByOrderNameWithMemberAndOrderItemsAndItem(@Param("orderName") String orderName);
+
+
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.member " +
+            "JOIN FETCH o.orderItems oi " +
+            "WHERE o.ordCode = :orderName")
     Optional<Order> findByOrderNameWithMemberAndOrderItems(@Param("orderName") String orderName);
 
 

@@ -57,7 +57,7 @@ public class PaymentFacadeWithNamedLock {
                                               DeliveryCreateServiceRequest deliveryRequest,
                                               MemberAddressCreateServiceRequest addressRequest) {
         // Order 조회 (fetch join으로 Member 로딩)
-        Order order = orderRepository.findByOrderNameWithMemberAndOrderItems(request.getOrderName())
+        Order order = orderRepository.findByOrderNameWithMemberAndOrderItemsAndItem(request.getOrderName())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
 
         // 결제 대기중 상태가 아니라면 이미 승인된 결제이므로 예외 발생
