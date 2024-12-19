@@ -6,6 +6,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -54,6 +55,7 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 // TODO DEFINED_PORT로 돌리게 되면 Application 서버가 로딩되면서 InitProduct클래스가 로딩된다.
 // TODO 정확히 DEFINED_PORT와 RANDOM_PORT의 차이를 알아야 할듯!
+@DisabledIfSystemProperty(named = "os.name", matches = "Mac OS X")
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")

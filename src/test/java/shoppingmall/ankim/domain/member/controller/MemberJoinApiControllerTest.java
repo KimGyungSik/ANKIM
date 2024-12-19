@@ -54,7 +54,7 @@ class MemberJoinApiControllerTest {
     void testInvalidEmailFormat() throws Exception {
         // 잘못된 이메일 형식 요청
         MemberEmailRequest request = MemberEmailRequest.builder()
-                .id("invalid-email")
+                .loginId("invalid-email")
                 .build();
 
         mockMvc.perform(post("/api/member/email-check") // post 요청
@@ -69,11 +69,11 @@ class MemberJoinApiControllerTest {
     void testDuplicateEmail() throws Exception {
         // given : 올바른 이메일 형식의 요청
         MemberEmailRequest request = MemberEmailRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .build();
 
         doThrow(new MemberRegistrationException(ErrorCode.MEMBER_ID_DUPLICATE)) // 중복 이메일 예외 발생
-                .when(memberService).isLoginIdDuplicated(request.getId());
+                .when(memberService).isLoginIdDuplicated(request.getLoginId());
 
         // when : 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")
@@ -89,10 +89,10 @@ class MemberJoinApiControllerTest {
     void testValidAndUniqueEmail() throws Exception {
         // given : 올바른 이메일 형식의 요청
         MemberEmailRequest request = MemberEmailRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .build();
 
-        doNothing().when(memberService).isLoginIdDuplicated(request.getId()); // 예외 발생하지 않도록 설정
+        doNothing().when(memberService).isLoginIdDuplicated(request.getLoginId()); // 예외 발생하지 않도록 설정
 
         // when: 이메일 중복 확인 요청
         mockMvc.perform(post("/api/member/email-check")

@@ -39,8 +39,10 @@ public class RedisHandler {
 
     // 데이터 삭제
     public void delete(String key) {
+        log.info("Redis 데이터 삭제 요청 들어오는지 확인 : {}", key);
         try {
             String redisKey = "token:" + key;
+            log.info("Redis 데이터 삭제 요청: key={}", redisKey);
             redisTemplate.delete(redisKey);
             log.info("Redis 데이터 삭제 성공: key={}", redisKey);
         } catch (Exception e) {

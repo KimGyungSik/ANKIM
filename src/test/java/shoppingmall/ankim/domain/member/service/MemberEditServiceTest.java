@@ -20,7 +20,6 @@ import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceReq
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.MemberFactory;
-import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
@@ -138,7 +137,7 @@ class MemberEditServiceTest {
         // when & then
         assertThatThrownBy(() -> memberEditService.changePassword(loginId, request))
                 .isInstanceOf(InvalidMemberException.class)
-                .hasMessageContaining(CURRENT_PASSWORD_INVALID.getMessage());
+                .hasMessageContaining(INVALID_CURRENT_PASSWORD.getMessage());
     }
 
     @Test

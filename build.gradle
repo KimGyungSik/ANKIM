@@ -75,6 +75,7 @@ dependencies {
 
     // JSONObject
     implementation 'net.minidev:json-smart:2.4.8'
+    implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310' // 날짜 데이터 직렬화/역직렬화
 
     // Mockito for testing
     testImplementation 'org.mockito:mockito-core:5.5.0'
