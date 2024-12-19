@@ -27,7 +27,7 @@ public class MemberJoinApiController {
     @PostMapping("/email-check")
     public ApiResponse<String> existByEmail(@Valid @RequestBody MemberEmailRequest request) {
         // 이메일 중복 확인 로직
-        memberService.isLoginIdDuplicated(request.getId());
+        memberService.isLoginIdDuplicated(request.getLoginId());
         return ApiResponse.ok("사용 가능한 이메일입니다.");
     }
 

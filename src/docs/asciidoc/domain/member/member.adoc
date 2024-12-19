@@ -1,5 +1,5 @@
-[[member-terms-next]]
-=== 회원가입을 위한 약관 동의
+[[member-terms-agreements]]
+=== 회원 가입을 위한 약관 동의
 
 ==== HTTP Request
 include::{snippets}/member-terms-agreements/http-request.adoc[]
@@ -8,3 +8,14 @@ include::{snippets}/member-terms-agreements/request-fields.adoc[]
 ==== HTTP Response
 include::{snippets}/member-terms-agreements/http-response.adoc[]
 include::{snippets}/member-terms-agreements/response-fields.adoc[]
+
+[[member-email-check]]
+=== 회원 가입을 위한 사용 가능 이메일 검증
+
+==== HTTP Request
+include::{snippets}/member-email-check/http-request.adoc[]
+include::{snippets}/member-email-check/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-email-check/http-response.adoc[]
+include::{snippets}/member-email-check/response-fields.adoc[]

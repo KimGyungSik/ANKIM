@@ -1,0 +1,20 @@
+[[mail-send]]
+=== 이메일 인증 요청
+
+==== HTTP Request
+include::{snippets}/mail-send/http-request.adoc[]
+include::{snippets}/mail-send/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/mail-send/http-response.adoc[]
+include::{snippets}/mail-send/response-fields.adoc[]
+
+
+=== 이메일 인증 코드 입력
+==== HTTP Request
+include::{snippets}/mail-verify/http-request.adoc[]
+include::{snippets}/mail-verify/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/mail-verify/http-response.adoc[]
+include::{snippets}/mail-verify/response-fields.adoc[]

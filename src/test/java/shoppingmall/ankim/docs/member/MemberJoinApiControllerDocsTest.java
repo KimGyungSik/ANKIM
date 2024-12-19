@@ -7,12 +7,14 @@ import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import shoppingmall.ankim.docs.RestDocsSupport;
 import shoppingmall.ankim.domain.member.controller.MemberJoinApiController;
+import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
 import shoppingmall.ankim.domain.member.service.MemberService;
 
 import static org.mockito.Mockito.*;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.*;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
@@ -55,7 +57,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
     """;
 
         // when, then
-        mockMvc.perform(MockMvcRequestBuilders.post("/api/member/terms-next")
+        mockMvc.perform(post("/api/member/terms-next")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(request))
                 .andExpect(status().isOk())
@@ -84,5 +86,34 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                         )
                 ));
 
+    }
+
+    @DisplayName("사용가능한 이메일인지 검증하는 API")
+    @Test
+    public void existByEmail() throws Exception {
+
+        MemberEmailRequest request = MemberEmailRequest.builder()
+                .loginId("test@example.com")
+                .build();
+
+        // when, then
+        mockMvc.perform(post("/api/member/email-check")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(request))
+                )
+                .andExpect(status().isOk())
+                .andDo(document("member-email-check",
+                        preprocessRequest(prettyPrint()),
+                        preprocessResponse(prettyPrint()),
+                        requestFields(fieldWithPath("loginId").type(JsonFieldType.STRING)
+                                .description("사용할 이메일 아이디")),
+                        responseFields(
+                                fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),
+                                fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
+                                fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
+                                fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
+                                fieldWithPath("data").description("응답 데이터")
+                        )
+                ));
     }
 }
