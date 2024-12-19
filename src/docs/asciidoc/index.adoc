@@ -9,6 +9,11 @@ endif::[]
 :toclevels: 2
 :sectlinks:
 
+[[Member-API]]
+== Member API
+
+include::domain/member/member.adoc[]
+
 [[Category-API]]
 == Category API
 

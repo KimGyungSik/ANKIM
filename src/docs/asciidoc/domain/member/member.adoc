@@ -1,0 +1,10 @@
+[[member-terms-next]]
+=== 회원가입을 위한 약관 동의
+
+==== HTTP Request
+include::{snippets}/member-terms-agreements/http-request.adoc[]
+include::{snippets}/member-terms-agreements/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-terms-agreements/http-response.adoc[]
+include::{snippets}/member-terms-agreements/response-fields.adoc[]

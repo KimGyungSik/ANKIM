@@ -33,7 +33,7 @@ public class MemberJoinApiController {
 
     // 약관 동의 후 다음 회원가입 절차로 넘어간다.
     @PostMapping("/terms-next")
-    public ApiResponse<String> nextRegisterEmail(@RequestBody List<TermsAgreement> termsAgreements, HttpSession session) {
+    public ApiResponse<String> termsAgreements(@RequestBody List<TermsAgreement> termsAgreements, HttpSession session) {
         session.setAttribute("termsAgreements", termsAgreements);
 
         // 약관 동의한 내용(termsAgreements)을 세션에 저장
