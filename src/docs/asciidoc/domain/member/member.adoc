@@ -19,3 +19,38 @@ include::{snippets}/member-email-check/request-fields.adoc[]
 ==== HTTP Response
 include::{snippets}/member-email-check/http-response.adoc[]
 include::{snippets}/member-email-check/response-fields.adoc[]
+
+[[member-register]]
+=== 회원 가입을 위한 개인 정보 입력
+==== 세션 데이터 요구사항
+이 API는 회원 가입 정보를 처리하며, 세션에 약관 동의 내역(`termsAgreements`)이 저장되어 있어야 합니다.
+
+===== 세션 데이터 구조
+- **Key**: `termsAgreements`
+- **Value**:
+```json
+[
+    {
+    "no": 1,
+    "name": "만 14세 이상입니다",
+    "agreeYn": "Y",
+    "level": 2,
+    "termsYn": "Y"
+    },
+    {
+    "no": 2,
+    "name": "이용약관 동의",
+    "agreeYn": "Y",
+    "level": 2,
+    "termsYn": "Y"
+    }
+]
+```
+
+==== HTTP Request
+include::{snippets}/member-register/http-request.adoc[]
+include::{snippets}/member-register/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-register/http-response.adoc[]
+include::{snippets}/member-register/response-fields.adoc[]

@@ -28,7 +28,7 @@ class MemberRegisterRequestTest {
     void invalidPassword() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("1234") // 비밀번호 형식이 틀림
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -49,7 +49,7 @@ class MemberRegisterRequestTest {
     void invalidName() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPass123!")
                 .name("홍 길 동") // 이름 형식이 틀림
                 .phoneNum("010-1234-5678")
@@ -69,7 +69,7 @@ class MemberRegisterRequestTest {
     void invalidPhoneNumber() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("01012345678") // 전화번호 형식이 틀림
@@ -89,7 +89,7 @@ class MemberRegisterRequestTest {
     void invalidBirthDate() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -109,7 +109,7 @@ class MemberRegisterRequestTest {
     void nullGender() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
@@ -129,7 +129,7 @@ class MemberRegisterRequestTest {
     void multipleInvalidFields() {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
-                .id("test@example.com")
+                .loginId("test@example.com")
                 .pwd("short") // 비밀번호 형식 오류
                 .name("홍 길 동") // 이름 형식 오류
                 .phoneNum("01012345678") // 전화번호 형식 오류
