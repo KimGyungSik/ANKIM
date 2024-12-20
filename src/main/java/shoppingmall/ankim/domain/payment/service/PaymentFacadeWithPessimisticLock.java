@@ -43,7 +43,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Transactional
 @RequiredArgsConstructor
 public class PaymentFacadeWithPessimisticLock {
-    private final ItemService itemService;
     private final ItemRepository itemRepository;
     private final DeliveryService deliveryService;
     private final PaymentService paymentService;
@@ -75,7 +74,6 @@ public class PaymentFacadeWithPessimisticLock {
         return paymentService.requestTossPayment(request);
     }
 
-    @Transactional
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequestWithPessimisticLock(String paymentKey, String orderId, Integer amount) {
         // 주문상태를 결제완료로 수정
@@ -105,7 +103,6 @@ public class PaymentFacadeWithPessimisticLock {
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
         order.failOrderWithOutDelivery();
-        orderRepository.saveAndFlush(order);
 
         // 재고 복구
         restoreStock(order);
@@ -120,22 +117,20 @@ public class PaymentFacadeWithPessimisticLock {
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));;
         // 단, 결제 취소 시 배송 상태가 배송 준비 상태일때만 가능
         order.cancelOrder(); // 주문 및 배송 취소 처리
-        orderRepository.saveAndFlush(order);
 
         // 재고 복구
         restoreStock(order);
 
         return paymentService.cancelPayment(paymentKey,cancelReason);
     }
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void reduceStock(Order order) {
+
+    private void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())
                     .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
             item.deductQuantity(orderItem.getQty());
         }
     }
-
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Item item = itemRepository.findByIdWithPessimisticLock(orderItem.getItem().getNo())

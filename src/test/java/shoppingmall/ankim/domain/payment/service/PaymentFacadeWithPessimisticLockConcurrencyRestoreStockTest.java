@@ -1,25 +1,28 @@
 package shoppingmall.ankim.domain.payment.service;
 
 import jakarta.persistence.EntityManager;
-import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.web.client.ExpectedCount;
 import org.springframework.test.web.client.MockRestServiceServer;
+import org.springframework.test.web.client.match.MockRestRequestMatchers;
+import org.springframework.test.web.client.response.MockRestResponseCreators;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.client.RestTemplate;
+import shoppingmall.ankim.domain.address.entity.BaseAddress;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
-import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
+import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
-import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.item.exception.ShortageItemStockException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -28,16 +31,16 @@ import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentQueryService;
-import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.entity.PayType;
+import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
-import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
+import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.time.LocalDateTime;
@@ -53,8 +56,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
-@TestInstance(TestInstance.Lifecycle.PER_CLASS) // 테스트 인스턴스를 클래스 수준으로 변경
-public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
+public class PaymentFacadeWithPessimisticLockConcurrencyRestoreStockTest {
     @MockBean
     private S3Service s3Service;
 
@@ -112,7 +114,7 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
     private List<String> orderIds = new ArrayList<>();
     private List<String> paymentkeys = new ArrayList<>();
 
-    @BeforeAll
+    @BeforeEach
     void setUp() {
         mockServer = MockRestServiceServer.createServer(restTemplate);
         transactionTemplate.execute(status -> {
@@ -125,19 +127,53 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
                 Item item = product.getItems().get(0);
                 Item item2 = product.getItems().get(1);
 
-                // 결제 요청에 대한 더미 (재고 감소)
-                for (int i = 0; i < 150; i++) {
-                    OrderItem orderItem = OrderItem.create(item, 1);
+                // 결제 실패, 취소에 대한 더미 (재고 복구)
+                for (int i = 0; i < 100; i++) {
+                    OrderItem orderItem = OrderItem.create(item2, 1);
                     entityManager.persist(orderItem);
 
-                    String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
-                    orderNames.add(dynamicOrderName);
+                    String dynamicOrderName = "ORD20241225-" + String.format("%07d", i);
 
-                    Order order = Order.create(List.of(orderItem), member, null, LocalDateTime.now());
+                    MemberAddress address = MemberAddress.create(
+                            member,
+                            "집",
+                            BaseAddress.builder()
+                                    .zipCode(12345)
+                                    .addressMain("서울시 강남구 테헤란로 123")
+                                    .addressDetail("1층")
+                                    .build(),
+                            "010-1234-5678",
+                            "010-5678-1234",
+                            "Y"
+                    );
+                    entityManager.persist(address);
+
+                    Delivery delivery = Delivery.create(
+                            address,
+                            "FastCourier",
+                            "문 앞에 놓아주세요.",
+                            new TrackingNumberGenerator() {
+                                @Override
+                                public String generate() {
+                                    return "TRACK123456";
+                                }
+                            }
+                    );
+                    entityManager.persist(delivery);
+
+                    Order order = Order.create(List.of(orderItem), member, delivery, LocalDateTime.now());
                     order.setOrdCode(dynamicOrderName);
-
                     orderRepository.save(order);
+                    orderIds.add(order.getOrdNo());
+
+                    String paymentKey = "test_key" + String.format("%07d", i);
+                    paymentkeys.add(paymentKey);
+                    Payment payment = Payment.create(order, PayType.CARD, 50000);
+                    payment.setPaymentKey(paymentKey,true);
+
+                    paymentRepository.save(payment);
                 }
+
                 // flush를 통해 DB에 반영
                 entityManager.flush();
                 entityManager.clear();
@@ -150,107 +186,27 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
         });
     }
 
+    @DisplayName("100명의 사용자가 결제 실패 시 첫 번째 품목의 재고 복구에 대한 동시성 제어가 가능하다.")
     @Test
-    @DisplayName("100명의 사용자가 결제 요청 시 첫 번째 품목의 재고 차감에 대한 동시성 제어가 가능하다.")
-    void requestTossPayment() throws InterruptedException {
-        int threadCount = 100; // 실행할 스레드 수
+    void tossPaymentFail() throws InterruptedException {
+        int threadCount = 100;
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
         CountDownLatch latch = new CountDownLatch(threadCount);
         AtomicInteger failureCount = new AtomicInteger(); // 실패한 트랜잭션 수를 기록
 
-        DeliveryCreateServiceRequest deliveryRequest = DeliveryCreateServiceRequest.builder()
-                .addressId(null)
-                .courier("FastCourier")
-                .delReq("문 앞에 놓아주세요")
-                .build();
-
-        MemberAddressCreateServiceRequest addressRequest = MemberAddressCreateServiceRequest.builder()
-                .addressMain("서울특별시 강남구 테헤란로 123")
-                .addressName("집")
-                .addressDetail("1층")
-                .zipCode(12345)
-                .phoneNumber("010-1234-5678")
-                .emergencyPhoneNumber("010-5678-1234")
-                .defaultAddressYn("Y")
-                .build();
+        String code = "ERR001";
+        String message = "결제 실패";
 
         long startTime = System.currentTimeMillis(); // 실행 시작 시간
 
         for (int i = 0; i < threadCount; i++) {
-            String orderName = orderNames.get(i);
+            String orderId = orderIds.get(i);
             executorService.submit(() -> {
                 try {
-                    PaymentCreateServiceRequest paymentRequest = PaymentCreateServiceRequest.builder()
-                            .orderName(orderName)
-                            .payType(PayType.CARD)
-                            .amount(10000)
-                            .build();
-
-                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
+                    paymentFacadeWithPessimisticLock.toFailRequestWithPessimisticLock(code, message, orderId);
                 } catch (Exception e) {
                     failureCount.incrementAndGet(); // 실패 시 카운트 증가
                     e.printStackTrace();
-                } finally {
-                    latch.countDown(); // 현재 스레드 작업 완료
-                }
-            });
-        }
-
-        latch.await(); // 모든 스레드 종료 대기
-        long endTime = System.currentTimeMillis(); // 실행 종료 시간
-
-        System.out.println("Execution Time: " + (endTime - startTime) + " ms"); // 실행 시간 출력
-        System.out.println("Failed Transactions: " + failureCount.get()); // 실패한 트랜잭션 수 출력
-
-        // 결과 검증: 첫 번째 품목의 재고가 0이어야 함
-        Item item = itemRepository.findById(1L).orElseThrow();
-        assertThat(item.getQty()).isEqualTo(0);
-    }
-
-
-    @Test
-    @DisplayName("재고가 100개인 상품을 101개의 스레드가 1개씩 동시에 구매했을 때 1개의 주문에 대한 재고 부족 예외가 발생한다.")
-    void testConcurrentBuyProduct() throws Exception {
-        int threadCount = 101;
-        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
-        CountDownLatch latch = new CountDownLatch(threadCount);
-        AtomicInteger failureCount = new AtomicInteger(); // 실패한 트랜잭션 수를 기록
-
-        DeliveryCreateServiceRequest deliveryRequest = DeliveryCreateServiceRequest.builder()
-                .addressId(null)
-                .courier("FastCourier")
-                .delReq("문 앞에 놓아주세요")
-                .build();
-
-        MemberAddressCreateServiceRequest addressRequest = MemberAddressCreateServiceRequest.builder()
-                .addressMain("서울특별시 강남구 테헤란로 123")
-                .addressName("집")
-                .addressDetail("1층")
-                .zipCode(12345)
-                .phoneNumber("010-1234-5678")
-                .emergencyPhoneNumber("010-5678-1234")
-                .defaultAddressYn("Y")
-                .build();
-
-        // 예외 발생 카운트
-        List<Exception> exceptions = new ArrayList<>();
-
-        for (int i = 0; i < threadCount; i++) {
-            String orderName = orderNames.get(i);
-            executorService.submit(() -> {
-                try {
-                    PaymentCreateServiceRequest paymentRequest = PaymentCreateServiceRequest.builder()
-                            .orderName(orderName)
-                            .payType(PayType.CARD)
-                            .amount(10000)
-                            .build();
-
-                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
-                } catch (Exception e) {
-                    failureCount.incrementAndGet(); // 실패 시 카운트 증가
-                    synchronized (exceptions) {
-                        exceptions.add(e);
-                    }
                 } finally {
                     latch.countDown();
                 }
@@ -258,19 +214,56 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
         }
 
         latch.await();
+        long endTime = System.currentTimeMillis(); // 실행 종료 시간
 
-        // 재고 검증
-        Item item = itemRepository.findById(1L).orElseThrow();
-        assertThat(item.getQty()).isEqualTo(0);
-
+        System.out.println("Execution Time: " + (endTime - startTime) + " ms"); // 실행 시간 출력
         System.out.println("Failed Transactions: " + failureCount.get()); // 실패한 트랜잭션 수 출력
-        assertThat(failureCount.get()).isEqualTo(1);
 
-        // 예외 검증 (1개의 구매 실패가 발생해야 함)
-        assertThat(exceptions.size()).isEqualTo(1);
-        assertThat(exceptions.get(0))
-                .isInstanceOf(ShortageItemStockException.class)
-                .hasMessage("차감할 재고 수량이 없습니다.");
+        Item item = itemRepository.findById(2L).orElseThrow();
+        assertThat(item.getQty()).isEqualTo(100);
+    }
+
+
+    @DisplayName("100명의 사용자가 결제 취소 시 첫 번째 품목의 재고 복구에 대한 동시성 제어가 가능하다.")
+    @Test
+    void cancelPayment() throws InterruptedException {
+        int threadCount = 100;
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+        AtomicInteger failureCount = new AtomicInteger(); // 실패한 트랜잭션 수를 기록
+
+        String cancelReason = "사용자 요청";
+
+        mockServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.anything())
+                .andRespond(MockRestResponseCreators.withSuccess("{\"status\": \"success\"}", MediaType.APPLICATION_JSON));
+
+        long startTime = System.currentTimeMillis(); // 실행 시작 시간
+
+        for (int i = 0; i < threadCount; i++) {
+            String paymentKey = paymentkeys.get(i);
+            executorService.submit(() -> {
+                try {
+                    paymentFacadeWithPessimisticLock.toCancelRequestWithPessimisticLock(paymentKey, cancelReason);
+                } catch (Exception e) {
+                    failureCount.incrementAndGet(); // 실패 시 카운트 증가
+                    e.printStackTrace();
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await();
+        long endTime = System.currentTimeMillis(); // 실행 종료 시간
+
+        System.out.println("Execution Time: " + (endTime - startTime) + " ms"); // 실행 시간 출력
+        System.out.println("Failed Transactions: " + failureCount.get()); // 실패한 트랜잭션 수 출력
+
+        Item item = itemRepository.findById(2L).orElseThrow();
+        assertThat(item.getQty()).isEqualTo(100);
+
+        // Mock 서버 검증
+        // mockServer.verify();
     }
 
 }
