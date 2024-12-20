@@ -28,3 +28,8 @@ include::domain/login/login.adoc[]
 == Category API
 
 include::domain/category/category.adoc[]
+
+[[Cart-API]]
+== Cart API
+
+include::domain/cart/cart.adoc[]

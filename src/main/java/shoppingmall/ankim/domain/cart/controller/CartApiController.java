@@ -1,8 +1,6 @@
 package shoppingmall.ankim.domain.cart.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
@@ -47,12 +45,12 @@ public class CartApiController {
     @PatchMapping("/items/{cartItemNo}")
     public ApiResponse<String> updateCartItemQuantity(
             @PathVariable Long cartItemNo,
-            @RequestParam Integer quantity
+            @RequestParam Integer qty
     ) {
         String loginId = securityContextHelper.getLoginId();
 
         // service
-        cartService.updateCartItemQuantity(loginId, cartItemNo, quantity);
+        cartService.updateCartItemQuantity(loginId, cartItemNo, qty);
 
         return ApiResponse.ok("장바구니 품목 수량이 변경되었습니다.");
     }
@@ -79,7 +77,7 @@ public class CartApiController {
     }
 
     // 장바구니 수 비동기로 카운팅
-    @GetMapping("/count")
+    @GetMapping("/items/count")
     public ApiResponse<Map<String, Integer>> getCartItemsCount() {
         String loginId = securityContextHelper.getLoginId();
 
