@@ -29,6 +29,9 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
+    @Version
+    private int version;
+
     // 상품 : 품목 = 1 : N
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "prod_no", nullable = false)
