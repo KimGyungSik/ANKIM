@@ -9,9 +9,7 @@ import java.util.List;
 
 public interface PaymentService {
     // 클라이언트 결제 요청처리 & 재고 감소
-    PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
-                                       DeliveryCreateServiceRequest deliveryRequest,
-                                       MemberAddressCreateServiceRequest addressRequest);
+    PaymentResponse requestTossPayment(PaymentCreateServiceRequest request);
 
     // 결제 성공 시 처리 & 배송지 저장 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     PaymentSuccessResponse tossPaymentSuccess(String paymentKey, String orderId, Integer amount);

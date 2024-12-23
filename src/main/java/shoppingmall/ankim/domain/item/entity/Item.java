@@ -2,12 +2,15 @@ package shoppingmall.ankim.domain.item.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import shoppingmall.ankim.domain.item.exception.InvalidStockQuantityException;
+import shoppingmall.ankim.domain.item.exception.ShortageItemStockException;
 import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
 import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.itemOption.entity.ItemOption;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -24,6 +28,9 @@ public class Item {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
+
+//    @Version
+//    private int version;
 
     // 상품 : 품목 = 1 : N
     @ManyToOne(fetch = FetchType.LAZY)
@@ -141,7 +148,7 @@ public class Item {
 
     public void deductQuantity(int qty) {
         if (isQuantityLessThan(qty)) {
-            throw new IllegalArgumentException("차감할 재고 수량이 없습니다.");
+            throw new ShortageItemStockException(SHORTAGE_ITEM_STOCK);
         }
         this.qty -= qty;
     }
@@ -149,7 +156,7 @@ public class Item {
     // 재고 복구 메서드
     public void restoreQuantity(int qty) {
         if (qty <= 0) {
-            throw new IllegalArgumentException("복구할 재고 수량은 0보다 커야 합니다.");
+            throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
         }
         this.qty += qty;
     }

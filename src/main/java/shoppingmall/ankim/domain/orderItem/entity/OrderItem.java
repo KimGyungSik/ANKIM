@@ -40,6 +40,7 @@ public class OrderItem extends BaseEntity {
     @Column(name = "prod_path")
     private String thumbNailImgUrl;
 
+    @Setter
     private Integer qty; // 주문 수량
 
     private Integer price; // 주문 상품 가격, 정상가격(원가) + 추가금액

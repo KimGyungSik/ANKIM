@@ -80,6 +80,9 @@ dependencies {
     // Mockito for testing
     testImplementation 'org.mockito:mockito-core:5.5.0'
     testImplementation 'org.mockito:mockito-junit-jupiter:5.5.0'
+
+    // Retry
+    implementation 'org.springframework.retry:spring-retry'
 }
 
 

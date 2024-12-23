@@ -1,6 +1,8 @@
 package shoppingmall.ankim.domain.item.service;
 
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -37,7 +39,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 // 옵션 조합 생성 후 품목 반환 → 각 품목에 대한 세부 값 입력 및 저장
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class ItemService {
 
     private final ItemRepository itemRepository;
@@ -45,13 +46,36 @@ public class ItemService {
     private final OptionGroupRepository optionGroupRepository;
     private final OptionValueRepository optionValueRepository;
 
-    // 재고 감소
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void reduceStock(Long itemNo, Integer quantity) {
-        // 재고 감소 로직
+    // 재고 차감
+    public synchronized void reduceStockWithSynchronized(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
         item.deductQuantity(quantity);
+        itemRepository.saveAndFlush(item);
+    }
+
+    // 재고 복구
+    public synchronized void restoreStockWithSynchronized(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.restoreQuantity(quantity);
+        itemRepository.saveAndFlush(item);
+    }
+
+    // 재고 차감
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void reduceStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.deductQuantity(quantity);
+    }
+
+    // 재고 복구
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void restoreStock(Long itemNo, Integer quantity) {
+        Item item = itemRepository.findByNo(itemNo)
+                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+        item.restoreQuantity(quantity);
     }
 
     /**

@@ -5,11 +5,12 @@ spring:
     password: 1234
     hikari:
       minimum-idle: 10
-      maximum-pool-size: 1000
+      maximum-pool-size: 102
       idle-timeout: 30000
       connection-timeout: 60000
       max-lifetime: 1800000
       data-source-properties:
+        connectionInitSql: SET GLOBAL innodb_print_all_deadlocks=1
         isolationLevel: READ_COMMITTED
         lockTimeout: 10000
 
@@ -43,13 +44,15 @@ spring:
 logging:
   level:
     org:
-      springframework:
-        orm:
-          jpa: DEBUG
       hibernate:
         SQL: DEBUG
         type: TRACE
-    com.zaxxer.hikari.HikariConfig: DEBUG # HikariCP 디버깅
+        engine:
+          transaction:
+            internal:
+              TransactionImpl: DEBUG
+          spi: TRACE
+        event: TRACE
 
 decorator:
   datasource:
@@ -117,12 +120,12 @@ mail:
         writetimeout: 5000
   auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
 
-server:
-  tomcat:
-    threads:
-      max: 200 # 생성할 수 있는 thread의 총 개수
-      min-spare: 10 # 항상 활성화 되어있는(idle) thread의 개수
-    max-connections: 8192 # 수립가능한 connection의 총 개수
-    accept-count: 100 # 작업큐의 사이즈
-    connection-timeout: 20000 # timeout 판단 기준 시간, 20초
-  port: 8080 # 서버를 띄울 포트번호
+#server:
+#  tomcat:
+#    threads:
+#      max: 200 # 생성할 수 있는 thread의 총 개수
+#      min-spare: 10 # 항상 활성화 되어있는(idle) thread의 개수
+#    max-connections: 8192 # 수립가능한 connection의 총 개수
+#    accept-count: 100 # 작업큐의 사이즈
+#    connection-timeout: 20000 # timeout 판단 기준 시간, 20초
+#  port: 8080 # 서버를 띄울 포트번호
