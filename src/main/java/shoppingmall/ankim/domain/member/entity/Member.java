@@ -7,6 +7,7 @@ import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.audit.Authority;
 import shoppingmall.ankim.global.audit.BaseEntity;
+import shoppingmall.ankim.global.config.uuid.Base62UUID;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -109,6 +110,12 @@ public class Member extends BaseEntity {
 
     public void lock() {
         this.status = MemberStatus.LOCKED;
+    }
+
+    public void leave() {
+        this.status = MemberStatus.LEAVE;
+        // Base62를 적용하여 UUID를 변환하고 길이를 줄임
+        this.loginId = Base62UUID.toBase62(UUID.randomUUID());
     }
 
     public void changePassword(String newPassword) {

@@ -1,0 +1,63 @@
+[[cart-add-item]]
+=== 장바구니 품목 추가
+
+==== HTTP Request
+include::{snippets}/cart-add-item/http-request.adoc[]
+include::{snippets}/cart-add-item/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-add-item/http-response.adoc[]
+include::{snippets}/cart-add-item/response-fields.adoc[]
+
+[[cart-get-items]]
+=== 장바구니 조회
+
+==== HTTP Request
+include::{snippets}/cart-get-items/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-get-items/http-response.adoc[]
+include::{snippets}/cart-get-items/response-fields.adoc[]
+
+[[cart-delete-selected-items]]
+=== 장바구니 품목 선택 삭제
+
+==== HTTP Request
+include::{snippets}/cart-delete-selected-items/http-request.adoc[]
+include::{snippets}/cart-delete-selected-items/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-delete-selected-items/http-response.adoc[]
+include::{snippets}/cart-delete-selected-items/response-fields.adoc[]
+
+[[cart-delete-sold-out-items]]
+=== 장바구니 품목 품절 삭제
+
+==== HTTP Request
+include::{snippets}/cart-delete-sold-out-items/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-delete-sold-out-items/http-response.adoc[]
+include::{snippets}/cart-delete-sold-out-items/response-fields.adoc[]
+
+[[cart-update-item-qty]]
+=== 장바구니 품목 수량 변경
+
+==== HTTP Request
+include::{snippets}/cart-update-item-qty/http-request.adoc[]
+include::{snippets}/cart-update-item-qty/path-parameters.adoc[]
+include::{snippets}/cart-update-item-qty/query-parameters.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-update-item-qty/http-response.adoc[]
+include::{snippets}/cart-update-item-qty/response-fields.adoc[]
+
+[[cart-get-items-count]]
+=== 장바구니 품목 개수 조회
+
+==== HTTP Request
+include::{snippets}/cart-get-items-count/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/cart-get-items-count/http-response.adoc[]
+include::{snippets}/cart-get-items-count/response-fields.adoc[]
