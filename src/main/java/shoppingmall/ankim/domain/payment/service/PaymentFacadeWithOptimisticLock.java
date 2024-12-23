@@ -51,7 +51,7 @@ public class PaymentFacadeWithOptimisticLock {
     private final CartRepository cartRepository;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 50, backoff = @Backoff(delay = 100))
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 80, backoff = @Backoff(delay = 100))
     public PaymentResponse createPaymentWithOptimisticLock(PaymentCreateServiceRequest request,
                                                          DeliveryCreateServiceRequest deliveryRequest,
                                                          MemberAddressCreateServiceRequest addressRequest) {
@@ -99,6 +99,7 @@ public class PaymentFacadeWithOptimisticLock {
     }
 
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 80, backoff = @Backoff(delay = 100))
     public PaymentFailResponse toFailRequestWithOptimisticLock(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
@@ -110,7 +111,9 @@ public class PaymentFacadeWithOptimisticLock {
 
         return paymentService.tossPaymentFail(code,message,orderId);
     }
+
     // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소) & 배송 상태 (배송 취소)
+    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 60, backoff = @Backoff(delay = 100))
     public PaymentCancelResponse toCancelRequestWithOptimisticLock(String paymentKey, String cancelReason) {
         Payment payment = paymentRepository.findByPayKeyWithOrder(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
 
