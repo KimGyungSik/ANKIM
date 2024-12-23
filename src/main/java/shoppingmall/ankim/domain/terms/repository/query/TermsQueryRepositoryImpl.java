@@ -9,6 +9,7 @@ import shoppingmall.ankim.domain.terms.entity.QTerms;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Repository
@@ -83,5 +84,34 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
                 )
                 .orderBy(terms.level.asc())
                 .fetch();
+    }
+
+    @Override
+    public List<Terms> findAllSubTermsIncludingParent(Long parentNo, String activeYn) {
+        List<Terms> allTerms = new ArrayList<>();
+        fetchSubTermsRecursive(parentNo, activeYn, allTerms);
+        return allTerms;
+    }
+
+    private void fetchSubTermsRecursive(Long parentNo, String activeYn, List<Terms> allTerms) {
+        QTerms terms = QTerms.terms;
+
+        // 상위 및 직속 하위 약관 조회
+        List<Terms> subTerms = queryFactory
+                .selectFrom(terms)
+                .where(
+                        terms.parentTerms.no.eq(parentNo)
+                                .and(terms.activeYn.eq(activeYn))
+                )
+                .orderBy(terms.level.asc())
+                .fetch();
+
+        // 결과 추가
+        allTerms.addAll(subTerms);
+
+        // 하위 약관의 하위 약관 탐색
+        for (Terms subTerm : subTerms) {
+            fetchSubTermsRecursive(subTerm.getNo(), activeYn, allTerms);
+        }
     }
 }

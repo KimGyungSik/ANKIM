@@ -12,7 +12,6 @@ import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceReq
 import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
-import shoppingmall.ankim.domain.security.exception.JwtValidException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -40,14 +39,14 @@ public class MemberEditServiceImpl implements MemberEditService {
     }
 
     /*
-    * TODO
-    * [비밀번호 변경]
-    * 1. 현재 비밀번호 비교 -> 일치 하지 않으면 현재 비빌번호를 정확히 입력하도록 안내
-    * 2. 새로운 비밀번호 비교 -> 비밀번호가 일치하더라도 비밀번호 형식에 맞지 않으면 허용 X(request에서 valid로 수행)
-    * 3. 새로운 비밀번호 비교 -> 비밀번호가 일치하고, 비밀번호 형식도 알맞게 입력한 경우 비밀번호 변경
-    * 4. 새로운 비밀번호 비교 -> 기존의 비밀번호와 일치하는지 확인
-    * 5. 변경 이력 테이블에 변경 전/후 입력
-    * */
+     * TODO
+     * [비밀번호 변경]
+     * 1. 현재 비밀번호 비교 -> 일치 하지 않으면 현재 비빌번호를 정확히 입력하도록 안내
+     * 2. 새로운 비밀번호 비교 -> 비밀번호가 일치하더라도 비밀번호 형식에 맞지 않으면 허용 X(request에서 valid로 수행)
+     * 3. 새로운 비밀번호 비교 -> 비밀번호가 일치하고, 비밀번호 형식도 알맞게 입력한 경우 비밀번호 변경
+     * 4. 새로운 비밀번호 비교 -> 기존의 비밀번호와 일치하는지 확인
+     * 5. 변경 이력 테이블에 변경 전/후 입력
+     * */
     @Override
     public void changePassword(String loginId, ChangePasswordServiceRequest request) {
         Member member = getMember(loginId);
@@ -55,7 +54,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
         boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPwd());
         if (!isPasswordValid) {
-            throw new InvalidMemberException(CURRENT_PASSWORD_INVALID);
+            throw new InvalidMemberException(INVALID_CURRENT_PASSWORD);
         }
 
         // 새로운 비밀번호 비교(새로운 비밀번호, 확인용 비밀번호 비교)

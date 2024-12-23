@@ -41,8 +41,8 @@ public class TermsHistory extends BaseEntity {
     public TermsHistory(Member member, Terms terms, String agreeYn, LocalDateTime agreeDate, String activeYn) {
         this.member = member;
         this.terms = terms;
-        this.agreeYn = agreeYn;
-        this.agreeDate = agreeDate;
+        this.agreeYn = agreeYn == null ? "Y" : agreeYn;
+        this.agreeDate = agreeDate == null ? LocalDateTime.now() : agreeDate;
         this.activeYn = activeYn == null ? "Y" : activeYn;
     }
 }

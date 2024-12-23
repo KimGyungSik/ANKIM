@@ -1,0 +1,21 @@
+[[login-member]]
+=== 회원 로그인
+
+==== HTTP Request
+include::{snippets}/login-member/http-request.adoc[]
+include::{snippets}/login-member/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/login-member/http-response.adoc[]
+include::{snippets}/login-member/response-fields.adoc[]
+
+[[login-admin]]
+=== 관리자 로그인
+
+==== HTTP Request
+include::{snippets}/login-admin/http-request.adoc[]
+include::{snippets}/login-admin/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/login-admin/http-response.adoc[]
+include::{snippets}/login-admin/response-fields.adoc[]

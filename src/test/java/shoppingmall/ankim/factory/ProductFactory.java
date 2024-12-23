@@ -613,7 +613,7 @@ public class ProductFactory {
                 .optionValues(List.of(black, large))
                 .code("P001-BLK-L")
                 .addPrice(3000)
-                .qty(0)
+                .qty(100)
                 .safQty(5)
                 .maxQty(3)
                 .minQty(1)

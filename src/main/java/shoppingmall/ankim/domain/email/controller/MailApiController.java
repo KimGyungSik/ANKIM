@@ -5,7 +5,6 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.email.service.Count;
@@ -34,7 +33,7 @@ public class MailApiController {
 
     // 인증번호 검증 요청 처리
     @PostMapping("/verify")
-    public ApiResponse<String> existByEmail(@Valid @RequestBody MailRequest request) {
+    public ApiResponse<String> verifyMail(@Valid @RequestBody MailRequest request) {
         Count isValid = mailService.verifyCode(request.getLoginId(), request.getVerificationCode());
 
         if (isValid == Count.RETRY) {
@@ -42,7 +41,7 @@ public class MailApiController {
             return ApiResponse.ok(HttpStatus.NO_CONTENT, isValid.name()); // "RETRY" 반환
         } else if (isValid == Count.SUCCESS) {
             // 인증번호 제대로 입력한 경우
-            return ApiResponse.ok(HttpStatus.OK, isValid.name()); // "OK" 반환
+            return ApiResponse.ok(HttpStatus.OK, isValid.name()); // "SUCCESS" 반환
         } else {
             // 인증번호 입력을 잘못한 경우
             return ApiResponse.ok(HttpStatus.NO_CONTENT, isValid.name()); // "FAIL" 반환

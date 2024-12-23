@@ -29,8 +29,8 @@ public class Item {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long no;
 
-    @Version
-    private int version;
+//    @Version
+//    private int version;
 
     // 상품 : 품목 = 1 : N
     @ManyToOne(fetch = FetchType.LAZY)

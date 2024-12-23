@@ -15,7 +15,7 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class MemberRegisterRequest {
 
-    private String id; // 아이디(이메일)
+    private String loginId; // 아이디(이메일)
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
     @Pattern(
@@ -50,8 +50,8 @@ public class MemberRegisterRequest {
     private String gender; // 성별 (남자 M, 여자 F)
 
     @Builder
-    public MemberRegisterRequest(String id, String pwd, String name, String phoneNum, LocalDate birth, String gender) {
-        this.id = id;
+    public MemberRegisterRequest(String loginId, String pwd, String name, String phoneNum, LocalDate birth, String gender) {
+        this.loginId = loginId;
         this.pwd = pwd;
         this.name = name;
         this.phoneNum = phoneNum;
@@ -62,7 +62,7 @@ public class MemberRegisterRequest {
     // Service단 Reqeust로 변경
     public MemberRegisterServiceRequest toServiceRequest() {
         return MemberRegisterServiceRequest.builder()
-                .loginId(this.id)
+                .loginId(this.loginId)
                 .pwd(this.pwd)
                 .name(this.name)
                 .phoneNum(this.phoneNum)

@@ -69,6 +69,7 @@ public enum ErrorCode {
     // 약관 관련 에러 코드
     REQUIRED_TERMS_NOT_AGREED(HttpStatus.BAD_REQUEST, "필수 약관에 동의하지 않았습니다."),
     TERMS_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 약관이 존재하지 않습니다."),
+    EMPTY_TERMS_UPDATE_REQUEST(HttpStatus.BAD_REQUEST, "요청 데이터가 비어 있습니다."),
 
     // 인증 관련 에러 코드
     ADMIN_ID_DUPLICATE(HttpStatus.CONFLICT, "이미 존재하는 아이디입니다."),
@@ -84,9 +85,16 @@ public enum ErrorCode {
     USER_STATUS_LOCKED(HttpStatus.FORBIDDEN, "로그인 시도 가능 횟수를 초과했습니다. 10분 동안 로그인 시도가 불가능합니다."),
     INVALID_MEMBER(HttpStatus.BAD_REQUEST, "유효하지 않은 사용자입니다."),
     INVALID_PASSWORD(HttpStatus.BAD_REQUEST, "비밀번호를 다시 확인해주세요."),
-    CURRENT_PASSWORD_INVALID(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
+    INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
     PASSWORD_CONFIRMATION_MISMATCH(HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "현재와 다른 비밀번호를 입력해주시기 바랍니다."),
+    DUPLICATE_MAIL_VERIFICATION_REQUEST(HttpStatus.BAD_REQUEST, "이메일 인증이 진행 중 입니다. 잠시 후 다시 시도해주세요."),
+    TOO_MANY_MAIL_CODE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."),
+    MAIL_VERIFICATION_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
+
+    // 탈퇴 관련 에러코드
+    LEAVE_REASON_NOT_FOUND(HttpStatus.BAD_REQUEST, "탈퇴 사유를 찾을 수 없습니다."),
+    MEMBER_LEAVE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR,"회원 탈퇴 중 오류가 발생했습니다."),
 
     // 주소 관련 에러 코드
     ADDRESS_REGISTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "주소 등록 중 에러가 발생했습니다."),

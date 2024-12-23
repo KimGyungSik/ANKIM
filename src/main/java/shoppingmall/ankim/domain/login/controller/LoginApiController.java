@@ -38,7 +38,7 @@ public class LoginApiController {
     private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성기
 
     @PostMapping("/member")
-    public ApiResponse<?> memberLoginV2(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
+    public ApiResponse<?> memberLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
         try {
             // LoginService를 통해 인증 처리
             Map<String, Object> jwtToken = loginService.memberLogin(loginRequest.toServiceRequest(), request);
@@ -54,8 +54,10 @@ public class LoginApiController {
 
             return ApiResponse.ok("로그인 성공");
 
-        } catch (BadCredentialsException ex) {
+        } catch (BadCredentialsException e) {
             throw new MemberLoginFailedException(INVALID_CREDENTIALS);
+        } catch (MemberLoginFailedException e) {
+            return ApiResponse.of(e.getErrorCode());
         }
     }
 

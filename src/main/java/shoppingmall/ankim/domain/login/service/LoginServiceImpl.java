@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.login.service;
 
+import jakarta.persistence.EntityManager;
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -10,6 +11,7 @@ import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
@@ -40,6 +42,7 @@ import java.net.UnknownHostException;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import static shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler.handleStatusChange;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -47,8 +50,9 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Slf4j
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class LoginServiceImpl implements LoginService {
+
+    private final EntityManager em;
 
     private final MemberRepository memberRepository;
     private final MemberLoginAttemptRepository memberLoginAttemptRepository;
@@ -58,6 +62,8 @@ public class LoginServiceImpl implements LoginService {
     private final AdminRepository adminRepository;
     private final AdminLoginAttemptRepository adminLoginAttemptRepository;
     private final AdminLoginHistoryRepository adminLoginHistoryRepository;
+
+//    private final LoginFailureHandler loginFailureHandler;
 
     private final JwtTokenProvider jwtTokenProvider;
     private final AuthenticationManager authenticationManager;
@@ -78,12 +84,14 @@ public class LoginServiceImpl implements LoginService {
     @Override
     public Map<String, Object> memberLogin(LoginServiceRequest loginServiceRequest, HttpServletRequest request) {
         // 사용자 조회 (status에 따라서 상태를 반환해줘야 됨)
-        Member member = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
+        Optional<Member> findMember = memberRepository.findByLoginIdExcludingWithdrawn(loginServiceRequest.getLoginId());
 
         // 사용자가 없는 경우
-        if(member == null) {
+        if(findMember.isEmpty()) {
             throw new MemberLoginFailedException(USER_NOT_FOUND);
         }
+
+        Member member = findMember.get();
 
         // 로그인 시도 기록 가져오기
         MemberLoginAttempt loginAttempt = memberLoginAttemptRepository
@@ -113,6 +121,7 @@ public class LoginServiceImpl implements LoginService {
 
             // 사용자(클라이언트)의 ip주소 가져오기
             String ipAddress = getClientIp(request);
+            log.info("사용자 ip 주소 : {}", ipAddress);
 
             // 로그인 성공 이력 저장
             MemberLoginHistory hisotry = MemberLoginHistory.recordLoginHistory(member, ipAddress, loginServiceRequest);
@@ -126,8 +135,10 @@ public class LoginServiceImpl implements LoginService {
             return successfulAuthentication(userDetails, loginServiceRequest.getAutoLogin());
 
         } catch (BadCredentialsException | UnknownHostException ex) {
+            log.error("로그인 실패");
             // 실패 시 처리
             handleLoginFailure(member, loginAttempt);
+//            loginFailureHandler.handleMemberLoginFailure(member, loginAttempt); // 별도 서비스 호출
             throw new MemberLoginFailedException(INVALID_CREDENTIALS);
         }
     }
@@ -190,28 +201,34 @@ public class LoginServiceImpl implements LoginService {
     }
 
     private void handleLoginFailure(Member member, MemberLoginAttempt loginAttempt) {
-        // 실패 횟수 증가
-        loginAttempt.increaseFailCount();
-        memberLoginAttemptRepository.save(loginAttempt);
+        log.error("로그인 실패 hadleLoginFailure");
+        try {
+            int failCount = loginAttempt.increaseFailCount();
+            log.info("로그인 실패 횟수 : {}", failCount);
+            memberLoginAttemptRepository.save(loginAttempt);
 
-        // 최대 실패 횟수 초과 시 계정 잠금
-        if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
-            MemberHistory history = handleStatusChange(member, MemberStatus.LOCKED);
-            memberHistoryRepository.save(history);
+            if (failCount >= MAX_LOGIN_ATTEMPTS) {
+                MemberHistory history = handleStatusChange(member, MemberStatus.LOCKED);
+                memberHistoryRepository.save(history);
 
-            member.lock();
-            loginAttempt.setLockTime(LOCK_TIME_MINUTES);
-            memberRepository.save(member);
+                member.lock();
+                loginAttempt.setLockTime(LOCK_TIME_MINUTES);
+                memberRepository.save(member);
+            }
+        } catch (Exception ex) {
+            log.error("로그인 실패 처리 중 예외 발생: {}", ex.getMessage(), ex);
         }
     }
 
     private void handleLoginFailure(Admin admin, AdminLoginAttempt loginAttempt) {
+        log.info("loginAttemp : {}", loginAttempt.getLoginAttemptDetails().getFailCount());
         // 실패 횟수 증가
-        loginAttempt.increaseFailCount();
+        int failcount = loginAttempt.increaseFailCount();
+        log.info("로그인 실패 횟수 증가 : {}", loginAttempt.getLoginAttemptDetails().getFailCount());
         adminLoginAttemptRepository.save(loginAttempt);
 
         // 최대 실패 횟수 초과 시 계정 잠금
-        if (loginAttempt.getLoginAttemptDetails().getFailCount() >= MAX_LOGIN_ATTEMPTS) {
+        if (failcount >= MAX_LOGIN_ATTEMPTS) {
             admin.lock();
             loginAttempt.setLockTime(LOCK_TIME_MINUTES);
             adminRepository.save(admin);

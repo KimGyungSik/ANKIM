@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.cart.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.cart.service.request.AddToCartServiceRequest;
@@ -34,6 +35,13 @@ public class AddToCartRequest {
     * */
     @NotNull
     private Integer qty;
+
+    @Builder
+    public AddToCartRequest(Long productNo, List<Long> optionValueNoList, Integer qty) {
+        this.productNo = productNo;
+        this.optionValueNoList = optionValueNoList;
+        this.qty = qty;
+    }
 
     public AddToCartServiceRequest toServiceRequest() {
         return AddToCartServiceRequest.builder()
