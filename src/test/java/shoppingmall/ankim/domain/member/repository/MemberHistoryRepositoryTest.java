@@ -1,4 +1,4 @@
-package shoppingmall.ankim.domain.member.service.port;
+package shoppingmall.ankim.domain.member.repository;
 
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
@@ -10,7 +10,6 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
-import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
 import java.time.LocalDate;
