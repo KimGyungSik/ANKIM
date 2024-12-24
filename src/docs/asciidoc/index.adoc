@@ -14,6 +14,11 @@ endif::[]
 
 include::domain/member/member.adoc[]
 
+[[TermsHistory-API]]
+== TermsHistory API
+
+include::domain/termsHistory/termsHistory.adoc[]
+
 [[Mail-API]]
 == Mail API
 
