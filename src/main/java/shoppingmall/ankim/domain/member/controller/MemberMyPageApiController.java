@@ -1,19 +1,11 @@
 package shoppingmall.ankim.domain.member.controller;
 
 import lombok.RequiredArgsConstructor;
-import org.apache.http.HttpStatus;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.member.controller.request.PasswordRequest;
 import shoppingmall.ankim.domain.member.service.MemberMyPageService;
-import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.security.exception.CookieNotIncludedException;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.global.response.ApiResponse;
-
-import static shoppingmall.ankim.global.exception.ErrorCode.COOKIE_NOT_INCLUDED;
 
 @RestController
 @RequiredArgsConstructor
@@ -29,7 +21,7 @@ public class MemberMyPageApiController {
     ) {
         String loginId = securityContextHelper.getLoginId();
 
-        memberMyPageService.isValidPassword(loginId, passwordRequest.getPwd());
+        memberMyPageService.isValidPassword(loginId, passwordRequest.getPassword());
 
         return ApiResponse.ok("비밀번호 검증에 성공했습니다.");
     }

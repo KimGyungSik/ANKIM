@@ -13,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.domain.member.controller.request.PasswordRequest;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -64,12 +65,13 @@ class MemberEditServiceTest {
         // given
         String loginId = "test@example.com";
         String rawPassword = "password123";
+        PasswordRequest request = PasswordRequest.builder().password(rawPassword).build();
 
         // Member 생성 및 저장
         Member member = MemberFactory.createSecureMember(em, loginId, rawPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertDoesNotThrow(() -> memberEditService.isValidPassword(loginId, rawPassword));
+        assertDoesNotThrow(() -> memberEditService.isValidPassword(loginId, request.toServiceRequest()));
     }
 
     @Test
@@ -79,11 +81,13 @@ class MemberEditServiceTest {
         String loginId = "secure@example.com";
         String correctPassword = "securePassword123";
         String wrongPassword = "wrongPassword456";
+        PasswordRequest request = PasswordRequest.builder().password(wrongPassword).build();
+
 
         Member secureMember = MemberFactory.createSecureMember(em, loginId, correctPassword, bCryptPasswordEncoder);
 
         // when & then
-        assertThatThrownBy(() -> memberEditService.isValidPassword(loginId, wrongPassword))
+        assertThatThrownBy(() -> memberEditService.isValidPassword(loginId, request.toServiceRequest()))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(INVALID_PASSWORD.getMessage());
     }

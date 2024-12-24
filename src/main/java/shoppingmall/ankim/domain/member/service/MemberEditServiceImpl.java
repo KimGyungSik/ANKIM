@@ -9,6 +9,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceRequest;
+import shoppingmall.ankim.domain.member.service.request.PasswordServiceRequest;
 import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
@@ -28,11 +29,11 @@ public class MemberEditServiceImpl implements MemberEditService {
     private final MemberHistoryRepository memberHistoryRepository;
 
     @Override
-    public void isValidPassword(String loginId, String pwd) {
+    public void isValidPassword(String loginId, PasswordServiceRequest request) {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(pwd, member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getPassword(), member.getPwd());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_PASSWORD);
         }
