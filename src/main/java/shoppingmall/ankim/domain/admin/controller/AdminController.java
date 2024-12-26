@@ -29,12 +29,4 @@ public class AdminController {
         return "관리자 회원가입 페이지";
     }
 
-    // 입력한 회원가입 정보를 등록한다.
-    @PostMapping("/register")
-    public String register (@Valid @RequestBody  AdminRegisterRequest request) {
-        log.info("Admin registration request received: {}", request);
-        adminService.register(request.toServiceRequest());
-
-        return ""; // FIXME 회원가입 후 이동할 관리자 페이지
-    }
 }

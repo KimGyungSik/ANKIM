@@ -61,7 +61,7 @@ public class SecurityConfig {
         http
                 .authorizeHttpRequests((authorize) -> authorize
 //                        .requestMatchers("/my/**").authenticated() // my라는 url로 들어오면 인증이 필요
-                        .requestMatchers("/admin/join", "/admin/register").permitAll()
+                        .requestMatchers("/admin/join", "/api/admin/register").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 접근 경로에 관리자 권한 필요
                         .requestMatchers("/mypage/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
                         .anyRequest().permitAll()) // 나머지 요청은 접근 허용
