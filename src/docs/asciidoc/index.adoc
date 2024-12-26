@@ -43,3 +43,8 @@ include::domain/cart/cart.adoc[]
 == Order API
 
 include::domain/order/order.adoc[]
+
+[[Token-API]]
+== Token API
+
+include::domain/security/security.adoc[]

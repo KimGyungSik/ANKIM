@@ -1,0 +1,10 @@
+[[reissue-token]]
+=== 토큰 재발행
+
+==== HTTP Request
+include::{snippets}/reissue-token/http-request.adoc[]
+// include::{snippets}/reissue-token/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/reissue-token/http-response.adoc[]
+include::{snippets}/reissue-token/response-fields.adoc[]
