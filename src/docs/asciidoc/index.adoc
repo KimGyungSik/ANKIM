@@ -49,3 +49,8 @@ include::domain/order/order.adoc[]
 
 include::domain/security/security.adoc[]
 
+[[MemberLeave-API]]
+== MemberLeave API
+
+include::domain/memberLeave/memberLeave.adoc[]
+
