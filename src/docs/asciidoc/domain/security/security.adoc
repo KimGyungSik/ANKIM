@@ -3,8 +3,17 @@
 
 ==== HTTP Request
 include::{snippets}/reissue-token/http-request.adoc[]
-// include::{snippets}/reissue-token/request-fields.adoc[]
 
 ==== HTTP Response
 include::{snippets}/reissue-token/http-response.adoc[]
 include::{snippets}/reissue-token/response-fields.adoc[]
+
+[[logout]]
+=== 로그아웃
+
+==== HTTP Request
+include::{snippets}/logout/http-request.adoc[]
+
+==== HTTP Response
+include::{snippets}/logout/http-response.adoc[]
+include::{snippets}/logout/response-fields.adoc[]

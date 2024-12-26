@@ -44,7 +44,8 @@ include::domain/cart/cart.adoc[]
 
 include::domain/order/order.adoc[]
 
-[[Token-API]]
-== Token API
+[[Security-API]]
+== Security API
 
 include::domain/security/security.adoc[]
+
