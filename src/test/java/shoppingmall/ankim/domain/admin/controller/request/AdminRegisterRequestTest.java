@@ -31,7 +31,7 @@ class AdminRegisterRequestTest {
         // given
         AdminRegisterRequest request = AdminRegisterRequest.builder()
                 .loginId("") // 빈 값
-                .pwd("1234") // 비밀번호 형식 오류
+                .password("1234") // 비밀번호 형식 오류
                 .name("홍 길 동") // 이름 형식 오류
                 .email("invalid-email") // 이메일 형식 오류
                 .phoneNum("01012345678") // 전화번호 형식 오류

@@ -78,7 +78,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("loginTime").optional().type(JsonFieldType.ARRAY)
                                         .description("로그인 시각"),
                                 fieldWithPath("autoLogin").optional().type(JsonFieldType.STRING)
-                                        .description("자동 로그인 여부")
+                                        .description("자동 로그인 여부( 자동 로그인 : \"rememberMe\" ")
                         ),
                         responseFields(
                                 fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),
@@ -129,7 +129,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("loginTime").optional().type(JsonFieldType.ARRAY)
                                         .description("로그인 시각"),
                                 fieldWithPath("autoLogin").optional().type(JsonFieldType.STRING)
-                                        .description("자동 로그인 여부")
+                                        .description("자동 로그인 여부( 자동 로그인 : \"rememberMe\" ")
                         ),
                         responseFields(
                                 fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),

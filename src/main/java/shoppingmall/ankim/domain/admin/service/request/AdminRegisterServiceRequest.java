@@ -28,14 +28,14 @@ public class AdminRegisterServiceRequest {
     private String officeNum; // 사무실유선전화
     private LocalDate birth; // 생년월일
     private String gender; // 성별 (남자 M, 여자 F)
-    private String joinDate; // 입사일
+    private LocalDate joinDate; // 입사일
     private AdminStatus status; // 관리자 상태
     private Integer zipCode; // 우편번호
     private String addressMain; // 주소
     private String addressDetail; // 상세주소(필수기재는 아님)
 
     @Builder
-    public AdminRegisterServiceRequest(String loginId, String pwd, String name, String email, String phoneNum, String officeNum, LocalDate birth, String gender, String joinDate, AdminStatus status, Integer zipCode, String addressMain, String addressDetail) {
+    public AdminRegisterServiceRequest(String loginId, String pwd, String name, String email, String phoneNum, String officeNum, LocalDate birth, String gender, LocalDate joinDate, AdminStatus status, Integer zipCode, String addressMain, String addressDetail) {
         this.loginId = loginId;
         this.pwd = pwd;
         this.name = name;

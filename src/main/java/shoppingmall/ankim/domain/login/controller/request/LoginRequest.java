@@ -23,7 +23,7 @@ public class LoginRequest {
 
     private LoginType loginType; // 로그인 타입 (EMAIL)
     private LocalDateTime loginTime; // 로그인 시각
-    private String autoLogin; // 자동 로그인 여부(자동로그인 true, 일반 로그인 false)
+    private String autoLogin; // 자동 로그인 여부(자동로그인 null, 일반 로그인 "rememberMe")
 
     @Builder
     public LoginRequest(String loginId, String pwd, String autoLogin) {

@@ -54,3 +54,7 @@ include::domain/security/security.adoc[]
 
 include::domain/memberLeave/memberLeave.adoc[]
 
+[[Admin-API]]
+== Admin API
+
+include::domain/admin/admin.adoc[]
