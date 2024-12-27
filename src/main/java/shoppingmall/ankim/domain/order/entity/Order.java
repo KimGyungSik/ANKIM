@@ -45,7 +45,7 @@ public class Order extends BaseEntity {
     @JoinColumn(name = "mem_no", nullable = false)
     private Member member;
 
-    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+    @OneToOne(cascade = CascadeType.ALL, fetch = FetchType.LAZY, orphanRemoval = true)
     @JoinColumn(name = "delivery_no")
     private Delivery delivery; // 배송 정보
 

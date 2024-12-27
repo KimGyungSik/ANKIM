@@ -9,27 +9,26 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: true
+#    defer-datasource-initialization: true
     open-in-view: true
   datasource:
         hikari:
           maximum-pool-size: 50 # 커넥션 풀 크기
   profiles:
     active:
-      - local
+       - local
     group:
       local:
         - email
         - jwt
         - login
         - redis
-  #      - prod
   main:
     allow-bean-definition-overriding: true
-  sql:
-    init:
-      data-locations: classpath*:data.sql
-      mode: always
+#  sql:
+#    init:
+#      data-locations: classpath*:data.sql
+#      mode: always
 
   servlet:
     multipart:

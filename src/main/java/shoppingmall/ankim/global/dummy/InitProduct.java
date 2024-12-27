@@ -9,6 +9,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.entity.BaseAddress;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.cart.entity.Cart;
+import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.image.entity.ProductImg;
@@ -155,47 +157,58 @@ public class InitProduct {
             OrderItem orderItem1 = OrderItem.create(item1, 2); // 수량 2
             OrderItem orderItem2 = OrderItem.create(item2, 3); // 수량 3
 
-            // Delivery 생성
-            Delivery delivery = createDelivery(member);
-
             // Order 생성
             Order order = Order.create(
                     List.of(orderItem1, orderItem2),
                     member,
-                    delivery,
+                    null,
                     LocalDateTime.now()
             );
             order.setOrdCode(orderCode);
 
             em.persist(order);
+
+            // Cart 생성
+            Cart cart = Cart.create(member, LocalDateTime.now());
+
+            createCartItem(em, cart, member,product,item1,2);
+            createCartItem(em, cart, member,product,item2,3);
+
+            em.persist(cart);
+        }
+
+        public static void createCartItem(EntityManager entityManager, Cart cart, Member member,Product product,Item item,Integer qty) {
+            // CartItem 생성
+            CartItem cartItem = CartItem.create(cart, product, item, qty, LocalDateTime.now());
+            cart.addCartItem(cartItem);
         }
 
         // Delivery 생성
-        private Delivery createDelivery(Member member) {
-            MemberAddress address = MemberAddress.create(
-                    member,
-                    "집",
-                    BaseAddress.builder()
-                            .zipCode(12345)
-                            .addressMain("서울시 강남구 테헤란로 123")
-                            .addressDetail("1층")
-                            .build(),
-                    "010-1234-5678",
-                    "010-5678-1234",
-                    "Y"
-            );
-            em.persist(address);
-
-            Delivery delivery = Delivery.create(
-                    address,
-                    "FastCourier",
-                    "문 앞에 놓아주세요.",
-                    () -> "TRACK123456" // TrackingNumberGenerator 구현
-            );
-            em.persist(delivery);
-
-            return delivery;
-        }
+//        private Delivery createDelivery(Member member) {
+//            MemberAddress address = MemberAddress.create(
+//                    member,
+//                    "집",
+//                    BaseAddress.builder()
+//                            .zipCode(12345)
+//                            .addressMain("서울시 강남구 테헤란로 123")
+//                            .addressDetail("1층")
+//                            .build(),
+//                    "010-1234-5678",
+//                    "010-5678-1234",
+//                    "Y"
+//            );
+//            em.persist(address);
+//
+//            Delivery delivery = Delivery.create(
+//                    address,
+//                    "FastCourier",
+//                    "문 앞에 놓아주세요.",
+//                    () -> "TRACK123456" // TrackingNumberGenerator 구현
+//            );
+//            em.persist(delivery);
+//
+//            return delivery;
+//        }
 
 
         // 카테고리 생성 메서드
