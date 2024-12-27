@@ -124,12 +124,14 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
                 // 결제 요청에 대한 더미 (재고 감소)
                 for (int i = 0; i < 150; i++) {
                     OrderItem orderItem = OrderItem.create(item, 1);
+                    OrderItem orderItem2 = OrderItem.create(item2, 1);
                     entityManager.persist(orderItem);
+                    entityManager.persist(orderItem2);
 
                     String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
                     orderNames.add(dynamicOrderName);
 
-                    Order order = Order.create(List.of(orderItem), member, null, LocalDateTime.now());
+                    Order order = Order.create(List.of(orderItem,orderItem2), member, null, LocalDateTime.now());
                     order.setOrdCode(dynamicOrderName);
 
                     orderRepository.save(order);
@@ -191,7 +193,9 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
         latch.await();
 
         Item item = itemRepository.findById(1L).orElseThrow();
+        Item item2 = itemRepository.findById(2L).orElseThrow();
         assertThat(item.getQty()).isEqualTo(0);
+        assertThat(item2.getQty()).isEqualTo(0);
     }
 
     @Test

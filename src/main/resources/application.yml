@@ -16,7 +16,7 @@ spring:
           maximum-pool-size: 50 # 커넥션 풀 크기
   profiles:
     active:
-       - local
+       - prod
     group:
       local:
         - email

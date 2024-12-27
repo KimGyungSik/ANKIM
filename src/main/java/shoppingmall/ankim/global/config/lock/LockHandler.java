@@ -16,6 +16,8 @@ public class LockHandler {
 
     public void lock(String key) {
         Long available = itemLockRepository.getLock(LOCK_KEY_PREFIX + key);
+//        락을 얻을 수 있을 때까지 최대 30초 동안 대기합니다.
+//        락이 사용 중이라면 30초 후에 타임아웃이 발생하고 0을 반환합니다.
         if (available == 0) {
             throw new RuntimeException("LOCK_ACQUISITION_FAILED");
         }
