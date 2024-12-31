@@ -94,6 +94,12 @@ public class PaymentFacadeWithNamedLock {
                 .orElseThrow(() -> new CartNotFoundException(CART_NOT_FOUND));
 
         // 주문 상품과 장바구니 상품 매핑하여 비활성화
+        deactivateCartItemsMappedToOrder(order, cart);
+        return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
+    }
+
+    @Async
+    public void deactivateCartItemsMappedToOrder(Order order, Cart cart) {
         List<OrderItem> orderItems = order.getOrderItems();
         List<CartItem> cartItems = cart.getCartItems();
 
@@ -102,8 +108,8 @@ public class PaymentFacadeWithNamedLock {
                     .filter(cartItem -> isMatchingCartAndOrder(cartItem, orderItem)) // 일치 여부 확인
                     .forEach(CartItem::deactivate); // 비활성화
         }
-        return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
     }
+
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
     public PaymentFailResponse toFailRequest(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
