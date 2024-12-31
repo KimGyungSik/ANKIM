@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
@@ -179,6 +180,7 @@ class PaymentFacadeWithNamedLockTest {
 //    }
 
     @Test
+    @Rollback(value = false)
     @Transactional
     @DisplayName("결제 성공 시 올바른 응답을 반환한다")
     void tossPaymentSuccess() {
@@ -230,7 +232,7 @@ class PaymentFacadeWithNamedLockTest {
         assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.PAID); // 주문 상태가 결제 완료로 변경되었는지 확인
 
         // 장바구니 상품 비활성화 검증
-        Cart cart = cartRepository.findByMemberAndActiveYn(order.getMember(), "Y").orElse(null);
+        Cart cart = cartRepository.findByMemberAndActiveYnAndCartItemsAndActiveYn(order.getMember(), "Y").orElse(null);
         assertThat(cart).isNotNull();
         List<CartItem> deactivatedItems = cart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getActiveYn().equals("N")) // 비활성화된 상품만 필터링

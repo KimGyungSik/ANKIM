@@ -244,7 +244,7 @@ class PaymentFacadeWithNamedQueryTest {
         assertThat(updatedOrder.getOrderStatus()).isEqualTo(OrderStatus.PAID); // 주문 상태가 결제 완료로 변경되었는지 확인
 
         // 장바구니 상품 비활성화 검증
-        Cart cart = cartRepository.findByMemberAndActiveYn(order.getMember(), "Y").orElse(null);
+        Cart cart = cartRepository.findByMemberAndActiveYnAndCartItemsAndActiveYn(order.getMember(), "Y").orElse(null);
         assertThat(cart).isNotNull();
         List<CartItem> deactivatedItems = cart.getCartItems().stream()
                 .filter(cartItem -> cartItem.getActiveYn().equals("N")) // 비활성화된 상품만 필터링

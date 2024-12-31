@@ -19,4 +19,10 @@ public interface CartRepository extends JpaRepository<Cart, Long>, CartQueryRepo
             "AND ci.activeYn = 'Y'")
     Optional<Cart> findByMemberAndActiveYn(@Param("member") Member member, @Param("activeYn") String activeYn);
 
+    @Query("SELECT c FROM Cart c " +
+            "JOIN FETCH c.cartItems ci " +
+            "WHERE c.member = :member " +
+            "AND c.activeYn = :activeYn")
+    Optional<Cart> findByMemberAndActiveYnAndCartItemsAndActiveYn(@Param("member") Member member, @Param("activeYn") String activeYn);
+
 }
