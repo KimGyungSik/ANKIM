@@ -90,16 +90,16 @@ public class PaymentFacadeWithNamedLock {
         order.successOrder();
 
         // 주문 상품은 장바구니에서 비우기
-        Cart cart = cartRepository.findByMemberAndActiveYn(order.getMember(), "Y")
-                .orElseThrow(() -> new CartNotFoundException(CART_NOT_FOUND));
-
         // 주문 상품과 장바구니 상품 매핑하여 비활성화
-        deactivateCartItemsMappedToOrder(order, cart);
+        deactivateCartItemsMappedToOrder(order);
         return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
     }
 
     @Async
-    public void deactivateCartItemsMappedToOrder(Order order, Cart cart) {
+    public void deactivateCartItemsMappedToOrder(Order order) {
+        Cart cart = cartRepository.findByMemberAndActiveYn(order.getMember(), "Y")
+                .orElseThrow(() -> new CartNotFoundException(CART_NOT_FOUND));
+
         List<OrderItem> orderItems = order.getOrderItems();
         List<CartItem> cartItems = cart.getCartItems();
 
