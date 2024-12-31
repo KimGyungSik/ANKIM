@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.payment.service;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.cart.entity.Cart;
@@ -66,8 +67,7 @@ public class PaymentFacadeWithNamedLock {
         }
 
         // 배송지 생성
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
-        order.setDelivery(delivery);
+        createDelivery(deliveryRequest, addressRequest, order);
 
         // 재고 차감
         reduceStock(order);
@@ -75,6 +75,13 @@ public class PaymentFacadeWithNamedLock {
         // 결제 요청 처리
         return paymentService.requestTossPayment(request);
     }
+
+    @Async
+    public void createDelivery(DeliveryCreateServiceRequest deliveryRequest, MemberAddressCreateServiceRequest addressRequest, Order order) {
+        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+        order.setDelivery(delivery);
+    }
+
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequest(String paymentKey, String orderId, Integer amount) {
         // 주문상태를 결제완료로 수정
@@ -123,7 +130,8 @@ public class PaymentFacadeWithNamedLock {
         return paymentService.cancelPayment(paymentKey,cancelReason);
     }
 
-    private void reduceStock(Order order) {
+    @Async
+    public void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
