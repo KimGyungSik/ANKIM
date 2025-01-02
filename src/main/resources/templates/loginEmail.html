@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이메일로 로그인/회원가입</title>
+    <link rel="stylesheet" th:href="@{/css/loginEmail.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <script>
+        function togglePasswordVisibility() {
+            const passwordField = document.getElementById("password");
+            passwordField.type = passwordField.type === "password" ? "text" : "password";
+        }
+    </script>
+</head>
+<body>
+<header>
+    <!-- Header 내용 -->
+    <nav>
+        <ul>
+            <li><a href="#">BEST</a></li>
+            <li><a href="#">WOMEN</a></li>
+            <li><a href="#">MEN</a></li>
+            <!-- 더 많은 메뉴 -->
+        </ul>
+    </nav>
+</header>
+<main>
+    <div class="login-container">
+        <div class="login-form">
+            <h1 class="login-title">이메일로<br>로그인/회원가입 하기</h1>
+            <form th:action="@{'/api/login/member'}" method="post" onsubmit="sendLoginRequest(event)">
+                <div class="form-group">
+                    <label for="loginId" class="input-label">이메일(아이디)</label>
+                    <input
+                            id="loginId"
+                            class="input-field"
+                            placeholder="abc@email.com"
+                            autocapitalize="none"
+                            autocomplete="loginId"
+                            type="text"
+                            name="loginId">
+                    <span id="loginIdError" class="error-message"></span>
+                </div>
+                <div class="form-group">
+                    <label for="password" class="input-label">비밀번호</label>
+                    <div class="password-input-wrapper">
+                        <input
+                                id="password"
+                                class="input-field"
+                                placeholder="8자 이상의 비밀번호"
+                                autocapitalize="none"
+                                autocomplete="current-password"
+                                type="password"
+                                name="password">
+                        <button type="button" class="password-toggle-button" onclick="togglePasswordVisibility()">👁️</button>
+                    </div>
+                    <div id="passwordError" class="error-message"></div>
+                    <div id="loginError" class="error-message"></div>
+                </div>
+                <div class="form-actions">
+                    <button class="submit-button" type="submit">로그인</button>
+                    <a class="register-button" th:href="@{'/member/join'}">이메일로 가입하기</a>
+                </div>
+                <div class="links">
+                    <a href="/account/find">계정 찾기</a>
+                    <span>|</span>
+                    <a href="/password/reset">비밀번호 변경</a>
+                    <span>|</span>
+                    <a href="/contact">문의하기</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</main>
+<footer th:replace="/common/footer :: footer-container"></footer>
+
+</body>
+<script>
+    async function sendLoginRequest(event) {
+        // 기본 폼 동작 중지
+        event.preventDefault();
+
+        // 폼 데이터 가져오기
+        var loginId = document.getElementById('loginId').value;
+        var password = document.getElementById('password').value;
+
+        // JSON 데이터 생성
+        var requestData = {
+            loginId: loginId,
+            password: password
+        };
+
+        try {
+            // Fetch API로 POST 요청 보내기
+            var response = await fetch('/api/login/member', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(requestData)
+            });
+
+            // 서버 응답 처리
+            if (response.ok) {
+                // 성공 시 페이지 이동
+                window.location.href = "/"; // 성공 시 루트 경로로 이동
+            } else {
+                var errorData = await response.json();
+                handleErrors(errorData);
+            }
+        } catch (error) {
+            alert('서버와의 연결에 실패했습니다.');
+        }
+    }
+
+    function handleErrors(errorData) {
+        // 기존 에러 메시지 초기화
+        document.querySelectorAll('.error-message').forEach(function (element) {
+            element.textContent = '';
+        });
+
+        // 에러 데이터가 필드 에러일 경우 처리
+        if (errorData && errorData.fieldErrors) {
+            errorData.fieldErrors.forEach(function (error) {
+                const field = error.field;
+                const reason = error.reason;
+
+                // 해당 필드의 에러 메시지 요소 찾기
+                const errorElement = document.getElementById(field + 'Error');
+                if (errorElement) {
+                    errorElement.textContent = reason; // 에러 메시지 설정
+                    errorElement.style.display = 'block'; // 에러 메시지 표시
+                }
+            });
+        } else if (errorData && errorData.message) {
+            // 일반 에러 메시지 처리
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = errorData.message;
+            loginError.style.display = 'block';
+        } else {
+            // 기본 오류 메시지 처리
+            const loginError = document.getElementById('loginError');
+            loginError.textContent = '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.';
+            loginError.style.display = 'block';
+        }
+    }
+</script>
+</html>

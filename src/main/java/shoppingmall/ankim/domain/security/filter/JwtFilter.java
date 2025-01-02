@@ -3,7 +3,6 @@ package shoppingmall.ankim.domain.security.filter;
 import io.jsonwebtoken.ExpiredJwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +30,7 @@ public class JwtFilter extends OncePerRequestFilter {
     protected boolean shouldNotFilter(HttpServletRequest request) throws ServletException {
         String path = request.getServletPath();
         return path.equals("/api/login/member")
+                || path.equals("/api/login/email")
                 || path.equals("/docs")
                 || path.equals("/api/login/admin")
                 || path.equals("/reissue");

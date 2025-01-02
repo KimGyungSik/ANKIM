@@ -48,7 +48,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // given
         LoginRequest loginRequest = LoginRequest.builder()
                 .loginId("test@example.com")
-                .pwd("password123")
+                .password("password123")
                 .autoLogin("rememberMe")
                 .build();
 
@@ -100,7 +100,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // given
         LoginRequest loginRequest = LoginRequest.builder()
                 .loginId("admin")
-                .pwd("adminPass123")
+                .password("adminPass123")
                 .build();
 
         Map<String, Object> tokenResponse = Map.of(
