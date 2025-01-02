@@ -228,7 +228,6 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
 
         latch.await();
 
-        entityManager.clear(); // 1차 캐시 무효화
         Item item = itemRepository.findById(1L).orElseThrow();
         Item item2 = itemRepository.findById(2L).orElseThrow();
         assertThat(item.getQty()).isEqualTo(0);
