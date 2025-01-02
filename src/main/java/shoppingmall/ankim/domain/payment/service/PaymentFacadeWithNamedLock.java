@@ -40,6 +40,8 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 // TODO 배송 상태 이력 테이블도 고려해야함 -> 배송 상태가 바뀔 때마다 이력이 쌓이도록
 // TODO 트랜잭션 경계에 맞춰서 결제 처리 실패시 재고 차감, 복구도 같이 롤백 시켜야하는 문제도 고려해봐야함
 // TODO 결제를 요청하고 나서 재고차감을 했는데 결제 요청 API에서 에러 발생 시 재고 감소 롤백 말하는거임
+
+// FIXME 비동기처리는 즉 @Async는 @Transactional과 동일하게 AOP방식으로 동작하므로 다른 서비스 클래스로 분리시켜줘야함
 @Service
 @Slf4j
 @Transactional
@@ -67,7 +69,8 @@ public class PaymentFacadeWithNamedLock {
         }
 
         // 배송지 생성
-        createDelivery(deliveryRequest, addressRequest, order);
+        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+        order.setDelivery(delivery);
 
         // 재고 차감
         reduceStock(order);
@@ -76,11 +79,11 @@ public class PaymentFacadeWithNamedLock {
         return paymentService.requestTossPayment(request);
     }
 
-    @Async
-    public void createDelivery(DeliveryCreateServiceRequest deliveryRequest, MemberAddressCreateServiceRequest addressRequest, Order order) {
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
-        order.setDelivery(delivery);
-    }
+//    @Async
+//    public void createDelivery(DeliveryCreateServiceRequest deliveryRequest, MemberAddressCreateServiceRequest addressRequest, Order order) {
+//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+//        order.setDelivery(delivery);
+//    }
 
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequest(String paymentKey, String orderId, Integer amount) {
@@ -136,8 +139,8 @@ public class PaymentFacadeWithNamedLock {
         return paymentService.cancelPayment(paymentKey,cancelReason);
     }
 
-    @Async
-    public void reduceStock(Order order) {
+//    @Async
+    private void reduceStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
