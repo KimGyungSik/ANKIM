@@ -126,7 +126,9 @@ public class PaymentFacadeWithRedis {
             log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
             String key = String.valueOf(itemNo);
             try {
+                // 아이템별 락
                 lockHandler.lockWithRedisson(key,10,10);
+
                 // 아이템 단위로 재고 감소
                 itemService.reduceStock(itemNo, quantity);
             } finally {
