@@ -16,6 +16,7 @@ import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
+import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.time.LocalDate;
@@ -38,10 +39,11 @@ import static shoppingmall.ankim.domain.category.entity.CategoryLevel.MIDDLE;
 public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
 
     private final MemberService memberService = mock(MemberService.class);
+    private final TermsQueryService termsQueryService = mock(TermsQueryService.class);
 
     @Override
     protected Object initController() {
-        return new MemberJoinApiController(memberService);
+        return new MemberJoinApiController(memberService, termsQueryService);
     }
 
     @DisplayName("회원가입을 위한 약관동의 내역을 전송하는 API")

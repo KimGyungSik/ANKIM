@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
+import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.global.response.ApiResponse;
 
@@ -22,6 +23,7 @@ import java.util.List;
 public class MemberJoinApiController {
 
     private final MemberService memberService;
+    private final TermsQueryService termsQueryService;
 
     // 사용가능한 이메일인지 검증한다.(중복 확인)
     @PostMapping("/email-check")
@@ -33,7 +35,9 @@ public class MemberJoinApiController {
 
     // 약관 동의 후 다음 회원가입 절차로 넘어간다.
     @PostMapping("/terms-next")
-    public ApiResponse<String> termsAgreements(@RequestBody List<TermsAgreement> termsAgreements, HttpSession session) {
+    public ApiResponse<Object> termsAgreements(@RequestBody List<TermsAgreement> termsAgreements, HttpSession session) {
+        termsQueryService.validateAndAddSubTerms(termsAgreements);
+
         session.setAttribute("termsAgreements", termsAgreements);
 
         // 약관 동의한 내용(termsAgreements)을 세션에 저장

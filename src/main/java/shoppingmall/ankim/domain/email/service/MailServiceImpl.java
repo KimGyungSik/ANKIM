@@ -6,8 +6,10 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.email.exception.MailSendException;
@@ -74,8 +76,12 @@ public class MailServiceImpl implements MailService {
 
     // 이메일 전송
     @Override
+    @Async("mailTaskExecutor") // 특정 Executor 지정 및 메서드 비동기 실행
     public void sendMail(MimeMessage message) {
+//        long start = System.currentTimeMillis();
         javaMailSender.send(message);
+//        long end = System.currentTimeMillis();
+//        log.info("이메일 전송시간 {} ms", (end - start));
     }
 
     @Override

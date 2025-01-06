@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>이메일로 로그인/회원가입</title>
-    <link rel="stylesheet" th:href="@{/css/loginEmail.css}">
+    <link rel="stylesheet" th:href="@{/css/login/loginEmail.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
@@ -60,7 +60,7 @@
                 </div>
                 <div class="form-actions">
                     <button class="submit-button" type="submit">로그인</button>
-                    <a class="register-button" th:href="@{'/member/join'}">이메일로 가입하기</a>
+                    <a class="register-button" th:href="@{'/api/terms/join'}">이메일로 가입하기</a>
                 </div>
                 <div class="links">
                     <a href="/account/find">계정 찾기</a>
@@ -76,5 +76,5 @@
 <footer th:replace="/common/footer :: footer-container"></footer>
 
 </body>
-<script src="/js/loginEmail.js"></script>
+<script th:src="@{/js/login/loginEmail.js}"></script>
 </html>

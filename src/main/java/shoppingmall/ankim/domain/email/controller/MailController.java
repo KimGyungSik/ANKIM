@@ -10,9 +10,9 @@ import org.springframework.web.bind.annotation.*;
 public class MailController {
 
     // 이메일 인증 페이지 렌더링
-    @GetMapping("/emailVerification")
+    @GetMapping("/mailVerification")
     public String emailVerificationPage() {
-        return "emailVerification"; // emailVerification.html 파일을 호출
+        return "join/mailVerification"; // emailVerification.html 파일을 호출
     }
 
 }

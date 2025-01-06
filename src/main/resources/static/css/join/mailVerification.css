@@ -1,0 +1,126 @@
+/* Reset */
+body, h1, p, ul, li, label, input, button, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+/* Body 설정 */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #ffffff;
+    line-height: 1.5;
+}
+
+/* 헤더 */
+header {
+    background-color: #f8f8f8;
+    padding: 10px 0;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* 메인 */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 70vh;
+}
+
+.login-container {
+    width: 50vw;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.login-title {
+    font-size: 24px;
+    margin-bottom: 30px;
+    line-height: 1.4;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+label {
+    display: block;
+    margin-bottom: 8px;
+    font-size: 14px;
+}
+
+input {
+    width: 100%;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+.submit-button {
+    width: 100%;
+    padding: 12px;
+    font-size: 16px;
+    border: none;
+    border-radius: 5px;
+    background-color: #ddd;
+    color: #fff;
+    cursor: not-allowed;
+}
+
+.submit-button.active {
+    background-color: #000;
+    cursor: pointer;
+}
+
+.verification-button, .submit-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+    margin-top: 10px;
+}
+
+.verification-button:disabled {
+    background-color: #ccc;
+    cursor: not-allowed;
+}
+
+.form-group {
+    margin-bottom: 20px;
+}
+
+/* Footer */
+footer {
+    background-color: #f8f8f8;
+    padding: 20px 0;
+    text-align: center;
+    font-size: 12px;
+    color: #333;
+}

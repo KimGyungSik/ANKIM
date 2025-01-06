@@ -34,6 +34,6 @@ public class TermsController {
 
         model.addAttribute("termsList", termsList);
 
-        return "registerTerms"; // FIXME 약관 동의 페이지 작성
+        return "join/termsJoin"; // FIXME 약관 동의 페이지 작성
     }
 }
