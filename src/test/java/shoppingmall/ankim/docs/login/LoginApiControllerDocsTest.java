@@ -38,7 +38,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object initController() {
-        return new LoginApiController(loginService, null, null);
+        return new LoginApiController(loginService);
     }
 
 
@@ -71,7 +71,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                         requestFields(
                                 fieldWithPath("loginId").type(JsonFieldType.STRING)
                                         .description("회원의 이메일 ID"),
-                                fieldWithPath("pwd").type(JsonFieldType.STRING)
+                                fieldWithPath("password").type(JsonFieldType.STRING)
                                         .description("회원의 비밀번호"),
                                 fieldWithPath("loginType").optional().type(JsonFieldType.STRING)
                                         .description("로그인 타입"),
@@ -122,7 +122,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                         requestFields(
                                 fieldWithPath("loginId").type(JsonFieldType.STRING)
                                         .description("관리자의 이메일 ID"),
-                                fieldWithPath("pwd").type(JsonFieldType.STRING)
+                                fieldWithPath("password").type(JsonFieldType.STRING)
                                         .description("관리자의 비밀번호"),
                                 fieldWithPath("loginType").optional().type(JsonFieldType.STRING)
                                         .description("로그인 타입"),

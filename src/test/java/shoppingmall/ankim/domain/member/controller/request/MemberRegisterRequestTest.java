@@ -93,7 +93,7 @@ class MemberRegisterRequestTest {
                 .pwd("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
-                .birth(LocalDate.of(2025, 1, 1)) // 미래 날짜로 설정하여 오류 발생
+                .birth(LocalDate.of(2060, 1, 1)) // 미래 날짜로 설정하여 오류 발생
                 .gender("M")
                 .build();
 
@@ -133,7 +133,7 @@ class MemberRegisterRequestTest {
                 .pwd("short") // 비밀번호 형식 오류
                 .name("홍 길 동") // 이름 형식 오류
                 .phoneNum("01012345678") // 전화번호 형식 오류
-                .birth(LocalDate.of(2025, 1, 1)) // 미래 생년월일
+                .birth(LocalDate.of(2060, 1, 1)) // 미래 생년월일
                 .gender(null) // 성별 미입력
                 .build();
 
