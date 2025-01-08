@@ -54,34 +54,65 @@ function closeModal() {
     modal.style.display = 'none'; // 모달 숨김
 }
 
+// function submitAgreements() {
+//     const errorElement = document.getElementById("termsAgreementsError");
+//     errorElement.textContent = '';
+//     errorElement.style.display = 'none';
+//
+//     var termsAgreements = Array.from(document.querySelectorAll("input[name='termsAgreement']")).map(input => ({
+//         no: input.value,
+//         name: input.getAttribute("data-name"),
+//         agreeYn: input.checked ? "Y" : "N",
+//         level: input.getAttribute("data-level"),
+//         termsYn: input.getAttribute("data-termsYn")
+//     }));
+//
+//     fetch("/api/member/terms-next", {
+//         method: "POST",
+//         headers: {
+//             "Content-Type": "application/json"
+//         },
+//         body: JSON.stringify(termsAgreements)
+//     })
+//         .then(response => {
+//             if (response.ok) {
+//                 // 메일 인증 화면으로 전환
+//                 loadMailVerificationPage();
+//             } else {
+//                 return response.json().then(errorData => {
+//                     handleErrors(errorData);
+//                 });
+//             }
+//         })
+//         .catch(error => {
+//             handleErrors("서버와의 통신 중 문제가 발생했습니다.");
+//         });
+// }
+
 function submitAgreements() {
     const errorElement = document.getElementById("termsAgreementsError");
-
-    // 기존 에러 메시지 초기화
     errorElement.textContent = '';
     errorElement.style.display = 'none';
 
     var termsAgreements = Array.from(document.querySelectorAll("input[name='termsAgreement']")).map(input => ({
-        no: input.value, // 약관 번호
-        name: input.getAttribute("data-name"), // 약관명
-        agreeYn: input.checked ? "Y" : "N", // 체크 여부
-        level: input.getAttribute("data-level"), // 약관 레벨
-        termsYn: input.getAttribute("data-termsYn") // 필수 여부
+        no: input.value,
+        name: input.getAttribute("data-name"),
+        agreeYn: input.checked ? "Y" : "N",
+        level: input.getAttribute("data-level"),
+        termsYn: input.getAttribute("data-termsYn"),
     }));
 
     fetch("/api/member/terms-next", {
         method: "POST",
         headers: {
-            "Content-Type": "application/json"
+            "Content-Type": "application/json",
         },
-        body: JSON.stringify(termsAgreements)
+        body: JSON.stringify(termsAgreements),
     })
         .then(response => {
             if (response.ok) {
-                // 성공 시 다음 페이지로 이동
-                window.location.href = "/mail/mailVerification"; // FIXME: 다음 페이지 URL로 변경
+                loadMailVerificationPage(); // 메일 인증 화면 전환
             } else {
-                // 실패 시 에러 메시지 표시
                 return response.json().then(errorData => {
                     handleErrors(errorData);
                 });
@@ -108,4 +139,37 @@ function handleErrors(errorData) {
         errorElement.textContent = '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.';
         errorElement.style.display = 'block';
     }
+}
+
+// 메일 인증 화면 로드 함수
+function loadMailVerificationResources() {
+    const cssLink = document.createElement("link");
+    cssLink.rel = "stylesheet";
+    cssLink.href = "/css/join/mailVerification.css";
+    document.head.appendChild(cssLink);
+
+    const script = document.createElement("script");
+    script.src = "/js/join/mailVerification.js";
+    script.defer = true;
+    script.onload = () => {
+        initializeMailVerification(); // 동적 로드 후 초기화 함수 호출
+    };
+    document.body.appendChild(script);
+}
+
+function loadMailVerificationPage() {
+    fetch("/mail/mailVerificationFragment", {
+        method: "GET",
+        headers: {
+            "Content-Type": "text/html"
+        }
+    })
+        .then(response => response.text())
+        .then(html => {
+            document.querySelector("main").innerHTML = html;
+            loadMailVerificationResources();
+        })
+        .catch(error => {
+            console.error("화면 전환 중 오류 발생:", error);
+        });
 }

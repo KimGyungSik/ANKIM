@@ -15,4 +15,9 @@ public class MailController {
         return "join/mailVerification"; // emailVerification.html 파일을 호출
     }
 
+    @GetMapping("/mailVerificationFragment")
+    public String emailVerificationFragment() {
+        return "join/mailVerification :: main-content"; // Fragment를 반환하도록 설정
+    }
+
 }

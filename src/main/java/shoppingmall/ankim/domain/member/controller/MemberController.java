@@ -41,7 +41,7 @@ public class MemberController {
         }
         // id값이 잘 전달됐으면 다음페이지로 이동
         model.addAttribute("loginId", loginId);
-        return "personalInfo"; // FIXME 회원 개인정보 입력 페이지 생성 필요
+        return "/join/personalInfo"; // FIXME 회원 개인정보 입력 페이지 생성 필요
     }
 
 }

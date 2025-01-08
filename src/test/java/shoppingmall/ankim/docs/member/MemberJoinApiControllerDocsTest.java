@@ -143,7 +143,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("testPassword!123")
+                .password("testPassword!123")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1999, 12, 19))
@@ -189,7 +189,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                         requestFields(
                                 fieldWithPath("loginId").type(JsonFieldType.STRING)
                                         .description("이메일 아이디"),
-                                fieldWithPath("pwd").type(JsonFieldType.STRING)
+                                fieldWithPath("password").type(JsonFieldType.STRING)
                                         .description("비밀번호"),
                                 fieldWithPath("name").type(JsonFieldType.STRING)
                                         .description("이름"),

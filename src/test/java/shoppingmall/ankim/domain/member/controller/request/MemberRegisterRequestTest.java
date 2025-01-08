@@ -29,7 +29,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("1234") // 비밀번호 형식이 틀림
+                .password("1234") // 비밀번호 형식이 틀림
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -50,7 +50,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPass123!")
+                .password("ValidPass123!")
                 .name("홍 길 동") // 이름 형식이 틀림
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -70,7 +70,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPass123!")
+                .password("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("01012345678") // 전화번호 형식이 틀림
                 .birth(LocalDate.of(1990, 1, 1))
@@ -90,7 +90,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPass123!")
+                .password("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(2060, 1, 1)) // 미래 날짜로 설정하여 오류 발생
@@ -110,7 +110,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPass123!")
+                .password("ValidPass123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -130,7 +130,7 @@ class MemberRegisterRequestTest {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("short") // 비밀번호 형식 오류
+                .password("short") // 비밀번호 형식 오류
                 .name("홍 길 동") // 이름 형식 오류
                 .phoneNum("01012345678") // 전화번호 형식 오류
                 .birth(LocalDate.of(2060, 1, 1)) // 미래 생년월일

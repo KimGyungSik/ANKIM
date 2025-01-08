@@ -1,0 +1,72 @@
+<main>
+    <div class="personal-info-container">
+        <h1>개인정보 입력</h1>
+        <form id="personalInfoForm">
+            <div class="form-group">
+                <label for="loginId">아이디 (이메일)</label>
+                <input type="email" id="loginId" name="loginId" th:value="${loginId}" readonly required>
+            </div>
+            <div class="form-group">
+                <label for="password">비밀번호</label>
+                <input type="password" id="password" name="password"
+                       placeholder="비밀번호 입력"
+                       pattern='^(?=.*[a-zA-Z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])[A-Za-z\d!@#$%^&*(),.?":{}|<>]{8,20}$'
+                       title="비밀번호는 8~20자 이내의 영문 대소문자, 숫자, 특수문자를 포함해야 합니다."
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="name">이름</label>
+                <input type="text" id="name" name="name"
+                       placeholder="이름 입력"
+                       pattern="^[가-힣a-zA-Z]{2,15}$"
+                       title="이름은 공백, 숫자 없이 2~15자 이내로 입력해야 합니다."
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="phoneNum">휴대전화번호</label>
+                <input type="tel" id="phoneNum" name="phoneNum"
+                       placeholder="010-1234-5678"
+                       pattern="^010-\d{4}-\d{4}$"
+                       title="휴대전화번호 형식이 올바르지 않습니다. (예: 010-1234-5678)"
+                       required>
+            </div>
+            <div class="form-group">
+                <label for="birth">생년월일</label>
+                <input type="date" id="birth" name="birth"
+                       max="2005-12-31"
+                       title="생년월일은 과거 날짜여야 합니다."
+                required>
+            </div>
+            <div class="form-group">
+                <label for="gender">성별</label>
+                <select id="gender" name="gender" required>
+                    <option value="" disabled selected>선택하세요</option>
+                    <option value="M">남자</option>
+                    <option value="F">여자</option>
+                </select>
+            </div>
+            <div id="formError" class="error-message"></div>
+            <button type="submit" class="submit-button">회원가입 완료</button>
+        </form>
+    </div>
+</main>
+<!--<main>-->
+<!--    <div class="personal-info-container">-->
+<!--        <h1>개인정보를 입력해 주세요</h1>-->
+<!--        <form id="personalInfoForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="name">이름</label>-->
+<!--                <input type="text" id="name" name="name" placeholder="이름을 입력하세요" required>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label for="phone">휴대폰 번호</label>-->
+<!--                <input type="tel" id="phone" name="phone" placeholder="010-1234-5678" required>-->
+<!--            </div>-->
+<!--            <div class="form-group">-->
+<!--                <label for="birth">생년월일</label>-->
+<!--                <input type="date" id="birth" name="birth" required>-->
+<!--            </div>-->
+<!--            <button type="submit" id="registerButton" class="register-button">회원가입 완료</button>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</main>-->

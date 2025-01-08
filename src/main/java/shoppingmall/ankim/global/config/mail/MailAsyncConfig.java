@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.util.concurrent.Executor;
 
-@EnableAsync
+@EnableAsync // 비동기처리 활성화
 @Configuration
 public class MailAsyncConfig {
 

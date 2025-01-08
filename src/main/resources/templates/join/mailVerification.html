@@ -1,64 +1,107 @@
-<!DOCTYPE html>
-<html lang="ko">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>로그인 아이디 입력</title>
-    <link rel="stylesheet" th:href="@{/css/join/mailVerification.css}">
-    <link rel="stylesheet" th:href="@{/css/footer.css}">
-</head>
-<body>
-<header>
-    <nav>
-        <ul>
-            <li><a href="#">BEST</a></li>
-            <li><a href="#">WOMEN</a></li>
-            <li><a href="#">MEN</a></li>
-        </ul>
-    </nav>
-</header>
 <main>
-    <div class="login-container">
-        <h1 class="login-title">로그인에 사용할<br>아이디를 입력해 주세요.</h1>
-        <form id="emailForm">
-            <div class="form-group">
-                <label for="loginId">이메일(아이디)</label>
-                <input
-                        type="email"
-                        id="loginId"
-                        name="loginId"
-                        placeholder="abc@email.com"
-                        required
-                        title="올바른 이메일 형식을 입력해주세요.">
-            </div>
-            <div class="form-group" id="verificationCodeContainer" style="display: none;">
-                <label for="verificationCode">인증번호</label>
-                <input
-                        type="text"
-                        id="verificationCode"
-                        name="verificationCode"
-                        placeholder="인증번호를 입력하세요"
-                        required>
-            </div>
-            <div id="codeError" class="error-message"></div>
-            <button
-                    type="button"
-                    id="verificationButton"
-                    class="verification-button"
-                    disabled>
-                이메일 인증
-            </button>
-            <button
-                    type="button"
-                    class="submit-button"
-                    id="nextButton"
-                    style="display: none;">
-                다음
-            </button>
-        </form>
+    <div th:fragment="main-content">
+        <div class="login-container" id="content">
+            <h1 class="login-title">로그인에 사용할<br>아이디를 입력해 주세요.</h1>
+            <form id="emailForm">
+                <div class="form-group">
+                    <label for="loginId">이메일(아이디)</label>
+                    <input
+                            type="email"
+                            id="loginId"
+                            name="loginId"
+                            placeholder="abc@email.com"
+                            required
+                            title="올바른 이메일 형식을 입력해주세요.">
+                </div>
+                <div class="form-group" id="verificationCodeContainer" style="display: none;">
+                    <label for="verificationCode">인증번호</label>
+                    <input
+                            type="text"
+                            id="verificationCode"
+                            name="verificationCode"
+                            placeholder="인증번호를 입력하세요"
+                            required>
+                </div>
+                <div id="codeError" class="error-message"></div>
+                <button
+                        type="button"
+                        id="verificationButton"
+                        class="verification-button"
+                        disabled>
+                    이메일 인증
+                </button>
+                <button
+                        type="button"
+                        class="submit-button"
+                        id="nextButton"
+                        style="display: none;">
+                    다음
+                </button>
+            </form>
+        </div>
     </div>
 </main>
-<footer th:replace="/common/footer :: footer-container"></footer>
-<script th:src="@{/js/join/mailVerification.js}"></script>
-</body>
-</html>
+<!--<!DOCTYPE html>-->
+<!--<html lang="ko">-->
+<!--<head>-->
+<!--    <meta charset="UTF-8">-->
+<!--    <meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+<!--    <title>로그인 아이디 입력</title>-->
+<!--    <link rel="stylesheet" th:href="@{/css/join/mailVerification.css}">-->
+<!--    <link rel="stylesheet" th:href="@{/css/footer.css}">-->
+<!--</head>-->
+<!--<body>-->
+<!--<header>-->
+<!--    <nav>-->
+<!--        <ul>-->
+<!--            <li><a href="#">BEST</a></li>-->
+<!--            <li><a href="#">WOMEN</a></li>-->
+<!--            <li><a href="#">MEN</a></li>-->
+<!--        </ul>-->
+<!--    </nav>-->
+<!--</header>-->
+<!--<main>-->
+<!--    <div class="login-container">-->
+<!--        <h1 class="login-title">로그인에 사용할<br>아이디를 입력해 주세요.</h1>-->
+<!--        <form id="emailForm">-->
+<!--            <div class="form-group">-->
+<!--                <label for="loginId">이메일(아이디)</label>-->
+<!--                <input-->
+<!--                        type="email"-->
+<!--                        id="loginId"-->
+<!--                        name="loginId"-->
+<!--                        placeholder="abc@email.com"-->
+<!--                        required-->
+<!--                        title="올바른 이메일 형식을 입력해주세요.">-->
+<!--            </div>-->
+<!--            <div class="form-group" id="verificationCodeContainer" style="display: none;">-->
+<!--                <label for="verificationCode">인증번호</label>-->
+<!--                <input-->
+<!--                        type="text"-->
+<!--                        id="verificationCode"-->
+<!--                        name="verificationCode"-->
+<!--                        placeholder="인증번호를 입력하세요"-->
+<!--                        required>-->
+<!--            </div>-->
+<!--            <div id="codeError" class="error-message"></div>-->
+<!--            <button-->
+<!--                    type="button"-->
+<!--                    id="verificationButton"-->
+<!--                    class="verification-button"-->
+<!--                    disabled>-->
+<!--                이메일 인증-->
+<!--            </button>-->
+<!--            <button-->
+<!--                    type="button"-->
+<!--                    class="submit-button"-->
+<!--                    id="nextButton"-->
+<!--                    style="display: none;">-->
+<!--                다음-->
+<!--            </button>-->
+<!--        </form>-->
+<!--    </div>-->
+<!--</main>-->
+<!--<footer th:replace="/common/footer :: footer-container"></footer>-->
+<!--<script th:src="@{/js/join/mailVerification.js}"></script>-->
+<!--</body>-->
+<!--</html>-->
