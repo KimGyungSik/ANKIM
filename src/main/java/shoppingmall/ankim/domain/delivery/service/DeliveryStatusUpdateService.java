@@ -7,18 +7,18 @@ import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.entity.DeliveryStatus;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
-import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
-import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
-import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedLock;
-import shoppingmall.ankim.global.config.lock.LockHandler;
+import shoppingmall.ankim.global.config.clock.ClockHolder;
 
+import java.time.Clock;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.List;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
@@ -32,19 +32,23 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
 @Service
 @RequiredArgsConstructor
 public class DeliveryStatusUpdateService {
+    private final ClockHolder clockHolder;
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
     @Transactional
-    public void updateDeliveryStatuses(LocalDateTime now) {
+    public void updateDeliveryStatuses() {
+        // ClockHolder를 활용하여 현재 시간 생성
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
         List<Delivery> deliveries = deliveryRepository.findAllWithOrder();
 
         for (Delivery delivery : deliveries) {
             Order order = delivery.getOrder();
             if(order.getRegDate().plusDays(1).isBefore(now) && order.getOrderStatus() == OrderStatus.PAID) {
                 delivery.setStatus(DeliveryStatus.IN_PROGRESS); // 배송중으로 상태전환
-            } else if (order.getRegDate().plusDays(2).isBefore(now) && delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
+            }
+            if (order.getRegDate().plusDays(2).isBefore(now) && delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
                 delivery.setStatus(DeliveryStatus.COMPLETED); // 배송완료로 상태전환
             }
 
