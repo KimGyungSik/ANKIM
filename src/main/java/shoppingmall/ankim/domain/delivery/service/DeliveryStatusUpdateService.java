@@ -33,8 +33,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
 @RequiredArgsConstructor
 public class DeliveryStatusUpdateService {
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
-    private final LockHandler lockHandler;
-    private final ItemService itemService;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
