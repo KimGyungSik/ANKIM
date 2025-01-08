@@ -130,7 +130,7 @@ public class PaymentFacadeWithNamedLock {
 
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(payment.getOrder().getOrdNo())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));;
-        // 단, 결제 취소 시 배송 상태가 배송 준비 상태일때만 가능
+        // 단, 결제 취소 시 결제상태가 결제완료, 배송 상태가 배송 준비 상태일때만 가능
         order.cancelOrder(); // 주문 및 배송 취소 처리
 
         // 재고 복구

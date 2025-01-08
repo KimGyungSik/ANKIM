@@ -54,6 +54,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.springframework.test.web.client.match.MockRestRequestMatchers.*;
+import static org.springframework.test.web.client.response.MockRestResponseCreators.withServerError;
 import static org.springframework.test.web.client.response.MockRestResponseCreators.withSuccess;
 import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_STOCK_QUNTITY;
 
@@ -333,9 +334,11 @@ class PaymentFacadeWithNamedQueryTest {
         // Order와 Payment 데이터 생성 및 저장
         Order order = OrderFactory.createOrderWithDelivery(entityManager);
         order.setOrdCode(orderCode);
+        order.setOrderStatus(OrderStatus.PAID);
         orderRepository.save(order);
 
-        Payment payment = Payment.create(order, PayType.CARD, 50000);
+        Payment payment = Payment.create(order,
+                PayType.CARD, 50000);
         payment.setPaymentKey(paymentKey,true);
         paymentRepository.save(payment);
 
@@ -398,6 +401,37 @@ class PaymentFacadeWithNamedQueryTest {
 
         // Mock 서버 검증
         mockServer.verify();
+
+    }
+
+    @DisplayName("결제 취소 시 주문 상태가 결제완료 상태가 아니면 예외가 발생한다.")
+    @Test
+    @Transactional
+    void cancelPaymentWithOrderStatusException() {
+        // given
+        String paymentKey = "test_payment_key";
+        String cancelReason = "사용자 요청";
+
+        Order order = OrderFactory.createOrderWithDelivery(entityManager);
+        orderRepository.save(order);
+
+        Payment payment = Payment.create(order, PayType.CARD, 50000);
+        payment.setPaymentKey(paymentKey, true);
+        paymentRepository.save(payment);
+
+        // Mock Toss API 응답 설정
+        mockServer.expect(requestTo("https://api.tosspayments.com/v1/payments/" + paymentKey + "/cancel"))
+                .andExpect(method(HttpMethod.POST))
+                .andRespond(withServerError()); // 잘못된 상태로 인해 실패 응답
+
+        // when & then
+        IllegalStateException exception = assertThrows(
+                IllegalStateException.class,
+                () -> paymentFacadeWithNamedQuery.toCancelRequestWithNamedQuery(paymentKey, cancelReason)
+        );
+
+        // 예외 메시지 검증
+        assertThat(exception.getMessage()).isEqualTo("결제를 완료해야 취소할 수 있습니다.");
 
     }
 
