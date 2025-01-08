@@ -127,7 +127,7 @@ public class PaymentFacadeWithRedis {
             String key = String.valueOf(itemNo);
             try {
                 // 아이템별 락
-                lockHandler.lockWithRedisson(key,10,10);
+                lockHandler.lockWithRedisson(key,60,120);
 
                 // 아이템 단위로 재고 감소
                 itemService.reduceStock(itemNo, quantity);

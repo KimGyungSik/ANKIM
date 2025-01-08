@@ -1,10 +1,13 @@
 package shoppingmall.ankim.domain.payment.service;
 
 import jakarta.persistence.EntityManager;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
+import org.redisson.api.RCountDownLatch;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -50,6 +53,7 @@ import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @ActiveProfiles("prod")
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -105,6 +109,9 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
 
     @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private RedissonClient redissonClient;
 
     private MockRestServiceServer mockServer;
 
@@ -211,10 +218,22 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
                 .defaultAddressYn("Y")
                 .build();
 
+        RCountDownLatch startLatch = redissonClient.getCountDownLatch("startLatch");
+        startLatch.trySetCount(2); // 두 서버가 대기하도록 설정
+
+        RCountDownLatch doneLatch = redissonClient.getCountDownLatch("doneLatch");
+        doneLatch.trySetCount(2); // 두 서버가 완료 신호를 기다리도록 설정
+
+        // 100개 요청을 미리 준비
         for (int i = 0; i < threadCount; i++) {
             String orderName = orderNames.get(i);
             executorService.submit(() -> {
                 try {
+                    // 작업 시작 로그
+                    log.info("Thread {} started at {}", Thread.currentThread().getId(), System.currentTimeMillis());
+                    // 작업 시작 전 동기화
+                    startLatch.await();
+
                     PaymentCreateServiceRequest paymentRequest = PaymentCreateServiceRequest.builder()
                             .orderName(orderName)
                             .payType(PayType.CARD)
@@ -222,6 +241,9 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
                             .build();
 
                     PaymentResponse paymentWithSynchronized = paymentFacadeWithRedis.createPaymentWithRedis(paymentRequest, deliveryRequest, addressRequest);
+                    // 작업 종료 로그
+                    log.info("Thread {} finished at {}", Thread.currentThread().getId(), System.currentTimeMillis());
+                    latch.countDown();
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -230,13 +252,20 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
             });
         }
 
-        latch.await();
+        // 두 서버 간 작업 시작 신호 보내기
+        startLatch.countDown(); // 첫 번째 서버 신호
+        startLatch.countDown(); // 두 번째 서버 신호
 
+        latch.await(); // 현재 서버의 작업 완료 대기
+        doneLatch.countDown(); // 작업 완료 신호 전송
+
+        // 작업 결과 검증
         Item item = itemRepository.findById(1L).orElseThrow();
         Item item2 = itemRepository.findById(2L).orElseThrow();
         assertThat(item.getQty()).isEqualTo(0);
         assertThat(item2.getQty()).isEqualTo(0);
     }
+
 
     @Test
     @DisplayName("재고가 100개인 상품을 101개의 스레드가 1개씩 동시에 구매했을 때 하나의 구매가 실패한다.")
