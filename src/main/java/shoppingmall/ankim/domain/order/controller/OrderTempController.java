@@ -7,6 +7,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
 import shoppingmall.ankim.domain.order.service.OrderService;
+import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
@@ -17,6 +18,7 @@ import java.util.List;
 public class OrderTempController {
 
     private final OrderService orderService;
+    private final SecurityContextHelper securityContextHelper;
 
     /*
      * 임시 주문 생성 API
@@ -27,17 +29,10 @@ public class OrderTempController {
     public ApiResponse<OrderResponse> createTempOrder(
             @RequestBody List<Long> cartItemNoList
     ) {
-
-        String loginId = getLoginId();
+        String loginId = securityContextHelper.getLoginId();
 
         OrderResponse tempOrder = orderService.createTempOrder(loginId, cartItemNoList);
         return ApiResponse.ok(tempOrder);
-    }
-
-    private static String getLoginId() {
-        // SecurityContext에서 인증된 사용자 정보 가져오기
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        return authentication.getName(); // 로그인 ID
     }
 
 }

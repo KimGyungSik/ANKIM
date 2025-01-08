@@ -135,7 +135,6 @@ public class CustomUserDetailsService implements UserDetailsService {
                 throw new AccountStatusLockedException(USER_STATUS_LOCKED);
             }
 
-
             return new CustomUserDetails(admin);
         }
     }

@@ -5,9 +5,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -17,7 +15,6 @@ import shoppingmall.ankim.domain.login.controller.request.LoginRequest;
 import shoppingmall.ankim.domain.login.exception.AdminLoginFailedException;
 import shoppingmall.ankim.domain.login.exception.MemberLoginFailedException;
 import shoppingmall.ankim.domain.login.service.LoginService;
-import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.Map;
@@ -30,12 +27,6 @@ import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_CREDENTIALS;
 public class LoginApiController {
 
     private final LoginService loginService;
-
-    @Value("${jwt.refresh.token.expire.time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME;
-
-    private final AuthenticationManager authenticationManager;
-    private final JwtTokenProvider jwtTokenProvider; // JWT 토큰 생성기
 
     @PostMapping("/member")
     public ApiResponse<?> memberLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
@@ -53,11 +44,8 @@ public class LoginApiController {
             response.setStatus(HttpStatus.OK.value());
 
             return ApiResponse.ok("로그인 성공");
-
         } catch (BadCredentialsException e) {
             throw new MemberLoginFailedException(INVALID_CREDENTIALS);
-        } catch (MemberLoginFailedException e) {
-            return ApiResponse.of(e.getErrorCode());
         }
     }
 

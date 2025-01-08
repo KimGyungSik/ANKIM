@@ -25,7 +25,7 @@ public class ReissueController {
     @Value("${jwt.refresh.token.expire.time}")
     private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 X)
 
-    @PostMapping("/reissue") // FIXME 토큰 재발행 및 헤더,쿠키,레디스에 토큰 저장
+    @PostMapping("/reissue")
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
         // 헤더에서 Access Token 추출
         String access = request.getHeader("access");

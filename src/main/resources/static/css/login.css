@@ -1,0 +1,195 @@
+/* Reset */
+body, h1, p, ul, li, button, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Body 설정 */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    /*display: flex;*/
+    flex-direction: column;
+    min-height: 100vh;
+    align-items: center;
+    background-color: #ffffff;
+}
+
+/* 헤더 설정 */
+header {
+    background-color: #f8f8f8;
+    padding: 10px 0;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    /*margin-bottom: 20px;*/
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* 메인 */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 70vh;
+}
+
+/* 메인 컨테이너 */
+.login-container {
+    width: 50vw;
+    max-width: 400px;
+    padding: 20px;
+}
+
+/* 텍스트 정렬 */
+.login-container h1 {
+    font-size: 24px;
+    /*margin-bottom: 10px;*/
+}
+
+.login-container p {
+    font-size: 14px;
+    /*margin-bottom: 20px;*/
+}
+
+/* 메인 컨테이너 */
+.welcome-container {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+/* 메인 텍스트 스타일 */
+.welcome-text {
+    display: block;
+    font-size: 36px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* 서브 텍스트 스타일 */
+.welcome-subtext {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 5px;
+    font-size: 12px;
+    line-height: 1.5;
+    color: #555;
+    margin-bottom: 50px; /* login-buttons와 간격 추가 */
+}
+
+/* 강조 텍스트 */
+.highlight {
+    font-weight: bold;
+    color: #ff6b00;
+}
+
+/* 링크 스타일 */
+.detail-link {
+    color: #007aff;
+    text-decoration: none;
+    font-weight: bold;
+    margin-left: 5px;
+}
+
+.detail-link:hover {
+    text-decoration: underline;
+}
+
+/* 버튼 스타일 */
+.login-buttons .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    width: 100%;
+    padding: 12px;
+    margin: 8px 0;
+    border: none;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s;
+}
+
+/* 버튼 호버 효과 */
+.naver:hover {
+    background-color: #029f4c;
+}
+
+.kakao:hover {
+    background-color: #dbc800;
+}
+
+.apple:hover {
+    background-color: #333;
+}
+
+.facebook:hover {
+    background-color: #2d4373;
+}
+
+.email:hover {
+    background-color: #e0e0e0;
+}
+
+.naver {
+    background-color: #03c75a;
+    color: #fff;
+}
+
+.kakao {
+    background-color: #fee500;
+    color: #000;
+}
+
+.apple {
+    background-color: #000;
+    color: #fff;
+}
+
+.facebook {
+    background-color: #3b5998;
+    color: #fff;
+}
+
+.email {
+    background-color: #f4f4f4;
+    color: #333;
+    border: 1px solid #ddd;
+}
+
+/* 링크 스타일 */
+.links {
+    margin-top: 20px;
+    font-size: 12px;
+    color: #666;
+    display: flex;
+    justify-content: center;
+    gap: 5px;
+}
+
+.links a {
+    color: #666;
+    text-decoration: none;
+}
+
+.links a:hover {
+    text-decoration: underline;
+}

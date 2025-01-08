@@ -6,7 +6,6 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.login.entity.member.LoginType;
 import shoppingmall.ankim.domain.login.service.request.LoginServiceRequest;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
 
 import java.time.LocalDateTime;
 
@@ -19,16 +18,16 @@ public class LoginRequest {
     private String loginId; // 아이디(이메일)
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
-    private String pwd; // 비밀번호
+    private String password; // 비밀번호
 
     private LoginType loginType; // 로그인 타입 (EMAIL)
     private LocalDateTime loginTime; // 로그인 시각
-    private String autoLogin; // 자동 로그인 여부(자동로그인 true, 일반 로그인 false)
+    private String autoLogin; // 자동 로그인 여부(자동로그인 null, 일반 로그인 "rememberMe")
 
     @Builder
-    public LoginRequest(String loginId, String pwd, String autoLogin) {
+    public LoginRequest(String loginId, String password, String autoLogin) {
         this.loginId = loginId;
-        this.pwd = pwd;
+        this.password = password;
         this.loginType = LoginType.EMAIL;
         this.loginTime = LocalDateTime.now();
         this.autoLogin = autoLogin;
@@ -38,7 +37,7 @@ public class LoginRequest {
     public LoginServiceRequest toServiceRequest() {
         return LoginServiceRequest.builder()
                 .loginId(this.loginId)
-                .pwd(this.pwd)
+                .pwd(this.password)
                 .loginType(this.loginType)
                 .loginTime(this.loginTime)
                 .autoLogin(this.autoLogin)

@@ -1,0 +1,10 @@
+[[member-temp-order]]
+=== 임시 주문 생성
+
+==== HTTP Request
+include::{snippets}/member-temp-order/http-request.adoc[]
+include::{snippets}/member-temp-order/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-temp-order/http-response.adoc[]
+include::{snippets}/member-temp-order/response-fields.adoc[]

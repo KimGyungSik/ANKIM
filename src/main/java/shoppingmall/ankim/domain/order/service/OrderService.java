@@ -39,11 +39,8 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @RequiredArgsConstructor
 public class OrderService {
 
-    private final ItemRepository itemRepository;
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
-    private final JwtTokenProvider jwtTokenProvider;
-    private final DeliveryService deliveryService;
     private final CartItemRepository cartItemRepository;
 
     public OrderResponse createTempOrder(String loginId, List<Long> cartItemNoList) {

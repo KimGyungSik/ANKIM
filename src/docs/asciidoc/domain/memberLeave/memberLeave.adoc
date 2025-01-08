@@ -1,0 +1,10 @@
+[[member-leave]]
+=== 회원 탈퇴
+
+==== HTTP Request
+include::{snippets}/member-leave/http-request.adoc[]
+include::{snippets}/member-leave/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-leave/http-response.adoc[]
+include::{snippets}/member-leave/response-fields.adoc[]

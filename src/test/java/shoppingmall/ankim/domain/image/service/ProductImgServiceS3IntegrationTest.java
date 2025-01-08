@@ -30,7 +30,8 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@DisabledIfSystemProperty(named = "os.name", matches = "Mac OS X")@SpringBootTest
+@DisabledIfSystemProperty(named = "os.name", matches = "Mac OS X")
+@SpringBootTest
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 class ProductImgServiceS3IntegrationTest {

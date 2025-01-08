@@ -69,8 +69,9 @@ public class Item {
     private Integer minQty; // 최소 구매 수량
 
     @Builder
-    private Item(Product product, List<OptionValue> optionValues, String code, String name, Integer addPrice,
+    private Item(Long no, Product product, List<OptionValue> optionValues, String code, String name, Integer addPrice,
                  Integer qty, Integer safQty, ProductSellingStatus sellingStatus, Integer maxQty, Integer minQty) {
+        this.no = no;
         this.product = product;
         this.code = code;
         this.name = name;

@@ -39,7 +39,7 @@ class AdminRegisterServiceRequestTest {
                 .officeNum("02-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
                 .gender("M")
-                .joinDate("2023-01-01")
+                .joinDate(LocalDate.of(2023, 1, 1))
                 .status(AdminStatus.ACTIVE)
                 .zipCode(12345)
                 .addressMain("서울특별시 강남구")

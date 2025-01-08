@@ -12,8 +12,8 @@ import shoppingmall.ankim.global.response.ApiResponse;
 @RequiredArgsConstructor
 @RequestMapping("api/leave")
 public class MemberLeaveController {
-    private final SecurityContextHelper securityContextHelper;
     private final MemberLeaveService memberLeaveService;
+    private final SecurityContextHelper securityContextHelper;
     private final LogoutHandler logoutHandler;
 
     @PostMapping("/info")

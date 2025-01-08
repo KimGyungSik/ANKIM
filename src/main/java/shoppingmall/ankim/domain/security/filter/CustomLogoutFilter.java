@@ -48,7 +48,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         String access = request.getHeader("access");
 
         if (access == null || access.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            log.warn("Access Token이 존재하지 않습니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "올바른 요청이 아닙니다.");
             return;
         }
 
@@ -56,7 +57,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // access token 에서 refresh token 추출
         String refresh = (String) redisHandler.get(access);
         if(refresh == null || refresh.isEmpty()) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            log.warn("Refresh Token이 존재하지 않습니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "올바른 요청이 아닙니다.");
             return;
         }
 
@@ -65,14 +67,16 @@ public class CustomLogoutFilter extends GenericFilterBean {
             jwtTokenProvider.isTokenExpired(refresh);
         } catch (ExpiredJwtException e) {
             // 이미 로그아웃이 된 경우
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            log.warn("만료된 토큰입니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "올바른 요청이 아닙니다.");
             return;
         }
 
         // 토큰이 refresh인지 확인
         String category = jwtTokenProvider.getCategoryFromToken(refresh);
         if(!category.equals("refresh")) {
-            response.setStatus(HttpServletResponse.SC_BAD_REQUEST);
+            log.warn("잘못된 토큰 카테고리입니다.");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "올바른 요청이 아닙니다.");
             return;
         }
 
@@ -82,8 +86,10 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 쿠키에서 access 제거
         Cookie deleteCookie = deleteCookie("access", null);
         response.addCookie(deleteCookie);
-
         response.setStatus(HttpServletResponse.SC_OK);
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write("{\"code\":200,\"status\":\"OK\",\"message\": \"로그아웃 되었습니다.\"}");
     }
 
     private Cookie deleteCookie(String key, String value) {
