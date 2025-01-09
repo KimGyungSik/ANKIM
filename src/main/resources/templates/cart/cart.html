@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>장바구니</title>
+    <link rel="stylesheet" href="/css/cart/cart.css">
+</head>
+<body>
+<main class="cart-container">
+    <h1>장바구니</h1>
+    <div class="cart-table">
+        <table>
+            <thead>
+            <tr>
+                <th><input type="checkbox" id="selectAll"></th>
+                <th>상품 정보</th>
+                <th>수량</th>
+                <th>주문 금액</th>
+                <th>배송비</th>
+            </tr>
+            </thead>
+            <tbody id="cartItemsContainer">
+            <!-- 장바구니 항목이 동적으로 렌더링됩니다. -->
+            </tbody>
+        </table>
+    </div>
+    <div class="cart-summary">
+        <button class="checkout-button" disabled>구매하기</button>
+    </div>
+</main>
+<script src="/js/cart/cart.js"></script>
+</body>
+</html>
