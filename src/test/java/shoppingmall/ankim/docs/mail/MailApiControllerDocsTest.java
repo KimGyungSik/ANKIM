@@ -39,7 +39,7 @@ public class MailApiControllerDocsTest extends RestDocsSupport {
     @Test
     public void sendMail() throws Exception {
         // given
-        Mockito.doNothing().when(mailService).sendMail(any());
+        Mockito.doAnswer(invocation -> null).when(mailService).sendMail(any());
         String loginId = "test@example.com";
 
         // when & then
