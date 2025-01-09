@@ -8,8 +8,15 @@ import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.entity.DeliveryStatus;
 import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
+import shoppingmall.ankim.domain.item.entity.Item;
+import shoppingmall.ankim.domain.item.exception.InvalidStockQuantityException;
+import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
+import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
+import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
+import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
+import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
@@ -22,7 +29,7 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.List;
 
-import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 /*
 - 자정(00시)마다 스케쥴링 진행
@@ -35,9 +42,11 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
 @Builder
 public class DeliveryStatusUpdateService {
     private final ClockHolder clockHolder;
-    private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
+    private final OrderItemRepository orderItemRepository;
+    private final ItemRepository itemRepository;
+    private final PaymentService paymentService;
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
     @Transactional
     public void updateDeliveryStatuses() {
@@ -47,7 +56,7 @@ public class DeliveryStatusUpdateService {
 
         for (Delivery delivery : deliveries) {
             Order order = delivery.getOrder();
-            if(order.getRegDate().plusDays(1).isBefore(now) && order.getOrderStatus() == OrderStatus.PAID) {
+            if(order.getRegDate().plusDays(1).isBefore(now) && order.getOrderStatus() == OrderStatus.PAID && delivery.getStatus() == DeliveryStatus.PREPARING) {
                 delivery.setStatus(DeliveryStatus.IN_PROGRESS); // 배송중으로 상태전환
             }
             if (order.getRegDate().plusDays(2).isBefore(now) && delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
@@ -58,8 +67,18 @@ public class DeliveryStatusUpdateService {
             // 반품 요청건에 대하여 3일 후에 재고복구 및 반품 완료로 변경됨
             if(delivery.getStatus()==DeliveryStatus.RETURN_REQUESTED && order.getRegDate().plusDays(3).isBefore(now)) {
                 Payment payment = paymentRepository.findByOrderId(order.getOrdNo()).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
-                // 결제 취소 & 재고 복구
-                paymentFacadeWithNamedLock.toCancelRequest(payment.getPayKey(),payment.getCancelReason()); // FIXME 반품 사유는 반품 요청 로직에서 setter로 추가
+                // 재고 복구 & 결제 취소
+                List<OrderItem> orderItems = orderItemRepository.findOrderItemsWithItemsByOrderNo(order.getOrdNo());
+                for (OrderItem orderItem : orderItems) {
+                    Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+                            .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+                    Integer quantity = orderItem.getQty();
+                    if(quantity<=0) throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
+                    item.restoreQuantity(quantity);
+                }
+                paymentService.cancelPayment(payment.getPayKey(),payment.getCancelReason()); // FIXME 반품 사유는 반품 요청 로직에서 setter로 추가
+                // 주문 상태 -> 결제 취소
+                order.setOrderStatus(OrderStatus.CANCELED);
                 // 반품 완료
                 delivery.setStatus(DeliveryStatus.RETURN_COMPLETED);
             }
