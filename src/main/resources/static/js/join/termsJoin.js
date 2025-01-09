@@ -31,16 +31,6 @@ function updateNextButtonState() {
     }
 }
 
-/*
-// 테스트용
-function updateNextButtonState() {
-    // "다음" 버튼 항상 활성화
-    const nextButton = document.getElementById("nextButton");
-    nextButton.classList.add("active"); // 활성화 스타일 추가
-    nextButton.disabled = false;       // 버튼 활성화
-}
-*/
-
 function showModal(contents) {
     var modal = document.querySelector('.modal');
     var modalBody = modal.querySelector('.modal-body');
@@ -54,43 +44,8 @@ function closeModal() {
     modal.style.display = 'none'; // 모달 숨김
 }
 
-// function submitAgreements() {
-//     const errorElement = document.getElementById("termsAgreementsError");
-//     errorElement.textContent = '';
-//     errorElement.style.display = 'none';
-//
-//     var termsAgreements = Array.from(document.querySelectorAll("input[name='termsAgreement']")).map(input => ({
-//         no: input.value,
-//         name: input.getAttribute("data-name"),
-//         agreeYn: input.checked ? "Y" : "N",
-//         level: input.getAttribute("data-level"),
-//         termsYn: input.getAttribute("data-termsYn")
-//     }));
-//
-//     fetch("/api/member/terms-next", {
-//         method: "POST",
-//         headers: {
-//             "Content-Type": "application/json"
-//         },
-//         body: JSON.stringify(termsAgreements)
-//     })
-//         .then(response => {
-//             if (response.ok) {
-//                 // 메일 인증 화면으로 전환
-//                 loadMailVerificationPage();
-//             } else {
-//                 return response.json().then(errorData => {
-//                     handleErrors(errorData);
-//                 });
-//             }
-//         })
-//         .catch(error => {
-//             handleErrors("서버와의 통신 중 문제가 발생했습니다.");
-//         });
-// }
-
 function submitAgreements() {
-    const errorElement = document.getElementById("termsAgreementsError");
+    var errorElement = document.getElementById("termsAgreementsError");
     errorElement.textContent = '';
     errorElement.style.display = 'none';
 
@@ -124,7 +79,7 @@ function submitAgreements() {
 }
 
 function handleErrors(errorData) {
-    const errorElement = document.getElementById("termsAgreementsError");
+    var errorElement = document.getElementById("termsAgreementsError");
 
     // 기존 에러 메시지 초기화
     errorElement.textContent = '';
@@ -143,12 +98,12 @@ function handleErrors(errorData) {
 
 // 메일 인증 화면 로드 함수
 function loadMailVerificationResources() {
-    const cssLink = document.createElement("link");
+    var cssLink = document.createElement("link");
     cssLink.rel = "stylesheet";
     cssLink.href = "/css/join/mailVerification.css";
     document.head.appendChild(cssLink);
 
-    const script = document.createElement("script");
+    var script = document.createElement("script");
     script.src = "/js/join/mailVerification.js";
     script.defer = true;
     script.onload = () => {
