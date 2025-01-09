@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -25,6 +26,7 @@ import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.factory.OrderFactory;
 import shoppingmall.ankim.global.config.S3Config;
+import shoppingmall.ankim.global.config.TestClockConfig;
 import shoppingmall.ankim.global.config.TestClockHolder;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
 import shoppingmall.ankim.global.dummy.InitProduct;
@@ -37,6 +39,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
+@Import(TestClockConfig.class)
 @ActiveProfiles("test")
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -49,37 +52,26 @@ class DeliveryStatusUpdateServiceTest {
 
     @MockBean
     private S3Config s3Config;
-
-    private DeliveryRepository deliveryRepository;
-    private PaymentRepository paymentRepository;
     @Autowired
     private EntityManager entityManager;
     @Autowired
     private OrderRepository orderRepository;
 
-    private TestClockHolder clockHolder;
+    @Autowired
+    private ClockHolder clockHolder;
 
     @Autowired
     private DeliveryStatusUpdateService updateService;
-
-    @BeforeEach
-    void setUp() {
-        // TestClockHolder 객체를 직접 생성
-        clockHolder = new TestClockHolder(Instant.now().toEpochMilli());
-    }
 
     @DisplayName("주문 이후 1일 후에 배송 상태를 '배송중'으로 변경할 수 있다.")
     @Test
     void updateDeliveryStatusesWithIN_PROGRESS() {
         // given
-        long fixedTime = Instant.parse("2025-01-10T00:00:00Z").toEpochMilli();
-        clockHolder.changeTime(fixedTime); // 시간 고정
-
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(fixedTime), ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
         String orderCode = "ORD20241125-1234567";
 
         // Order와 Payment 데이터 생성 및 저장
-        Order order = OrderFactory.createOrderWithDeliveryAndLocalDateTime(entityManager,now.minusDays(3));
+        Order order = OrderFactory.createOrderWithDeliveryAndLocalDateTime(entityManager,now.minusDays(2));
         order.setOrdCode(orderCode);
         order.setOrderStatus(OrderStatus.PAID);
         orderRepository.save(order);
@@ -96,14 +88,11 @@ class DeliveryStatusUpdateServiceTest {
     @Test
     void updateDeliveryStatusesWithCOMPLETED() {
         // given
-        long fixedTime = Instant.parse("2025-01-10T00:00:00Z").toEpochMilli();
-        clockHolder.changeTime(fixedTime); // 시간 고정
-
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(fixedTime), ZoneId.systemDefault());
+        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
         String orderCode = "ORD20241125-1234567";
 
         // Order와 Payment 데이터 생성 및 저장
-        Order order = OrderFactory.createOrderWithDeliveryAndLocalDateTime(entityManager,now.minusDays(5));
+        Order order = OrderFactory.createOrderWithDeliveryAndLocalDateTime(entityManager,now.minusDays(3));
         order.setOrdCode(orderCode);
         order.setOrderStatus(OrderStatus.PAID);
         order.getDelivery().setStatus(DeliveryStatus.IN_PROGRESS);

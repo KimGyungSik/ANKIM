@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.delivery.service;
 
+import lombok.Builder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -31,6 +32,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PAYMENT_NOT_FOUND;
  */
 @Service
 @RequiredArgsConstructor
+@Builder
 public class DeliveryStatusUpdateService {
     private final ClockHolder clockHolder;
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
