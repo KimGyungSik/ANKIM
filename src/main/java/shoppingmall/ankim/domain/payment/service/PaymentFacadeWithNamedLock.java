@@ -29,8 +29,10 @@ import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.global.config.lock.LockHandler;
+import shoppingmall.ankim.global.config.lock.NamedLock;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAYMENT;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -140,24 +142,18 @@ public class PaymentFacadeWithNamedLock {
     }
 
 //    @Async
-    private void reduceStock(Order order) {
-        for (OrderItem orderItem : order.getOrderItems()) {
-            Long itemNo = orderItem.getItem().getNo();
-            Integer quantity = orderItem.getQty();
-            log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            String key = String.valueOf(itemNo);
-            try {
-                // 아이템별 락
-                lockHandler.lock(key);
+@NamedLock(key = "'ITEM_' + #orderItem.item.no", timeout = 10, timeUnit = TimeUnit.SECONDS)
+private void reduceStock(Order order) {
+    for (OrderItem orderItem : order.getOrderItems()) {
+        Long itemNo = orderItem.getItem().getNo();
+        Integer quantity = orderItem.getQty();
+        log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
 
-                // 아이템 단위로 재고 감소
-                itemService.reduceStock(itemNo, quantity);
-            } finally {
-                // 락 해제
-                lockHandler.unlock(key);
-            }
-        }
+        // 재고 감소 로직
+        itemService.reduceStock(itemNo, quantity);
     }
+}
+
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
@@ -166,7 +162,7 @@ public class PaymentFacadeWithNamedLock {
             String key = String.valueOf(itemNo);
             try {
                 // 아이템별 락
-                lockHandler.lock(key);
+//                lockHandler.lock(key);
 
                 // 아이템 단위로 재고 감소
                 itemService.restoreStock(itemNo, quantity);

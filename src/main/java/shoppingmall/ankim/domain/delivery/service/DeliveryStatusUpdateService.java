@@ -58,7 +58,7 @@ public class DeliveryStatusUpdateService {
     @Transactional
     public void updateDeliveryStatuses() {
         try{
-            lockHandler.lock(LOCK_KEY); // 락 획득
+//            lockHandler.lock(LOCK_KEY); // 락 획득
             // ClockHolder를 활용하여 현재 시간 생성
             LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
             List<Delivery> deliveries = deliveryRepository.findAllWithOrder();

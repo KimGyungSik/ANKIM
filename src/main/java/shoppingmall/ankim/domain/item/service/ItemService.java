@@ -63,7 +63,7 @@ public class ItemService {
     }
 
     // 재고 차감
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+//    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void reduceStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
