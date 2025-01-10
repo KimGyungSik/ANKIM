@@ -1,9 +1,17 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const cartItemsContainer = document.getElementById("cartItemsContainer");
-    const checkoutButton = document.querySelector(".checkout-button");
+    var cartItemsContainer = document.getElementById("cartItemsContainer");
+    var checkoutButton = document.querySelector(".checkout-button");
+
+    // Access Token 가져오기
+    var accessToken = localStorage.getItem("access");
 
     // API 호출을 통해 장바구니 데이터 가져오기
-    fetch("/api/cart")
+    fetch("/api/cart", {
+        method: "GET",
+        headers: {
+            "access": accessToken
+        }}
+        )
         .then(response => response.json())
         .then(data => {
             if (data.code === 200 && data.data) {
@@ -25,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
         }
 
         items.forEach(item => {
-            const row = document.createElement("tr");
+            var row = document.createElement("tr");
 
             row.innerHTML = `
                 <td><input type="checkbox" class="select-item"></td>
@@ -52,7 +60,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
     // 구매 버튼 활성화 상태 업데이트
     function updateCheckoutButtonState() {
-        const selectedItems = document.querySelectorAll(".select-item:checked");
+        var selectedItems = document.querySelectorAll(".select-item:checked");
         checkoutButton.disabled = selectedItems.length === 0;
     }
 

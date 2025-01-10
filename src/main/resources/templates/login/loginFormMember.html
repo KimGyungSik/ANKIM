@@ -5,21 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link rel="stylesheet" th:href="@{/css/login/login.css}">
-    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/common/footer.css}">
 </head>
 <body>
-<header>
-    <!-- Header 내용 -->
-    <nav>
-        <ul>
-            <li><a href="#">BEST</a></li>
-            <li><a href="#">WOMEN</a></li>
-            <li><a href="#">MEN</a></li>
-            <!-- 더 많은 메뉴 -->
-        </ul>
-    </nav>
-</header>
-
+<header th:replace="/common/header :: header-container"></header>
 <main>
     <div class="login-container">
         <div class="welcome-container">
@@ -79,4 +68,5 @@
 </main>
 <footer th:replace="/common/footer :: footer-container"></footer>
 </body>
+<script th:src="@{/js/common/header.js}"></script>
 </html>
