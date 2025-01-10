@@ -24,8 +24,11 @@ async function sendLoginRequest(event) {
 
         // 서버 응답 처리
         if (response.ok) {
-            // 성공 시 페이지 이동
-            window.location.href = "/"; // 성공 시 루트 경로로 이동
+            var accessToken = response.headers.get("access"); // Access Token 가져오기
+            if (accessToken) {
+                localStorage.setItem("access", accessToken); // localStorage에 저장
+                window.location.href = "/"; // 성공 시 루트 경로로 이동
+            }
         } else {
             var errorData = await response.json();
             handleErrors(errorData);
