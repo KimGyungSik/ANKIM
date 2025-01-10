@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.delivery.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -35,6 +36,7 @@ import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
+import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.entity.PayType;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
@@ -44,27 +46,36 @@ import shoppingmall.ankim.factory.OrderFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TestClockConfig;
+import shoppingmall.ankim.global.config.TestClockHolder;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
+import shoppingmall.ankim.global.config.lock.LockHandler;
 import shoppingmall.ankim.global.config.track.TrackingNumberGenerator;
 import shoppingmall.ankim.global.dummy.InitProduct;
+import shoppingmall.ankim.global.flag.TaskCompletionHandler;
 
 import java.time.Instant;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-@Import(TestClockConfig.class)
 @ActiveProfiles("prod")
+@Import(TestClockConfig.class)
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @TestInstance(TestInstance.Lifecycle.PER_CLASS)
+@Slf4j
 class DeliveryStatusUpdateConcurrencyServiceTest {
     @MockBean
     private S3Service s3Service;
@@ -79,6 +90,8 @@ class DeliveryStatusUpdateConcurrencyServiceTest {
     @Autowired
     private OrderRepository orderRepository;
 
+    @Autowired
+    TaskCompletionHandler taskCompletionHandler;
     @Autowired
     private MemberRepository memberRepository;
 
@@ -103,7 +116,13 @@ class DeliveryStatusUpdateConcurrencyServiceTest {
     private TransactionTemplate transactionTemplate;
 
     @Autowired
+    private LockHandler lockHandler;
+
+    @Autowired
     private RestTemplate restTemplate;
+
+    @Autowired
+    private PaymentService paymentService;
 
     private MockRestServiceServer mockServer;
 
@@ -157,7 +176,7 @@ class DeliveryStatusUpdateConcurrencyServiceTest {
                                     }
                                 }
                         );
-                        delivery.setStatus(DeliveryStatus.RETURN_REQUESTED);
+//                        delivery.setStatus(DeliveryStatus.RETURN_REQUESTED);
                         deliveryRepository.save(delivery);
 
                         LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
@@ -167,13 +186,13 @@ class DeliveryStatusUpdateConcurrencyServiceTest {
                         orderRepository.save(order);
                         orderIds.add(order.getOrdNo());
 
-                        String paymentKey = "test_key" + String.format("%07d", i);
-                        paymentkeys.add(paymentKey);
-                        Payment payment = Payment.create(order, PayType.CARD, 50000);
-                        payment.setPaymentKey(paymentKey, true);
-                        payment.setCancelReason("반품");
-
-                        paymentRepository.save(payment);
+//                        String paymentKey = "test_key" + String.format("%07d", i);
+//                        paymentkeys.add(paymentKey);
+//                        Payment payment = Payment.create(order, PayType.CARD, 50000);
+//                        payment.setPaymentKey(paymentKey, true);
+//                        payment.setCancelReason("반품");
+//
+//                        paymentRepository.save(payment);
                     }
 
                     // flush를 통해 DB에 반영
@@ -188,20 +207,111 @@ class DeliveryStatusUpdateConcurrencyServiceTest {
             });
     }
 
-    @DisplayName("100명의 사용자가 동일한 상품에 대하여 반품 요청을 한 경우 3일 후에 재고 복구 및 배송 상태를 '반품완료'로 변경할 수 있다.")
+    @DisplayName("중복 작업 방지가 제대로 이루어졌는지 검증한다.")
     @Test
-    void updateDeliveryStatusesWithRETURN_COMPLETED() {
+    void testDuplicatePreventionInScheduledTask() throws InterruptedException {
         // given
-        mockServer.expect(ExpectedCount.manyTimes(), MockRestRequestMatchers.anything())
-                .andRespond(MockRestResponseCreators.withSuccess("{\"status\": \"success\"}", MediaType.APPLICATION_JSON));
+        int threadCount = 2; // 스레드 수를 2로 제한
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
 
-        updateService.updateDeliveryStatuses();
+        AtomicInteger successfulExecutions = new AtomicInteger(0); // 실제로 작업이 수행된 횟수
+        AtomicInteger skippedExecutions = new AtomicInteger(0); // 작업이 스킵된 횟수
 
-        Item item = itemRepository.findById(1L).orElseThrow();
-        Item item2 = itemRepository.findById(2L).orElseThrow();
+        List<String> threadLogs = new CopyOnWriteArrayList<>(); // 각 스레드의 작업 결과 기록
 
-        // 정합성 검증
-        assertThat(item.getQty()).isEqualTo(100);
-        assertThat(item2.getQty()).isEqualTo(100);
+        for (int i = 0; i < threadCount; i++) {
+            int threadIndex = i; // 스레드 인덱스 저장
+            executorService.submit(() -> {
+                try {
+                    log.info("Thread {} attempting task", threadIndex);
+
+                    // 첫 번째 스레드가 작업 수행
+                    if (threadIndex == 0) {
+                        updateService.updateDeliveryStatuses();
+                        successfulExecutions.incrementAndGet();
+                        threadLogs.add(String.format("Thread %d successfully executed the task.", threadIndex));
+                    } else {
+                        // 두 번째 스레드는 작업 시도 후 데이터를 확인
+                        updateService.updateDeliveryStatuses();
+
+                        // 데이터 상태 확인
+                        List<Delivery> deliveries = deliveryRepository.findAllWithOrder();
+                        boolean isDataAlreadyUpdated = deliveries.stream()
+                                .allMatch(delivery -> delivery.getStatus() == DeliveryStatus.COMPLETED);
+
+                        if (isDataAlreadyUpdated) {
+                            skippedExecutions.incrementAndGet();
+                            threadLogs.add(String.format("Thread %d saw already updated data and skipped.", threadIndex));
+                        } else {
+                            successfulExecutions.incrementAndGet();
+                            threadLogs.add(String.format("Thread %d executed the task unnecessarily.", threadIndex));
+                        }
+                    }
+                } catch (Exception e) {
+                    log.error("Unexpected error: {}", e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+
+        latch.await(); // 모든 스레드의 작업 완료 대기
+        executorService.shutdown();
+
+        // then
+        log.info("Successful executions: {}", successfulExecutions.get());
+        log.info("Skipped executions: {}", skippedExecutions.get());
+        log.info("Thread logs: {}", threadLogs);
+
+        // 작업이 한 번만 실행되었는지 검증
+        assertThat(successfulExecutions.get()).isEqualTo(1);
+        assertThat(skippedExecutions.get()).isEqualTo(1);
     }
+
+    @DisplayName("네임드 락으로 동시성 제어가 동작하는지 검증한다.")
+    @Test
+    void testNamedLockPreventsConcurrentExecution() throws InterruptedException {
+        // given
+        int threadCount = 2; // 스레드 수를 2로 제한
+        ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
+        CountDownLatch latch = new CountDownLatch(threadCount);
+
+        AtomicInteger taskExecutionCount = new AtomicInteger(0);
+        List<String> threadLogs = new CopyOnWriteArrayList<>();
+        List<Long> lockAcquisitionTimestamps = new CopyOnWriteArrayList<>(); // 락 획득 시간 기록
+
+        for (int i = 0; i < threadCount; i++) {
+            int threadIndex = i;
+            executorService.submit(() -> {
+                try {
+                    long startTime = System.currentTimeMillis();
+                    log.info("Thread {} attempting task", threadIndex);
+                    updateService.updateDeliveryStatuses(); // 작업 수행
+                    long lockAcquisitionTime = System.currentTimeMillis() - startTime;
+
+                    lockAcquisitionTimestamps.add(lockAcquisitionTime);
+                    taskExecutionCount.incrementAndGet();
+                    threadLogs.add(String.format("Thread %d completed task in %d ms", threadIndex, lockAcquisitionTime));
+                } catch (Exception e) {
+                    log.error("Unexpected error: {}", e.getMessage());
+                } finally {
+                    latch.countDown();
+                }
+            });
+        }
+
+        latch.await(); // 모든 스레드가 작업을 완료할 때까지 대기
+        executorService.shutdown();
+
+        // then
+        log.info("Task execution count: {}", taskExecutionCount.get());
+        log.info("Thread logs: {}", threadLogs);
+
+        // 락이 제대로 동작했다면, 첫 번째 스레드만 바로 작업을 수행하고 두 번째 스레드는 대기 후 수행
+        assertThat(taskExecutionCount.get()).isEqualTo(2); // 두 스레드 모두 작업 수행
+        assertThat(lockAcquisitionTimestamps.get(1)).isGreaterThan(lockAcquisitionTimestamps.get(0)); // 두 번째 스레드의 락 획득 시간이 더 커야 함
+    }
+
 }

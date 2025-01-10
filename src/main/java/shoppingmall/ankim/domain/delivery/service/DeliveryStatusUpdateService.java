@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.delivery.service;
 
 import lombok.Builder;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,8 @@ import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedLock;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
+import shoppingmall.ankim.global.config.lock.LockHandler;
+import shoppingmall.ankim.global.flag.TaskCompletionHandler;
 
 import java.time.Clock;
 import java.time.Instant;
@@ -42,46 +45,57 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 @Builder
 public class DeliveryStatusUpdateService {
     private final ClockHolder clockHolder;
+    private final LockHandler lockHandler;
     private final DeliveryRepository deliveryRepository;
     private final PaymentRepository paymentRepository;
     private final OrderItemRepository orderItemRepository;
     private final ItemRepository itemRepository;
     private final PaymentService paymentService;
+
+    private static final String LOCK_KEY = "SCHEDULER_DELIVERY_STATUS"; // 스케줄링 작업 고유 키
+
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
     @Transactional
     public void updateDeliveryStatuses() {
-        // ClockHolder를 활용하여 현재 시간 생성
-        LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
-        List<Delivery> deliveries = deliveryRepository.findAllWithOrder();
+        try{
+            lockHandler.lock(LOCK_KEY); // 락 획득
+            // ClockHolder를 활용하여 현재 시간 생성
+            LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
+            List<Delivery> deliveries = deliveryRepository.findAllWithOrder();
 
-        for (Delivery delivery : deliveries) {
-            Order order = delivery.getOrder();
-            if(order.getRegDate().plusDays(1).isBefore(now) && order.getOrderStatus() == OrderStatus.PAID && delivery.getStatus() == DeliveryStatus.PREPARING) {
-                delivery.setStatus(DeliveryStatus.IN_PROGRESS); // 배송중으로 상태전환
-            }
-            if (order.getRegDate().plusDays(2).isBefore(now) && delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
-                delivery.setStatus(DeliveryStatus.COMPLETED); // 배송완료로 상태전환
-            }
-
-            // 반품 처리
-            // 반품 요청건에 대하여 3일 후에 재고복구 및 반품 완료로 변경됨
-            if(delivery.getStatus()==DeliveryStatus.RETURN_REQUESTED && order.getRegDate().plusDays(3).isBefore(now)) {
-                Payment payment = paymentRepository.findByOrderId(order.getOrdNo()).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
-                // 재고 복구 & 결제 취소
-                List<OrderItem> orderItems = orderItemRepository.findOrderItemsWithItemsByOrderNo(order.getOrdNo());
-                for (OrderItem orderItem : orderItems) {
-                    Item item = itemRepository.findByNo(orderItem.getItem().getNo())
-                            .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
-                    Integer quantity = orderItem.getQty();
-                    if(quantity<=0) throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
-                    item.restoreQuantity(quantity);
+            for (Delivery delivery : deliveries) {
+                Order order = delivery.getOrder();
+                if(order.getRegDate().plusDays(1).isBefore(now) && order.getOrderStatus() == OrderStatus.PAID && delivery.getStatus() == DeliveryStatus.PREPARING) {
+                    delivery.setStatus(DeliveryStatus.IN_PROGRESS); // 배송중으로 상태전환
                 }
-                paymentService.cancelPayment(payment.getPayKey(),payment.getCancelReason()); // FIXME 반품 사유는 반품 요청 로직에서 setter로 추가
-                // 주문 상태 -> 결제 취소
-                order.setOrderStatus(OrderStatus.CANCELED);
-                // 반품 완료
-                delivery.setStatus(DeliveryStatus.RETURN_COMPLETED);
+                if (order.getRegDate().plusDays(2).isBefore(now) && delivery.getStatus() == DeliveryStatus.IN_PROGRESS) {
+                    delivery.setStatus(DeliveryStatus.COMPLETED); // 배송완료로 상태전환
+                }
+
+                // 반품 처리
+                // 반품 요청건에 대하여 3일 후에 재고복구 및 반품 완료로 변경됨
+                if(delivery.getStatus()==DeliveryStatus.RETURN_REQUESTED && order.getRegDate().plusDays(3).isBefore(now)) {
+                    Payment payment = paymentRepository.findByOrderId(order.getOrdNo()).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
+                    // 재고 복구 & 결제 취소
+                    List<OrderItem> orderItems = orderItemRepository.findOrderItemsWithItemsByOrderNo(order.getOrdNo());
+                    for (OrderItem orderItem : orderItems) {
+                        Item item = itemRepository.findByNo(orderItem.getItem().getNo())
+                                .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
+                        Integer quantity = orderItem.getQty();
+                        if(quantity<=0) throw new InvalidStockQuantityException(INVALID_STOCK_QUNTITY);
+                        item.restoreQuantity(quantity);
+                    }
+                    paymentService.cancelPayment(payment.getPayKey(),payment.getCancelReason()); // FIXME 반품 사유는 반품 요청 로직에서 setter로 추가
+                    // 주문 상태 -> 결제 취소
+                    order.setOrderStatus(OrderStatus.CANCELED);
+                    // 반품 완료
+                    delivery.setStatus(DeliveryStatus.RETURN_COMPLETED);
+                }
             }
+        } finally {
+            lockHandler.unlock(LOCK_KEY);
         }
     }
 }
+
+
