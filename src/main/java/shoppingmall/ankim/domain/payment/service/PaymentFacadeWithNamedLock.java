@@ -157,17 +157,8 @@ public class PaymentFacadeWithNamedLock {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
-//            String key = String.valueOf(itemNo);
-//            try {
-                // 아이템별 락
-//                lockHandler.lock(key);
 
-                // 아이템 단위로 재고 감소
-                itemService.restoreStock(itemNo, quantity);
-//            } finally {
-//                // 락 해제
-//                lockHandler.unlock(key);
-//            }
+            itemService.restoreStock(itemNo, quantity);
         }
     }
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {

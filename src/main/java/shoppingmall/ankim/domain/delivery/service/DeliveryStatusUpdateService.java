@@ -24,6 +24,7 @@ import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedLock;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
 import shoppingmall.ankim.global.config.lock.LockHandler;
+import shoppingmall.ankim.global.config.lock.NamedLock;
 import shoppingmall.ankim.global.flag.TaskCompletionHandler;
 
 import java.time.Clock;
@@ -52,13 +53,9 @@ public class DeliveryStatusUpdateService {
     private final ItemRepository itemRepository;
     private final PaymentService paymentService;
 
-    private static final String LOCK_KEY = "SCHEDULER_DELIVERY_STATUS"; // 스케줄링 작업 고유 키
-
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
-    @Transactional
+    @NamedLock(key = "SCHEDULER_DELIVERY_STATUS",timeout = 30)
     public void updateDeliveryStatuses() {
-        try{
-//            lockHandler.lock(LOCK_KEY); // 락 획득
             // ClockHolder를 활용하여 현재 시간 생성
             LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());
             List<Delivery> deliveries = deliveryRepository.findAllWithOrder();
@@ -92,9 +89,6 @@ public class DeliveryStatusUpdateService {
                     delivery.setStatus(DeliveryStatus.RETURN_COMPLETED);
                 }
             }
-        } finally {
-            lockHandler.unlock(LOCK_KEY);
-        }
     }
 }
 
