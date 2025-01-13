@@ -1,11 +1,11 @@
 document.addEventListener("DOMContentLoaded", () => {
-    const cartButton = document.getElementById("cartButton");
+    var cartButton = document.getElementById("cartButton");
 
     cartButton.addEventListener("click", (event) => {
         event.preventDefault();
 
         // localStorage에서 accessToken 가져오기
-        const accessToken = localStorage.getItem("access");
+        var accessToken = localStorage.getItem("access");
 
         if (!accessToken) {
             alert("로그인이 필요합니다."); // 토큰 없을 경우 처리
