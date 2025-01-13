@@ -20,7 +20,7 @@ public class NamedLockAop {
     private final ItemLockRepository itemLockRepository;
     private final AopForTransaction aopForTransaction;
 
-    @Around("@annotation(namedLock)")
+    @Around("@annotation(NamedLock)")
     public Object lock(final ProceedingJoinPoint joinPoint) throws Throwable {
         MethodSignature signature = (MethodSignature) joinPoint.getSignature();
         Method method = signature.getMethod();

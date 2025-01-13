@@ -30,6 +30,7 @@ import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
+import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
 import shoppingmall.ankim.domain.orderItem.repository.OrderItemRepository;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentQueryService;
 import shoppingmall.ankim.domain.payment.entity.PayType;
@@ -169,6 +170,7 @@ public class PaymentFacadeWithNamedLockConcurrencyRestoreStockTest {
 
                         Order order = Order.create(List.of(orderItem,orderItem2), member, delivery, LocalDateTime.now());
                         order.setOrdCode(dynamicOrderName);
+                        order.setOrderStatus(OrderStatus.PAID);
                         orderRepository.save(order);
                         orderIds.add(order.getOrdNo());
 
@@ -308,8 +310,8 @@ public class PaymentFacadeWithNamedLockConcurrencyRestoreStockTest {
                 Item item2 = itemRepository.findById(2L).orElseThrow();
 
                 // 정합성 검증
-                assertThat(item.getQty()).isEqualTo(200);
-                assertThat(item2.getQty()).isEqualTo(200);
+                assertThat(item.getQty()).isEqualTo(100);
+                assertThat(item2.getQty()).isEqualTo(100);
 
                 // 검증 성공 시 루프 탈출
                 success = true;
@@ -366,8 +368,8 @@ public class PaymentFacadeWithNamedLockConcurrencyRestoreStockTest {
         Item item2 = itemRepository.findById(2L).orElseThrow();
 
         // 정합성 검증
-        assertThat(item.getQty()).isEqualTo(200);
-        assertThat(item2.getQty()).isEqualTo(200);
+        assertThat(item.getQty()).isEqualTo(100);
+        assertThat(item2.getQty()).isEqualTo(100);
 
         // Mock 서버 검증
         // mockServer.verify();

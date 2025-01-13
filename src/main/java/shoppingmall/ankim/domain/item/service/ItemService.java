@@ -25,11 +25,13 @@ import shoppingmall.ankim.domain.option.service.request.OptionValueCreateService
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.global.config.lock.NamedLock;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
@@ -63,7 +65,7 @@ public class ItemService {
     }
 
     // 재고 차감
-//    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @NamedLock(key = "'LOCK_' + #itemNo", timeout = 30)
     public void reduceStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
@@ -71,7 +73,7 @@ public class ItemService {
     }
 
     // 재고 복구
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @NamedLock(key = "'LOCK_' + #itemNo", timeout = 30)
     public void restoreStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));

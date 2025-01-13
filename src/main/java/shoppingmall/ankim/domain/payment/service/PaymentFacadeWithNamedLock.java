@@ -1,6 +1,6 @@
 package shoppingmall.ankim.domain.payment.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Async;
@@ -141,35 +141,33 @@ public class PaymentFacadeWithNamedLock {
         return paymentService.cancelPayment(paymentKey,cancelReason);
     }
 
-//    @Async
-@NamedLock(key = "'ITEM_' + #orderItem.item.no", timeout = 10, timeUnit = TimeUnit.SECONDS)
-private void reduceStock(Order order) {
-    for (OrderItem orderItem : order.getOrderItems()) {
-        Long itemNo = orderItem.getItem().getNo();
-        Integer quantity = orderItem.getQty();
-        log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
+    private void reduceStock(Order order) {
+        for (OrderItem orderItem : order.getOrderItems()) {
+            Long itemNo = orderItem.getItem().getNo();
+            Integer quantity = orderItem.getQty();
+            log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
 
-        // 재고 감소 로직
-        itemService.reduceStock(itemNo, quantity);
+            // 재고 감소 로직
+            itemService.reduceStock(itemNo, quantity);
+        }
     }
-}
 
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            String key = String.valueOf(itemNo);
-            try {
+//            String key = String.valueOf(itemNo);
+//            try {
                 // 아이템별 락
 //                lockHandler.lock(key);
 
                 // 아이템 단위로 재고 감소
                 itemService.restoreStock(itemNo, quantity);
-            } finally {
-                // 락 해제
-                lockHandler.unlock(key);
-            }
+//            } finally {
+//                // 락 해제
+//                lockHandler.unlock(key);
+//            }
         }
     }
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {
