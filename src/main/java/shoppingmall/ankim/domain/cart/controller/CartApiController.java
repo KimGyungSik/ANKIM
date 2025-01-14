@@ -35,6 +35,7 @@ public class CartApiController {
     @GetMapping
     public ApiResponse<List<CartItemsResponse>> getCartItems() {
         String loginId = securityContextHelper.getLoginId();
+        System.out.println("loginId = " + loginId);
 
         List<CartItemsResponse> response = cartService.getCartItems(loginId);
 

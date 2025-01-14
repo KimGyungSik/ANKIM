@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login Page</title>
     <link rel="stylesheet" th:href="@{/css/login/login.css}">
-    <link rel="stylesheet" th:href="@{/css/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
 </head>
 <body>
-<header th:replace="/common/header :: header-container"></header>
+<header th:replace="/fragments/header :: header-container"></header>
 <main>
     <div class="login-container">
         <div class="welcome-container">
@@ -66,7 +66,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="/common/footer :: footer-container"></footer>
+<footer th:replace="/fragments/footer :: footer-container"></footer>
 </body>
-<script th:src="@{/js/common/header.js}"></script>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
 </html>

@@ -5,21 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ANKIM 회원가입</title>
     <link rel="stylesheet" th:href="@{/css/join/termsJoin.css}">
-    <link rel="stylesheet" th:href="@{/css/common/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
 </head>
 <body>
-<header>
-    <!-- Header 내용 -->
-    <nav>
-        <ul>
-            <li><a href="#">BEST</a></li>
-            <li><a href="#">WOMEN</a></li>
-            <li><a href="#">MEN</a></li>
-            <li><a href="/cart">장바구니</a></li>
-            <!-- 더 많은 메뉴 -->
-        </ul>
-    </nav>
-</header>
+<header th:replace="/fragments/header :: header-container"></header>
 <main>
     <div class="terms-container">
         <h1 class="terms-title">ANKIM 이용 약관에 동의해 주세요</h1>
@@ -70,7 +59,8 @@
         </div>
     </div>
 </main>
-<footer th:replace="/common/footer :: footer-container"></footer>
+<footer th:replace="/fragments/footer :: footer-container"></footer>
 </body>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
 <script th:src="@{/js/join/termsJoin.js}"></script>
 </html>

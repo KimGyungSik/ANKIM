@@ -1,33 +1,28 @@
-function toggleAllChecks(checkAllBox) {
+async function toggleAllChecks(checkAllBox) {
     var checkboxes = document.querySelectorAll("input[name='termsAgreement']");
     checkboxes.forEach(checkbox => {
         checkbox.checked = checkAllBox.checked;
     });
-    updateNextButtonState();
+    await updateNextButtonState();
 }
 
-function updateNextButtonState() {
+async function updateNextButtonState() {
     var checkboxes = document.querySelectorAll("input[name='termsAgreement']");
     var checkAllBox = document.getElementById("checkAll");
     var requiredCheckboxes = document.querySelectorAll("input[name='termsAgreement'][data-required='true']");
 
-    // 모든 체크박스가 체크되었는지 확인
     var allChecked = Array.from(checkboxes).every(checkbox => checkbox.checked);
-
-    // 필수 약관이 모두 체크되었는지 확인
     var requiredChecked = Array.from(requiredCheckboxes).every(checkbox => checkbox.checked);
 
-    // 전체 동의 체크 상태 업데이트
     checkAllBox.checked = allChecked;
 
-    // 다음 버튼 활성화/비활성화 처리
     var nextButton = document.getElementById("nextButton");
     if (requiredChecked) {
-        nextButton.classList.add("active"); // 활성화 스타일 추가
-        nextButton.disabled = false;       // 버튼 활성화
+        nextButton.classList.add("active");
+        nextButton.disabled = false;
     } else {
-        nextButton.classList.remove("active"); // 활성화 스타일 제거
-        nextButton.disabled = true;           // 버튼 비활성화
+        nextButton.classList.remove("active");
+        nextButton.disabled = true;
     }
 }
 
@@ -44,7 +39,7 @@ function closeModal() {
     modal.style.display = 'none'; // 모달 숨김
 }
 
-function submitAgreements() {
+async function submitAgreements() {
     var errorElement = document.getElementById("termsAgreementsError");
     errorElement.textContent = '';
     errorElement.style.display = 'none';
@@ -57,25 +52,24 @@ function submitAgreements() {
         termsYn: input.getAttribute("data-termsYn"),
     }));
 
-    fetch("/api/member/terms-next", {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(termsAgreements),
-    })
-        .then(response => {
-            if (response.ok) {
-                loadMailVerificationPage(); // 메일 인증 화면 전환
-            } else {
-                return response.json().then(errorData => {
-                    handleErrors(errorData);
-                });
-            }
-        })
-        .catch(error => {
-            handleErrors("서버와의 통신 중 문제가 발생했습니다.");
+    try {
+        var response = await fetch("/api/member/terms-next", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(termsAgreements),
         });
+
+        if (!response.ok) {
+            var errorData = await response.json();
+            handleErrors(errorData);
+        } else {
+            await loadMailVerificationPage();
+        }
+    } catch (error) {
+        handleErrors("서버와의 통신 중 문제가 발생했습니다.");
+    }
 }
 
 function handleErrors(errorData) {
@@ -97,7 +91,7 @@ function handleErrors(errorData) {
 }
 
 // 메일 인증 화면 로드 함수
-function loadMailVerificationResources() {
+ function loadMailVerificationResources() {
     var cssLink = document.createElement("link");
     cssLink.rel = "stylesheet";
     cssLink.href = "/css/join/mailVerification.css";
@@ -112,19 +106,23 @@ function loadMailVerificationResources() {
     document.body.appendChild(script);
 }
 
-function loadMailVerificationPage() {
-    fetch("/mail/mailVerificationFragment", {
-        method: "GET",
-        headers: {
-            "Content-Type": "text/html"
-        }
-    })
-        .then(response => response.text())
-        .then(html => {
-            document.querySelector("main").innerHTML = html;
-            loadMailVerificationResources();
-        })
-        .catch(error => {
-            console.error("화면 전환 중 오류 발생:", error);
+async function loadMailVerificationPage() {
+    try {
+        var response = await fetch("/mail/mailVerificationFragment", {
+            method: "GET",
+            headers: {
+                "Content-Type": "text/html"
+            }
         });
+
+        if (!response.ok) {
+            throw new Error("서버 응답이 올바르지 않습니다.");
+        }
+
+        var html = await response.text();
+        document.querySelector("main").innerHTML = html;
+        await loadMailVerificationResources();
+    } catch (error) {
+        console.error("화면 전환 중 오류 발생:", error);
+    }
 }

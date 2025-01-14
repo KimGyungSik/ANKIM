@@ -17,12 +17,12 @@ public class CartController {
     // 장바구니 페이지
     @GetMapping
     public String getCartItems() {
-        try {
-            securityContextHelper.getLoginId();
-        } catch (IllegalStateException e) {
-            log.error("로그인이 필요합니다.");
-            return "redirect:/login/member";
-        }
+//        try {
+//            securityContextHelper.getLoginId();
+//        } catch (IllegalStateException e) {
+//            log.error("로그인이 필요합니다.");
+//            return "redirect:/login/member";
+//        }
 
         return "cart/cart";
     }
