@@ -198,6 +198,41 @@ public class ProductQueryHelper {
         }
     }
 
+    // 할인율 필터링 메서드
+    private static void addDiscountRateFilter(Integer discountRate, QProduct product, BooleanBuilder filterBuilder) {
+        if (discountRate != null) {
+            switch (discountRate) {
+                case 80:
+                    filterBuilder.and(product.discRate.goe(80L));
+                    break;
+                case 70:
+                    filterBuilder.and(product.discRate.between(70L, 79L));
+                    break;
+                case 60:
+                    filterBuilder.and(product.discRate.between(60L, 69L));
+                    break;
+                case 50:
+                    filterBuilder.and(product.discRate.between(50L, 59L));
+                    break;
+                case 40:
+                    filterBuilder.and(product.discRate.between(40L, 49L));
+                    break;
+                case 30:
+                    filterBuilder.and(product.discRate.between(30L, 39L));
+                    break;
+                case 20:
+                    filterBuilder.and(product.discRate.between(20L, 29L));
+                    break;
+                default:
+                    filterBuilder.and(product.discRate.gt(0L));
+                    break;
+            }
+        } else {
+            filterBuilder.and(product.discRate.gt(0L));
+        }
+    }
+
+
     // 검색 필터링 메서드
     // 상품명 or 검색 키워드 or 상세 설명
     private static void addKeywordFilter(String keyword, QProduct product, BooleanBuilder filterBuilder) {

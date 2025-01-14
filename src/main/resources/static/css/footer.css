@@ -1,0 +1,115 @@
+.footer-container {
+    background-color: #f8f8f8;
+    padding: 30px 15px;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    color: #666;
+}
+
+.customer-center {
+    text-align: left;
+    margin-bottom: 20px;
+}
+
+.customer-center h3 {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 5px;
+}
+
+.customer-center p {
+    font-size: 13px;
+    color: #666;
+    margin-bottom: 10px;
+}
+
+.customer-links {
+    display: flex;
+    justify-content: left;
+    gap: 15px;
+}
+
+.customer-links a {
+    font-size: 13px;
+    color: #fff;
+    background-color: #000;
+    text-decoration: none;
+    padding: 5px 10px;
+    border-radius: 3px;
+}
+
+.customer-links a:hover {
+    background-color: #f0f0f0;
+    text-decoration: underline;
+}
+
+.footer-links {
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    margin-bottom: 20px;
+    border-top: 1px solid #ddd;
+    padding-top: 20px;
+    gap: 20px;
+    text-align: left;
+}
+
+/* NOTICE 섹션 확장 */
+#notice-section {
+    flex: 2; /* NOTICE 섹션의 확장 비율 (다른 섹션은 기본적으로 flex: 1) */
+    min-width: 300px; /* 너무 좁아지지 않도록 최소 너비 설정 */
+}
+
+.footer-links section {
+    flex: 1;
+    min-width: 100px;
+}
+
+.footer-links h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.footer-links ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.footer-links ul li {
+    margin-bottom: 5px;
+}
+
+.footer-links ul li a {
+    font-size: 13px;
+    color: #666;
+    text-decoration: none;
+}
+
+.footer-links ul li a:hover {
+    color: #007aff;
+    text-decoration: underline;
+}
+
+.footer-info {
+    font-size: 11px;
+    color: #666;
+    line-height: 1.5;
+    border-top: 1px solid #ddd;
+    padding-top: 15px;
+    text-align: left;
+}
+
+.footer-info a {
+    color: #007aff;
+    text-decoration: none;
+    text-align: left;
+
+}
+
+.footer-info a:hover {
+    text-decoration: underline;
+}
