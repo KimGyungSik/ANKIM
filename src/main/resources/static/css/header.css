@@ -1,0 +1,106 @@
+/* 기본 스타일 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 20px;
+    border-bottom: 1px solid #ccc;
+    background-color: #fff;
+    width: 100%;
+}
+
+/* 로고 */
+.logo {
+    font-size: 24px;
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+/* 카테고리 */
+.nav {
+    flex-grow: 1;
+    margin-left: 20px;
+}
+
+.nav-list {
+    display: flex;
+    gap: 15px;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 14px;
+}
+
+.nav-list li a {
+    text-decoration: none;
+    color: #000;
+    transition: color 0.3s;
+}
+
+.nav-list li a:hover {
+    color: #007BFF; /* 강조 색상 */
+}
+
+/* 사용자 메뉴 */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    font-size: 14px;
+}
+
+.user-actions a {
+    text-decoration: none;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    transition: color 0.3s;
+}
+
+.user-actions a:hover {
+    color: #007BFF; /* 강조 색상 */
+}
+
+.user-actions i {
+    font-size: 16px;
+}
+
+/* 돋보기 아이콘 */
+.search-icon i {
+    font-size: 18px;
+    margin-left: 5px;
+
+    /* 사용자 메뉴 스타일 */
+    .user-actions {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+
+    .menu-item {
+        display: flex;
+        align-items: center;
+        text-decoration: none;
+        color: #000;
+        font-size: 14px;
+    }
+
+    .menu-item:hover {
+        color: #007BFF;
+    }
+
+    /* SVG 아이콘 스타일 */
+    .icon {
+        width: 16px;
+        height: 16px;
+        margin-right: 5px;
+        fill: currentColor; /* 텍스트 색상과 동일 */
+    }
+
+}
