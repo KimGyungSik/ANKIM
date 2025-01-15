@@ -42,8 +42,31 @@
             <!-- 장바구니 항목이 동적으로 렌더링됩니다. -->
         </div>
     </div>
-    <div class="cart-summary">
-        <button class="checkout-button" disabled>구매하기</button>
+    <div id="cartSummaryContainer" class="cart-summary-container hidden">
+        <div class="summary-row">
+            <div>총 주문금액</div>
+            <div id="totalOrderAmount">0원</div>
+        </div>
+        <div class="summary-row">
+            <div>총 배송비</div>
+            <div id="totalShippingFee">0원</div>
+        </div>
+        <div class="summary-row total">
+            <div>총 결제금액</div>
+            <div id="totalPaymentAmount">0원</div>
+        </div>
+        <div class="summary-buttons">
+            <button class="continue-shopping-button">CONTINUE SHOPPING</button>
+            <button class="checkout-button">CHECK OUT</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
     </div>
 </main>
 <footer th:replace="/fragments/footer :: footer-container"></footer>
