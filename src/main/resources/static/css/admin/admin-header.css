@@ -1,0 +1,44 @@
+/* 헤더 스타일 */
+.header {
+    margin-left: 250px;
+    background-color: #fff;
+    padding: 15px 20px;
+    border-bottom: 1px solid #ccc;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    box-sizing: border-box;
+    position: fixed;
+    width: calc(100% - 250px);
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+}
+
+.brand-select {
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+}
+
+.header-right a {
+    margin-left: 15px;
+    text-decoration: none;
+    color: #333;
+    font-size: 14px;
+    transition: color 0.3s;
+}
+
+.header-right a:hover {
+    color: #007BFF;
+}
+
+.user-info {
+    margin-left: 15px;
+    font-weight: bold;
+}
