@@ -77,7 +77,7 @@ public class LoginApiController {
         cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
         cookie.setMaxAge((int) expireTime / 1000); // 쿠키 유효 시간 설정(초단위)
 //        cookie.setSecure(true); // https 통신시 사용
-//        cookie.setPath("/"); // cookie 적용 범위
+        cookie.setPath("/"); // cookie 적용 범위
         return cookie;
     }
 

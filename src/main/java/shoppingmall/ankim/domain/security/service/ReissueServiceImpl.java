@@ -89,6 +89,7 @@ public class ReissueServiceImpl implements ReissueService {
     @Override
     public void isAccessTokenExist(String accessToken) {
         boolean isExist = redisHandler.exists(accessToken);
+        System.out.println("isExist = " + isExist);
         if (!isExist) {
             throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND);
         }
