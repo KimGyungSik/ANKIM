@@ -23,11 +23,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (data.code === 200 && data.data) {
             renderCartItems(data.data);
         } else {
-            alert("장바구니 데이터를 불러오는데 실패했습니다.");
+            showModal(data.message || "장바구니 데이터를 불러오는데 실패했습니다.");
         }
     } catch (error) {
-        console.error("장바구니 불러오기 오류:", error);
-        alert("장바구니 데이터를 가져오는 중 오류가 발생했습니다.");
+        showModal(errer.message || "장바구니 데이터를 가져오는 중 오류가 발생했습니다.");
     }
 
     // 선택 상품 총 결제정보 업데이트 함수
@@ -146,6 +145,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 checkbox.checked = isChecked;
             });
             renderCartSummary(); // 선택 상품 총 결제정보 업데이트
+            updateCheckoutButtonState(); // checkoutButton 활성화
         });
 
         // 개별 체크박스 변경 시 Select All 상태 변경
@@ -154,6 +154,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 var allChecked = Array.from(itemCheckboxes).every((cb) => cb.checked); // 모든 체크박스가 선택되었는지 확인
                 selectAllCheckbox.checked = allChecked; // 모든 체크박스가 선택된 경우에만 전체 선택 체크
                 renderCartSummary(); // 선택 상품 총 결제정보 업데이트
+                updateCheckoutButtonState(); // checkoutButton 활성화
             });
         });
     }
@@ -351,7 +352,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         // 입력값 검증: 잘못된 값 입력 시 경고 및 복구
         if (isNaN(currentQty) || currentQty < 1) {
-            alert("수량은 1 이상이어야 합니다.");
+            showModal("수량은 1개 이상이어야 합니다.");
             qtyInput.value = previousQty; // 이전 값으로 복구
             return;
         }
@@ -398,8 +399,45 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
         } catch (error) {
-            alert(error.message);
+            showModal(error.message);
             return false; // 실패
         }
     }
+
+    checkoutButton.addEventListener("click", async () => {
+        var selectedItems = document.querySelectorAll(".select-item:checked");
+
+        if (selectedItems.length === 0) {
+            showModal("주문할 상품을 선택해주세요.");
+            return;
+        }
+
+        // 선택된 상품의 cartItemNo 리스트 생성
+        var cartItemNoList = Array.from(selectedItems).map((checkbox) => {
+            var cartItem = checkbox.closest(".cart-item");
+            return parseInt(cartItem.querySelector(".decrease-qty").dataset.id, 10);
+        });
+
+        try {
+            var response = await fetchWithAccessToken("/api/temp-order", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(cartItemNoList),
+            });
+
+            var data = await response.json();
+
+            if (data.code === 200 && data.data) {
+                alert("임시 주문 생성 성공"); // FIXME 주문페이지로 랜더링 해야됨!!!
+                // 주문 생성 성공 -> /order 페이지로 이동
+                // window.location.href = "/order";
+            } else {
+                showModal(data.message || "주문 요청 중 오류가 발생했습니다.");
+            }
+        } catch (error) {
+            showModal(error.message || "주문 요청을 보내는 중 오류가 발생했습니다.");
+        }
+    });
 });
