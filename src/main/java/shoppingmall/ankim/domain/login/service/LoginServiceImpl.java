@@ -196,7 +196,7 @@ public class LoginServiceImpl implements LoginService {
         } catch (BadCredentialsException | UnknownHostException ex) {
             // 실패 시 처리
             handleLoginFailure(admin, loginAttempt);
-            throw new MemberLoginFailedException(INVALID_CREDENTIALS);
+            throw new AdminLoginFailedException(INVALID_CREDENTIALS);
         }
     }
 
