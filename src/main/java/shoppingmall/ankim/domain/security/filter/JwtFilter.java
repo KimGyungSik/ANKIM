@@ -53,19 +53,6 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // 토큰 형식확인, 형식이 올바르지 않으면 다름필터로 넘기지 않음
-        try {
-            jwtTokenProvider.isTokenValidate(accessToken);
-        } catch (JwtTokenException e) {
-            // response body
-            PrintWriter writer = response.getWriter();
-            writer.print("access token is not validate");
-
-            // response status code
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            return;
-        }
-
         // 토큰 만료 여부 확인, 만료 시 다음 필터로 넘기지 않음
         try {
             jwtTokenProvider.isTokenExpired(accessToken);
@@ -76,6 +63,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
             // response status code
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            log.info("Access Token Expired");
             return;
         }
 

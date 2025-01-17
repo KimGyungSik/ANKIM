@@ -25,7 +25,7 @@ public class ReissueController {
     private final ReissueService reissueService;
 
     @Value("${jwt.refresh.token.expire.time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 X)
+    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간
 
     @PostMapping("/reissue")
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
@@ -54,9 +54,6 @@ public class ReissueController {
         }
 
         try {
-            // access token의 형식이 올바른지 확인
-            reissueService.validateAccessToken(access);
-
             // Redis에 access token이 저장되어 있는지 확인
             reissueService.isAccessTokenExist(access);
 

@@ -19,6 +19,8 @@ export async function fetchWithAccessToken(url, options = {}, loginType = "membe
         credentials: "include", // 쿠키 정보 포함 (CORS 설정 필요)
     });
 
+    alert(response.status);
+
     // JWT 형식 및 refresh 토큰 만료 에러 상태 코드 처리
     if ([403, 415, 500].includes(response.status)) {
         await handleLogout(loginType);
@@ -79,7 +81,7 @@ async function refreshAccessToken(accessToken) {
 
 // 로그아웃 처리 및 리디렉트
 async function handleLogout(loginType) {
-    alert("다시 로그인해주세요.");
+    alert("로그인이 필요합니다.");
     localStorage.removeItem("access");
 
     await fetch("/logout", { method: "POST", credentials: "include" });

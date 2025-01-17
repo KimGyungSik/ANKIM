@@ -27,11 +27,6 @@ public class ReissueServiceImpl implements ReissueService {
     private long REFRESH_TOKEN_EXPIRE_TIME;
 
     @Override
-    public void validateAccessToken(String access) {
-        jwtTokenProvider.isTokenValidate(access);
-    }
-
-    @Override
     public String validateRefreshToken(String access) {
         String refresh = (String) redisHandler.get(access);
         if(refresh == null || refresh.isEmpty()) {
@@ -42,7 +37,8 @@ public class ReissueServiceImpl implements ReissueService {
         try {
             jwtTokenProvider.isTokenExpired(refresh);
         } catch (ExpiredJwtException e) {
-            // FIXME Refresh 토큰이 만료된 경우 로그아웃 또는 재인증 요청
+            // FIXME Refresh 토큰이 만료된 경우 로그아웃 요청
+            log.info("Refresh Token Expired");
             redisHandler.delete(access); // Refresh Token이 만료되었으므로 Redis에서 해당 데이터를 삭제
             throw new JwtTokenException(REFRESH_TOKEN_EXPIRED);
         }
