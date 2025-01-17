@@ -54,9 +54,11 @@ public class ReissueController {
         }
 
         try {
+            // access token의 형식이 올바른지 확인
+            reissueService.validateAccessToken(access);
+
             // Redis에 access token이 저장되어 있는지 확인
             reissueService.isAccessTokenExist(access);
-            System.out.println("isAccessTokenExist = ");
 
             // Redis에서 access 토큰으로 refresh 토큰 추출 및 검증
             String refreshRedis = reissueService.validateRefreshToken(access);

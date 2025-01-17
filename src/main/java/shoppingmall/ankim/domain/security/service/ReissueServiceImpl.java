@@ -27,6 +27,11 @@ public class ReissueServiceImpl implements ReissueService {
     private long REFRESH_TOKEN_EXPIRE_TIME;
 
     @Override
+    public void validateAccessToken(String access) {
+        jwtTokenProvider.isTokenValidate(access);
+    }
+
+    @Override
     public String validateRefreshToken(String access) {
         String refresh = (String) redisHandler.get(access);
         if(refresh == null || refresh.isEmpty()) {

@@ -12,6 +12,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.filter.OncePerRequestFilter;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
+import shoppingmall.ankim.domain.security.exception.JwtTokenException;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import java.io.IOException;
@@ -49,6 +50,19 @@ public class JwtFilter extends OncePerRequestFilter {
         if(accessToken == null) {
             filterChain.doFilter(request, response);
             // 조건이 해당하면 메서드 종료
+            return;
+        }
+
+        // 토큰 형식확인, 형식이 올바르지 않으면 다름필터로 넘기지 않음
+        try {
+            jwtTokenProvider.isTokenValidate(accessToken);
+        } catch (JwtTokenException e) {
+            // response body
+            PrintWriter writer = response.getWriter();
+            writer.print("access token is not validate");
+
+            // response status code
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
             return;
         }
 

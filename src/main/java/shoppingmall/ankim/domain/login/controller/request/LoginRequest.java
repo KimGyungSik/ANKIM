@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.login.controller.request;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -15,9 +16,17 @@ import java.time.LocalDateTime;
 public class LoginRequest {
 
     @NotBlank(message = "이메일을 입력해주세요.") // null 과 "" 과 " " 모두 허용하지 않는다.
+    @Pattern(
+            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$",
+            message = "올바른 이메일을 입력해주세요."
+    )
     private String loginId; // 아이디(이메일)
 
     @NotBlank(message = "비밀번호를 입력해주세요.")
+//    @Pattern(
+//            regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,20}$",
+//            message = "올바른 비밀번호를 입력해주세요."
+//    )
     private String password; // 비밀번호
 
     private LoginType loginType; // 로그인 타입 (EMAIL)
