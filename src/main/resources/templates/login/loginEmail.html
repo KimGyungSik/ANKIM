@@ -47,10 +47,14 @@
                     </div>
                     <div id="passwordError" class="error-message"></div>
                     <div id="loginError" class="error-message"></div>
+                    <!-- 로그인 상태 유지 버튼 -->
+                    <div class="form-group remember-me-container">
+                        <input type="checkbox" id="rememberMe" class="remember-me-checkbox">
+                        <label for="rememberMe" class="remember-me-label">로그인 상태 유지</label>
+                    </div>
                 </div>
                 <div class="form-actions">
                     <button class="submit-button" type="submit">로그인</button>
-<!--                    <a class="register-button" th:href="@{'/api/terms/join'}">이메일로 가입하기</a>-->
                     <a class="register-button" th:href="@{'/join/email'}">이메일로 가입하기</a>
                 </div>
                 <div class="links">

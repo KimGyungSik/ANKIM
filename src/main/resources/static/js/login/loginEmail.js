@@ -5,11 +5,13 @@ async function sendLoginRequest(event) {
     // 폼 데이터 가져오기
     var loginId = document.getElementById('loginId').value;
     var password = document.getElementById('password').value;
+    var rememberMe = document.getElementById('rememberMe').checked ? "rememberMe" : null;
 
     // JSON 데이터 생성
     var requestData = {
         loginId: loginId,
-        password: password
+        password: password,
+        autoLogin: rememberMe
     };
 
     try {

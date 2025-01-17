@@ -127,4 +127,16 @@ public class JwtTokenProvider {
         // 클레임에서 "category" 값을 추출
         return claims.get("roles", String.class);
     }
+
+    // Token의 만료 시간을 추출하는 메서드
+    public long getExpirationTimeFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Date expiration = claims.getExpiration();
+        return expiration.getTime() - System.currentTimeMillis(); // 남은 만료 시간(ms)
+    }
 }
