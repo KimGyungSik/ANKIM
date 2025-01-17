@@ -101,16 +101,16 @@ public enum ErrorCode {
     ADDRESS_REGISTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "주소 등록 중 에러가 발생했습니다."),
 
     // Token 관련 에러 코드
-    ACCESS_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Access Token이 요청에 포함되지 않았습니다."),
-    REFRESH_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Refresh Token이 요청에 포함되지 않았습니다."),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다."),
-    INVALID_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "유효하지 않은 Refresh Token입니다."),
-    TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Token 재발급 중 오류가 발생했습니다."),
-    TOKEN_VALIDATION_ERROR(HttpStatus.FORBIDDEN,"유효하지 않은 토큰 입니다."),
-    INVALID_JWT_SIGNATURE(HttpStatus.FORBIDDEN, "잘못된 JWT 서명입니다."),
-    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다."),
-    UNSUPPORTED_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원되지 않는 JWT 토큰입니다."),
-    INVALID_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "잘못된 JWT 토큰입니다."),
+    ACCESS_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Access Token이 요청에 포함되지 않았습니다.", true),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Refresh Token이 요청에 포함되지 않았습니다.", true),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다.", true),
+    INVALID_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "유효하지 않은 Refresh Token입니다.", true),
+    TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Token 재발급 중 오류가 발생했습니다.", true),
+    TOKEN_VALIDATION_ERROR(HttpStatus.FORBIDDEN,"유효하지 않은 토큰 입니다.", true),
+    INVALID_JWT_SIGNATURE(HttpStatus.FORBIDDEN, "잘못된 JWT 서명입니다.", true),
+    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다.", true),
+    UNSUPPORTED_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원되지 않는 JWT 토큰입니다.", true),
+    INVALID_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "잘못된 JWT 토큰입니다.", true),
 
     // 쿠키 관련 에러 코드
     COOKIE_NOT_INCLUDED(HttpStatus.BAD_REQUEST, "쿠키가 요청에 포함되어 있지 않습니다."),
@@ -130,8 +130,19 @@ public enum ErrorCode {
 
     private final String message;
 
+    // JWT 관련 여부 추가
+    private final boolean isJwtError;
+
     ErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
+        this.isJwtError = false; // 기본값 false (JWT 관련 에러 아님)
+    }
+
+    // JWT 관련 에러를 구분하기 위한 생성자 추가
+    ErrorCode(HttpStatus httpStatus, String message, boolean isJwtError) {
+        this.httpStatus = httpStatus;
+        this.message = message;
+        this.isJwtError = isJwtError;
     }
 }

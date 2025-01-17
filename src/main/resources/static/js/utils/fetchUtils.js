@@ -19,16 +19,21 @@ export async function fetchWithAccessToken(url, options = {}, loginType = "membe
         credentials: "include", // 쿠키 정보 포함 (CORS 설정 필요)
     });
 
-    alert(response.status);
+    var responseData;
+    try {
+        responseData = await response.json();
+    } catch (error) {
+        return response;
+    }
 
     // JWT 형식 및 refresh 토큰 만료 에러 상태 코드 처리
-    if ([403, 415, 500].includes(response.status)) {
+    if (responseData.jwtError && [403, 415, 500].includes(response.status)) {
         await handleLogout(loginType);
         return;
     }
 
     // Access Token이 만료되었을 경우 -> 재발행 요청
-    if (response.status === 401) {
+    if (responseData.jwtError && response.status === 401) {
         console.warn("로그인이 만료되었습니다.");
 
         // 사용자에게 로그인 연장 여부를 묻는 다이얼로그 표시

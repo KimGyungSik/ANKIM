@@ -63,6 +63,27 @@ public class JwtTokenProvider {
         return generateToken(userDetails, category, expireTime);
     }
 
+    // Token 유효 여부 검증
+    public void isTokenValidate(String token) {
+        try {
+            Jwts.parser()
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                    .build()
+                    .parseSignedClaims(token);
+        } catch (ExpiredJwtException e) {
+            throw new JwtTokenException(EXPIRED_JWT_TOKEN);
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 JWT 서명입니다.");
+            throw new JwtTokenException(INVALID_JWT_SIGNATURE);
+        } catch (UnsupportedJwtException e) {
+            log.error("지원되지 않는 JWT 토큰입니다.");
+            throw new JwtTokenException(UNSUPPORTED_JWT_TOKEN);
+        } catch (IllegalArgumentException e) {
+            log.error("JWT 토큰이 잘못되었습니다.");
+            throw new JwtTokenException(INVALID_JWT_TOKEN);
+        }
+    }
+
     // Token 만료 여부 검증
     public boolean isTokenExpired(String token) {
             Date expirationDate = Jwts.parser()
