@@ -172,7 +172,9 @@ public class Product extends BaseEntity {
                     if (keywordsBuilder.length() > 0) {
                         keywordsBuilder.append(", ");
                     }
-                    keywordsBuilder.append(optionValue.getColorCode());
+                    if(optionValue.getColorCode()!=null) {
+                        keywordsBuilder.append(optionValue.getColorCode());
+                    }
                 }
             }
         }
