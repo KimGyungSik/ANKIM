@@ -33,7 +33,14 @@
 <body class="nav-md">
 <div class="container body">
   <div class="main_container">
-    <div class="col-md-3 left_col">
+    <div class="col-md-3 left_col" style="
+    position: fixed; /* 사이드바를 고정 */
+    top: 0; /* 상단에서 시작 */
+    left: 0; /* 왼쪽에서 시작 */
+    height: 100%; /* 화면 전체 높이 */
+    overflow-y: auto; /* 스크롤 가능하도록 설정 */
+    z-index: 999; /* 다른 요소 위에 표시 */
+">
       <div class="left_col scroll-view">
         <div class="navbar nav_title" style="border: 0;">
           <a href="index.html" class="site_title"><i class="fa fa-paw"></i> <span>ANKIM-ADMIN</span></a>
@@ -62,7 +69,7 @@
     </div>
 
     <div th:replace="~{top :: top}"></div>
-    <div th:replace="~{body :: body}"></div>
+    <div th:replace="~{/admin/product/registerBody :: registerBody}"></div>
 <!--    <div th:replace="~{down :: down}"></div>-->
   </div>
 </div>

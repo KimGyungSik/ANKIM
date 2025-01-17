@@ -1,0 +1,696 @@
+<div th:fragment="registerBody">
+    <div class="right_col register-page" role="main" style="padding: 10px 20px 0;">
+        <style>
+            /* General Styles */
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+                background-color: #f9f9f9;
+            }
+
+            .right_col.register-page {
+                padding: 20px;
+                max-width: 100%;
+                margin: 0 auto;
+            }
+
+            .section-card {
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                padding: 20px;
+                margin-bottom: 20px;
+            }
+
+            .section-header {
+                align-items: center;
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 20px;
+                border-bottom: 2px solid #f0f0f0;
+                padding-bottom: 14px;
+                color: #333;
+            }
+
+            .section-header .required {
+                color: #ff6b6b;
+                margin-left: 5px;
+                font-size: 14px;
+            }
+
+            label {
+                font-size: 14px;
+                font-weight: bold;
+                margin-bottom: 5px;
+                display: inline-block;
+                color: #555;
+            }
+
+            input,
+            select,
+            textarea {
+                width: calc(100% - 10px);
+                padding: 8px 10px;
+                margin-bottom: 15px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                box-sizing: border-box;
+                font-size: 14px;
+            }
+
+            input:focus,
+            select:focus,
+            textarea:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+            }
+
+            .form-row {
+                display: flex;
+                gap: 20px; /* 필드 간 간격 */
+                margin-bottom: 15px;
+            }
+
+            .form-field {
+                flex: 1; /* 필드 너비 균등 배분 */
+                min-width: 200px; /* 최소 너비 */
+            }
+
+            .form-field label {
+                display: block;
+                margin-bottom: 5px;
+                font-size: 14px;
+                font-weight: bold;
+                color: #555;
+            }
+
+            .form-field input,
+            .form-field textarea,
+            .form-field select {
+                width: 100%;
+                padding: 10px;
+                border: 1px solid #ddd;
+                border-radius: 4px;
+                font-size: 14px;
+                box-sizing: border-box;
+                margin-top: 10px;
+            }
+
+            .form-field textarea {
+                resize: none;
+                height: 80px;
+            }
+
+            .form-field input:focus,
+            .form-field select:focus,
+            .form-field textarea:focus {
+                border-color: #007bff;
+                outline: none;
+                box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+            }
+            .custom-switch {
+                position: relative;
+                display: inline-block;
+                width: 34px;
+                height: 20px;
+            }
+
+            .custom-switch input {
+                opacity: 0;
+                width: 0;
+                height: 0;
+            }
+
+            .custom-slider {
+                position: absolute;
+                cursor: pointer;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                background-color: #ccc;
+                transition: 0.4s;
+                border-radius: 20px;
+            }
+
+            .custom-slider:before {
+                position: absolute;
+                content: "";
+                height: 14px;
+                width: 14px;
+                left: 3px;
+                bottom: 3px;
+                background-color: white;
+                transition: 0.4s;
+                border-radius: 50%;
+            }
+
+            .custom-switch input:checked + .custom-slider {
+                background-color: #007bff;
+            }
+
+            .custom-switch input:checked + .custom-slider:before {
+                transform: translateX(14px);
+            }
+
+            .custom-tag-container {
+                display: flex;
+                gap: 10px;
+                flex-wrap: wrap;
+                padding: 5px 0;
+            }
+
+            .custom-tag {
+                background-color: #007bff;
+                color: white;
+                padding: 5px 14px;
+                border-radius: 20px;
+                font-size: 14px;
+                display: flex;
+                align-items: center;
+            }
+
+            .custom-tag button {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 14px;
+                cursor: pointer;
+                margin-top: 4px;
+            }
+
+            /* 추가: 기본 버튼 스타일 초기화 방지 */
+            .custom-tag button:hover {
+                color: #ddd;
+            }
+            /* 모달 스타일 */
+            .modal {
+                display: none;
+                position: fixed;
+                z-index: 1000;
+                left: 0;
+                top: 0;
+                width: 100%;
+                height: 100%;
+                overflow: auto;
+                background-color: rgba(0, 0, 0, 0.5);
+            }
+
+            .modal-content {
+                background-color: #fff;
+                margin: 10% auto;
+                padding: 20px;
+                border-radius: 10px;
+                width: 82%;
+                box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            }
+
+            .close-btn {
+                color: #aaa;
+                float: right;
+                font-size: 28px;
+                font-weight: bold;
+                cursor: pointer;
+            }
+
+            .close-btn:hover {
+                color: black;
+            }
+
+            .option-preview-list {
+                list-style-type: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .option-preview-item {
+                padding: 10px;
+                margin-bottom: 5px;
+                border: 1px solid #ddd;
+                border-radius: 5px;
+                background-color: #f9f9f9;
+            }
+            .option-preview-table {
+                width: 100%;
+                border-collapse: collapse;
+                margin-top: 20px;
+            }
+
+            .option-preview-table th,
+            .option-preview-table td {
+                border: 1px solid #ddd;
+                padding: 10px;
+                text-align: center;
+                vertical-align: middle;
+            }
+
+            .option-preview-table th {
+                background-color: #f7f7f7;
+                font-weight: bold;
+            }
+
+            .option-preview-table input[type="text"],
+            .option-preview-table input[type="number"] {
+                width: 100%;
+                padding: 5px;
+                box-sizing: border-box;
+                text-align: center;
+            }
+
+            .option-preview-table input[type="checkbox"] {
+                cursor: pointer;
+                width: 20px;
+                height: 20px; /* 체크박스 크기 증가 */
+            }
+
+            /* 옵션명이 겹치지 않도록 수정 */
+            .option-preview-table td .option-name {
+                white-space: pre-line; /* 줄바꿈 허용 */
+                text-align: left;
+                word-wrap: break-word;
+                line-height: 1.8; /* 줄 간격을 늘림 */
+                padding: 5px; /* 각 항목에 여백 추가 */
+            }
+
+            /* 옵션명 열 크기 늘리기 */
+            .option-preview-table th:nth-child(2),
+            .option-preview-table td:nth-child(2) {
+                width: 30%; /* 옵션명 열 너비 */
+            }
+
+            /* 최종 옵션 선택하기 버튼 조정 */
+            .modal-content h2 {
+                margin: 0;
+                font-size: 18px;
+            }
+
+            .modal-content button {
+                margin-left: auto;
+            }
+            .image-upload-container {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+                align-items: center;
+            }
+
+            .image-preview-grid {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 10px;
+            }
+            /*이미지 섹션 css*/
+            .image-preview-grid img {
+                width: 100px;
+                height: 100px;
+                object-fit: cover;
+                border-radius: 8px;
+                border: 1px solid #ddd;
+                cursor: pointer;
+            }
+
+            .upload-button {
+                width: 100px;
+                height: 100px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                background-color: #f9f9f9;
+                border: 1px dashed #ddd;
+                border-radius: 8px;
+                cursor: pointer;
+                font-size: 24px;
+                color: #aaa;
+                text-align: center;
+            }
+
+            .upload-button input {
+                display: none;
+            }
+
+            .image-guidelines {
+                font-size: 12px;
+                color: #555;
+                margin-top: 10px;
+                line-height: 1.5;
+            }
+             .registration-buttons {
+                 display: flex;
+                 justify-content: flex-end;
+                 align-items: center;
+                 margin-top: 20px;
+                 padding: 10px 20px;
+                 background-color: #f9f9f9;
+                 border-top: 1px solid #ddd;
+             }
+
+            .btn-secondary {
+                background-color: #f1f1f1;
+                color: #333;
+                border: 1px solid #ccc;
+                padding: 10px 20px;
+                font-size: 14px;
+                border-radius: 5px;
+                cursor: pointer;
+                margin-right: 10px;
+            }
+
+            .btn-secondary:hover {
+                background-color: #e0e0e0;
+                border-color: #bbb;
+            }
+
+            .btn-primary {
+                background-color: #007bff;
+                color: #fff;
+                border: none;
+                padding: 10px 20px;
+                font-size: 14px;
+                border-radius: 5px;
+                cursor: pointer;
+            }
+
+            .btn-primary:hover {
+                background-color: #0056b3;
+            }
+        </style>
+
+        <!-- Section: 카테고리 -->
+        <div class="section-card" style="margin-top: 75px;">
+            <div class="section-header">
+                카테고리 <span class="required">*</span>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>대카테고리</label>
+                    <select name="categoryNo">
+                        <option>여성</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>중카테고리</label>
+                    <select name="subcategoryNo">
+                        <option>선택</option>
+                    </select>
+                </div>
+                <div class="form-field">
+                    <label>소카테고리</label>
+                    <select name="smallCategoryNo">
+                        <option>선택</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: 기본정보 -->
+        <div class="section-card">
+            <div class="section-header">
+                기본정보 <span class="required">*</span>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>상품명</label>
+                    <input type="text" name="name" placeholder="최대 60자까지 입력 가능" maxlength="60" />
+                </div>
+                <div class="form-field">
+                    <label>상품코드</label>
+                    <input type="text" name="code" placeholder="상품 코드를 입력하세요" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>상세설명</label>
+                    <textarea name="desc" placeholder="상품 상세 설명을 입력하세요" maxlength="2000"></textarea>
+                </div>
+                <div class="form-field">
+                    <label>재고량</label>
+                    <input type="number" name="qty" placeholder="재고 수량을 입력하세요" />
+                </div>
+            </div>
+        </div>
+        <!-- Section: 가격설정 -->
+        <div class="section-card">
+            <div class="section-header">
+                가격설정 <span class="required">*</span>
+            </div>
+            <div class="form-row">
+                <div class="form-field" style="width: 100%;">
+                    <label>정상가(소비자가)</label>
+                    <input type="number" id="origPrice" placeholder="원" oninput="calculatePrice()" />
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-field">
+                    <label>할인율</label>
+                    <input type="number" id="discRate" placeholder="%" oninput="calculatePrice()" />
+                </div>
+                <div class="form-field">
+                    <label>판매가</label>
+                    <input type="number" id="finalPrice" placeholder="원" disabled style="background-color: #f9f9f9;" />
+                </div>
+            </div>
+        </div>
+
+        <script>
+            function calculatePrice() {
+                const origPrice = parseFloat(document.getElementById('origPrice').value) || 0;
+                const discRate = parseFloat(document.getElementById('discRate').value) || 0;
+
+                // 판매가 계산
+                const finalPrice = origPrice - (origPrice * (discRate / 100));
+                document.getElementById('finalPrice').value = finalPrice.toFixed(2); // 소수점 두 자리까지 표시
+            }
+        </script>
+        <!-- Section: 유의사항 -->
+        <div class="section-card">
+            <div class="section-header">
+                유의사항
+            </div>
+            <div class="form-row" style="flex-direction: column; gap: 15px;">
+                <div class="form-field" style="width: 100%;">
+                    <label>상품 유의사항</label>
+                    <textarea name="cauProd" placeholder="최대 4000자까지 입력 가능" maxlength="4000"></textarea>
+                </div>
+                <div class="form-field" style="width: 100%;">
+                    <label>주문 유의사항</label>
+                    <textarea name="cauOrd" placeholder="최대 4000자까지 입력 가능" maxlength="4000"></textarea>
+                </div>
+                <div class="form-field" style="width: 100%;">
+                    <label>배송 유의사항</label>
+                    <textarea name="cauShip" placeholder="최대 4000자까지 입력 가능" maxlength="4000"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- Section: 기타 설정 -->
+        <div class="section-card">
+            <div class="section-header">
+                기타 설정
+            </div>
+            <div class="form-row">
+                <!-- 검색 키워드 -->
+                <div class="form-field">
+                    <label>검색 키워드</label>
+                    <input type="text" name="searchKeywords" placeholder="검색 키워드를 입력하세요 (콤마로 구분)" />
+                </div>
+                <!-- 연관 상품 코드 -->
+                <div class="form-field">
+                    <label>연관 상품 코드</label>
+                    <input type="text" name="relProdCode" placeholder="연관 상품 코드를 입력하세요" />
+                </div>
+            </div>
+            <div class="form-row">
+                <!-- 베스트 상품 여부 -->
+                <div class="form-field">
+                    <label>베스트 상품 여부</label>
+                    <select name="handMadeYn">
+                        <option value="Y">예</option>
+                        <option value="N">아니오</option>
+                    </select>
+                </div>
+                <!-- 무료배송 여부 -->
+                <div class="form-field">
+                    <label>무료배송 여부</label>
+                    <select id="freeShip" name="freeShip" onchange="toggleShippingFee()">
+                        <option value="Y">예</option>
+                        <option value="N">아니오</option>
+                    </select>
+                </div>
+            </div>
+            <!-- 배송비 (기본적으로 숨김 처리) -->
+            <div class="form-row" id="shippingFeeRow" style="display: none;">
+                <div class="form-field">
+                    <label>배송비</label>
+                    <input type="number" name="shipFee" placeholder="배송비를 입력하세요" />
+                </div>
+            </div>
+        </div>
+        <script>
+            // 무료배송 여부에 따라 배송비 입력 필드 표시/숨기기
+            function toggleShippingFee() {
+                const freeShip = document.getElementById("freeShip").value;
+                const shippingFeeRow = document.getElementById("shippingFeeRow");
+
+                if (freeShip === "N") {
+                    shippingFeeRow.style.display = "flex"; // 배송비 필드 표시
+                } else {
+                    shippingFeeRow.style.display = "none"; // 배송비 필드 숨김
+                    shippingFeeRow.querySelector("input").value = ""; // 값 초기화
+                }
+            }
+        </script>
+        <!-- Section: 옵션 및 재고 설정 -->
+        <div class="section-card">
+            <div class="section-header">
+                옵션 및 재고 설정 <span class="required">*</span>
+            </div>
+            <!-- 옵션 여부 슬라이딩 스위치 -->
+            <div class="form-row">
+                <div class="form-field" style="display: flex; align-items: center;">
+                    <label>옵션 여부</label>
+                    <label class="custom-switch" style="margin-left: 10px;">
+                        <input type="checkbox" id="optionToggle" onchange="toggleOptionFields()">
+                        <span class="custom-slider"></span>
+                    </label>
+                    <span id="optionStatus" style="margin-left: 10px; font-weight: bold; margin-bottom: 5px;">옵션 없음 (단품)</span>
+                </div>
+            </div>
+            <!-- 옵션 없음일 때 -->
+            <div class="form-row" id="singleOptionFields">
+                <div class="form-field">
+                    <label>재고수량</label>
+                    <input type="number" name="stockQty" placeholder="재고 수량 입력">
+                </div>
+                <div class="form-field">
+                    <label>재입고 알림 여부</label>
+                    <select name="restockYn">
+                        <option value="Y">예</option>
+                        <option value="N">아니오</option>
+                    </select>
+                </div>
+            </div>
+            <!-- 옵션 있을 때 -->
+            <div id="multipleOptionFields" style="display: none;">
+                <div class="form-row">
+                    <div class="form-field">
+                        <label>옵션 항목 개수 (최대 3개)</label>
+                        <select name="optionCount" id="optionCount" onchange="renderOptionFields()">
+                            <option value="1">1개</option>
+                            <option value="2">2개</option>
+                            <option value="3">3개</option>
+                        </select>
+                    </div>
+                    <div class="form-field">
+                        <label>품절 임박 수량</label>
+                        <input type="number" name="lowStockThreshold" placeholder="임박 수량 입력">
+                    </div>
+                </div>
+                <!-- 동적으로 옵션 필드 추가 -->
+                <div id="dynamicOptionFields"></div>
+                <div class="form-row" style="margin-top: 20px;">
+                    <button type="button" onclick="generateOptionsPreview()"
+                            style="
+                background-color: #007bff;
+                color: white;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 5px;
+                cursor: pointer;
+                font-size: 14px;"
+                            onmouseover="this.style.backgroundColor='#0056b3';"
+                            onmouseout="this.style.backgroundColor='#007bff';">
+                        품목 생성하기
+                    </button>
+                </div>
+            </div>
+
+            <!-- 모달창 -->
+            <div id="optionPreviewModal" class="modal">
+                <div class="modal-content">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2>옵션 미리보기</h2>
+                        <button type="button" onclick="finalizeOptions()"
+                                style="
+                    background-color: #007bff;
+                    color: white;
+                    padding: 9px 10px;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 14px;"
+                                onmouseover="this.style.backgroundColor='#0056b3';"
+                                onmouseout="this.style.backgroundColor='#007bff';">
+                            품목 선택완료
+                        </button>
+                    </div>
+                    <table class="option-preview-table">
+                        <thead>
+                        <tr>
+                            <th><input type="checkbox" id="selectAll" onclick="toggleSelectAll(this)"></th>
+                            <th>옵션명</th>
+                            <th>추가 금액</th>
+                            <th>재고량</th>
+                            <th>안전 재고량</th>
+                            <th>최대 구매 수량</th>
+                            <th>최소 구매 수량</th>
+                        </tr>
+                        </thead>
+                        <tbody id="optionPreviewContent">
+                        <!-- 동적으로 옵션 리스트가 추가됩니다 -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <script th:src="@{/js/admin/optionItem.js}"></script>
+        <!-- 썸네일 섹션 -->
+        <div class="section-card">
+            <div class="section-header">
+                썸네일 이미지 <span class="required">*</span>
+            </div>
+            <div class="image-upload-container">
+                <div id="thumbnailPreview" class="image-preview-grid">
+                    <!-- 이미지 미리보기 추가 -->
+                </div>
+                <label class="upload-button">
+                    <input type="file" id="thumbnailInput" accept="image/*" multiple onchange="handleThumbnailUpload(event)">
+                    +
+                </label>
+            </div>
+            <p class="image-guidelines">
+                - 썸네일 이미지는 최소 1장 필수, 최대 6장까지 업로드 가능합니다.<br>
+                - 권장 사이즈: 1000x1000 (정사각형).<br>
+                - jpg, jpeg, png만 지원합니다.<br>
+            </p>
+        </div>
+
+        <!-- 상세 이미지 섹션 -->
+        <div class="section-card">
+            <div class="section-header">
+                상세 이미지 <span class="required">*</span>
+            </div>
+            <div class="image-upload-container">
+                <div id="detailPreview" class="image-preview-grid">
+                    <!-- 이미지 미리보기 추가 -->
+                </div>
+                <label class="upload-button">
+                    <input type="file" id="detailInput" accept="image/*" multiple onchange="handleDetailUpload(event)">
+                    +
+                </label>
+            </div>
+            <p class="image-guidelines">
+                - 상세 이미지는 최소 1장 필수, 최대 10장까지 업로드 가능합니다.<br>
+                - 권장 사이즈: 1000x1000 (정사각형).<br>
+                - jpg, jpeg, png만 지원합니다.<br>
+            </p>
+        </div>
+        <script th:src="@{/js/admin/productImg.js}"></script>
+        <!-- 등록 버튼 Section -->
+        <div class="registration-buttons">
+            <button type="button" class="btn-secondary" onclick="goToProductList()">상품 목록으로 이동</button>
+            <button type="button" class="btn-primary" onclick="completeRegistration()">등록완료</button>
+        </div>
+    </div>
+</div>

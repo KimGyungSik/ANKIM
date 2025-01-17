@@ -3,11 +3,11 @@
   <!-- menu profile quick info -->
   <div class="profile clearfix">
     <div class="profile_pic">
-      <img src="images/admin/img.jpg" alt="..." class="img-circle profile_img">
+      <img th:src="@{/images/admin/img.jpg}" alt="..." class="img-circle profile_img">
     </div>
     <div class="profile_info">
       <span>Welcome,</span>
-      <h2>Gyung Sik</h2>
+      <h2>경식님</h2>
     </div>
   </div>
   <!-- /menu profile quick info -->
@@ -20,7 +20,7 @@
         <li><a href="/dashboard"><i class="fa fa-home"></i> 대시보드 </a></li>
         <li><a><i class="fa fa-edit"></i> 상품 <span class="fa fa-chevron-down"></span></a>
           <ul class="nav child_menu">
-            <li><a href="form.html">상품 등록</a></li>
+            <li><a href="/product/admin/new">상품 등록</a></li>
             <li><a href="form_advanced.html">상품 관리</a></li>
             <li><a href="form_validation.html">옵션/재고 관리</a></li>
             <li><a href="form_wizards.html">상품 일괄 등록</a></li>

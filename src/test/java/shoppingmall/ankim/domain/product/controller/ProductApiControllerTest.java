@@ -7,32 +7,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMultipartHttpServletRequestBuilder;
-import shoppingmall.ankim.domain.category.entity.Category;
-import shoppingmall.ankim.domain.category.repository.CategoryRepository;
-import shoppingmall.ankim.domain.image.entity.ProductImg;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.controller.request.ItemCreateRequest;
 import shoppingmall.ankim.domain.item.controller.request.ItemDetailRequest;
 import shoppingmall.ankim.domain.item.controller.request.ItemUpdateRequest;
-import shoppingmall.ankim.domain.item.service.request.ItemDetailServiceRequest;
-import shoppingmall.ankim.domain.item.service.request.ItemUpdateServiceRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupUpdateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionValueCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionValueUpdateRequest;
-import shoppingmall.ankim.domain.option.service.request.OptionGroupUpdateServiceRequest;
-import shoppingmall.ankim.domain.option.service.request.OptionValueUpdateServiceRequest;
 import shoppingmall.ankim.domain.product.controller.request.ProductCreateRequest;
 import shoppingmall.ankim.domain.product.controller.request.ProductUpdateRequest;
-import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
-import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.ProductService;
 
 import java.util.List;
@@ -44,10 +33,10 @@ import static org.springframework.test.web.client.match.MockRestRequestMatchers.
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-@WebMvcTest(controllers = ProductController.class)
+@WebMvcTest(controllers = ProductApiController.class)
 @AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
 @ActiveProfiles("test")
-class ProductControllerTest {
+class ProductApiControllerTest {
 
     @MockBean
     private S3Service s3Service;
