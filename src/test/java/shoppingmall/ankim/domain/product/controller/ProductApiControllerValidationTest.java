@@ -12,14 +12,12 @@ import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import shoppingmall.ankim.domain.image.dto.ProductImgeCreateRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.item.controller.request.ItemCreateRequest;
 import shoppingmall.ankim.domain.item.controller.request.ItemDetailRequest;
 import shoppingmall.ankim.domain.option.dto.OptionGroupCreateRequest;
 import shoppingmall.ankim.domain.option.dto.OptionValueCreateRequest;
 import shoppingmall.ankim.domain.product.controller.request.ProductCreateRequest;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.service.ProductService;
 
 import java.util.List;
@@ -30,10 +28,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = ProductController.class)
+@WebMvcTest(controllers = ProductApiController.class)
 @AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
 @ActiveProfiles("test")
-public class ProductControllerValidationTest {
+public class ProductApiControllerValidationTest {
     @MockBean
     private S3Service s3Service;
 
@@ -175,7 +173,6 @@ public class ProductControllerValidationTest {
                 .andExpect(jsonPath("$.fieldErrors[*].field", containsInAnyOrder(
                         "items.items[0].safQty",
                         "items.items[0].maxQty",
-                        "items.items[0].sellingStatus",
                         "items.items[0].qty",
                         "items.items[0].minQty",
                         "items.items[0].optionValueNames",
@@ -185,11 +182,10 @@ public class ProductControllerValidationTest {
                 .andExpect(jsonPath("$.fieldErrors[*].reason", containsInAnyOrder(
                         "안전 재고량은 필수 입력 값입니다.",
                         "최대 구매 수량은 필수 입력 값입니다.",
-                        "품목 판매상태는 필수 입력 값입니다.",
                         "재고량은 필수 입력 값입니다.",
                         "최소 구매 수량은 필수 입력 값입니다.",
                         "옵션 값 이름 리스트는 필수 입력 값입니다.",
-                        "품목명은 필수 입력 값입니다.",
+                        "항목명은 필수 입력 값입니다.",
                         "옵션항목명은 필수 입력 값입니다." // 옵션 그룹에 대한 오류 메시지 추가
                 )));
     }
@@ -333,7 +329,6 @@ public class ProductControllerValidationTest {
                 .andExpect(jsonPath("$.fieldErrors[*].field", containsInAnyOrder(
                         "items.items[0].safQty",
                         "items.items[0].maxQty",
-                        "items.items[0].sellingStatus",
                         "items.items[0].qty",
                         "items.items[0].minQty",
                         "items.items[0].optionValueNames",
@@ -342,11 +337,10 @@ public class ProductControllerValidationTest {
                 .andExpect(jsonPath("$.fieldErrors[*].reason", containsInAnyOrder(
                         "안전 재고량은 필수 입력 값입니다.",
                         "최대 구매 수량은 필수 입력 값입니다.",
-                        "품목 판매상태는 필수 입력 값입니다.",
                         "재고량은 필수 입력 값입니다.",
                         "최소 구매 수량은 필수 입력 값입니다.",
                         "옵션 값 이름 리스트는 필수 입력 값입니다.",
-                        "품목명은 필수 입력 값입니다."
+                        "항목명은 필수 입력 값입니다."
                 )));
     }
 
