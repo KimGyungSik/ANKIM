@@ -52,7 +52,7 @@ export async function fetchWithAccessToken(url, options = {}, loginType = "membe
         }
     }
 
-    return response;
+    return responseData;
 }
 
 // JWT 관련 에러 처리 함수
@@ -80,7 +80,7 @@ async function refreshAccessToken(accessToken) {
         return { success: true, accessToken: response.headers.get("access") }; // 새 Access Token 반환
     } catch (error) {
         console.error("Refresh Token 만료, 로그아웃 필요:", error);
-        return { success: false };
+        return { success: false, message: error.message };
     }
 }
 

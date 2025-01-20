@@ -17,8 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     var checkoutButton = document.querySelector(".checkout-button");
 
     try {
-        var response = await fetchWithAccessToken("/api/cart", { method: "GET" });
-        var data = await response.json();
+        var data = await fetchWithAccessToken("/api/cart", { method: "GET" });
+
+        if (!data || data.error) {
+            throw new Error(data.message || "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        }
 
         if (data.code === 200 && data.data) {
             renderCartItems(data.data);
@@ -26,7 +29,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             showModal(data.message || "장바구니 데이터를 불러오는데 실패했습니다.");
         }
     } catch (error) {
-        showModal(errer.message || "장바구니 데이터를 가져오는 중 오류가 발생했습니다.");
+        showModal(error.message || "장바구니 데이터를 가져오는 중 오류가 발생했습니다.");
     }
 
     // 선택 상품 총 결제정보 업데이트 함수
@@ -319,9 +322,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         var cartItem = qtyInput.closest(".cart-item");
         var itemPriceElement = cartItem.querySelector(".item-price");
         var unitPrice = parseInt(itemPriceElement.dataset.unitPrice, 10); // 개별 단가
-        let currentQty = parseInt(qtyInput.value);
+        let previousQty = parseInt(qtyInput.dataset.default) || 1; // 기존 수량
 
-        currentQty += 1;
+        let currentQty = previousQty +  1; // 수량 증가
         qtyInput.value = currentQty;
 
         // 총 가격 업데이트
@@ -386,11 +389,11 @@ document.addEventListener("DOMContentLoaded", async () => {
     async function updateCartItemQuantity(cartItemNo, qty, qtyInput) {
         var previousQty = parseInt(qtyInput.dataset.default); // 이전 수량 저장
         try {
-            var response = await fetchWithAccessToken(
+            var data = await fetchWithAccessToken(
                 `/api/cart/items/${cartItemNo}?qty=${qty}`,
                 { method: "PATCH" }
             );
-            var data = await response.json();
+            // var data = await response.json();
 
             if (data.code === 200) {
                 return true; // 성공
