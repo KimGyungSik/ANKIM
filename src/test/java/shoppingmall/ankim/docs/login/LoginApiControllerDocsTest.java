@@ -3,22 +3,13 @@ package shoppingmall.ankim.docs.login;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import shoppingmall.ankim.docs.RestDocsSupport;
 import shoppingmall.ankim.domain.login.controller.LoginApiController;
-import shoppingmall.ankim.domain.login.controller.request.LoginRequest;
+import shoppingmall.ankim.domain.login.controller.request.AdminLoginRequest;
+import shoppingmall.ankim.domain.login.controller.request.MemberLoginRequest;
 import shoppingmall.ankim.domain.login.service.LoginService;
-import shoppingmall.ankim.domain.member.controller.MemberJoinApiController;
-import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
-import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
-import shoppingmall.ankim.domain.member.dto.MemberResponse;
-import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
-import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
-import java.time.LocalDate;
-import java.util.List;
 import java.util.Map;
 
 import static org.mockito.BDDMockito.given;
@@ -33,7 +24,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 public class LoginApiControllerDocsTest extends RestDocsSupport {
 
-
     private final LoginService loginService = mock(LoginService.class);
 
     @Override
@@ -46,7 +36,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
     @Test
     public void memberLogin() throws Exception {
         // given
-        LoginRequest loginRequest = LoginRequest.builder()
+        MemberLoginRequest memberLoginRequest = MemberLoginRequest.builder()
                 .loginId("test@example.com")
                 .password("password123")
                 .autoLogin("rememberMe")
@@ -63,7 +53,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // when & then
         mockMvc.perform(post("/api/login/member")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(memberLoginRequest)))
                 .andExpect(status().isOk())
                 .andDo(document("login-member",
                         preprocessRequest(prettyPrint()),
@@ -85,7 +75,8 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("로그인 성공 메시지").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("로그인 성공 메시지").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         ),
                         responseHeaders(
                                 headerWithName("access").description("Access 토큰 (헤더에 포함)"),
@@ -98,7 +89,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
     @Test
     public void adminLogin() throws Exception {
         // given
-        LoginRequest loginRequest = LoginRequest.builder()
+        AdminLoginRequest adminLoginRequest = AdminLoginRequest.builder()
                 .loginId("admin")
                 .password("adminPass123")
                 .build();
@@ -114,7 +105,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // when & then
         mockMvc.perform(post("/api/login/admin")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(loginRequest)))
+                        .content(objectMapper.writeValueAsString(adminLoginRequest)))
                 .andExpect(status().isOk())
                 .andDo(document("login-admin",
                         preprocessRequest(prettyPrint()),
@@ -136,7 +127,8 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("로그인 성공 메시지").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("로그인 성공 메시지").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         ),
                         responseHeaders(
                                 headerWithName("access").description("Access 토큰 (헤더에 포함)"),

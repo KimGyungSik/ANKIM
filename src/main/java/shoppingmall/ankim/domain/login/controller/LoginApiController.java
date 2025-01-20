@@ -11,7 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import shoppingmall.ankim.domain.login.controller.request.LoginRequest;
+import shoppingmall.ankim.domain.login.controller.request.AdminLoginRequest;
+import shoppingmall.ankim.domain.login.controller.request.MemberLoginRequest;
 import shoppingmall.ankim.domain.login.exception.AdminLoginFailedException;
 import shoppingmall.ankim.domain.login.exception.MemberLoginFailedException;
 import shoppingmall.ankim.domain.login.service.LoginService;
@@ -29,10 +30,10 @@ public class LoginApiController {
     private final LoginService loginService;
 
     @PostMapping("/member")
-    public ApiResponse<?> memberLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
+    public ApiResponse<?> memberLogin(@RequestBody @Valid MemberLoginRequest memberLoginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
         try {
             // LoginService를 통해 인증 처리
-            Map<String, Object> jwtToken = loginService.memberLogin(loginRequest.toServiceRequest(), request);
+            Map<String, Object> jwtToken = loginService.memberLogin(memberLoginRequest.toServiceRequest(), request);
             String access = (String) jwtToken.get("access");
             String refresh = (String) jwtToken.get("refresh");
             long expireTime = (long) jwtToken.get("expireTime");
@@ -50,10 +51,10 @@ public class LoginApiController {
     }
 
     @PostMapping("/admin") // FIXME 관리자 로그인 로직
-    public ApiResponse<?> adminLogin(@RequestBody @Valid LoginRequest loginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
+    public ApiResponse<?> adminLogin(@RequestBody @Valid AdminLoginRequest adminLoginRequest, HttpServletRequest request, HttpServletResponse response) throws MemberLoginFailedException {
         try {
             // LoginService를 통해 인증 처리
-            Map<String, Object> jwtToken = loginService.adminLogin(loginRequest.toServiceRequest(), request);
+            Map<String, Object> jwtToken = loginService.adminLogin(adminLoginRequest.toServiceRequest(), request);
             String access = (String) jwtToken.get("access");
             String refresh = (String) jwtToken.get("refresh");
             long expireTime = (long) jwtToken.get("expireTime");

@@ -81,7 +81,8 @@ public class MemberLeaveControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").type(JsonFieldType.ARRAY).optional(),
-                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }

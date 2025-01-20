@@ -13,12 +13,12 @@ import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
-public class LoginRequest {
+public class AdminLoginRequest {
 
-    @NotBlank(message = "이메일을 입력해주세요.") // null 과 "" 과 " " 모두 허용하지 않는다.
+    @NotBlank(message = "아이디를 입력해주세요.") // null 과 "" 과 " " 모두 허용하지 않는다.
     @Pattern(
-            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$",
-            message = "올바른 이메일을 입력해주세요."
+            regexp = "^(?!\\d)[a-z][a-z\\d]{2,15}$",
+            message = "올바른 아이디를 입력해주세요."
     )
     private String loginId; // 아이디(이메일)
 
@@ -34,7 +34,7 @@ public class LoginRequest {
     private String autoLogin; // 자동 로그인 여부(자동로그인 null, 일반 로그인 "rememberMe")
 
     @Builder
-    public LoginRequest(String loginId, String password, String autoLogin) {
+    public AdminLoginRequest(String loginId, String password, String autoLogin) {
         this.loginId = loginId;
         this.password = password;
         this.loginType = LoginType.EMAIL;

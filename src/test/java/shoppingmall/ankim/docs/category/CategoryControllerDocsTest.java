@@ -87,7 +87,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("data.parentNo").description("상위 카테고리 번호 (없으면 null)").optional().type(JsonFieldType.NUMBER),
                                 fieldWithPath("data.level").description("카테고리 레벨").type(JsonFieldType.STRING),
                                 fieldWithPath("data.name").description("카테고리 이름").type(JsonFieldType.STRING),
-                                fieldWithPath("data.childCategories").description("하위 카테고리 목록 (없으면 빈 배열)").optional().type(JsonFieldType.ARRAY)
+                                fieldWithPath("data.childCategories").description("하위 카테고리 목록 (없으면 빈 배열)").optional().type(JsonFieldType.ARRAY),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -123,7 +124,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -160,7 +162,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -185,7 +188,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("모든 카테고리 목록").type(JsonFieldType.ARRAY)
+                                fieldWithPath("data").description("모든 카테고리 목록").type(JsonFieldType.ARRAY),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -223,7 +227,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -257,7 +262,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("fieldErrors[].field").description("문제 발생 필드 이름").optional().type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors[].rejectedValue").description("거부된 값").optional().type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors[].reason").description("거부 사유").optional().type(JsonFieldType.STRING),
-                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -288,7 +294,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("소분류 목록").type(JsonFieldType.ARRAY)
+                                fieldWithPath("data").description("소분류 목록").type(JsonFieldType.ARRAY),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -317,7 +324,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터 (없음)").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )));
     }
 
@@ -349,7 +357,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("에러 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -382,7 +391,8 @@ public class CategoryControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("에러 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.NULL)
+                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.NULL),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }

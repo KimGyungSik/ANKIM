@@ -207,7 +207,8 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("data.payAmt").description("최종 결제 금액").type(JsonFieldType.NUMBER),
                                 fieldWithPath("data.regDate").description("주문 등록일").type(JsonFieldType.ARRAY),
                                 fieldWithPath("data.modDate").description("주문 상태 변경일").type(JsonFieldType.ARRAY),
-                                fieldWithPath("data.orderStatus").description("주문 상태").type(JsonFieldType.STRING)
+                                fieldWithPath("data.orderStatus").description("주문 상태").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }

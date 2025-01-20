@@ -81,7 +81,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -173,7 +174,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("data[].freeShip").description("무료배송 여부").type(JsonFieldType.STRING),
                                 fieldWithPath("data[].shipFee").description("배송비").type(JsonFieldType.NUMBER),
                                 fieldWithPath("data[].maxQty").description("최대 구매 수량").type(JsonFieldType.NUMBER),
-                                fieldWithPath("data[].minQty").description("최소 구매 수량").type(JsonFieldType.NUMBER)
+                                fieldWithPath("data[].minQty").description("최소 구매 수량").type(JsonFieldType.NUMBER),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
 
@@ -208,7 +210,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -236,7 +239,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -273,7 +277,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -304,7 +309,8 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data.cartItemsCount").description("장바구니 품목 수").type(JsonFieldType.NUMBER)
+                                fieldWithPath("data.cartItemsCount").description("장바구니 품목 수").type(JsonFieldType.NUMBER),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }

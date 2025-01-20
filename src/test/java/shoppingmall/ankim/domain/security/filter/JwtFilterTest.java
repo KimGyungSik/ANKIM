@@ -15,10 +15,13 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.global.exception.ErrorCode;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
+import static org.springframework.http.HttpStatus.FORBIDDEN;
+import static shoppingmall.ankim.global.exception.ErrorCode.TOKEN_VALIDATION_ERROR;
 
 @ExtendWith(MockitoExtension.class)
 class JwtFilterTest {
@@ -80,7 +83,7 @@ class JwtFilterTest {
     }
 
     @Test
-    @DisplayName("잘못된 카테고리의 토큰이 제공되었을 때, 요청이 차단되고 401 상태코드를 반환한다.")
+    @DisplayName("잘못된 카테고리의 토큰이 제공되었을 때, 요청이 차단되고 403 상태코드를 반환한다.")
     void shouldReturnUnauthorizedWhenInvalidTokenCategory() throws Exception {
         // given
         String invalidCategoryToken = "invalidCategoryToken";
@@ -93,7 +96,7 @@ class JwtFilterTest {
         jwtFilter.doFilterInternal(request, response, filterChain);
 
         // then
-        assertEquals(HttpServletResponse.SC_UNAUTHORIZED, response.getStatus());
+        assertEquals(TOKEN_VALIDATION_ERROR.getHttpStatus().value(), response.getStatus());
         verify(filterChain, never()).doFilter(request, response);
     }
 
