@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home - ANKIM</title>
+    <link rel="stylesheet" th:href="@{/css/fragments/header.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
+</head>
+<body>
+<!-- 헤더 포함 -->
+<header th:replace="/fragments/header :: header-container"></header>
+
+<!-- 메인 내용 -->
+<main>
+</main>
+
+<!-- 푸터 포함 -->
+<footer th:replace="/fragments/footer :: footer-container"></footer>
+</body>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+</html>

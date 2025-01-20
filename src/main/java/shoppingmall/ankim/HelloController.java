@@ -8,13 +8,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import shoppingmall.ankim.global.response.ApiResponse;
 
-@RestController()
+@Controller()
 @RequiredArgsConstructor
 public class HelloController {
 
     @GetMapping("/")
     public String hello() {
-        return "hello";
+        return "home";
     }
 
 }
