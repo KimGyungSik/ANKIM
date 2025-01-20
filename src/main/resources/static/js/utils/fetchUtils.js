@@ -87,11 +87,26 @@ async function refreshAccessToken(accessToken) {
 // 로그아웃 처리 및 리디렉트
 async function handleLogout(loginType) {
     alert("로그인이 필요합니다.");
-    localStorage.removeItem("access");
+    try {
+        const response = await fetch("/logout", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "access": accessToken // access 토큰 추가
+            },
+            credentials: "include"
+        });
 
-    await fetch("/logout", { method: "POST", credentials: "include" });
+        if (!response.ok) {
+            throw new Error("로그아웃 요청 실패: " + response.status);
+        }
 
-    redirectToLogin(loginType);
+        localStorage.removeItem("access");
+
+        redirectToLogin(loginType);
+    } catch (error) {
+        redirectToLogin(loginType);
+    }
 }
 
 // 로그인 페이지로 이동

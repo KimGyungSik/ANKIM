@@ -46,6 +46,7 @@ public class CustomLogoutFilter extends GenericFilterBean {
 
         // 헤더에서 Access Token 추출
         String access = request.getHeader("access");
+        log.info("logout 요청을 보냄 (access : " +access + ")");
 
         if (access == null || access.isEmpty()) {
             log.warn("Access Token이 존재하지 않습니다.");
@@ -83,8 +84,8 @@ public class CustomLogoutFilter extends GenericFilterBean {
         // 로그아웃 진행
         // refresh를 DB에서 제거
         redisHandler.delete(access);
-        // 쿠키에서 access 제거
-        Cookie deleteCookie = deleteCookie("access", null);
+        // 쿠키에서 refresh 제거
+        Cookie deleteCookie = deleteCookie("refresh", request, response);
         response.addCookie(deleteCookie);
         response.setStatus(HttpServletResponse.SC_OK);
         response.setContentType("application/json");
@@ -92,13 +93,31 @@ public class CustomLogoutFilter extends GenericFilterBean {
         response.getWriter().write("{\"code\":200,\"status\":\"OK\",\"message\": \"로그아웃 되었습니다.\"}");
     }
 
-    private Cookie deleteCookie(String key, String value) {
-        Cookie cookie = new Cookie(key, value);
+    private Cookie deleteCookie(String key, HttpServletRequest request, HttpServletResponse response) {
+        Cookie cookie = new Cookie(key, "");
         // 쿠키 설정
         cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
-        cookie.setMaxAge(0); // 쿠키 유효 시간 설정(초단위)
-        cookie.setSecure(true); // https 통신시 사용
+        cookie.setMaxAge(0); // 즉시 만료
         cookie.setPath("/"); // cookie 적용 범위
+        // 기존 쿠키의 secure 여부 확인 후 동일하게 설정
+        boolean isSecure = isSecureCookie(request, key);
+        cookie.setSecure(isSecure);
+
+        // 추가적으로 강제 삭제 헤더 설정
+        response.setHeader("Set-Cookie", "refresh=; Max-Age=0; Path=/; HttpOnly; SameSite=Lax");
+
         return cookie;
+    }
+
+    private boolean isSecureCookie(HttpServletRequest request, String key) {
+        Cookie[] cookies = request.getCookies();
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if (cookie.getName().equals(key)) {
+                    return cookie.getSecure();
+                }
+            }
+        }
+        return false;
     }
 }
