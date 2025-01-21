@@ -233,6 +233,7 @@ function finalizeOptions() {
                 const maxQuantity = row.querySelector(".max-quantity").value;
                 const minQuantity = row.querySelector(".min-quantity").value;
 
+                console.log(row.querySelector(".option-name").textContent.trim());
                 selectedOptions.push({
                     name: optionName,
                     additionalPrice,

@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.item.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -41,6 +42,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 // 옵션 조합 생성 후 품목 반환 → 각 품목에 대한 세부 값 입력 및 저장
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemService {
 
     private final ItemRepository itemRepository;

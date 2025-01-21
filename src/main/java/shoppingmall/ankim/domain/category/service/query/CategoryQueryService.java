@@ -9,6 +9,7 @@ import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 
 import java.util.List;
 
+import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_IS_EMPTY;
 import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NOT_FOUND;
 
 @Transactional(readOnly = true)
@@ -27,7 +28,7 @@ public class CategoryQueryService {
 
         // 빈 리스트일 경우 예외 발생
         if (subCategories.isEmpty()) {
-            throw new CategoryNotFoundException(CATEGORY_NOT_FOUND);
+            throw new CategoryNotFoundException(CATEGORY_IS_EMPTY);
         }
 
         return subCategories;
