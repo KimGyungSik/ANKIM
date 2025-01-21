@@ -6,10 +6,13 @@ import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
+import shoppingmall.ankim.global.constants.ShippingConstants;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
 import java.util.Map;
+
+import static shoppingmall.ankim.global.constants.ShippingConstants.FREE_SHIPPING_THRESHOLD;
 
 @RestController("v1CartApiController")
 @RequiredArgsConstructor
@@ -33,13 +36,17 @@ public class CartApiController {
 
     // 장바구니 페이지에 들어갈때 장바구니 읽어오기 ( R )
     @GetMapping
-    public ApiResponse<List<CartItemsResponse>> getCartItems() {
+//    public ApiResponse<List<CartItemsResponse>> getCartItems() {
+    public ApiResponse<Map<String, Object>> getCartItems() {
         String loginId = securityContextHelper.getLoginId();
-        System.out.println("loginId = " + loginId);
 
         List<CartItemsResponse> response = cartService.getCartItems(loginId);
 
-        return ApiResponse.ok(response);
+//        return ApiResponse.ok(response);
+        return ApiResponse.ok(Map.of(
+                "cartItems", response,
+                "freeShippingThreshold", FREE_SHIPPING_THRESHOLD
+        ));
     }
 
     // 장바구니에 담은 상품 수량 변경하기 ( U )

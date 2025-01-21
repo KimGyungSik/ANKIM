@@ -15,6 +15,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     var cartItemsContainer = document.getElementById("cartItemsContainer");
     var checkoutButton = document.querySelector(".checkout-button");
+    var shippingMessage = document.getElementById("shippingMessage"); // 무료배송 안내 메시지 추가
+
+    let freeShippingThreshold = 0; // 무료배송 기준 금액 저장 변수
 
     try {
         var data = await fetchWithAccessToken("/api/cart", { method: "GET" });
@@ -24,7 +27,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (data.code === 200 && data.data) {
-            renderCartItems(data.data);
+            renderCartItems(data.data.cartItems);
+            freeShippingThreshold = data.data.freeShippingThreshold; // 무료배송 기준 금액 저장
         } else {
             showModal(data.message || "장바구니 데이터를 불러오는데 실패했습니다.");
         }
@@ -89,10 +93,14 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         items.forEach((item) => {
-            var unitPrice = parseInt(item.totalPrice || 0, 10); // 단가 가져오기
+            var unitPrice = parseInt(item.totalPrice || 0, 10); // 개별 단가
             var calculatedTotalPrice = unitPrice * parseInt(item.qty || 1, 10); // 수량에 따른 총 가격 계산
-
             var isSoldOut = item.itemQty === 0; // 품절 여부 확인
+
+            // 배송비 결정 (freeShippingThreshold 기준)
+            var shippingFeeText = item.freeShip === "Y" || calculatedTotalPrice >= freeShippingThreshold
+                ? "🎉 무료배송!"
+                : `${item.shipFee.toLocaleString()}원`;
 
             var cartItem = document.createElement("div");
             cartItem.className = "cart-item";
@@ -110,16 +118,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         </div>
         <div class="item-qty">
             <div class="quantity-control">
-                <button class="decrease-qty" type="button" data-id="${item.cartItemNo}" ${isSoldOut ? "disabled" : ""}>-</button>
+                <button class="decrease-qty" type="button" data-id="${item.cartItemNo}"  data-ship-fee="${item.shipFee}" ${isSoldOut ? "disabled" : ""}>-</button>
                 <input class="qty-input" type="text" value="${item.qty}" inputmode="numeric" data-default="${item.qty}" ${isSoldOut ? "disabled" : ""}>
-                <button class="increase-qty" type="button" data-id="${item.cartItemNo}" ${isSoldOut ? "disabled" : ""}>+</button>
+                <button class="increase-qty" type="button" data-id="${item.cartItemNo}"  data-ship-fee="${item.shipFee}" ${isSoldOut ? "disabled" : ""}>+</button>
             </div>
         </div>
         <div class="item-price" data-unit-price="${unitPrice}">
             ${isSoldOut ? "SOLD OUT" : `${calculatedTotalPrice.toLocaleString()}원`}
         </div>
         <div class="item-shipping">
-            ${item.freeShip === "Y" ? "조건무료" : `${item.shipFee.toLocaleString()}원`}
+            ${item.freeShip === "Y" ? "조건무료" : `${shippingFeeText}`}
         </div>
     `;
             if (isSoldOut) {
@@ -205,7 +213,7 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
 
             try {
-                var response = await fetchWithAccessToken("/api/cart/items/selected", {
+                var data = await fetchWithAccessToken("/api/cart/items/selected", {
                     method: "DELETE",
                     headers: {
                         "Content-Type": "application/json",
@@ -213,7 +221,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     body: JSON.stringify(cartItemNos),
                 });
 
-                var data = await response.json();
+                // var data = await response.json();
                 showModal(data.data || "선택된 상품이 삭제되었습니다.");
 
                 // 선택된 항목 제거
@@ -230,11 +238,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         deleteSoldOutButton.addEventListener("click", async () => {
             try {
-                var response = await fetchWithAccessToken("/api/cart/items/sold-out", {
+                var data = await fetchWithAccessToken("/api/cart/items/sold-out", {
                     method: "DELETE",
                 });
 
-                var data = await response.json();
+                // var data = await response.json();
                 showModal(data.data || "품절 상품이 삭제되었습니다.");
 
                 // 품절 상품 제거
@@ -290,8 +298,10 @@ document.addEventListener("DOMContentLoaded", async () => {
         var qtyInput = event.target.nextElementSibling;
         var cartItem = qtyInput.closest(".cart-item");
         var itemPriceElement = cartItem.querySelector(".item-price");
-        var unitPrice = parseInt(itemPriceElement.dataset.unitPrice, 10); // 개별 단가
-        let currentQty = parseInt(qtyInput.value);
+        var itemShippingElement = cartItem.querySelector(".item-shipping");
+        var unitPrice = parseInt(itemPriceElement.dataset.unitPrice, 10) || 0; // 개별 단가
+        let previousQty = parseInt(qtyInput.dataset.default) || 1; // 기존 수량
+        let currentQty = parseInt(qtyInput.value, 10) || 1; // 현재 수량
 
         if (currentQty > 1) {
             currentQty -= 1;
@@ -301,6 +311,11 @@ document.addEventListener("DOMContentLoaded", async () => {
             // 총 가격 업데이트
             var newTotalPrice = unitPrice * currentQty;
             itemPriceElement.textContent = `${newTotalPrice.toLocaleString()}원`;
+
+            // 배송비 업데이트
+            itemShippingElement.textContent = event.target.dataset.freeShip === "Y" || newTotalPrice >= freeShippingThreshold
+                ? "🎉 무료배송!"
+                : `${event.target.dataset.shipFee.toLocaleString()}원`;
 
             var isUpdated = await updateCartItemQuantity(cartItemNo, currentQty, qtyInput);
 
@@ -321,6 +336,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         var qtyInput = event.target.previousElementSibling;
         var cartItem = qtyInput.closest(".cart-item");
         var itemPriceElement = cartItem.querySelector(".item-price");
+        var itemShippingElement = cartItem.querySelector(".item-shipping");
         var unitPrice = parseInt(itemPriceElement.dataset.unitPrice, 10); // 개별 단가
         let previousQty = parseInt(qtyInput.dataset.default) || 1; // 기존 수량
 
@@ -330,6 +346,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 총 가격 업데이트
         var newTotalPrice = unitPrice * currentQty;
         itemPriceElement.textContent = `${newTotalPrice.toLocaleString()}원`;
+
+        // 배송비 업데이트
+        itemShippingElement.textContent = event.target.dataset.freeShip === "Y" || newTotalPrice >= freeShippingThreshold
+            ? "🎉 무료배송!"
+            : `${event.target.dataset.shipFee.toLocaleString()}원`;
 
         var isUpdated = await updateCartItemQuantity(cartItemNo, currentQty, qtyInput);
 
@@ -393,7 +414,6 @@ document.addEventListener("DOMContentLoaded", async () => {
                 `/api/cart/items/${cartItemNo}?qty=${qty}`,
                 { method: "PATCH" }
             );
-            // var data = await response.json();
 
             if (data.code === 200) {
                 return true; // 성공

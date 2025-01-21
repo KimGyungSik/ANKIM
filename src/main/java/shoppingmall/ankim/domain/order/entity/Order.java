@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.*;
 import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.CANCELED;
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
+import static shoppingmall.ankim.global.constants.ShippingConstants.FREE_SHIPPING_THRESHOLD;
 
 @Entity
 @Getter @Setter
@@ -72,8 +73,6 @@ public class Order extends BaseEntity {
 
     @Column(name = "mod_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime modDate = LocalDateTime.now(); // 주문 상태 변경일
-
-    private static final int FREE_SHIPPING_THRESHOLD = 30000; // 무료배송 기준 금액
 
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);

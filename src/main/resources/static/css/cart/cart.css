@@ -70,6 +70,13 @@ h1 {
     box-sizing: border-box;
 }
 
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #000000; /* 체크 색상 */
+}
+
 .item-checkbox {
     flex: 0 0 5%;
     text-align: center;
