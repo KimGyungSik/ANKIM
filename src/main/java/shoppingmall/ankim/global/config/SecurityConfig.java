@@ -63,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/css/**", "/js/**", "/images/**").permitAll() // 정적 리소스 경로 허용
 //                        .requestMatchers("/admin/join", "/api/admin/register").permitAll()
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 접근 경로에 관리자 권한 필요
-                        .requestMatchers("/mypage/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
+                        .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN") // 장바구니는 USER, ADMIN 모두 접근 가능
+                        .requestMatchers("/api/mypage/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
                         .anyRequest().permitAll()) // 나머지 요청은 접근 허용
         ;
 
