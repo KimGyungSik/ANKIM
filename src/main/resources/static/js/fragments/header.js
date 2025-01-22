@@ -1,4 +1,5 @@
 document.addEventListener("DOMContentLoaded", async () => {
+    var mypageButton = document.getElementById("mypageButton");
     var cartButton = document.getElementById("cartButton");
     var loginButton = document.getElementById("loginButton");
     var logoutButton = document.getElementById("logoutButton");
@@ -13,6 +14,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         loginButton.style.display = "inline-block";
         logoutButton.style.display = "none";
     }
+
+    // 마이페이지 버튼 클릭 이벤트
+    mypageButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.location.href = "/mypage";
+    });
 
     // 장바구니 버튼 클릭 이벤트
     cartButton.addEventListener("click", (event) => {

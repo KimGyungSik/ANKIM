@@ -25,10 +25,9 @@ public class MemberMyPageController {
     private final MemberService memberService;
 
     @GetMapping
-    @ResponseBody
     public String myPage() {
 
-        return "welcome"; // FIXME 마이 페이지
+        return "mypage/mypage"; // FIXME 마이 페이지
     }
 
     @GetMapping("/edit/info")

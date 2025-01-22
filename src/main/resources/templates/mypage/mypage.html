@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/header.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="mypage-container">
+    <!-- 좌측 사이드바 -->
+    <aside class="mypage-sidebar">
+        <div class="user-info">
+            <h2 th:text="${userName}">안*훈</h2>
+            <p>좋아요 ♡ 21</p>
+        </div>
+        <nav class="sidebar-menu">
+            <h3>나의 쇼핑정보</h3>
+            <ul>
+                <li><a th:href="@{/mypage/orders}">주문배송조회</a></li>
+                <li><a th:href="@{/mypage/reservations}">숙박예약조회</a></li>
+                <li><a th:href="@{/mypage/cancel-returns}">취소/교환/반품 내역</a></li>
+                <li><a th:href="@{/mypage/reviews}">상품 리뷰</a></li>
+                <li><a th:href="@{/mypage/coupons}">증빙서류 발급</a></li>
+            </ul>
+
+            <h3>나의 계정정보</h3>
+            <ul>
+                <li><a th:href="@{/mypage/edit-profile}">회원정보수정</a></li>
+                <li><a th:href="@{/mypage/membership}">회원등급</a></li>
+                <li><a th:href="@{/mypage/coupons}">쿠폰</a></li>
+                <li><a th:href="@{/mypage/mileage}">마일리지</a></li>
+            </ul>
+
+            <h3>고객센터</h3>
+            <ul>
+                <li><a th:href="@{/support/inquiry}">1:1 문의</a></li>
+                <li><a th:href="@{/support/faq}">FAQ</a></li>
+                <li><a th:href="@{/support/opinion}">고객의 소리</a></li>
+            </ul>
+
+            <h3>ABOUT ANKIM</h3>
+            <ul>
+                <li><a th:href="@{/support/notice}">공지사항</a></li>
+                <li><a th:href="@{/support/recruit}">인재채용</a></li>
+                <li><a th:href="@{/support/about}">29CM 소개</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <!-- 마이페이지 메인 콘텐츠 -->
+    <section class="mypage-main">
+        <div class="membership-info">
+            <div class="membership-header">
+                <h3>회원등급</h3>
+                <h3>사용가능쿠폰</h3>
+                <h3>마일리지</h3>
+            </div>
+            <div class="membership-content">
+                <div class="membership-level">
+                    <p class="membership-grade" th:text="${userGrade}">ORANGE</p>
+                    <a th:href="@{/mypage/membership}" class="btn">할인혜택 보기</a>
+                </div>
+                <p th:text="${couponCount}" class="membership-stat">4</p>
+                <p th:text="${mileage}" class="membership-stat">966</p>
+            </div>
+        </div>
+
+        <!-- 개별 페이지 본문 -->
+<!--        <div class="mypage-content" th:insert="~{::content}"></div>-->
+    </section>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+</html>
