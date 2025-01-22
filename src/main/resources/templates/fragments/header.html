@@ -18,66 +18,35 @@
         <!-- 메인 카테고리 -->
         <nav class="nav">
             <ul class="nav-list">
-                <li><a href="#" th:href="@{/best}">BEST</a></li>
-                <li><a href="#" th:href="@{/new}">NEW</a></li>
+                <!-- BEST와 NEW -->
+                <li><a href="#" th:href="@{'/list?condition=BEST'}">BEST</a></li>
+                <li><a href="#" th:href="@{'/list?condition=NEW'}">NEW</a></li>
+
+                <!-- MADE 메뉴 -->
                 <li class="dropdown">
-                    <a href="#" th:href="@{/made}">MADE</a>
+                    <a href="#" th:href="@{'/list?condition=HANDMADE'}">MADE</a>
                     <ul class="dropdown-menu">
-                        <li><a href="#" th:href="@{/outer}">OUTER</a></li>
-                        <li><a href="#" th:href="@{/top}">TOP</a></li>
-                        <li><a href="#" th:href="@{/bottom}">BOTTOM</a></li>
-                        <li><a href="#" th:href="@{/ops}">OPS</a></li>
+                        <li th:each="category : ${handmadeCategories}">
+                            <a href="#"
+                               th:href="@{'/list?size=10&page=0&condition=HANDMADE&category=' + ${category.categoryNo}}"
+                               th:text="${category.name}"></a>
+                        </li>
                     </ul>
                 </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/bottom}">BOTTOM</a>
+
+                <!-- 중분류 카테고리 -->
+                <li class="dropdown" th:each="category : ${middleCategories}">
+                    <a href="#"
+                       th:href="@{'/list?condition=' + ${category.name}}"
+                       th:text="${category.name}"></a>
                     <ul class="dropdown-menu">
-                        <li><a href="#">데님</a></li>
-                        <li><a href="#">팬츠</a></li>
-                        <li><a href="#">슬랙스</a></li>
-                        <li><a href="#">쇼츠</a></li>
-                        <li><a href="#">트레이닝팬츠</a></li>
-                        <li><a href="#">스판혼방</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/knit}">KNIT</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">니트</a></li>
-                        <li><a href="#">가디건</a></li>
-                        <li><a href="#">베스트</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/outer}">OUTER</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">코트</a></li>
-                        <li><a href="#">자켓</a></li>
-                        <li><a href="#">가디건</a></li>
-                        <li><a href="#">점퍼</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/top}">TOP</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">티셔츠</a></li>
-                        <li><a href="#">맨투맨/후드</a></li>
-                        <li><a href="#">슬리브리스</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/shirt}">SHIRT</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">셔츠</a></li>
-                        <li><a href="#">블라우스</a></li>
-                    </ul>
-                </li>
-                <li class="dropdown">
-                    <a href="#" th:href="@{/opssk}">OPS/SK</a>
-                    <ul class="dropdown-menu">
-                        <li><a href="#">원피스</a></li>
-                        <li><a href="#">미니스커트</a></li>
-                        <li><a href="#">미디-롱 스커트</a></li>
+                        <!-- 하위 카테고리 -->
+                        <li th:each="subCategory : ${subCategories}"
+                            th:if="${subCategory.parentNo == category.categoryNo}">
+                            <a href="#"
+                               th:href="@{'/list?condition=' + ${category.name} + '&category=' + ${subCategory.categoryNo}}"
+                               th:text="${subCategory.name}"></a>
+                        </li>
                     </ul>
                 </li>
             </ul>

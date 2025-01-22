@@ -54,7 +54,22 @@ public class InitProduct {
             Map<Condition, Category> conditionToCategoryMap = new HashMap<>();
             for (Condition condition : Condition.values()) {
                 if (condition.isCategoryCondition()) {
-                    Category category = createCategory(em, condition.getCategoryName());
+                    // 중분류 이름
+                    String categoryName = condition.getCategoryName();
+
+                    // 해당 중분류에 연결될 서브카테고리 이름 리스트
+                    List<String> subCategoryNames = switch (categoryName) {
+                        case "BOTTOM" -> List.of("데님", "팬츠", "슬랙스", "쇼츠", "트레이닝팬츠", "스판혼방");
+                        case "KNIT" -> List.of("니트", "가디건", "베스트");
+                        case "OUTER" -> List.of("코트", "자켓", "가디건", "점퍼");
+                        case "TOP" -> List.of("티셔츠", "맨투맨/후드", "슬리브리스");
+                        case "SHIRT" -> List.of("셔츠", "블라우스");
+                        case "OPS/SK" -> List.of("원피스", "미니스커트", "미디-롱 스커트");
+                        default -> List.of(); // 기본적으로 서브카테고리가 없을 경우
+                    };
+
+                    // 카테고리 생성 (중분류 + 하위 카테고리)
+                    Category category = createCategory(em, categoryName, subCategoryNames);
                     conditionToCategoryMap.put(condition, category);
                 }
             }
@@ -211,13 +226,25 @@ public class InitProduct {
 //        }
 
 
-        // 카테고리 생성 메서드
-        private Category createCategory(EntityManager em, String name) {
-            Category category = Category.builder()
+        // 카테고리 생성 메서드 (서브카테고리 포함)
+        private Category createCategory(EntityManager em, String name, List<String> subCategoryNames) {
+            Category parentCategory = Category.builder()
                     .name(name)
                     .build();
-            em.persist(category);
-            return category;
+            em.persist(parentCategory);
+
+            // 서브카테고리 생성 및 연결
+            if (subCategoryNames != null && !subCategoryNames.isEmpty()) {
+                for (String subCategoryName : subCategoryNames) {
+                    Category subCategory = Category.builder()
+                            .name(subCategoryName)
+                            .build();
+                    parentCategory.addSubCategory(subCategory); // 부모-자식 관계 설정
+                    em.persist(subCategory);
+                }
+            }
+
+            return parentCategory;
         }
 
         // 옵션 그룹 생성

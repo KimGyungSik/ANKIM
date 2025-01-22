@@ -8,7 +8,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 20px 30px; /* 헤더 높이를 늘리기 위해 패딩 증가 */
+    padding: 15px 30px; /* 헤더 높이를 늘리기 위해 패딩 증가 */
     border-bottom: 1px solid #ccc;
     background-color: #fff;
     width: 100%;
@@ -20,31 +20,37 @@ body {
     font-size: 35px; /* 로고 글씨 크기 증가 */
     font-weight: bold;
     margin-right: 20px;
+    flex-shrink: 0; /* 로고 크기 유지 */
+    margin-right: 20px;
 }
 
 /* 카테고리 */
 .nav {
     flex-grow: 1;
-    margin-left: 20px;
+    margin-left: 12px;
+    display: flex; /* 가로 정렬 */
+    justify-content: flex-start; /* 플렉스 정렬 */
+    min-width: 0; /* 축소 가능 */
+    overflow: visible; /* 자식 요소가 경계를 넘어도 표시 */
 }
 
 /* 메인 카테고리 */
 .nav-list {
     display: flex;
-    gap: 20px; /* 메뉴 간격 증가 */
+    gap: 8px; /* 메뉴 간격 증가 */
     list-style: none;
     padding: 0;
     margin: 0;
-    font-size: 20px; /* 글씨 크기 증가 */
+    font-size: 15px; /* 글씨 크기 증가 */
     font-weight: 600; /* 글씨를 진하게 설정 (로고보다 덜 진하게) */
-    line-height: 2.5; /* 높이를 더 늘림 */
+    line-height: 2; /* 높이를 더 늘림 */
 }
 
 .nav-list li a {
     text-decoration: none;
     color: #000;
     transition: color 0.3s;
-    padding: 8px 12px; /* 클릭 영역을 더 넓게 설정 */
+    padding: 5px 10px; /* 클릭 영역 확대 */
 }
 
 .nav-list li a:hover {
@@ -55,9 +61,9 @@ body {
 .user-actions {
     display: flex;
     align-items: center;
-    gap: 20px; /* 메뉴 간격 증가 */
-    font-size: 16px; /* 글씨 크기 증가 */
-    white-space: nowrap; /* 텍스트가 줄바꿈되지 않도록 설정 */
+    gap: 10px; /* 메뉴 간격 */
+    font-size: 8px; /* 글씨 크기 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
     overflow: hidden; /* 잘린 경우에도 스크롤 생기지 않도록 설정 */
 }
 
@@ -76,9 +82,8 @@ body {
 
 /* SVG 아이콘 스타일 */
 .icon {
-    width: 20px; /* 아이콘 크기 증가 */
-    height: 20px;
-    margin-right: 5px;
+    width: 18px; /* 아이콘 크기 */
+    height: 18px;
     fill: currentColor; /* 텍스트 색상과 동일 */
 }
 
@@ -99,13 +104,13 @@ body {
     top: 100%; /* 상위 항목 바로 아래에 표시 */
     left: 0;
     background-color: #f9f9f9;
-    padding: 15px 20px; /* 메뉴 간격 증가 */
+    padding: 10px 15px; /* 메뉴 간격 */
     list-style: none;
     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     z-index: 10; /* 드롭다운이 다른 요소 위에 표시되도록 설정 */
-    font-size: 19px; /* 드롭다운 메뉴 글씨 크기 증가 */
+    font-size: 16px; /* 드롭다운 글씨 크기 */
     border-radius: 4px;
-    min-width: 180px; /* 최소 너비 증가 */
+    min-width: 150px; /* 최소 너비 */
     box-sizing: border-box; /* 패딩 포함 크기 계산 */
 }
 
@@ -143,3 +148,7 @@ body {
     opacity: 1;
     transform: translateY(0);
 }
+
+
+
+

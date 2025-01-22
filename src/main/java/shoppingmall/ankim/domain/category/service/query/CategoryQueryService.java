@@ -8,6 +8,7 @@ import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
 import shoppingmall.ankim.domain.category.repository.CategoryRepository;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_IS_EMPTY;
 import static shoppingmall.ankim.global.exception.ErrorCode.CATEGORY_NOT_FOUND;
@@ -43,5 +44,32 @@ public class CategoryQueryService {
 
     public List<CategoryResponse> retrieveMiddleCategories() {
         return categoryRepository.findMiddleCategories();
+    }
+
+    // 소분류만 조회
+    public List<CategoryResponse> fetchAllSubCategories() {
+        // 소분류만 가져오도록 필터링
+        List<CategoryResponse> responses = categoryRepository.findAll()
+                .stream()
+                .filter(category -> category.getParent() != null) // 소분류만 가져오기
+                .map(CategoryResponse::of)
+                .collect(Collectors.toList());
+        if(responses==null || responses.isEmpty()) {
+            throw new CategoryNotFoundException(CATEGORY_NOT_FOUND);
+        }
+        return responses;
+    }
+
+    // 핸드메이드 소분류 카테고리 조회
+    public List<CategoryResponse> fetchHandmadeCategories() {
+        // HANDMADE와 관련된 중분류 카테고리만 가져오기
+        List<CategoryResponse> responses = categoryRepository.findAllByNames(List.of("OUTER", "TOP", "BOTTOM", "OPS/SK"))
+                .stream()
+                .map(CategoryResponse::of)
+                .collect(Collectors.toList());
+        if(responses==null || responses.isEmpty()) {
+            throw new CategoryNotFoundException(CATEGORY_NOT_FOUND);
+        }
+        return responses;
     }
 }
