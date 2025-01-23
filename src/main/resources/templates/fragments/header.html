@@ -18,40 +18,79 @@
         <!-- 메인 카테고리 -->
         <nav class="nav">
             <ul class="nav-list">
-                <!-- BEST와 NEW -->
-                <li><a href="#" th:href="@{'/list?condition=BEST'}">BEST</a></li>
-                <li><a href="#" th:href="@{'/list?condition=NEW'}">NEW</a></li>
+                <!-- BEST와 NEW (고정) -->
+                <li><a href="/list?condition=BEST">BEST</a></li>
+                <li><a href="/list?condition=NEW">NEW</a></li>
 
                 <!-- MADE 메뉴 -->
                 <li class="dropdown">
-                    <a href="#" th:href="@{'/list?condition=HANDMADE'}">MADE</a>
-                    <ul class="dropdown-menu">
-                        <li th:each="category : ${handmadeCategories}">
-                            <a href="#"
-                               th:href="@{'/list?size=10&page=0&condition=HANDMADE&category=' + ${category.categoryNo}}"
-                               th:text="${category.name}"></a>
-                        </li>
+                    <a href="/list?condition=HANDMADE">MADE</a>
+                    <ul class="dropdown-menu" id="handmade-categories">
+                        <!-- 동적으로 추가될 하위 카테고리 -->
                     </ul>
                 </li>
 
-                <!-- 중분류 카테고리 -->
-                <li class="dropdown" th:each="category : ${middleCategories}">
-                    <a href="#"
-                       th:href="@{'/list?condition=' + ${category.name}}"
-                       th:text="${category.name}"></a>
-                    <ul class="dropdown-menu">
-                        <!-- 하위 카테고리 -->
-                        <li th:each="subCategory : ${subCategories}"
-                            th:if="${subCategory.parentNo == category.categoryNo}">
-                            <a href="#"
-                               th:href="@{'/list?condition=' + ${category.name} + '&category=' + ${subCategory.categoryNo}}"
-                               th:text="${subCategory.name}"></a>
-                        </li>
-                    </ul>
+                <!-- 중분류 및 하위 카테고리 (동적 추가) -->
+                <!-- 기존 구조와 동일하게 <ul> 사용 -->
+                <li class="dropdown" id="dynamic-categories-container">
+                    <!-- 동적으로 추가될 중분류 -->
+                    <ul class="dropdown-menu" id="dynamic-categories"></ul>
                 </li>
             </ul>
         </nav>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('/header')
+                    .then(response => response.json())
+                    .then(data => {
+                        const handmadeCategories = data.handmadeCategories;
+                        const middleCategories = data.middleCategories;
+                        const subCategories = data.subCategories;
 
+                        // MADE 하위 카테고리 추가
+                        const handmadeCategoriesContainer = document.getElementById("handmade-categories");
+                        handmadeCategories.forEach(category => {
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = `
+                    <a href="/list?size=10&page=0&condition=HANDMADE&category=${category.categoryNo}">
+                        ${category.name}
+                    </a>
+                `;
+                            handmadeCategoriesContainer.appendChild(listItem);
+                        });
+
+                        // 동적 중분류 및 하위 카테고리 추가
+                        const dynamicCategoriesContainer = document.querySelector(".nav-list"); // 수정: 정확한 부모 컨테이너 선택
+                        middleCategories.forEach(category => {
+                            const listItem = document.createElement("li");
+                            listItem.classList.add("dropdown");
+                            listItem.innerHTML = `
+                    <a href="/list?condition=${category.name}">${category.name}</a>
+                    <ul class="dropdown-menu"></ul>
+                `;
+
+                            const dropdownMenu = listItem.querySelector(".dropdown-menu");
+                            subCategories
+                                .filter(sub => sub.parentNo === category.categoryNo)
+                                .forEach(subCategory => {
+                                    const subListItem = document.createElement("li");
+                                    subListItem.innerHTML = `
+                            <a href="/list?condition=${category.name}&category=${subCategory.categoryNo}">
+                                ${subCategory.name}
+                            </a>
+                        `;
+                                    dropdownMenu.appendChild(subListItem);
+                                });
+
+                            // 중분류를 nav-list에 추가
+                            dynamicCategoriesContainer.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error loading categories:", error);
+                    });
+            });
+        </script>
         <!-- 사용자 메뉴 -->
         <div class="user-actions">
             <a href="#" th:href="@{/mypage}" class="menu-item">

@@ -1,0 +1,55 @@
+<div class="filter-sidebar" th:fragment="listSide">
+    <!-- 필터 Section -->
+    <div class="filter-section">
+        <h2>필터</h2>
+        <h3>색상</h3>
+        <ul class="color-filter">
+            <li><span class="color-box" style="background-color: #000000;"></span> 블랙</li>
+            <li><span class="color-box" style="background-color: #808080;"></span> 그레이</li>
+            <li><span class="color-box" style="background-color: #A52A2A;"></span> 브라운</li>
+            <li><span class="color-box" style="background-color: #FFFFFF; border: 1px solid #ccc;"></span> 화이트</li>
+            <li><span class="color-box" style="background-color: #F5F5DC;"></span> 베이지</li>
+            <li><span class="color-box" style="background-color: #0000FF;"></span> 블루</li>
+            <li><span class="color-box" style="background-color: #000080;"></span> 네이비</li>
+            <li><span class="color-box" style="background-color: #FFC0CB;"></span> 핑크</li>
+        </ul>
+    </div>
+
+    <!-- 가격대 Section -->
+    <div class="price-section">
+        <h3>가격대</h3>
+        <ul class="price-filter">
+            <li><input type="radio" name="price" id="price1"> <label for="price1">1만원 이하</label></li>
+            <li><input type="radio" name="price" id="price2"> <label for="price2">1만원 - 5만원</label></li>
+            <li><input type="radio" name="price" id="price3"> <label for="price3">5만원 - 10만원</label></li>
+            <li><input type="radio" name="price" id="price4"> <label for="price4">10만원 - 30만원</label></li>
+            <li><input type="radio" name="price" id="price5"> <label for="price5">30만원 이상</label></li>
+        </ul>
+
+        <div class="custom-price">
+            <label for="min-price">최소 가격</label>
+            <input type="text" id="min-price" placeholder="최소 가격">
+            <span>원</span>
+            <label for="max-price">최대 가격</label>
+            <input type="text" id="max-price" placeholder="최대 가격">
+            <span>원</span>
+        </div>
+    </div>
+
+    <!-- 상품정보 Section -->
+    <div class="product-info-section">
+        <h3>상품정보</h3>
+        <ul>
+            <li><input type="checkbox" id="free-shipping"> <label for="free-shipping">무료배송</label></li>
+            <li><input type="checkbox" id="exclude-outofstock"> <label for="exclude-outofstock">품절상품 제외</label></li>
+            <li><input type="checkbox" id="discount-only"> <label for="discount-only">할인상품만</label></li>
+            <li><input type="checkbox" id="handmade-only"> <label for="discount-only">핸드메이드 상품만</label></li>
+        </ul>
+    </div>
+
+    <!-- 버튼 Section -->
+    <div class="button-section">
+        <button class="reset-button">초기화</button>
+        <button class="apply-button">97,196개의 상품보기</button>
+    </div>
+</div>
