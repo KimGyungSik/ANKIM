@@ -18,9 +18,6 @@ import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
-import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
-import shoppingmall.ankim.domain.product.repository.query.helper.OrderBy;
-import shoppingmall.ankim.domain.product.repository.query.helper.PriceCondition;
 
 import java.util.List;
 
@@ -32,10 +29,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@WebMvcTest(controllers = ProductQueryController.class)
+@WebMvcTest(controllers = ProductApiQueryController.class)
 @AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
 @ActiveProfiles("test")
-class ProductQueryControllerTest {
+class ProductApiQueryControllerTest {
     @MockBean
     private S3Service s3Service;
 

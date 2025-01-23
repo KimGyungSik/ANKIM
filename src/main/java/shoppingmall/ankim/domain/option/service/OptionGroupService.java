@@ -67,7 +67,9 @@ public class OptionGroupService {
 
             // OptionValue 목록 생성 및 추가
             request.getOptionValues().forEach(optValReq -> {
-                OptionValue optionValue = OptionValue.create(optionGroup, optValReq.getValueName(), optValReq.getColorCode());
+                OptionValue optionValue = (optValReq.getColorCode() == null || optValReq.getColorCode().isBlank())
+                        ? OptionValue.create(optionGroup, optValReq.getValueName())
+                        : OptionValue.create(optionGroup, optValReq.getValueName(), optValReq.getColorCode());
                 optionGroup.addOptionValue(optionValue);
             });
 

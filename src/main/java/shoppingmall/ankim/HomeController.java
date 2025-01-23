@@ -19,15 +19,9 @@ public class HomeController {
     private final CategoryQueryService categoryQueryService;
     @GetMapping("/")
     public String home(Model model) {
-        List<CategoryResponse> middleCategories = categoryQueryService.retrieveMiddleCategories();
-        model.addAttribute("middleCategories", middleCategories);
-
-        List<CategoryResponse> handmadeCategories = categoryQueryService.fetchHandmadeCategories();
-        model.addAttribute("handmadeCategories", handmadeCategories);
-
-        List<CategoryResponse> subCategories = categoryQueryService.fetchAllSubCategories();
-        model.addAttribute("subCategories", subCategories);
-
+        model.addAttribute("middleCategories", categoryQueryService.retrieveMiddleCategories());
+        model.addAttribute("handmadeCategories", categoryQueryService.fetchHandmadeCategories());
+        model.addAttribute("subCategories", categoryQueryService.fetchAllSubCategories());
         return "home";
     }
 

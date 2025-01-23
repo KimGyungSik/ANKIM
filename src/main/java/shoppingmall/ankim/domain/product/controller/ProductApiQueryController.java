@@ -17,7 +17,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/product/catalog")
-public class ProductQueryController {
+public class ProductApiQueryController {
 
     private final ProductRepository productRepository;
 

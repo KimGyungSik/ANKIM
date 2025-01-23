@@ -9,6 +9,8 @@ import shoppingmall.ankim.domain.product.entity.QProduct;
 import java.time.LocalDateTime;
 import java.util.List;
 
+// TODO Enum -> 상수별 메서드 구현 사용하여 리팩토링 해볼것 (이펙티브 자바 Item 34 )
+
 public class ProductQueryHelper {
 
     /**
