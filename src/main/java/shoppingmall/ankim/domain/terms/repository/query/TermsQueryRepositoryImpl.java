@@ -45,7 +45,6 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
                         terms.termsYn,
                         terms.level))
                 .from(terms)
-//                .leftJoin(terms.subTerms)
                 .where(
                         terms.category.eq(category)
                                 .and(terms.activeYn.eq(activeYn))

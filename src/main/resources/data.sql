@@ -67,16 +67,16 @@ VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대
 
 -- 선택 약관
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적으로 개인정보를 수집 및 이용하는 것에 대한 동의입니다.', 'N', 'v1', 2, 'Y');
+VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 'v1', 2, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (4, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
+VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 2, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
+VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
 
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
-VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
+VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)

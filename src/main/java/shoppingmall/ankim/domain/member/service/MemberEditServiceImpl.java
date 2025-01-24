@@ -5,6 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
+import shoppingmall.ankim.domain.member.dto.MemberAddressResponse;
+import shoppingmall.ankim.domain.member.dto.MemberInfoResponse;
+import shoppingmall.ankim.domain.member.dto.TermsAgreementResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -14,6 +19,11 @@ import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.termsHistory.repository.TermsHistoryRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -25,8 +35,9 @@ public class MemberEditServiceImpl implements MemberEditService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberHistoryRepository memberHistoryRepository;
+    private final MemberAddressRepository memberAddressRepository;
+    private final TermsHistoryRepository termsHistoryRepository;
 
     @Override
     public void isValidPassword(String loginId, PasswordServiceRequest request) {
@@ -78,6 +89,27 @@ public class MemberEditServiceImpl implements MemberEditService {
         member.changePassword(encodedNewPassword);
 
         memberHistoryRepository.save(history);
+    }
+
+    @Override
+    public MemberInfoResponse getMemberInfo(String loginId) {
+        Member member = getMember(loginId);
+
+
+        // 기본 배송지 조회
+        MemberAddressResponse addressResponse = memberAddressRepository.findDefaultAddressByMember(member)
+                .map(MemberAddressResponse::of)
+                .orElse(null);
+
+        // 약관 동의 내역 조회 (findAgreedTermsByMember 활용)
+        Long parentTermsNo = 1L; // 회원가입 약관의 최상위 부모 번호 (필요시 변경)
+        List<TermsAgreementResponse> agreedTerms = termsHistoryRepository.findAgreedTermsByMember(member.getNo(), parentTermsNo, "Y");
+
+
+        // MemberInfoResponse 생성 후 반환
+        // FIXME MemberInfoResponse 생성 작업 필요
+//        return MemberInfoResponse.of(member, addressResponse, agreedTerms);
+        return null;
     }
 
     private Member getMember(String loginId) {

@@ -6,6 +6,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.cart.dto.CartItemsResponse;
 import shoppingmall.ankim.domain.member.controller.request.PasswordRequest;
+import shoppingmall.ankim.domain.member.dto.MemberInfoResponse;
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.MemberMyPageService;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
@@ -27,7 +28,7 @@ public class MemberMyPageApiController {
 
     // 마이 페이지에 들어갈때 개인정보 읽어오기 ( R ) // FIXME 테스트용으로 작성하여서 수정필요
     @GetMapping
-    public ApiResponse<MemberResponse> getCartItems() {
+    public ApiResponse<MemberResponse> getMyPage() {
         String loginId = securityContextHelper.getLoginId();
 
         log.info("loginId: {}", loginId);
@@ -39,7 +40,6 @@ public class MemberMyPageApiController {
 
         return ApiResponse.ok(memberData);
     }
-
 
     @PostMapping("/confirm-password") // FIXME 마이 페이지 비밀번호 재확인
     public ApiResponse<String> confirmPassword(
