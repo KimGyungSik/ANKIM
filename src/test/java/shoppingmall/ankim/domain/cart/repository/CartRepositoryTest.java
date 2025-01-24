@@ -64,7 +64,7 @@ class CartRepositoryTest {
         // given: 회원 생성
         Member member = Member.builder()
                 .loginId("test@ankim.com")
-                .pwd("password!")
+                .password("password!")
                 .name("또치")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1985, 5, 15))

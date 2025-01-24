@@ -117,7 +117,7 @@ class MemberEditServiceTest {
         // then
         Member findMember = memberRepository.findByLoginId(loginId);
         // matches()를 사용하여 새 비밀번호가 올바르게 저장되었는지 검증
-        assertTrue(bCryptPasswordEncoder.matches(newPassword, findMember.getPwd()));
+        assertTrue(bCryptPasswordEncoder.matches(newPassword, findMember.getPassword()));
     }
 
     @Test

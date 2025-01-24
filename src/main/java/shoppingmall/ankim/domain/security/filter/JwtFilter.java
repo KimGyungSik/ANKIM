@@ -93,7 +93,7 @@ public class JwtFilter extends OncePerRequestFilter {
         // Member 엔티티 생성
         Member member = Member.builder()
                 .loginId(username)
-                .pwd("tempPassword")
+                .password("tempPassword")
                 .build();
 
         // UserDetails에 Member 엔티티 담기

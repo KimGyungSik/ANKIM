@@ -23,7 +23,7 @@ public class MemberFactory {
         String encodedPwd = encoder.encode(rawPwd);
         Member member = Member.builder()
                 .loginId(loginId)
-                .pwd(encodedPwd) // 암호화된 비밀번호 저장
+                .password(encodedPwd) // 암호화된 비밀번호 저장
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -39,7 +39,7 @@ public class MemberFactory {
     public static Member createMember(EntityManager entityManager, String loginId) {
         Member member = Member.builder()
                 .loginId(loginId)
-                .pwd("password")
+                .password("password")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -69,7 +69,7 @@ public class MemberFactory {
         // Member 생성
         Member member = Member.builder()
                 .loginId(loginId)
-                .pwd(encodedPwd) // 암호화된 비밀번호 저장
+                .password(encodedPwd) // 암호화된 비밀번호 저장
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))

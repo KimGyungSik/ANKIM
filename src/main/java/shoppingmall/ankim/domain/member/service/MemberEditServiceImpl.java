@@ -33,7 +33,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getPassword(), member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getPassword(), member.getPassword());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_PASSWORD);
         }
@@ -53,7 +53,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPassword());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_CURRENT_PASSWORD);
         }
@@ -64,7 +64,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         }
 
         // 새로운 비밀번호가 이전 비밀번호와 동일한지 비교
-        if (bCryptPasswordEncoder.matches(request.getNewPassword(), member.getPwd())) {
+        if (bCryptPasswordEncoder.matches(request.getNewPassword(), member.getPassword())) {
             throw new InvalidMemberException(PASSWORD_SAME_AS_OLD);
         }
 

@@ -55,7 +55,7 @@ class CustomUserDetailsServiceTest {
         member = Member.builder()
                 .no(2L)
                 .loginId("user@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Test User")
                 .status(MemberStatus.ACTIVE)
                 .build();
@@ -105,7 +105,7 @@ class CustomUserDetailsServiceTest {
         // given
         Member lockedMember = Member.builder()
                 .loginId("locked@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Locked User")
                 .status(MemberStatus.LOCKED) // 계정 상태를 잠금으로 설정
                 .build();
@@ -142,7 +142,7 @@ class CustomUserDetailsServiceTest {
         member = Member.builder()
                 .no(2L)
                 .loginId("unlock@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Test User")
                 .status(MemberStatus.LOCKED)
                 .build();

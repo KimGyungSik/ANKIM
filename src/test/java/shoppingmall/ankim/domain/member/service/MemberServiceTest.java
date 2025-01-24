@@ -61,7 +61,7 @@ class MemberServiceTest {
         // given
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -192,7 +192,7 @@ class MemberServiceTest {
         // 회원 정보
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -205,12 +205,12 @@ class MemberServiceTest {
         // then
         Member savedMember = memberRepository.findById(memberResponse.getNo()).orElse(null);
 
-        System.out.println("savedMember.getPwd() = " + savedMember.getPwd());
+        System.out.println("savedMember.getPwd() = " + savedMember.getPassword());
 
         assertThat(savedMember).isNotNull();
         assertThat(savedMember.getName()).isEqualTo("홍길동");
         assertThat(savedMember.getPhoneNum()).isEqualTo("010-1234-5678");
-        assertThat(bCryptPasswordEncoder.matches("ValidPassword123!", savedMember.getPwd())).isTrue();
+        assertThat(bCryptPasswordEncoder.matches("ValidPassword123!", savedMember.getPassword())).isTrue();
     }
 
 }

@@ -1,7 +1,6 @@
 package shoppingmall.ankim.domain.member.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.query.Param;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.member.repository.query.MemberQueryRepository;
@@ -23,6 +22,6 @@ public interface MemberRepository extends JpaRepository<Member, Long>, MemberQue
     Member findByLoginIdAndStatus(String loginId, MemberStatus status);
 
     // 회원의 비밀번호를 조회한다.
-    Member findByLoginIdAndPwd(Member member, String pwd);
+    Member findByLoginIdAndPassword(Member member, String password);
 
 }

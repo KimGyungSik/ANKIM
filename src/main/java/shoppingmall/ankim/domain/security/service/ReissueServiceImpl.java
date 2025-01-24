@@ -60,7 +60,7 @@ public class ReissueServiceImpl implements ReissueService {
             // Member 엔티티 생성
             Member member = Member.builder()
                     .loginId(username)
-                    .pwd("tempPassword") // 가짜 비밀번호
+                    .password("tempPassword") // 가짜 비밀번호
                     .build();
 
             // UserDetails에 Member 엔티티 담기

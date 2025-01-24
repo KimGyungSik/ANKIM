@@ -70,7 +70,7 @@ public class MemberServiceImpl implements MemberService {  // FIXME 클래스명
         List<Terms> agreeTerms = termsQueryService.validateAndAddSubTerms(termsAgreements);
 
         // 비밀번호 암호화
-        String encodePwd = bCryptPasswordEncoder.encode(request.getPwd());
+        String encodePwd = bCryptPasswordEncoder.encode(request.getPassword());
         log.info("회원가입을 위해 암호화된 비밀번호 : {}", encodePwd);
 
         Member member = request.create(encodePwd, agreeTerms);

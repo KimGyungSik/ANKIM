@@ -36,7 +36,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("user123@ankim.com")
-                .pwd("password")
+                .password("password")
 //                .uuid(UUID.randomUUID())
                 .name("user1")
                 .phoneNum("010-1234-5678")
@@ -67,7 +67,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("user123@ankim.com")
-                .pwd("password")
+                .password("password")
 //                .uuid(UUID.randomUUID())
                 .name("user1")
                 .phoneNum("010-1234-5678")
@@ -97,7 +97,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -126,7 +126,7 @@ class MemberHistoryRepositoryTest {
 
         Member member = Member.builder()
                 .loginId(loginId)
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -153,7 +153,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member activeMember = Member.builder()
                 .loginId("active@example.com")
-                .pwd("password123")
+                .password("password123")
                 .name("Active User")
                 .phoneNum("010-1111-2222")
                 .birth(LocalDate.of(1990, 5, 15))
@@ -163,7 +163,7 @@ class MemberHistoryRepositoryTest {
 
         Member lockedMember = Member.builder()
                 .loginId("locked@example.com")
-                .pwd("password456")
+                .password("password456")
                 .name("Locked User")
                 .phoneNum("010-3333-4444")
                 .birth(LocalDate.of(1985, 3, 10))
@@ -197,7 +197,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member activeMember = Member.builder()
                 .loginId("activeUser@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Active User")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -209,7 +209,7 @@ class MemberHistoryRepositoryTest {
 
         Member withdrawnMember = Member.builder()
                 .loginId("withdrawnUser@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Withdrawn User")
                 .phoneNum("010-9876-5432")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -237,7 +237,7 @@ class MemberHistoryRepositoryTest {
         // given
         Member withdrawnMember = Member.builder()
                 .loginId("withdrawnUser@example.com")
-                .pwd("password")
+                .password("password")
                 .name("Withdrawn User")
                 .phoneNum("010-9876-5432")
                 .birth(LocalDate.of(1990, 1, 1))

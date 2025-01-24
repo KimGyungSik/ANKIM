@@ -16,7 +16,7 @@ import java.util.List;
 public class MemberRegisterServiceRequest {
 
     private String loginId; // 아이디(이메일)
-    private String pwd; // 비밀번호
+    private String password; // 비밀번호
     private String name; // 이름
     private String phoneNum; // 휴대전화번호
     private LocalDate birth; // 생년월일
@@ -25,9 +25,9 @@ public class MemberRegisterServiceRequest {
     private List<Terms> terms;
 
     @Builder
-    public MemberRegisterServiceRequest(String loginId, String pwd, String name, String phoneNum, LocalDate birth, String gender, Integer grade, List<Terms> terms) {
+    public MemberRegisterServiceRequest(String loginId, String password, String name, String phoneNum, LocalDate birth, String gender, Integer grade, List<Terms> terms) {
         this.loginId = loginId;
-        this.pwd = pwd;
+        this.password = password;
         this.name = name;
         this.phoneNum = phoneNum;
         this.birth = birth;
@@ -41,7 +41,7 @@ public class MemberRegisterServiceRequest {
         return Member.builder()
 //                .uuid() // uuid 생성 로직 작성 후 값 넣기
                 .loginId(this.loginId)
-                .pwd(encodePwd)
+                .password(encodePwd)
                 .name(this.name)
                 .phoneNum(this.phoneNum)
                 .birth(this.birth)

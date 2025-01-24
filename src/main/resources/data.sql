@@ -85,7 +85,7 @@ VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 'v1',
 -- [ 회원 삽입 ]
 INSERT INTO member (
     login_id,
-    pwd,
+    password,
     name,
     phone_num,
     birth,

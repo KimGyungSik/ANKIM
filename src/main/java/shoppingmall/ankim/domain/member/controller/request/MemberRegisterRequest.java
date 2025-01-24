@@ -63,7 +63,7 @@ public class MemberRegisterRequest {
     public MemberRegisterServiceRequest toServiceRequest() {
         return MemberRegisterServiceRequest.builder()
                 .loginId(this.loginId)
-                .pwd(this.password)
+                .password(this.password)
                 .name(this.name)
                 .phoneNum(this.phoneNum)
                 .birth(this.birth)

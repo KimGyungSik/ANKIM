@@ -20,7 +20,7 @@ public class MemberHistoryHandler {
         return MemberHistory.builder()
                 .member(member)
                 .modCode(ModificationCode.PASSWORD)
-                .oldValue(member.getPwd())
+                .oldValue(member.getPassword())
                 .newValue(request)
                 .build();
     }
