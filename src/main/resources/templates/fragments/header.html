@@ -52,7 +52,7 @@
                         handmadeCategories.forEach(category => {
                             const listItem = document.createElement("li");
                             listItem.innerHTML = `
-                    <a href="/list?size=10&page=0&condition=HANDMADE&category=${category.categoryNo}">
+                    <a href="/list?condition=HANDMADE&category=${category.categoryNo}">
                         ${category.name}
                     </a>
                 `;

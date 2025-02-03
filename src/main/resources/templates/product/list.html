@@ -7,16 +7,28 @@
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
     <link rel="stylesheet" th:href="@{/css/product/listSide.css}">
+    <link rel="stylesheet" th:href="@{/css/product/listMain.css}">
+    <style>
+        /* Main Content Layout */
+        .main-content {
+            display: flex; /* 왼쪽 사이드바와 나머지 콘텐츠를 가로로 정렬 */
+            flex-direction: row; /* 기본 방향은 가로 */
+            width: 100%; /* 전체 너비 */
+            margin: 0 auto; /* 중앙 정렬 */
+            box-sizing: border-box; /* 패딩 포함 크기 계산 */
+        }
+    </style>
 </head>
 <body>
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
-<!-- 왼쪽 사이드 포함 -->
-<div th:replace="product/listSide :: listSide"></div>
-<!-- 상단 메뉴 포함 -->
-
-<!-- 상품 리스트 포함 -->
-
+<!-- 콘텐츠 전체 -->
+<div class="main-content">
+    <!-- 왼쪽 사이드 포함 -->
+    <div th:replace="product/listSide :: listSide"></div>
+    <!-- 메인  -->
+    <div th:replace="product/listMain :: listMain"></div>
+</div>
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>

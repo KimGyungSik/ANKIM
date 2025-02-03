@@ -1,8 +1,14 @@
+/* Left Sidebar */
+.filter-sidebar {
+    width: 260px; /* 왼쪽 사이드바 고정 너비 */
+    flex-shrink: 0; /* 사이드바 크기 고정 */
+}
 /* 필터 섹션 */
 .filter-section {
     padding: 22px;
     max-width: 235px;
     font-size: 14px;
+    padding-top: 0px;
 }
 .filter-line {
     width: 100%; /* 가로로 꽉 채우기 */

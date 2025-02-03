@@ -1,0 +1,54 @@
+<div class="list-main" th:fragment="listMain">
+    <!-- 중분류 카테고리 이름과 검색 -->
+    <div class="category-header">
+        <h2 class="subcategory-title">중분류 카테고리 이름</h2>
+        <div class="search-bar">
+            <input type="text" id="search-input" />
+            <button type="button">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-search">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                </svg>
+            </button>
+        </div>
+    </div>
+    <!-- 카테고리와 정렬 -->
+    <div class="category-sort-section">
+        <!-- 카테고리 메뉴 -->
+        <div class="category-menu">
+            <ul>
+                <li><a href="#">전체</a></li>
+                <li><a href="#">미니 원피스</a></li>
+                <li><a href="#">미디 원피스</a></li>
+                <li><a href="#">롱 원피스</a></li>
+                <li><a href="#">데님 원피스</a></li>
+            </ul>
+        </div>
+        <!-- 정렬 선택 -->
+        <div class="sort-selection">
+            <select id="order-by">
+                <option value="LATEST">최신순</option>
+                <option value="POPULAR">인기순</option>
+                <option value="LOW_PRICE">낮은 가격순</option>
+                <option value="HIGH_PRICE">높은 가격순</option>
+                <option value="HIGH_DISCOUNT_RATE">높은 할인율순</option>
+                <option value="HIGH_REVIEW">리뷰 많은순</option>
+                <option value="HIGH_VIEW">조회수 많은순</option>
+            </select>
+        </div>
+    </div>
+
+    <!-- 상품 리스트 -->
+    <div class="product-list">
+        <!-- 상품 카드 -->
+        <div class="product-card">
+            <img src="#" alt="상품 이미지" />
+            <div class="product-info">
+                <h3>상품 이름</h3>
+                <p class="price">₩가격</p>
+                <p class="details">상품 상세 정보</p>
+            </div>
+        </div>
+        <!-- 반복적으로 상품 카드 추가 -->
+    </div>
+</div>

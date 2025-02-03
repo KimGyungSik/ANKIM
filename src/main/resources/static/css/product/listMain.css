@@ -1,0 +1,223 @@
+/* 메인 레이아웃 */
+.list-main {
+    flex-grow: 1;
+    padding: 0px 25px;
+    background-color: #fff;
+}
+
+/* 카테고리와 정렬 섹션 */
+.category-sort-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border: 1px solid #ddd; /* 테두리 추가 */
+    padding: 10px 20px;
+    margin-bottom: 20px;
+    border-radius: 4px; /* 테두리 둥글게 */
+    background-color: #fff;
+}
+
+/* 카테고리 메뉴 */
+.category-menu ul {
+    list-style: none;
+    display: flex;
+    padding: 0;
+    margin: 0;
+    gap: 20px;
+}
+
+.category-menu li {
+    position: relative;
+    font-size: 14px;
+}
+
+.category-menu li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    right: -10px;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background-color: #ddd; /* 카테고리 사이의 희미한 선 */
+}
+
+.category-menu a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    padding: 5px 10px;
+    border-radius: 4px;
+    transition: background-color 0.3s, color 0.3s;
+}
+
+.category-menu a:hover {
+    background-color: #f4f4f4;
+    color: #007bff;
+}
+
+.category-menu a.active {
+    background-color: #007bff;
+    color: #fff;
+}
+
+/* 정렬 선택 */
+.sort-selection {
+    position: relative;
+    width: 150px;
+}
+
+select {
+    margin: 0;
+    padding: 0;
+    border: 0;
+    outline: 0;
+    appearance: none;
+}
+
+.sort-selection select {
+    width: 100%;
+    padding: 8px 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+    appearance: none; /* 기본 스타일 제거 */
+    -moz-appearance: none;
+    -webkit-appearance: none;
+    box-sizing: border-box; /* 크기 계산 오류 방지 */
+}
+
+/* Hover 상태의 드롭다운 옵션 */
+.sort-selection select:focus {
+    outline: none;
+    border-color: #007bff;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* 드롭다운 옵션 스타일 */
+.sort-selection select option {
+    padding: 10px 15px; /* 각 옵션의 패딩 */
+    background-color: #fff; /* 기본 배경 */
+    color: #333; /* 기본 글자 색상 */
+}
+
+.sort-selection select option:hover {
+    background-color: #f0f0f0; /* Hover 시 회색 배경 */
+    color: #000; /* Hover 시 글자 색상 */
+}
+
+/* 드롭다운 화살표 */
+.sort-selection::after {
+    content: "▼";
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 12px;
+    color: #666;
+    pointer-events: none;
+}
+
+/* 상품 리스트 */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 20px;
+}
+
+/* 상품 카드 */
+.product-card {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden;
+    transition: box-shadow 0.3s;
+}
+
+.product-card img {
+    width: 100%;
+    height: auto;
+    display: block;
+}
+
+.product-info {
+    padding: 10px;
+}
+
+.product-info h3 {
+    font-size: 16px;
+    margin: 0 0 5px;
+    color: #333;
+}
+
+.product-info .price {
+    font-size: 14px;
+    color: #007bff;
+    font-weight: bold;
+}
+
+.product-info .details {
+    font-size: 12px;
+    color: #666;
+}
+
+/* 상품 카드 Hover 효과 */
+.product-card:hover {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+
+
+/* 중분류 카테고리와 검색 */
+.category-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px; /* 하단 여백 */
+}
+
+.subcategory-title {
+    font-size: 24px; /* 적절한 크기 */
+    font-weight: bold;
+    color: #333;
+}
+/* 검색 바 스타일 */
+.search-bar {
+    display: flex;
+    align-items: center;
+    width: 230px; /* 검색 바 전체 너비 */
+    border: 1px solid #ccc;
+    border-radius: 25px; /* 원통 모양 */
+    background-color: #f9f9f9;
+    overflow: hidden;
+}
+
+.search-bar input[type="text"] {
+    flex-grow: 1; /* 입력창이 버튼 제외 나머지 공간을 차지 */
+    border: none; /* 입력창 경계선 제거 */
+    padding: 8px 12px;
+    font-size: 14px;
+    outline: none;
+    background-color: transparent; /* 투명 배경 */
+}
+
+.search-bar button {
+    background-color: transparent;
+    border: none;
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.search-bar button .icon-search {
+    width: 16px;
+    height: 16px;
+    color: #666;
+}
+
+.search-bar button:hover .icon-search {
+    color: #333; /* Hover 시 아이콘 색상 변경 */
+}
