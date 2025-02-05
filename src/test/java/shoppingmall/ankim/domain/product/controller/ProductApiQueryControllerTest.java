@@ -19,7 +19,9 @@ import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
@@ -91,39 +93,43 @@ class ProductApiQueryControllerTest {
                 new ProductListResponse(/* Mock 데이터 */)
         );
 
-        PageRequest pageRequest = PageRequest.of(0, 10); // 첫 페이지, 사이즈 10
-        Page<ProductListResponse> list = new PageImpl<>(responseList, pageRequest, 50); // total = 50
+        PageRequest pageRequest = PageRequest.of(0, 10);
+        Page<ProductListResponse> pageResult = new PageImpl<>(responseList, pageRequest, 50); // Mock 페이징 데이터
+
+        // 페이징 정보 포함된 JSON 응답 구조를 맞추기 위한 Mock 설정
+        Map<String, Object> mockResponse = new HashMap<>();
+        mockResponse.put("products", responseList);
+        mockResponse.put("pageInfo", Map.of(
+                "currentPage", 0,
+                "totalPages", 5,
+                "totalElements", 50,
+                "size", 10,
+                "hasNext", true,
+                "hasPrevious", false
+        ));
 
         given(productRepository.findUserProductListResponse(
                 any(Pageable.class),
-                isNull(), // null이 예상되는 경우
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull(),
-                isNull()
-        )).willReturn(list);
+                any(), any(), any(), any(),
+                any(), any(), any(), any(), any()
+        )).willReturn(pageResult);
 
 
         // when // then
         mockMvc.perform(get("/api/v1/product/catalog/list")
-                        .param("page", "0") // 첫 번째 페이지
-                        .param("size", "10") // 페이지당 10개
+                        .param("page", "0")
+                        .param("size", "10")
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(print())
-                .andExpect(status().isOk()) // HTTP 상태 코드 200 확인
+                .andExpect(status().isOk())
                 .andExpect(jsonPath("$.code").value("200"))
                 .andExpect(jsonPath("$.status").value("OK"))
                 .andExpect(jsonPath("$.message").value("OK"))
-                .andExpect(jsonPath("$.data.totalElements").value(50)) // 전체 데이터 개수 확인
-                .andExpect(jsonPath("$.data.totalPages").value(5)) // 총 페이지 개수 확인
-                .andExpect(jsonPath("$.data.size").value(10)) // 페이지당 데이터 개수 확인
-                .andExpect(jsonPath("$.data.number").value(0)) // 현재 페이지 번호 확인
-                .andExpect(jsonPath("$.data.content").isNotEmpty()) // 데이터가 존재하는지 확인
-                .andExpect(jsonPath("$.data.content").isArray()); // 데이터가 리스트인지 확인
+                .andExpect(jsonPath("$.data.pageInfo.totalElements").value(50))
+                .andExpect(jsonPath("$.data.pageInfo.totalPages").value(5))
+                .andExpect(jsonPath("$.data.pageInfo.size").value(10))
+                .andExpect(jsonPath("$.data.pageInfo.currentPage").value(0))
+                .andExpect(jsonPath("$.data.products").isNotEmpty())
+                .andExpect(jsonPath("$.data.products").isArray());
     }
-
 }

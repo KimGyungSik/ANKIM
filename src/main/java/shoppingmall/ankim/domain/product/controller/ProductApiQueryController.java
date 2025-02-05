@@ -12,7 +12,9 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 import shoppingmall.ankim.global.response.ApiResponse;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -51,11 +53,11 @@ public class ProductApiQueryController {
      * @return
      */
     @GetMapping("/list")
-    public ApiResponse<Page<ProductListResponse>> getFilteredAndSortedProducts(
+    public ApiResponse<Map<String, Object>> getFilteredAndSortedProducts(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "size", defaultValue = "24") int size,
             @RequestParam(name = "condition", required = false) Condition condition,
-            @RequestParam(name = "order", required = false) OrderBy order,
+            @RequestParam(name = "order", defaultValue = "POPULAR", required = false) OrderBy order,
             @RequestParam(name = "category", required = false) Long category,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "colorConditions", required = false) List<ColorCondition> colorConditions,
@@ -65,19 +67,23 @@ public class ProductApiQueryController {
             @RequestParam(name = "infoSearches", required = false) List<InfoSearch> infoSearches
     ) {
         Pageable pageable = PageRequest.of(page, size);
-        return ApiResponse.ok(
-                productRepository.findUserProductListResponse(
-                        pageable,
-                        condition,
-                        order,
-                        category,
-                        keyword,
-                        colorConditions,
-                        priceCondition,
-                        customMinPrice,
-                        customMaxPrice,
-                        infoSearches
-                )
+
+        Page<ProductListResponse> productList = productRepository.findUserProductListResponse(
+                pageable, condition, order, category, keyword, colorConditions, priceCondition,
+                customMinPrice, customMaxPrice, infoSearches
         );
+
+        Map<String, Object> response = new HashMap<>();
+        response.put("products", productList.getContent()); // 상품 리스트
+        response.put("pageInfo", Map.of(
+                "currentPage", productList.getNumber(),
+                "totalPages", productList.getTotalPages(),
+                "totalElements", productList.getTotalElements(),
+                "size", productList.getSize(),
+                "hasNext", productList.hasNext(),
+                "hasPrevious", productList.hasPrevious()
+        ));
+
+        return ApiResponse.ok(response);
     }
 }
