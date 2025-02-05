@@ -66,20 +66,14 @@ public class ProductController {
                 customMinPrice, customMaxPrice, infoSearches
         );
 
-        // 로그 추가
-        System.out.println("Products found: " + productList.getContent());
-        System.out.println("Total Pages: " + productList.getTotalPages());
-        System.out.println("Current Page: " + productList.getNumber());
-        System.out.println("Condition: " + condition);
-        System.out.println("Order: " + order);
-        System.out.println("Category: " + category);
-        System.out.println("Keyword: " + keyword);
-
-        // 모델에 데이터 추가
-        model.addAttribute("products", productList.getContent());
-        model.addAttribute("page", productList.getNumber());
-        model.addAttribute("size", productList.getSize());
-        model.addAttribute("totalPages", productList.getTotalPages());
+        // ✅ 페이지네이션 정보 추가
+        model.addAttribute("products", productList.getContent());  // 상품 리스트
+        model.addAttribute("page", productList.getNumber());       // 현재 페이지 번호
+        model.addAttribute("size", productList.getSize());         // 페이지 크기 (한 페이지 당 개수)
+        model.addAttribute("totalElements", productList.getTotalElements());  // 전체 데이터 개수
+        model.addAttribute("totalPages", productList.getTotalPages());        // 전체 페이지 개수
+        model.addAttribute("hasNext", productList.hasNext());   // 다음 페이지 존재 여부
+        model.addAttribute("hasPrevious", productList.hasPrevious()); // 이전 페이지 존재 여부
         model.addAttribute("condition", condition);
         model.addAttribute("order", order);
         model.addAttribute("category", category);

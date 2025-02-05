@@ -110,23 +110,140 @@
     </div>
 
     <!-- 페이지네이션 -->
-    <div th:if="${!#lists.isEmpty(products)}" class="pagination">
-        <!-- 이전 페이지 -->
-        <a th:if="${page > 0}" th:href="@{/list(page=${page - 1}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}" class="prev">&lt;</a>
+    <div th:if="${totalPages > 1}" class="pagination">
+        <th:block th:with="
+        groupSize=10,
+        currentGroup=${(page / groupSize) + 1},
+        startPage=${(currentGroup - 1) * groupSize},
+        endPage=${startPage + groupSize - 1 > totalPages - 1 ? totalPages - 1 : startPage + groupSize - 1}">
 
-        <!-- 페이지 번호 -->
-        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-              th:classappend="${page == i} ? 'active' : ''"
-              th:if="${i == 0 or i == totalPages - 1 or (i >= page - 2 and i <= page + 2)}"
-              th:text="${i + 1}"
-              th:href="@{/list(page=${i}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}">
-    </span>
+            <!-- 이전 그룹 이동 -->
+            <a th:if="${startPage > 0}" href="#" class="prev-group" data-page="${startPage - 1}">&laquo;</a>
 
-        <!-- 중간 생략 -->
-        <span th:if="${page > 3 and totalPages > 6}">...</span>
-        <span th:if="${page < totalPages - 4 and totalPages > 6}">...</span>
+            <!-- 페이지 번호 표시 (한 번에 10개씩) -->
+            <span th:each="i : ${#numbers.sequence(startPage, endPage)}"
+                  th:classappend="${page == i} ? 'active' : ''">
+            <a href="#" class="page-link" th:attr="data-page=${i}" th:text="${i + 1}"></a>
+        </span>
 
-        <!-- 다음 페이지 -->
-        <a th:if="${page + 1 < totalPages}" th:href="@{/list(page=${page + 1}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}" class="next">&gt;</a>
+            <!-- 다음 그룹 이동 -->
+            <a th:if="${endPage < totalPages - 1}" href="#" class="next-group" data-page="${endPage + 1}">&raquo;</a>
+        </th:block>
     </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // 최초 로딩 시 현재 URL의 페이지네이션 정보를 업데이트
+            const urlParams = new URLSearchParams(window.location.search);
+            const currentPage = parseInt(urlParams.get("page")) || 0;
+            fetch(`/api/v1/product/catalog/list?${urlParams.toString()}`, {
+                method: "GET",
+                headers: { "X-Requested-With": "XMLHttpRequest" }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    updateProductList(data.data.products);
+                    updatePagination(data.data.pageInfo);
+                })
+                .catch(error => console.error("Error:", error));
+
+            // 페이지네이션 이벤트 위임 방식으로 등록 (모든 동적 요소 대응)
+            document.body.addEventListener("click", function (event) {
+                if (event.target.matches(".pagination a")) {
+                    event.preventDefault(); // 기본 링크 이동 방지
+
+                    const newPage = parseInt(event.target.getAttribute("data-page"), 10);
+
+                    // 현재 URL에서 queryString 유지하면서 page 값만 변경
+                    urlParams.set("page", newPage);
+                    const newUrl = `/api/v1/product/catalog/list?${urlParams.toString()}`;
+
+                    // AJAX 요청 (비동기 페이지 변경)
+                    fetch(newUrl, {
+                        method: "GET",
+                        headers: { "X-Requested-With": "XMLHttpRequest" }
+                    })
+                        .then(response => response.json())
+                        .then(data => {
+                            updateProductList(data.data.products);
+                            updatePagination(data.data.pageInfo);
+                        })
+                        .catch(error => console.error("Error:", error));
+                }
+            });
+        });
+
+        function updateProductList(products) {
+            const productListContainer = document.querySelector(".product-list");
+            productListContainer.innerHTML = "";
+
+            if (products.length === 0) {
+                productListContainer.innerHTML = '<div class="no-products">상품이 0개입니다.</div>';
+                return;
+            }
+
+            products.forEach(product => {
+                const productCard = `
+        <div class="product-card" data-product-id="${product.no}">
+            <img src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+            <div class="product-info">
+                <h3 class="product-name">${product.name}</h3>
+                <div class="price-discount">
+                    ${product.discRate > 0 ? `<span class="discount-rate">${product.discRate}%</span>` : ""}
+                    <span class="price">${product.sellPrice.toLocaleString()}</span>
+                </div>
+                <div class="product-badges">
+                    ${product.freeShip === "Y" ? '<span class="badge">무료배송</span>' : ""}
+                    ${product.handMadeYn === "Y" ? '<span class="badge">핸드메이드</span>' : ""}
+                </div>
+                <div class="extra-info">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path d="M8 2C4.685-1.127 0 1.324 0 5.3 0 7.999 3.354 11.324 8 14c4.646-2.676 8-6.001 8-8.7 0-3.976-4.685-6.427-8-3.3-3.315-3.127-8-.676-8 3.3 0 2.699 3.354 6.024 8 8.7 4.646-2.676 8-6.001 8-8.7 0-3.976-4.685-6.427-8-3.3z"/>
+                    </svg>
+                    <span class="wish-cnt">${product.wishCnt || 0}</span>
+
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c-.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.22l-4.898.696c-.441.062-.612.636-.282.95l3.522 3.356-.83 4.73z"/>
+                    </svg>
+                    <span class="avg-rating">${product.avgR || 0}</span>
+                    (<span class="review-cnt">${product.rvwCnt || 0}</span>)
+                </div>
+            </div>
+        </div>
+        `;
+                productListContainer.innerHTML += productCard;
+            });
+        }
+
+        function updatePagination(pageInfo) {
+            const paginationContainer = document.querySelector(".pagination");
+            let paginationHTML = "";
+
+            const groupSize = 10; // 한 번에 표시할 페이지 개수
+            const currentGroup = Math.floor(pageInfo.currentPage / groupSize) + 1;
+            const startPage = (currentGroup - 1) * groupSize;
+            const endPage = Math.min(startPage + groupSize - 1, pageInfo.totalPages - 1);
+
+            // 이전 그룹 이동 버튼
+            if (startPage > 0) {
+                paginationHTML += `<a href="#" class="prev-group" data-page="${startPage - 1}">&laquo;</a>`;
+            }
+
+            // 페이지 번호 표시 (한 번에 10개씩)
+            for (let i = startPage; i <= endPage; i++) {
+                paginationHTML += `
+        <span class="${pageInfo.currentPage === i ? 'active' : ''}">
+            <a href="#" class="page-link" data-page="${i}">${i + 1}</a>
+        </span>
+        `;
+            }
+
+            // 다음 그룹 이동 버튼
+            if (endPage < pageInfo.totalPages - 1) {
+                paginationHTML += `<a href="#" class="next-group" data-page="${endPage + 1}">&raquo;</a>`;
+            }
+
+            paginationContainer.innerHTML = paginationHTML;
+        }
+    </script>
 </div>
