@@ -19,12 +19,12 @@
         <nav class="nav">
             <ul class="nav-list">
                 <!-- BEST와 NEW (고정) -->
-                <li><a href="/list?condition=BEST">BEST</a></li>
-                <li><a href="/list?condition=NEW">NEW</a></li>
+                <li><a href="/product/list?condition=BEST">BEST</a></li>
+                <li><a href="/product/list?condition=NEW">NEW</a></li>
 
                 <!-- MADE 메뉴 -->
                 <li class="dropdown">
-                    <a href="/list?condition=HANDMADE">MADE</a>
+                    <a href="/product/list?condition=HANDMADE">MADE</a>
                     <ul class="dropdown-menu" id="handmade-categories">
                         <!-- 동적으로 추가될 하위 카테고리 -->
                     </ul>
@@ -52,7 +52,7 @@
                         handmadeCategories.forEach(category => {
                             const listItem = document.createElement("li");
                             listItem.innerHTML = `
-                    <a href="/list?condition=HANDMADE&category=${category.categoryNo}">
+                    <a href="/product/list?condition=HANDMADE&category=${category.categoryNo}">
                         ${category.name}
                     </a>
                 `;
@@ -64,10 +64,13 @@
                         middleCategories.forEach(category => {
                             const listItem = document.createElement("li");
                             listItem.classList.add("dropdown");
+
                             listItem.innerHTML = `
-                    <a href="/list?condition=${category.name}">${category.name}</a>
-                    <ul class="dropdown-menu"></ul>
-                `;
+                                <a href="/product/list?condition=${category.name === "OPS/SK" ? "OPS" : category.name}">
+                                    ${category.name}
+                                </a>
+                                <ul class="dropdown-menu"></ul>
+                            `;
 
                             const dropdownMenu = listItem.querySelector(".dropdown-menu");
                             subCategories
@@ -75,7 +78,7 @@
                                 .forEach(subCategory => {
                                     const subListItem = document.createElement("li");
                                     subListItem.innerHTML = `
-                            <a href="/list?condition=${category.name}&category=${subCategory.categoryNo}">
+                            <a href="/product/list?condition=${category.name === "OPS/SK" ? "OPS" : category.name}&category=${subCategory.categoryNo}">
                                 ${subCategory.name}
                             </a>
                         `;

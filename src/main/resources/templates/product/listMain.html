@@ -25,30 +25,108 @@
             </ul>
         </div>
         <!-- 정렬 선택 -->
-        <div class="sort-selection">
-            <select id="order-by">
-                <option value="LATEST">최신순</option>
-                <option value="POPULAR">인기순</option>
-                <option value="LOW_PRICE">낮은 가격순</option>
-                <option value="HIGH_PRICE">높은 가격순</option>
-                <option value="HIGH_DISCOUNT_RATE">높은 할인율순</option>
-                <option value="HIGH_REVIEW">리뷰 많은순</option>
-                <option value="HIGH_VIEW">조회수 많은순</option>
-            </select>
+        <div class="custom-select">
+            <div class="selected-option" tabindex="0">
+                인기순
+                <span class="dropdown-arrow">▼</span>
+            </div>
+            <ul class="dropdown-options">
+                <li data-value="POPULAR">인기순</li>
+                <li data-value="LATEST">최신순</li>
+                <li data-value="LOW_PRICE">낮은 가격순</li>
+                <li data-value="HIGH_PRICE">높은 가격순</li>
+                <li data-value="HIGH_DISCOUNT_RATE">높은 할인율순</li>
+                <li data-value="HIGH_REVIEW">리뷰 많은순</li>
+                <li data-value="HIGH_VIEW">조회수 많은순</li>
+            </ul>
         </div>
+        <script>
+            document.addEventListener("DOMContentLoaded", () => {
+                const select = document.querySelector(".custom-select");
+                const selectedOption = select.querySelector(".selected-option");
+                const options = select.querySelector(".dropdown-options");
+
+                selectedOption.addEventListener("click", () => {
+                    select.classList.toggle("open");
+                });
+
+                options.addEventListener("click", (event) => {
+                    if (event.target.tagName === "LI") {
+                        selectedOption.textContent = event.target.textContent;
+                        select.classList.remove("open");
+                    }
+                });
+
+                document.addEventListener("click", (event) => {
+                    if (!select.contains(event.target)) {
+                        select.classList.remove("open");
+                    }
+                });
+            });
+        </script>
     </div>
 
     <!-- 상품 리스트 -->
     <div class="product-list">
-        <!-- 상품 카드 -->
-        <div class="product-card">
-            <img src="#" alt="상품 이미지" />
+        <!-- Thymeleaf 조건문으로 상품 존재 여부 확인 -->
+        <div th:if="${#lists.isEmpty(products)}" class="no-products">
+            상품이 0개입니다.
+        </div>
+
+        <!-- Thymeleaf 반복문으로 동적 렌더링 -->
+        <div th:if="${!#lists.isEmpty(products)}" th:each="product, iterStat : ${products}" class="product-card" th:attr="data-product-id=${product.no}">
+            <!-- 상품 이미지 -->
+            <img th:src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+
+            <!-- 상품 정보 -->
             <div class="product-info">
-                <h3>상품 이름</h3>
-                <p class="price">₩가격</p>
-                <p class="details">상품 상세 정보</p>
+                <h3 class="product-name" th:text="${product.name}">상품 이름</h3>
+                <div class="price-discount">
+                    <span class="discount-rate" th:if="${product.discRate > 0}" th:text="${product.discRate + '%'}"></span>
+                    <span class="price" th:text="${#numbers.formatInteger(product.sellPrice, 3, 'COMMA')}"></span>
+                </div>
+                <div class="product-badges">
+                    <span class="badge" th:if="${product.freeShip == 'Y'}">무료배송</span>
+                    <span class="badge" th:if="${product.handMadeYn == 'Y'}">핸드메이드</span>
+                </div>
+                <div class="extra-info">
+                    <!-- 찜 수 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-heart-fill" viewBox="0 0 16 16">
+                        <path d="M8 2C4.685-1.127 0 1.324 0 5.3 0 7.999 3.354 11.324 8 14c4.646-2.676 8-6.001 8-8.7 0-3.976-4.685-6.427-8-3.3-3.315-3.127-8-.676-8 3.3 0 2.699 3.354 6.024 8 8.7 4.646-2.676 8-6.001 8-8.7 0-3.976-4.685-6.427-8-3.3z"/>
+                    </svg>
+                    <span class="wish-cnt" th:text="${product.wishCnt != null ? product.wishCnt : 0}"></span>
+
+                    <!-- 별점 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" class="bi bi-star" viewBox="0 0 16 16">
+                        <path d="M2.866 14.85c-.078.444.36.791.746.593l4.39-2.256 4.389 2.256c.386.198.824-.149.746-.592l-.83-4.73 3.523-3.356c-.329-.314.158-.888-.283-.95l-4.898-.696L8.465.792a.513.513 0 0 0-.927 0L5.354 5.22l-4.898.696c-.441.062-.612.636-.282.95l3.522 3.356-.83 4.73z"/>
+                    </svg>
+                    <span class="avg-rating" th:text="${product.avgR != null ? product.avgR : 0}"></span>
+
+                    <!-- 리뷰 수 -->
+                    (<span class="review-cnt" th:text="${product.rvwCnt != null ? product.rvwCnt : 0}"></span>)
+                </div>
             </div>
         </div>
-        <!-- 반복적으로 상품 카드 추가 -->
+    </div>
+
+    <!-- 페이지네이션 -->
+    <div th:if="${!#lists.isEmpty(products)}" class="pagination">
+        <!-- 이전 페이지 -->
+        <a th:if="${page > 0}" th:href="@{/list(page=${page - 1}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}" class="prev">&lt;</a>
+
+        <!-- 페이지 번호 -->
+        <span th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+              th:classappend="${page == i} ? 'active' : ''"
+              th:if="${i == 0 or i == totalPages - 1 or (i >= page - 2 and i <= page + 2)}"
+              th:text="${i + 1}"
+              th:href="@{/list(page=${i}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}">
+    </span>
+
+        <!-- 중간 생략 -->
+        <span th:if="${page > 3 and totalPages > 6}">...</span>
+        <span th:if="${page < totalPages - 4 and totalPages > 6}">...</span>
+
+        <!-- 다음 페이지 -->
+        <a th:if="${page + 1 < totalPages}" th:href="@{/list(page=${page + 1}, size=${size}, condition=${condition}, order=${order}, category=${category}, keyword=${keyword})}" class="next">&gt;</a>
     </div>
 </div>
