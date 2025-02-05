@@ -27,6 +27,7 @@ import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,16 +49,14 @@ public class InitProduct {
 
         @Transactional
         public void init() {
-            int productCount = 100;
+            int productCountPerSubCategory = 40; // 소분류당 40개씩 상품 생성
 
             // 중분류 카테고리(최상위) 생성
-            Map<Condition, Category> conditionToCategoryMap = new HashMap<>();
+            Map<Condition, List<Category>> conditionToSubCategoryMap = new HashMap<>();
             for (Condition condition : Condition.values()) {
                 if (condition.isCategoryCondition()) {
-                    // 중분류 이름
                     String categoryName = condition.getCategoryName();
 
-                    // 해당 중분류에 연결될 서브카테고리 이름 리스트
                     List<String> subCategoryNames = switch (categoryName) {
                         case "BOTTOM" -> List.of("데님", "팬츠", "슬랙스", "쇼츠", "트레이닝팬츠", "스판혼방");
                         case "KNIT" -> List.of("니트", "가디건", "베스트");
@@ -65,81 +64,83 @@ public class InitProduct {
                         case "TOP" -> List.of("티셔츠", "맨투맨/후드", "슬리브리스");
                         case "SHIRT" -> List.of("셔츠", "블라우스");
                         case "OPS/SK" -> List.of("원피스", "미니스커트", "미디-롱 스커트");
-                        default -> List.of(); // 기본적으로 서브카테고리가 없을 경우
+                        default -> List.of();
                     };
 
-                    // 카테고리 생성 (중분류 + 하위 카테고리)
-                    Category category = createCategory(em, categoryName, subCategoryNames);
-                    conditionToCategoryMap.put(condition, category);
+                    // 중분류 및 소분류 생성
+                    List<Category> subCategories = createCategory(em, categoryName, subCategoryNames);
+                    conditionToSubCategoryMap.put(condition, subCategories);
                 }
             }
-            Product product = null;
 
-            // 더미 데이터 생성
-            for (int i = 0; i < productCount; i++) {
-                // 동적 조건 설정
-                Condition condition = getRandomCondition(i);
-                Category category = conditionToCategoryMap.get(condition); // 해당 중분류 카테고리
+            // 더미 데이터 생성 (소분류에 매핑)
+            for (Map.Entry<Condition, List<Category>> entry : conditionToSubCategoryMap.entrySet()) {
+                Condition condition = entry.getKey();
+                List<Category> subCategories = entry.getValue();
 
-                OrderBy orderBy = getRandomOrderBy(i);
-                List<InfoSearch> infoSearches = getRandomInfoSearches(i);
-                List<ColorCondition> colorConditions = getRandomColorConditions(i);
-                PriceCondition priceCondition = getRandomPriceCondition(i);
-                Integer customMinPrice = priceCondition == PriceCondition.CUSTOM ? 10000 : null;
-                Integer customMaxPrice = priceCondition == PriceCondition.CUSTOM ? 50000 : null;
-
-                // 상품 생성
-                product = Product.builder()
-                        .category(category)
-                        .name("더미 상품 " + i)
-                        .desc("테스트용 더미 상품입니다.")
-                        .origPrice(10000 + (i * 1000)) // 기본 가격 설정
-                        .discRate(condition == Condition.DISCOUNT ? 20 : 0) // 할인율 설정
-                        .qty(infoSearches.contains(InfoSearch.EXCLUDE_OUT_OF_STOCK) ? 50 : 0) // 재고 설정
-                        .rvwCnt(orderBy == OrderBy.HIGH_REVIEW ? 50 : 10) // 리뷰 수 설정
-                        .viewCnt(orderBy == OrderBy.HIGH_VIEW ? 500 : 100) // 조회 수 설정
-                        .wishCnt(condition == Condition.BEST ? 50 : 10) // 찜 수 설정
-                        .freeShip(infoSearches.contains(InfoSearch.FREESHIP) ? "Y" : "N") // 무료 배송 여부
-                        .handMadeYn(condition == Condition.HANDMADE ? "Y" : "N") // 핸드메이드 여부
-                        .sellingStatus(ProductSellingStatus.SELLING)
-                        .shipFee(2000)
-                        .build();
-                product.setCreatedAt(LocalDateTime.now().minusDays(i));
-                em.persist(product);
-
-                // 옵션 그룹 생성
-                OptionGroup colorGroup = createOptionGroup(em, "컬러", product);
-                OptionGroup sizeGroup = createOptionGroup(em, "사이즈", product);
-
-                // 옵션 값 생성
-                for (ColorCondition colorCondition : colorConditions) {
-                    createOptionValue(em, colorCondition.name(), colorCondition.getHexCode(), colorGroup);
+                for (Category subCategory : subCategories) {
+                    for (int i = 0; i < productCountPerSubCategory; i++) {
+                        createProduct(em, condition, subCategory, i);
+                    }
                 }
-                createOptionValue(em, "M", null, sizeGroup);
-                createOptionValue(em, "L", null, sizeGroup);
-                product.updateSearchKeywords();
-
-                // 상품 이미지 생성
-                addProductImages(em, product, i);
-
-                // 품목 생성
-                createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: M", List.of(
-                        colorGroup.getOptionValues().get(0), // 첫 번째 색상
-                        sizeGroup.getOptionValues().get(0)  // M
-                ), product, i);
-
-                createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: L", List.of(
-                        colorGroup.getOptionValues().get(0), // 첫 번째 색상
-                        sizeGroup.getOptionValues().get(1)  // L
-                ), product, i);
             }
-            // 회원 생성
-            Member member = createMember(em, "0712kyungh@naver.com");
 
-            // 주문 데이터 생성
-            createOrderWithProduct(product,member);
+            System.out.println("각 소분류에 40개씩 총 " + (productCountPerSubCategory * conditionToSubCategoryMap.values().stream().mapToInt(List::size).sum()) + "개의 더미 상품이 생성되었습니다.");
+        }
 
-            System.out.println(productCount + "개의 상세한 조건을 가진 더미 상품이 생성되었습니다.");
+        // 상품 생성
+        private void createProduct(EntityManager em, Condition condition, Category subCategory, int index) {
+            OrderBy orderBy = getRandomOrderBy(index);
+            List<InfoSearch> infoSearches = getRandomInfoSearches(index);
+            List<ColorCondition> colorConditions = getRandomColorConditions(index);
+            PriceCondition priceCondition = getRandomPriceCondition(index);
+            Integer customMinPrice = priceCondition == PriceCondition.CUSTOM ? 10000 : null;
+            Integer customMaxPrice = priceCondition == PriceCondition.CUSTOM ? 50000 : null;
+
+            // 상품 생성
+            Product product = Product.builder()
+                    .category(subCategory) // ⭐ 소분류에 상품을 할당
+                    .name(subCategory.getName() + " 상품 " + index)
+                    .desc("테스트용 더미 상품입니다.")
+                    .origPrice(10000 + (index * 1000))
+                    .discRate(condition == Condition.DISCOUNT ? 20 : 0)
+                    .qty(infoSearches.contains(InfoSearch.EXCLUDE_OUT_OF_STOCK) ? 50 : 0)
+                    .rvwCnt(orderBy == OrderBy.HIGH_REVIEW ? 50 : 10)
+                    .viewCnt(orderBy == OrderBy.HIGH_VIEW ? 500 : 100)
+                    .wishCnt(condition == Condition.BEST ? 50 : 10)
+                    .freeShip(infoSearches.contains(InfoSearch.FREESHIP) ? "Y" : "N")
+                    .handMadeYn(condition == Condition.HANDMADE ? "Y" : "N")
+                    .sellingStatus(ProductSellingStatus.SELLING)
+                    .shipFee(2000)
+                    .build();
+            product.setCreatedAt(LocalDateTime.now().minusDays(index));
+            em.persist(product);
+
+            // 옵션 그룹 생성
+            OptionGroup colorGroup = createOptionGroup(em, "컬러", product);
+            OptionGroup sizeGroup = createOptionGroup(em, "사이즈", product);
+
+            // 옵션 값 생성
+            for (ColorCondition colorCondition : colorConditions) {
+                createOptionValue(em, colorCondition.name(), colorCondition.getHexCode(), colorGroup);
+            }
+            createOptionValue(em, "M", null, sizeGroup);
+            createOptionValue(em, "L", null, sizeGroup);
+            product.updateSearchKeywords();
+
+            // 상품 이미지 생성
+            addProductImages(em, product, index);
+
+            // 품목 생성
+            createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: M", List.of(
+                    colorGroup.getOptionValues().get(0),
+                    sizeGroup.getOptionValues().get(0)
+            ), product, index);
+
+            createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: L", List.of(
+                    colorGroup.getOptionValues().get(0),
+                    sizeGroup.getOptionValues().get(1)
+            ), product, index);
         }
 
         public static Member createMember(EntityManager entityManager, String loginId) {
@@ -226,26 +227,26 @@ public class InitProduct {
 //        }
 
 
-        // 카테고리 생성 메서드 (서브카테고리 포함)
-        private Category createCategory(EntityManager em, String name, List<String> subCategoryNames) {
+        // 카테고리 생성 메서드 (중분류 + 소분류 포함)
+        private List<Category> createCategory(EntityManager em, String name, List<String> subCategoryNames) {
             Category parentCategory = Category.builder()
                     .name(name)
                     .build();
             em.persist(parentCategory);
 
-            // 서브카테고리 생성 및 연결
-            if (subCategoryNames != null && !subCategoryNames.isEmpty()) {
-                for (String subCategoryName : subCategoryNames) {
-                    Category subCategory = Category.builder()
-                            .name(subCategoryName)
-                            .build();
-                    parentCategory.addSubCategory(subCategory); // 부모-자식 관계 설정
-                    em.persist(subCategory);
-                }
+            List<Category> subCategories = new ArrayList<>();
+            for (String subCategoryName : subCategoryNames) {
+                Category subCategory = Category.builder()
+                        .name(subCategoryName)
+                        .build();
+                parentCategory.addSubCategory(subCategory);
+                em.persist(subCategory);
+                subCategories.add(subCategory);
             }
 
-            return parentCategory;
+            return subCategories;
         }
+
 
         // 옵션 그룹 생성
         private OptionGroup createOptionGroup(EntityManager em, String name, Product product) {

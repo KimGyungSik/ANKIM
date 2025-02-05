@@ -45,9 +45,9 @@ public class ProductController {
     @GetMapping("/list")
     public String getFilteredAndSortedProductList(
             @RequestParam(name = "page", defaultValue = "0") int page,
-            @RequestParam(name = "size", defaultValue = "10") int size,
+            @RequestParam(name = "size", defaultValue = "24") int size,
             @RequestParam(name = "condition", required = false) Condition condition,
-            @RequestParam(name = "order", required = false) OrderBy order,
+            @RequestParam(name = "order", defaultValue = "POPULAR", required = false) OrderBy order,
             @RequestParam(name = "category", required = false) Long category,
             @RequestParam(name = "keyword", required = false) String keyword,
             @RequestParam(name = "colorConditions", required = false) List<ColorCondition> colorConditions,
@@ -65,6 +65,15 @@ public class ProductController {
                 pageable, condition, order, category, keyword, colorConditions, priceCondition,
                 customMinPrice, customMaxPrice, infoSearches
         );
+
+        // 로그 추가
+        System.out.println("Products found: " + productList.getContent());
+        System.out.println("Total Pages: " + productList.getTotalPages());
+        System.out.println("Current Page: " + productList.getNumber());
+        System.out.println("Condition: " + condition);
+        System.out.println("Order: " + order);
+        System.out.println("Category: " + category);
+        System.out.println("Keyword: " + keyword);
 
         // 모델에 데이터 추가
         model.addAttribute("products", productList.getContent());
