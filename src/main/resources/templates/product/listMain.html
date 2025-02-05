@@ -1,7 +1,7 @@
 <div class="list-main" th:fragment="listMain">
     <!-- 중분류 카테고리 이름과 검색 -->
     <div class="category-header">
-        <h2 class="subcategory-title">중분류 카테고리 이름</h2>
+        <h2 class="subcategory-title" th:text="${subCategoryTitle}">중분류 카테고리 이름</h2>
         <div class="search-bar">
             <input type="text" id="search-input" />
             <button type="button">
@@ -17,11 +17,17 @@
         <!-- 카테고리 메뉴 -->
         <div class="category-menu">
             <ul>
-                <li><a href="#">전체</a></li>
-                <li><a href="#">미니 원피스</a></li>
-                <li><a href="#">미디 원피스</a></li>
-                <li><a href="#">롱 원피스</a></li>
-                <li><a href="#">데님 원피스</a></li>
+                <!-- 전체 카테고리 -->
+                <li th:classappend="${category == null} ? 'active' : ''">
+                    <a th:href="@{/list(condition=${condition})}">전체</a>
+                </li>
+
+                <!-- 하위 카테고리 목록 -->
+                <li th:each="subCategory : ${subCategories}"
+                    th:classappend="${category != null and category == subCategory.categoryNo} ? 'active' : ''">
+                    <a th:href="@{/list(condition=${condition}, category=${subCategory.categoryNo})}"
+                       th:text="${subCategory.name}"></a>
+                </li>
             </ul>
         </div>
         <!-- 정렬 선택 -->

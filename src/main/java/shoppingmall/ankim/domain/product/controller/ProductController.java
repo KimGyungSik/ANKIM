@@ -9,6 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import shoppingmall.ankim.domain.category.dto.CategoryResponse;
+import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
 import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
@@ -21,6 +23,7 @@ import java.util.List;
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final CategoryQueryService categoryQueryService;
     @GetMapping("/admin/new")
     public String productForm(Model model) {
         return "/admin/product/registerForm";
@@ -66,6 +69,12 @@ public class ProductController {
                 customMinPrice, customMaxPrice, infoSearches
         );
 
+        // ✅ 중분류 카테고리에 해당하는 하위 카테고리 조회
+        List<CategoryResponse> subCategories = categoryQueryService.getSubCategoriesUnderMiddleCategoryWithCondition(condition);
+
+        // ✅ 현재 선택된 카테고리 여부 설정 (전체 선택 여부 확인)
+        boolean isCategorySelected = (category != null);
+
         // ✅ 페이지네이션 정보 추가
         model.addAttribute("products", productList.getContent());  // 상품 리스트
         model.addAttribute("page", productList.getNumber());       // 현재 페이지 번호
@@ -78,6 +87,10 @@ public class ProductController {
         model.addAttribute("order", order);
         model.addAttribute("category", category);
         model.addAttribute("keyword", keyword);
+
+        model.addAttribute("subCategoryTitle", condition.name());
+        model.addAttribute("subCategories", subCategories);
+        model.addAttribute("isCategorySelected", isCategorySelected);
 
         // 상품 리스트 페이지 반환
         return "product/list";
