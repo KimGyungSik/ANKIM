@@ -46,30 +46,6 @@
                 <li data-value="HIGH_VIEW">조회수 많은순</li>
             </ul>
         </div>
-        <script>
-            document.addEventListener("DOMContentLoaded", () => {
-                const select = document.querySelector(".custom-select");
-                const selectedOption = select.querySelector(".selected-option");
-                const options = select.querySelector(".dropdown-options");
-
-                selectedOption.addEventListener("click", () => {
-                    select.classList.toggle("open");
-                });
-
-                options.addEventListener("click", (event) => {
-                    if (event.target.tagName === "LI") {
-                        selectedOption.textContent = event.target.textContent;
-                        select.classList.remove("open");
-                    }
-                });
-
-                document.addEventListener("click", (event) => {
-                    if (!select.contains(event.target)) {
-                        select.classList.remove("open");
-                    }
-                });
-            });
-        </script>
     </div>
 
     <!-- 상품 리스트 -->
@@ -139,19 +115,72 @@
 
     <script>
         document.addEventListener("DOMContentLoaded", function () {
+            const select = document.querySelector(".custom-select");
+            const selectedOption = select.querySelector(".selected-option");
+            const searchInput = document.getElementById("search-input"); // 검색 입력창
+            const searchButton = document.querySelector(".search-bar button"); // 검색 버튼
             const urlParams = new URLSearchParams(window.location.search);
 
-            // ✅ 초기 로딩 시 데이터 가져오기 (비동기 호출)
-            fetch(`/api/v1/product/catalog/list?${urlParams.toString()}`, {
-                method: "GET",
-                headers: { "X-Requested-With": "XMLHttpRequest" }
-            })
-                .then(response => response.json())
-                .then(data => {
-                    updateProductList(data.data.products);
-                    updatePagination(data.data.pageInfo);
-                })
-                .catch(error => console.error("Error:", error));
+            // // ✅ 초기 로딩 시 데이터 가져오기 (비동기 호출)
+            // fetch(`/api/v1/product/catalog/list?${urlParams.toString()}`, {
+            //     method: "GET",
+            //     headers: { "X-Requested-With": "XMLHttpRequest" }
+            // })
+            //     .then(response => response.json())
+            //     .then(data => {
+            //         updateProductList(data.data.products);
+            //         updatePagination(data.data.pageInfo);
+            //     })
+            //     .catch(error => console.error("Error:", error));
+
+            // ✅ 정렬 드롭다운 열기/닫기
+            selectedOption.addEventListener("click", () => {
+                select.classList.toggle("open");
+            });
+
+            // ✅ 정렬 옵션 선택 이벤트
+            document.querySelectorAll(".dropdown-options li").forEach(option => {
+                option.addEventListener("click", function () {
+                    const selectedOrder = this.getAttribute("data-value");
+
+                    if (selectedOrder) {
+                        urlParams.set("order", selectedOrder);
+                    } else {
+                        urlParams.delete("order");
+                    }
+
+                    sendAjaxRequest(urlParams);
+                    updateSelectedOrderText(this.textContent);
+                    select.classList.remove("open");
+                });
+            });
+
+            // ✅ 정렬 선택 UI 업데이트
+            function updateSelectedOrderText(text) {
+                selectedOption.childNodes[0].nodeValue = text + " "; // `dropdown-arrow` 유지
+            }
+
+            // ✅ 검색 버튼 클릭 이벤트
+            searchButton.addEventListener("click", function () {
+                const keyword = searchInput.value.trim();
+
+                if (keyword) {
+                    urlParams.set("keyword", keyword);
+                } else {
+                    urlParams.delete("keyword");
+                }
+
+                urlParams.set("page", 0); // ✅ 검색 시 페이지 초기화
+                sendAjaxRequest(urlParams);
+            });
+
+            // ✅ 검색창 Enter 키 입력 이벤트
+            searchInput.addEventListener("keypress", function (event) {
+                if (event.key === "Enter") {
+                    event.preventDefault();
+                    searchButton.click();
+                }
+            });
 
             // ✅ 헤더 카테고리 메뉴 클릭 이벤트 (기본 이동 유지)
             document.querySelectorAll(".nav-list a").forEach(link => {
@@ -198,6 +227,9 @@
         function sendAjaxRequest(params) {
             const newUrl = `/api/v1/product/catalog/list?${params.toString()}`;
 
+            // ✅ 브라우저의 주소창 URL 변경 (뒤로 가기 가능)
+            history.pushState(null, "", newUrl);
+
             fetch(newUrl, {
                 method: "GET",
                 headers: { "X-Requested-With": "XMLHttpRequest" }
@@ -217,8 +249,18 @@
             const productListContainer = document.querySelector(".product-list");
             productListContainer.innerHTML = "";
 
+            // 현재 URL에서 keyword 파라미터 확인 (검색 여부 판단)
+            const urlParams = new URLSearchParams(window.location.search);
+            const keyword = urlParams.get("keyword");
+
             if (products.length === 0) {
-                productListContainer.innerHTML = '<div class="no-products">상품이 0개입니다.</div>';
+                if (keyword) {
+                    // 🔹 검색어가 있을 때 검색 결과 없음 문구 표시
+                    productListContainer.innerHTML = '<div class="no-products">해당 카테고리에는 검색결과가 없습니다.</div>';
+                } else {
+                    // 🔹 일반적인 경우 상품 없음 문구 표시
+                    productListContainer.innerHTML = '<div class="no-products">상품이 0개입니다.</div>';
+                }
                 return;
             }
 
