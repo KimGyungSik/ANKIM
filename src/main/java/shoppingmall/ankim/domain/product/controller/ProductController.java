@@ -70,7 +70,17 @@ public class ProductController {
         );
 
         // ✅ 중분류 카테고리에 해당하는 하위 카테고리 조회
-        List<CategoryResponse> subCategories = categoryQueryService.getSubCategoriesUnderMiddleCategoryWithCondition(condition);
+        // condition이 중분류 카테고리
+        if(condition.isCategoryCondition()) {
+            model.addAttribute("subCategoryTitle", condition.getCategoryName());
+            model.addAttribute("subCategories", categoryQueryService.getSubCategoriesUnderMiddleCategoryWithCondition(condition));
+        }else { // condition이 BEST, NEW, HANDMADE
+            model.addAttribute("subCategoryTitle", condition.name());
+            if(condition.name().equals("HANDMADE"))
+                model.addAttribute("subCategories", categoryQueryService.fetchHandmadeCategories());
+            else model.addAttribute("subCategories", null);
+        }
+
 
         // ✅ 현재 선택된 카테고리 여부 설정 (전체 선택 여부 확인)
         boolean isCategorySelected = (category != null);
@@ -87,9 +97,6 @@ public class ProductController {
         model.addAttribute("order", order);
         model.addAttribute("category", category);
         model.addAttribute("keyword", keyword);
-
-        model.addAttribute("subCategoryTitle", condition.name());
-        model.addAttribute("subCategories", subCategories);
         model.addAttribute("isCategorySelected", isCategorySelected);
 
         // 상품 리스트 페이지 반환

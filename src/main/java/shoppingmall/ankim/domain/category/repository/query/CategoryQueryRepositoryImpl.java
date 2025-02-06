@@ -63,7 +63,7 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository{
                         category.name
                 ))
                 .from(category)
-                .where(category.parent.name.eq(condition.name())
+                .where(category.parent.name.eq(condition.getCategoryName())
                         .and(category.level.eq(CategoryLevel.SUB)))
                 .fetch();
     }

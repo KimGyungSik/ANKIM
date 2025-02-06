@@ -31,6 +31,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ThreadLocalRandom;
 
 @Profile("!test")
 @Component
@@ -88,39 +89,40 @@ public class InitProduct {
             System.out.println("각 소분류에 40개씩 총 " + (productCountPerSubCategory * conditionToSubCategoryMap.values().stream().mapToInt(List::size).sum()) + "개의 더미 상품이 생성되었습니다.");
         }
 
-        // 상품 생성
         private void createProduct(EntityManager em, Condition condition, Category subCategory, int index) {
-            OrderBy orderBy = getRandomOrderBy(index);
-            List<InfoSearch> infoSearches = getRandomInfoSearches(index);
-            List<ColorCondition> colorConditions = getRandomColorConditions(index);
-            PriceCondition priceCondition = getRandomPriceCondition(index);
+            condition = getRandomCondition(); // 랜덤 Condition 적용
+
+            OrderBy orderBy = getRandomOrderBy();
+            List<InfoSearch> infoSearches = getRandomInfoSearches();
+            List<ColorCondition> colorConditions = getRandomColorConditions();
+            PriceCondition priceCondition = getRandomPriceCondition();
             Integer customMinPrice = priceCondition == PriceCondition.CUSTOM ? 10000 : null;
             Integer customMaxPrice = priceCondition == PriceCondition.CUSTOM ? 50000 : null;
 
             // 상품 생성
             Product product = Product.builder()
-                    .category(subCategory) // ⭐ 소분류에 상품을 할당
+                    .category(subCategory)
                     .name(subCategory.getName() + " 상품 " + index)
                     .desc("테스트용 더미 상품입니다.")
                     .origPrice(10000 + (index * 1000))
                     .discRate(condition == Condition.DISCOUNT ? 20 : 0)
-                    .qty(infoSearches.contains(InfoSearch.EXCLUDE_OUT_OF_STOCK) ? 50 : 0)
-                    .rvwCnt(orderBy == OrderBy.HIGH_REVIEW ? 50 : 10)
-                    .viewCnt(orderBy == OrderBy.HIGH_VIEW ? 500 : 100)
-                    .wishCnt(condition == Condition.BEST ? 50 : 10)
+                    .qty(infoSearches.contains(InfoSearch.EXCLUDE_OUT_OF_STOCK) ? 50 : ThreadLocalRandom.current().nextInt(0, 100))
+                    .rvwCnt(ThreadLocalRandom.current().nextInt(1, 200))
+                    .viewCnt(ThreadLocalRandom.current().nextInt(50, 1000))
+                    .wishCnt(ThreadLocalRandom.current().nextInt(5, 100))
                     .freeShip(infoSearches.contains(InfoSearch.FREESHIP) ? "Y" : "N")
-                    .handMadeYn(condition == Condition.HANDMADE ? "Y" : "N")
+                    .handMadeYn(condition == Condition.HANDMADE ? "Y" : (ThreadLocalRandom.current().nextBoolean() ? "Y" : "N"))
                     .sellingStatus(ProductSellingStatus.SELLING)
                     .shipFee(2000)
                     .build();
             product.setCreatedAt(LocalDateTime.now().minusDays(index));
             em.persist(product);
 
-            // 옵션 그룹 생성
+            // ✅ 옵션 그룹 생성
             OptionGroup colorGroup = createOptionGroup(em, "컬러", product);
             OptionGroup sizeGroup = createOptionGroup(em, "사이즈", product);
 
-            // 옵션 값 생성
+            // ✅ 옵션 값 생성
             for (ColorCondition colorCondition : colorConditions) {
                 createOptionValue(em, colorCondition.name(), colorCondition.getHexCode(), colorGroup);
             }
@@ -128,10 +130,10 @@ public class InitProduct {
             createOptionValue(em, "L", null, sizeGroup);
             product.updateSearchKeywords();
 
-            // 상품 이미지 생성
+            // ✅ 상품 이미지 생성
             addProductImages(em, product, index);
 
-            // 품목 생성
+            // ✅ 품목(Item) 생성
             createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: M", List.of(
                     colorGroup.getOptionValues().get(0),
                     sizeGroup.getOptionValues().get(0)
@@ -313,30 +315,26 @@ public class InitProduct {
             product.addItem(item);
         }
 
-        // 랜덤 Condition 생성
-        private Condition getRandomCondition(int index) {
-            return Condition.values()[index % Condition.values().length];
+        private Condition getRandomCondition() {
+            return Condition.values()[ThreadLocalRandom.current().nextInt(Condition.values().length)];
         }
 
-        // 랜덤 OrderBy 생성
-        private OrderBy getRandomOrderBy(int index) {
-            return OrderBy.values()[index % OrderBy.values().length];
+        private OrderBy getRandomOrderBy() {
+            return OrderBy.values()[ThreadLocalRandom.current().nextInt(OrderBy.values().length)];
         }
 
-        // 랜덤 InfoSearch 생성
-        private List<InfoSearch> getRandomInfoSearches(int index) {
-            return List.of(InfoSearch.values()[index % InfoSearch.values().length]);
+        private List<InfoSearch> getRandomInfoSearches() {
+            return List.of(InfoSearch.values()[ThreadLocalRandom.current().nextInt(InfoSearch.values().length)]);
         }
 
-        // 랜덤 ColorCondition 생성
-        private List<ColorCondition> getRandomColorConditions(int index) {
-            return List.of(ColorCondition.values()[index % ColorCondition.values().length]);
+        private List<ColorCondition> getRandomColorConditions() {
+            return List.of(ColorCondition.values()[ThreadLocalRandom.current().nextInt(ColorCondition.values().length)]);
         }
 
-        // 랜덤 PriceCondition 생성
-        private PriceCondition getRandomPriceCondition(int index) {
-            return PriceCondition.values()[index % PriceCondition.values().length];
+        private PriceCondition getRandomPriceCondition() {
+            return PriceCondition.values()[ThreadLocalRandom.current().nextInt(PriceCondition.values().length)];
         }
+
     }
 
 }
