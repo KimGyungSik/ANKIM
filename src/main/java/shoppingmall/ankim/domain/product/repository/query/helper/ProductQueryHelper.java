@@ -238,13 +238,19 @@ public class ProductQueryHelper {
     // 검색 필터링 메서드
     // 상품명 or 검색 키워드 or 상세 설명
     private static void addKeywordFilter(String keyword, QProduct product, BooleanBuilder filterBuilder) {
-        if (keyword != null) {
-            filterBuilder.and(
-                    product.name.containsIgnoreCase(keyword)
-                            .or(product.searchKeywords.containsIgnoreCase(keyword))
-                            .or(product.desc.containsIgnoreCase(keyword))
-            );
+        if (keyword != null && !keyword.trim().isEmpty()) {
+            String[] keywords = keyword.trim().split("(?<=\\D)(?=\\d)|(?<=\\d)(?=\\D)|\\s+");
+
+            BooleanBuilder keywordCondition = new BooleanBuilder();
+            for (String word : keywords) {
+                keywordCondition.and(
+                        product.name.containsIgnoreCase(word)
+                                .or(product.searchKeywords.containsIgnoreCase(word))
+                                .or(product.desc.containsIgnoreCase(word))
+                );
+            }
+
+            filterBuilder.and(keywordCondition);
         }
     }
-
 }
