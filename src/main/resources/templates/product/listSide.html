@@ -90,20 +90,20 @@
             <h3 style="margin-top: 35px;">상품정보</h3>
             <ul>
                 <li>
-                    <input type="checkbox" id="free-shipping">
-                    <label for="free-shipping">무료배송</label>
+                    <input type="checkbox" id="FREESHIP">
+                    <label for="FREESHIP">무료배송</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="exclude-outofstock">
-                    <label for="exclude-outofstock">품절상품 제외</label>
+                    <input type="checkbox" id="EXCLUDE_OUT_OF_STOCK">
+                    <label for="EXCLUDE_OUT_OF_STOCK">품절상품 제외</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="discount-only">
-                    <label for="discount-only">할인상품만</label>
+                    <input type="checkbox" id="DISCOUNT_ONLY">
+                    <label for="DISCOUNT_ONLY">할인상품만</label>
                 </li>
                 <li>
-                    <input type="checkbox" id="handmade-only">
-                    <label for="handmade-only">핸드메이드 상품만</label>
+                    <input type="checkbox" id="HANDMADE_ONLY">
+                    <label for="HANDMADE_ONLY">핸드메이드 상품만</label>
                 </li>
             </ul>
         </div>
@@ -124,20 +124,23 @@
             const minPriceInput = document.getElementById("min-price");
             const maxPriceInput = document.getElementById("max-price");
             const colorFilterItems = document.querySelectorAll(".color-filter li");
+
             let selectedPriceCondition = null; // 선택한 가격대 조건
             let customMinPrice = null; // 사용자 지정 최소 가격
             let customMaxPrice = null; // 사용자 지정 최대 가격
             let selectedColors = []; // 선택한 색상
             let selectedInfoSearches = []; // 선택한 상품정보
 
-            // 새로고침 시 최소 가격/최대 가격 필드 비활성화 확인
-            const savedPriceCondition = new URLSearchParams(window.location.search).get("priceCondition");
+            const urlParams = new URLSearchParams(window.location.search); // 기존 URL 유지
+
+            // ✅ 새로고침 시 최소 가격/최대 가격 필드 비활성화 확인 (누락된 부분 추가)
+            const savedPriceCondition = urlParams.get("priceCondition");
             if (!savedPriceCondition || savedPriceCondition !== "CUSTOM") {
                 minPriceInput.disabled = true;
                 maxPriceInput.disabled = true;
             }
 
-            // 색상 필터 클릭 이벤트 핸들러
+            // ✅ 색상 필터 클릭 이벤트 핸들러
             colorFilterItems.forEach(item => {
                 item.addEventListener("click", function () {
                     const color = this.getAttribute("data-color");
@@ -148,21 +151,17 @@
                         this.classList.add("selected");
                         selectedColors.push(color);
                     }
-                    console.log("Selected Colors:", selectedColors);
                 });
             });
 
-            // 가격대 필터 클릭 이벤트 핸들러
+            // ✅ 가격대 필터 클릭 이벤트 핸들러
             priceFilterInputs.forEach(input => {
                 input.addEventListener("change", function () {
-                    selectedPriceCondition = this.value; // 선택한 가격대 조건 저장
-
+                    selectedPriceCondition = this.value;
                     if (this.value === "CUSTOM") {
-                        // '직접 설정' 선택 시 입력 필드 활성화
                         minPriceInput.disabled = false;
                         maxPriceInput.disabled = false;
                     } else {
-                        // 다른 옵션 선택 시 입력 필드 비활성화 및 초기화
                         minPriceInput.disabled = true;
                         maxPriceInput.disabled = true;
                         minPriceInput.value = "";
@@ -170,25 +169,22 @@
                         customMinPrice = null;
                         customMaxPrice = null;
                     }
-                    console.log("Selected Price Condition:", selectedPriceCondition);
                 });
             });
 
-            // 사용자 지정 가격 입력 이벤트
+            // ✅ 사용자 지정 가격 입력 이벤트
             minPriceInput.addEventListener("input", function () {
                 customMinPrice = this.value || null;
-                console.log("Custom Min Price:", customMinPrice);
             });
 
             maxPriceInput.addEventListener("input", function () {
                 customMaxPrice = this.value || null;
-                console.log("Custom Max Price:", customMaxPrice);
             });
 
-            // 상품정보 체크박스 선택 이벤트 핸들러
+            // ✅ 상품정보 체크박스 선택 이벤트 핸들러
             checkboxes.forEach(checkbox => {
                 checkbox.addEventListener("change", function () {
-                    const infoSearch = this.id.replace(/-/g, "_").toUpperCase();
+                    const infoSearch = this.id; // id 값이 Enum 값과 동일하므로 변환 불필요
                     if (this.checked) {
                         if (!selectedInfoSearches.includes(infoSearch)) {
                             selectedInfoSearches.push(infoSearch);
@@ -196,11 +192,10 @@
                     } else {
                         selectedInfoSearches = selectedInfoSearches.filter(s => s !== infoSearch);
                     }
-                    console.log("Selected InfoSearches:", selectedInfoSearches);
                 });
             });
 
-            // 초기화 버튼 클릭 이벤트
+            // ✅ 초기화 버튼 클릭 이벤트 (누락된 기능 추가)
             resetButton.addEventListener("click", function () {
                 // 체크박스 초기화
                 checkboxes.forEach(checkbox => checkbox.checked = false);
@@ -223,31 +218,45 @@
                 console.log("필터 초기화 완료");
             });
 
-            // 상품 보기 버튼 클릭 이벤트
+            // ✅ 필터링 적용 버튼 클릭 (비동기 요청 유지)
             applyButton.addEventListener("click", function () {
-                let url = `/list?size=10&page=0`;
+                // 🔹 기존 URL 유지하면서 필터 조건 추가
+                const urlParams = new URLSearchParams(window.location.search); // ✅ 기존 URL 유지
 
-                // 색상 필터 조건 추가
+                // ✅ 색상 필터 조건 추가
                 if (selectedColors.length > 0) {
-                    url += `&colorConditions=${selectedColors.join(",")}`;
+                    urlParams.set("colorConditions", selectedColors.join(","));
+                } else {
+                    urlParams.delete("colorConditions");
                 }
 
-                // 가격대 필터 조건 추가
+                // ✅ 가격대 필터 조건 추가
                 if (selectedPriceCondition) {
-                    url += `&priceCondition=${selectedPriceCondition}`;
+                    urlParams.set("priceCondition", selectedPriceCondition);
                     if (selectedPriceCondition === "CUSTOM") {
-                        if (customMinPrice) url += `&customMinPrice=${customMinPrice}`;
-                        if (customMaxPrice) url += `&customMaxPrice=${customMaxPrice}`;
+                        if (customMinPrice) urlParams.set("customMinPrice", customMinPrice);
+                        if (customMaxPrice) urlParams.set("customMaxPrice", customMaxPrice);
                     }
+                } else {
+                    urlParams.delete("priceCondition");
+                    urlParams.delete("customMinPrice");
+                    urlParams.delete("customMaxPrice");
                 }
 
-                // 상품정보 필터 조건 추가
+                // ✅ 상품정보 필터 조건 추가
                 if (selectedInfoSearches.length > 0) {
-                    url += `&infoSearches=${selectedInfoSearches.join(",")}`;
+                    urlParams.set("infoSearches", selectedInfoSearches.join(","));
+                } else {
+                    urlParams.delete("infoSearches");
                 }
 
-                console.log("Generated URL:", url);
-                window.location.href = url; // URL로 이동
+                // ✅ 페이지 초기화 (새로운 필터 적용 시 항상 0페이지부터 시작)
+                urlParams.set("page", 0);
+
+                console.log("Updated URL:", urlParams.toString()); // 🔍 디버깅용
+
+                // ✅ 기존 URL 유지 + 필터 조건 추가한 상태로 비동기 요청 실행
+                sendAjaxRequest(urlParams);
             });
         });
     </script>
