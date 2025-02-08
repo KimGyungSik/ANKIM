@@ -116,3 +116,164 @@ function updateCategoryActiveState(selectedCategory) {
             ?.closest("li").classList.add("active");
     }
 }
+
+
+const selectedFiltersContainer = document.querySelector(".selected-filters");
+// ✅ 전역 변수 초기화 (global.js에서 선언)
+window.selectedColors = window.selectedColors || [];
+window.selectedInfoSearches = window.selectedInfoSearches || [];
+window.selectedPriceCondition = window.selectedPriceCondition || null;
+window.customMinPrice = window.customMinPrice || null;
+window.customMaxPrice = window.customMaxPrice || null;
+
+
+
+// ✅ 선택된 필터 업데이트
+function updateSelectedFilters() {
+    const urlParams = new URLSearchParams(window.location.search);
+    selectedFiltersContainer.innerHTML = ""; // 기존 내용 초기화
+
+    // 🔹 색상 필터 추가
+    const colorConditions = urlParams.get("colorConditions");
+    if (colorConditions) {
+        colorConditions.split(",").forEach(color => {
+            addFilterTag(color, "colorConditions");
+        });
+    }
+
+    // 🔹 상품정보 필터 추가
+    const infoSearches = urlParams.get("infoSearches");
+    if (infoSearches) {
+        infoSearches.split(",").forEach(info => {
+            addFilterTag(info, "infoSearches");
+        });
+    }
+
+    // 🔹 가격대 필터 추가
+    const priceCondition = urlParams.get("priceCondition");
+    if (priceCondition) {
+        addFilterTag(priceCondition, "priceCondition");
+    }
+}
+
+// ✅ 필터 태그 추가 (보이는 값은 한글로 변환)
+function addFilterTag(value, key) {
+    const filterTag = document.createElement("div");
+    filterTag.classList.add("filter-tag");
+
+    let displayText = value; // 기본값으로 value 사용
+
+    // 🔹 색상 필터의 한글명 가져오기
+    if (key === "colorConditions") {
+        const colorElement = document.querySelector(`.color-filter li[data-color="${value}"]`);
+        if (colorElement) {
+            displayText = colorElement.textContent.trim(); // 색상명 가져오기
+        }
+    }
+    // 🔹 가격대 필터의 한글명 가져오기
+    else if (key === "priceCondition") {
+        if (value === "CUSTOM") {
+            // 직접 입력한 가격이 있을 경우 가져오기
+            const minPrice = window.customMinPrice || "";
+            const maxPrice = window.customMaxPrice || "";
+            if (minPrice && maxPrice) {
+                displayText = `${parseInt(minPrice).toLocaleString()}원 ~ ${parseInt(maxPrice).toLocaleString()}원`;
+            } else if (minPrice) {
+                displayText = `${parseInt(minPrice).toLocaleString()}원 이상`;
+            } else if (maxPrice) {
+                displayText = `${parseInt(maxPrice).toLocaleString()}원 이하`;
+            }
+        } else {
+            const priceLabel = document.querySelector(`.price-filter input[value="${value}"] + label`);
+            if (priceLabel) {
+                displayText = priceLabel.textContent.trim();
+            }
+        }
+    }
+    // 🔹 상품정보 필터의 한글명 가져오기
+    else if (key === "infoSearches") {
+        const infoLabel = document.querySelector(`.product-info-section input[id="${value}"] + label`);
+        if (infoLabel) {
+            displayText = infoLabel.textContent.trim();
+        }
+    }
+
+    filterTag.innerHTML = `
+        ${displayText}
+        <button class="remove-filter" data-key="${key}" data-value="${value}">X</button>
+    `;
+
+    selectedFiltersContainer.appendChild(filterTag);
+}
+
+
+
+// ✅ X 버튼 클릭 이벤트 처리
+selectedFiltersContainer.addEventListener("click", function (event) {
+    if (event.target.matches(".remove-filter")) {
+        const key = event.target.getAttribute("data-key");
+        const value = event.target.getAttribute("data-value");
+
+        const urlParams = new URLSearchParams(window.location.search);
+
+        // ✅ listSide 요소들 가져오기
+        const priceFilterInputs = document.querySelectorAll(".price-filter input");
+        const minPriceInput = document.getElementById("min-price");
+        const maxPriceInput = document.getElementById("max-price");
+        const colorFilterItems = document.querySelectorAll(".color-filter li");
+        const checkboxes = document.querySelectorAll(".product-info-section input[type='checkbox']");
+
+        if (key === "colorConditions") {
+            // ✅ 색상 필터 전역 상태 업데이트
+            window.selectedColors = window.selectedColors.filter(color => color !== value);
+            colorFilterItems.forEach(item => {
+                if (item.getAttribute("data-color") === value) {
+                    item.classList.remove("selected");
+                }
+            });
+            urlParams.set("colorConditions", window.selectedColors.join(","));
+            if (window.selectedColors.length === 0) {
+                urlParams.delete("colorConditions");
+            }
+        } else if (key === "infoSearches") {
+            // ✅ 상품정보 필터 전역 상태 업데이트
+            window.selectedInfoSearches = window.selectedInfoSearches.filter(info => info !== value);
+            checkboxes.forEach(checkbox => {
+                if (checkbox.id === value) {
+                    checkbox.checked = false;
+                }
+            });
+            urlParams.set("infoSearches", window.selectedInfoSearches.join(","));
+            if (window.selectedInfoSearches.length === 0) {
+                urlParams.delete("infoSearches");
+            }
+        } else if (key === "priceCondition") {
+            // ✅ 가격 필터 초기화
+            window.selectedPriceCondition = null;
+            window.customMinPrice = null;
+            window.customMaxPrice = null;
+
+            priceFilterInputs.forEach(input => input.checked = false);
+            if (minPriceInput && maxPriceInput) {
+                minPriceInput.value = "";
+                maxPriceInput.value = "";
+                minPriceInput.disabled = true;
+                maxPriceInput.disabled = true;
+            }
+            urlParams.delete("priceCondition");
+            urlParams.delete("customMinPrice");
+            urlParams.delete("customMaxPrice");
+        }
+
+        // ✅ 비동기 요청
+        sendAjaxRequest(urlParams);
+
+        // ✅ 필터 태그 업데이트
+        updateSelectedFilters();
+    }
+});
+
+
+
+
+
