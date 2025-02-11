@@ -10,7 +10,6 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (response.code === 200 && response.data) {
-            alert("정상");
             renderMyPage(response.data);
         } else {
             alert("데이터 전송실패");
@@ -37,5 +36,8 @@ function renderMyPage(data) {
 
 // 모달 표시 함수
 function showModal(message) {
-    alert(message);
+    var modal = document.querySelector('.modal');
+    var modalBody = modal.querySelector('.modal-body');
+    modalBody.textContent = message;
+    modal.style.display = "flex";
 }

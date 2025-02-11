@@ -103,7 +103,7 @@ public class MemberEditServiceImpl implements MemberEditService {
 
         // 약관 동의 내역 조회 (findAgreedTermsByMember 활용)
         Long parentTermsNo = 1L; // 회원가입 약관의 최상위 부모 번호 (필요시 변경)
-        List<TermsAgreementResponse> agreedTerms = termsHistoryRepository.findAgreedTermsByMember(member.getNo(), parentTermsNo, "Y");
+//        List<TermsAgreementResponse> agreedTerms = termsHistoryRepository.findAgreedTermsByMember(member.getNo(), parentTermsNo, "Y");
 
 
         // MemberInfoResponse 생성 후 반환

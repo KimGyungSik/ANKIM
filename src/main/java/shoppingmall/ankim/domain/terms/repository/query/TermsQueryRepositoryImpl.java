@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 @Repository
@@ -112,5 +113,28 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
         for (Terms subTerm : subTerms) {
             fetchSubTermsRecursive(subTerm.getNo(), activeYn, allTerms);
         }
+    }
+
+    // FIXME 최신버전의 약관을 불러온다.
+    public List<Terms> findLatestTerms(TermsCategory category, String activeYn) {
+        QTerms terms = QTerms.terms;
+
+        Integer latestVersion = queryFactory
+                .select(terms.termsVersion.max())
+                .from(terms)
+                .where(terms.category.eq(category)
+                        .and(terms.activeYn.eq(activeYn)))
+                .fetchOne();
+
+        if (latestVersion == null) {
+            return Collections.emptyList(); // 최신 버전이 없으면 빈 리스트 반환
+        }
+
+        return queryFactory
+                .selectFrom(terms)
+                .where(terms.category.eq(category)
+                        .and(terms.activeYn.eq(activeYn))
+                        .and(terms.termsVersion.eq(latestVersion)))  // 최신 버전만 필터링
+                .fetch();
     }
 }

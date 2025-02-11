@@ -3,7 +3,6 @@ package shoppingmall.ankim.domain.termsHistory.repository.query;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Repository;
 import shoppingmall.ankim.domain.member.dto.TermsAgreementResponse;
 import shoppingmall.ankim.domain.terms.entity.QTerms;
@@ -49,5 +48,4 @@ public class TermsHistoryQueryRepositoryImpl implements TermsHistoryQueryReposit
                 .orderBy(terms.level.asc())
                 .fetch();
     }
-
 }

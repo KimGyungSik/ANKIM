@@ -40,8 +40,12 @@ public class Terms extends BaseEntity {
     @Column(name = "terms_yn", length = 1, nullable = false)
     private String termsYn; // 필수 동의 여부
 
+/*
     @Column(name = "version", length = 10, nullable = false)
     private String termsVersion; // 약관 버전
+*/
+    @Column(name = "version", nullable = false)
+    private Integer termsVersion; // 약관 버전
 
     @Column(nullable = false)
     private Integer level; // 약관 레벨
@@ -50,7 +54,7 @@ public class Terms extends BaseEntity {
     private String activeYn; // 활성화 상태
 
     @Builder
-    public Terms(Terms parentTerms, TermsCategory category, String name, String termsYn, String contents, String termsVersion, Integer level, String activeYn) {
+    public Terms(Terms parentTerms, TermsCategory category, String name, String termsYn, String contents, Integer termsVersion, Integer level, String activeYn) {
         this.parentTerms = parentTerms;
         this.category = category;
         this.name = name;

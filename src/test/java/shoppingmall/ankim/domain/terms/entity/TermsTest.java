@@ -25,7 +25,8 @@ class TermsTest {
                 .category(TermsCategory.JOIN)
                 .contents("약관 내용입니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -41,7 +42,8 @@ class TermsTest {
                 .category(TermsCategory.JOIN)
                 .contents("약관 내용입니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -49,21 +51,21 @@ class TermsTest {
         assertThrows(DataIntegrityViolationException.class, () -> termsRepository.saveAndFlush(terms));
     }
 
-    @Test
-    @DisplayName("약관 버전 길이가 10자를 초과할 경우 예외가 발생해야 한다.")
-    void invalidTermsVersionLength() {
-        Terms terms = Terms.builder()
-                .name("이용약관")
-                .category(TermsCategory.JOIN)
-                .contents("약관 내용입니다.")
-                .termsYn("Y")
-                .termsVersion("v".repeat(11))  // 길이 초과
-                .level(1)
-                .activeYn("Y")
-                .build();
-
-        assertThrows(DataIntegrityViolationException.class, () -> termsRepository.saveAndFlush(terms));
-    }
+//    @Test
+//    @DisplayName("약관 버전 길이가 10자를 초과할 경우 예외가 발생해야 한다.")
+//    void invalidTermsVersionLength() {
+//        Terms terms = Terms.builder()
+//                .name("이용약관")
+//                .category(TermsCategory.JOIN)
+//                .contents("약관 내용입니다.")
+//                .termsYn("Y")
+//                .termsVersion("v".repeat(11))  // 길이 초과
+//                .level(1)
+//                .activeYn("Y")
+//                .build();
+//
+//        assertThrows(DataIntegrityViolationException.class, () -> termsRepository.saveAndFlush(terms));
+//    }
 
     @Test
     @DisplayName("약관 버전이 null일 경우 예외가 발생해야 한다.")
@@ -89,7 +91,8 @@ class TermsTest {
                 .category(TermsCategory.JOIN)
                 .contents("약관 내용입니다.")
                 .termsYn(null)  // 필수 값이므로 null
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -105,7 +108,8 @@ class TermsTest {
                 .category(TermsCategory.JOIN)
                 .contents("약관 내용입니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn(null)  // 필수 값이므로 null
                 .build();
@@ -121,7 +125,8 @@ class TermsTest {
                 .category(TermsCategory.JOIN)
                 .contents("약관 내용입니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(null)  // 필수 값이므로 null
                 .activeYn("Y")
                 .build();

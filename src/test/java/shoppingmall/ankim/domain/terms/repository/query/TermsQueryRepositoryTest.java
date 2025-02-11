@@ -5,20 +5,25 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
 import org.springframework.test.context.TestPropertySource;
+import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.domain.member.entity.MemberStatus;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.repository.TermsRepository;
+import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 import static org.assertj.core.api.AssertionsForClassTypes.tuple;
 import static org.assertj.core.api.AssertionsForInterfaceTypes.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.when;
 
 @DataJpaTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -43,7 +48,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -56,7 +62,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -68,7 +75,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -80,7 +88,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -92,7 +101,8 @@ class TermsQueryRepositoryTest {
                 .category(TermsCategory.ORDER)
                 .contents("ANKIM 주문결제 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -131,7 +141,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("ANKIM 이용약관")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -144,7 +155,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("이 약관은 만 14세 이상임을 동의하는 내용입니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -156,7 +168,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("이 약관은 서비스 이용에 대한 동의를 포함합니다.")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -169,7 +182,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("마케팅 목적으로 개인정보를 수집 및 이용하는 것에 대한 동의입니다.")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -181,7 +195,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -194,7 +209,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -206,7 +222,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -244,7 +261,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -257,7 +275,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("나이 약관")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -269,7 +288,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -281,7 +301,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -293,7 +314,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -305,7 +327,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 이메일 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -317,7 +340,8 @@ class TermsQueryRepositoryTest {
                 .category(TermsCategory.ORDER)
                 .contents("ANKIM 주문결제 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -352,7 +376,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -365,7 +390,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("나이 약관")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -377,7 +403,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -389,7 +416,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -401,7 +429,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -413,7 +442,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 이메일 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -425,7 +455,8 @@ class TermsQueryRepositoryTest {
                 .category(TermsCategory.ORDER)
                 .contents("ANKIM 주문결제 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -461,7 +492,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -474,7 +506,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("나이 약관")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -486,7 +519,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -498,7 +532,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -510,7 +545,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -522,7 +558,8 @@ class TermsQueryRepositoryTest {
                 .category(category)
                 .contents("광고성 이메일 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -534,7 +571,8 @@ class TermsQueryRepositoryTest {
                 .category(TermsCategory.ORDER)
                 .contents("ANKIM 주문결제 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -555,4 +593,185 @@ class TermsQueryRepositoryTest {
                 );
     }
 
+    @Test
+    @DisplayName("회원가입 약관 중 최신 약관을 조회한다.")
+    void testFindLatestJoinTerms() {
+        // Given: 회원 생성
+        Member member = Member.builder()
+                .loginId("test@example.com")
+                .password("password")
+                .name("홍길동")
+                .phoneNum("010-1234-5678")
+                .birth(LocalDate.of(1995, 1, 1))
+                .gender("M")
+                .status(MemberStatus.ACTIVE)
+                .build();
+        em.persist(member);
+
+        // Given: 부모 약관 생성
+        // 최상위 약관 생성
+        Terms mainTerms = Terms.builder()
+                .name("회원가입 약관")
+                .category(TermsCategory.JOIN)
+                .contents("ANKIM 이용약관")
+                .termsYn("Y")
+//                .termsVersion("v1")
+                .termsVersion(1)
+                .level(1)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(mainTerms);
+
+        Terms subTerm3 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("마케팅 목적의 개인정보 수집 및 이용 동의")
+                .category(TermsCategory.JOIN)
+                .contents("마케팅 목적의 개인정보 수집 및 이용 동의")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(1)
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm3);
+
+        Terms subTerm4 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("광고성 정보 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(1)
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTerm4);
+
+        // level 3 하위 약관 생성
+        Terms subSubTerm1 = Terms.builder()
+                .parentTerms(subTerm4)
+                .name("문자 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(1)
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTerm1);
+
+        Terms subSubTerm2 = Terms.builder()
+                .parentTerms(subTerm4)
+                .name("이메일 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(1)
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTerm2);
+
+        Terms subTermUpdate4 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("약관 변경 v2) 광고성 정보 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(2)
+                .level(2)
+                .activeYn("N")
+                .build();
+        termsRepository.save(subTermUpdate4);
+
+        Terms subSubTermUpdate1 = Terms.builder()
+                .parentTerms(subTermUpdate4)
+                .name("약관 변경 v2) 문자 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(2)
+                .level(3)
+                .activeYn("N")
+                .build();
+        termsRepository.save(subSubTermUpdate1);
+
+        Terms subTermV3Update4 = Terms.builder()
+                .parentTerms(mainTerms)
+                .name("약관 변경 v3) 광고성 정보 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(2)
+                .level(2)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subTermV3Update4);
+
+        Terms subSubTermV3Update1 = Terms.builder()
+                .parentTerms(subTermV3Update4)
+                .name("약관 변경 v3) 문자 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(3)
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTermV3Update1);
+
+        Terms subSubTermV3Update2 = Terms.builder()
+                .parentTerms(subTermV3Update4)
+                .name("약관 변경 v3) 이메일 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(3)
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTermV3Update2);
+
+        Terms subSubTermV3Update3 = Terms.builder()
+                .parentTerms(subTermV3Update4)
+                .name("약관 변경 v3) 카톡 수신 동의")
+                .category(TermsCategory.JOIN)
+                .contents("약관 변경) 광고성 정보를 수신하는 것에 대한 동의입니다.")
+                .termsYn("N")
+//                .termsVersion("v1")
+                .termsVersion(3)
+                .level(3)
+                .activeYn("Y")
+                .build();
+        termsRepository.save(subSubTermV3Update3);
+
+        // Given: 사용자의 동의 내역 추가 (문자 수신 동의만 동의)
+        TermsHistory agreedSubSubTerm1 = TermsHistory.builder()
+                .member(member)
+                .terms(subSubTerm1)
+                .agreeYn("Y")
+                .activeYn("Y")
+                .agreeDate(LocalDateTime.now())
+                .build();
+        em.persist(agreedSubSubTerm1);
+
+        em.flush();
+        em.clear();
+
+        // when : 최신 버전의 약관 조회
+        List<Terms> latestJoinTerms = termsRepository.findLatestTerms(TermsCategory.JOIN, "Y");
+
+        // then : 최신 약관이 올바르게 조회되었는지 검증
+        assertThat(latestJoinTerms).isNotEmpty();
+        assertThat(latestJoinTerms.size()).isEqualTo(3);
+        assertThat(latestJoinTerms).allMatch(terms -> terms.getTermsVersion() == 3);
+    }
 }

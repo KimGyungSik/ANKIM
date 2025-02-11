@@ -13,7 +13,7 @@
 <main class="mypage-container">
     <aside class="mypage-sidebar">
         <div class="user-info">
-            <h2 id="userName">로딩 중...</h2>
+            <h2 id="userName">알 수 없음</h2>
             <p>좋아요 ♡ <span id="likeCount">-</span></p>
         </div>
         <nav class="sidebar-menu">
@@ -40,7 +40,7 @@
             <div class="membership-level">
                 <h3>회원등급</h3>
                 <div class="membership-grade-container">
-                    <p id="userGrade">로딩 중...</p>
+                    <p id="userGrade">NONE</p>
                     <a href="/mypage/membership" class="btn">할인혜택 보기</a>
                 </div>
             </div>
@@ -61,6 +61,14 @@
             <p>데이터를 불러오는 중입니다...</p>
         </div>
     </section>
+
+    <!-- Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
+    </div>
 </main>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>

@@ -51,4 +51,5 @@ public class TermsHistoryController {
 
         return ApiResponse.ok(termsHistoryUpdateResponse);
     }
+
 }
