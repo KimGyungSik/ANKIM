@@ -6,5 +6,5 @@ import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import java.util.List;
 
 public interface TermsService {
-    List<TermsAgreeResponse> getTermsForMember(Long memberId, TermsCategory category);
+    List<TermsAgreeResponse> getTermsForMember(Long memberNo, TermsCategory category);
 }

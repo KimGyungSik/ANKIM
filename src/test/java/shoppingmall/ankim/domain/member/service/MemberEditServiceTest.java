@@ -4,6 +4,7 @@ import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -12,20 +13,34 @@ import org.springframework.context.annotation.Import;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressRegisterServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.controller.request.PasswordRequest;
+import shoppingmall.ankim.domain.member.dto.MemberAddressResponse;
+import shoppingmall.ankim.domain.member.dto.MemberInfoResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.member.service.request.ChangePasswordServiceRequest;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
+import shoppingmall.ankim.domain.terms.entity.TermsCategory;
+import shoppingmall.ankim.domain.terms.service.TermsService;
 import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 
+import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
+
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.Mockito.mock;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @SpringBootTest
@@ -44,15 +59,13 @@ class MemberEditServiceTest {
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
     @Autowired
-    private JwtTokenProvider jwtTokenProvider;
-
-    @Autowired
     private MemberRepository memberRepository;
 
-    @MockBean
-    private S3Service s3Service;
     @Autowired
-    private MemberHistoryRepository memberHistoryRepository;
+    private MemberAddressRepository memberAddressRepository;
+
+    @MockBean
+    private TermsService termsService;
 
     @BeforeEach
     void setUp() {
@@ -188,5 +201,83 @@ class MemberEditServiceTest {
         assertThatThrownBy(() -> memberEditService.changePassword(loginId, request))
                 .isInstanceOf(InvalidMemberException.class)
                 .hasMessageContaining(PASSWORD_CONFIRMATION_MISMATCH.getMessage());
+    }
+
+    @Test
+    @DisplayName("기본 배송지 및 약관 동의 내역을 포함하여 회원 정보 조회를 성공한다.")
+    void getMemberInfo_success() {
+        // given
+        String loginId = "test@example.com";
+        Member member = MemberFactory.createMember(em, loginId);
+
+        // 기존 기본 배송지 설정
+        MemberAddress memberAddress = MemberAddress.builder()
+                .member(member)
+                .baseAddress(MemberAddressRegisterServiceRequest.builder()
+                        .zipCode(12345)
+                        .addressMain("서울특별시 강남구")
+                        .addressDetail("101호")
+                        .build()
+                        .toBaseAddress())
+                .phoneNumber(member.getPhoneNum())
+                .defaultAddressYn("Y")
+                .build();
+        memberAddressRepository.save(memberAddress);
+
+        em.flush();
+        em.clear();
+
+        List<TermsAgreeResponse> agreedTerms = List.of(
+                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2),
+                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3)
+        );
+
+        given(termsService.getTermsForMember(any(Long.class), eq(TermsCategory.JOIN)))
+                .willReturn(agreedTerms);
+
+        // When
+        MemberInfoResponse response = memberEditService.getMemberInfo(loginId);
+
+        // Then
+        assertThat(response.getNo()).isEqualTo(member.getNo());
+        assertThat(response.getLoginId()).isEqualTo(loginId);
+        assertThat(response.getName()).isEqualTo(member.getName());
+        assertThat(response.getPhoneNum()).isEqualTo(member.getPhoneNum());
+        assertThat(response.getAddress().getAddressMain()).isEqualTo(memberAddress.getBaseAddress().getAddressMain());
+        assertThat(response.getAgreedTerms()).hasSize(agreedTerms.size());
+        assertThat(response.getAgreedTerms().get(0).getAgreeYn()).isEqualTo("Y");
+        assertThat(response.getAgreedTerms().get(1).getAgreeYn()).isEqualTo("N");
+    }
+
+    @Test
+    @DisplayName("기본 배송지가 없는 경우에도 회원 정보 조회를 성공한다.")
+    void getMemberInfo_noAddress() {
+        // given
+        String loginId = "test@example.com";
+        Member member = MemberFactory.createMember(em, loginId);
+
+        em.flush();
+        em.clear();
+
+        List<TermsAgreeResponse> agreedTerms = List.of(
+                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2),
+                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3)
+        );
+
+        given(termsService.getTermsForMember(any(Long.class), eq(TermsCategory.JOIN)))
+                .willReturn(agreedTerms);
+
+        // When
+        MemberInfoResponse response = memberEditService.getMemberInfo(loginId);
+
+        // Then
+        assertThat(response.getNo()).isEqualTo(member.getNo());
+        assertThat(response.getLoginId()).isEqualTo(loginId);
+        assertThat(response.getName()).isEqualTo(member.getName());
+        assertThat(response.getPhoneNum()).isEqualTo(member.getPhoneNum());
+        assertThat(response.getAddress()).isNull();
+        assertThat(response.getAgreedTerms()).hasSize(agreedTerms.size());
+        assertThat(response.getAgreedTerms().get(0).getAgreeYn()).isEqualTo("Y");
+        assertThat(response.getAgreedTerms().get(1).getAgreeYn()).isEqualTo("N");
     }
 }

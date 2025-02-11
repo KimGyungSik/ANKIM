@@ -19,6 +19,9 @@ import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
+import shoppingmall.ankim.domain.terms.entity.TermsCategory;
+import shoppingmall.ankim.domain.terms.service.TermsService;
 import shoppingmall.ankim.domain.termsHistory.repository.TermsHistoryRepository;
 
 import java.util.List;
@@ -37,7 +40,7 @@ public class MemberEditServiceImpl implements MemberEditService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
     private final MemberHistoryRepository memberHistoryRepository;
     private final MemberAddressRepository memberAddressRepository;
-    private final TermsHistoryRepository termsHistoryRepository;
+    private final TermsService termsService;
 
     @Override
     public void isValidPassword(String loginId, PasswordServiceRequest request) {
@@ -95,21 +98,18 @@ public class MemberEditServiceImpl implements MemberEditService {
     public MemberInfoResponse getMemberInfo(String loginId) {
         Member member = getMember(loginId);
 
-
         // 기본 배송지 조회
         MemberAddressResponse addressResponse = memberAddressRepository.findDefaultAddressByMember(member)
                 .map(MemberAddressResponse::of)
                 .orElse(null);
 
-        // 약관 동의 내역 조회 (findAgreedTermsByMember 활용)
-        Long parentTermsNo = 1L; // 회원가입 약관의 최상위 부모 번호 (필요시 변경)
-//        List<TermsAgreementResponse> agreedTerms = termsHistoryRepository.findAgreedTermsByMember(member.getNo(), parentTermsNo, "Y");
+        // 약관 동의 내역 조회 (findAgreTermsByMember 활용)
+        List<TermsAgreeResponse> agreedTerms = termsService.getTermsForMember(member.getNo(), TermsCategory.JOIN);
 
+        log.info("getMemberInfo() - agreedTerms: {}", agreedTerms);
 
         // MemberInfoResponse 생성 후 반환
-        // FIXME MemberInfoResponse 생성 작업 필요
-//        return MemberInfoResponse.of(member, addressResponse, agreedTerms);
-        return null;
+        return MemberInfoResponse.of(member, addressResponse, agreedTerms);
     }
 
     private Member getMember(String loginId) {

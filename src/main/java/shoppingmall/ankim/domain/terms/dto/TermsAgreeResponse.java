@@ -4,21 +4,22 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.terms.entity.Terms;
-import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 
 @Getter
 @NoArgsConstructor
 public class TermsAgreeResponse {
-    private Long no;
+    private Long termsNo;
     private String name;
+    private String contents;
     private int termsVersion;
     private String agreeYn; // "Y" or "N"
     private Integer level; // 약관 레벨
 
     @Builder
-    public TermsAgreeResponse(Long no, String name, int termsVersion, String agreeYn, Integer level) {
-        this.no = no;
+    public TermsAgreeResponse(Long termsNo, String name, String contents, int termsVersion, String agreeYn, Integer level) {
+        this.termsNo = termsNo;
         this.name = name;
+        this.contents = contents;
         this.termsVersion = termsVersion;
         this.agreeYn = agreeYn;
         this.level = level;
@@ -26,8 +27,9 @@ public class TermsAgreeResponse {
 
     public static TermsAgreeResponse of(Terms terms, String agreeYn) {
         return TermsAgreeResponse.builder()
-                .no(terms.getNo())
+                .termsNo(terms.getNo())
                 .name(terms.getName())
+                .contents(terms.getContents())
                 .termsVersion(terms.getTermsVersion())
                 .agreeYn(agreeYn)
                 .level(terms.getLevel())

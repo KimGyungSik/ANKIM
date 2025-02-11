@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shoppingmall.ankim.domain.member.entity.Member;
+import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 
 import java.time.LocalDate;
@@ -41,10 +42,10 @@ public class MemberInfoResponse {
     * [마케팅 및 광고 알림 설정]
     * 약관 이력
     * */
-    private List<TermsAgreementResponse> agreedTerms;
+    private List<TermsAgreeResponse> agreedTerms;
 
     @Builder
-    public MemberInfoResponse(Long no, String loginId, String password, String name, String phoneNum, LocalDate birth, MemberAddressResponse address, List<TermsAgreementResponse> agreedTerms) {
+    public MemberInfoResponse(Long no, String loginId, String password, String name, String phoneNum, LocalDate birth, MemberAddressResponse address, List<TermsAgreeResponse> agreedTerms) {
         this.no = no;
         this.loginId = loginId;
         this.password = password;
@@ -55,7 +56,7 @@ public class MemberInfoResponse {
         this.agreedTerms = agreedTerms;
     }
 
-    public static MemberInfoResponse of(Member member, MemberAddressResponse address, List<TermsHistory> termsHistories) {
+    public static MemberInfoResponse of(Member member, MemberAddressResponse address, List<TermsAgreeResponse> agreedTerms) {
         return MemberInfoResponse.builder()
                 .no(member.getNo())
                 .loginId(member.getLoginId())
@@ -63,9 +64,7 @@ public class MemberInfoResponse {
                 .phoneNum(member.getPhoneNum())
                 .birth(member.getBirth())
                 .address(address)
-                .agreedTerms(termsHistories.stream()
-                        .map(TermsAgreementResponse::of)
-                        .collect(Collectors.toList()))
+                .agreedTerms(agreedTerms)
                 .build();
     }
 
