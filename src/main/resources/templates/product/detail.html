@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANKIM</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/product/detail.css}">
+</head>
+<body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+<!-- 네비게이션 바 -->
+<nav class="breadcrumb">
+    <div class="dropdown">
+        <span>상의</span>
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/></svg>
+        </div>
+        <ul class="dropdown-menu">
+            <li>반소매 티셔츠</li>
+            <li>긴소매 티셔츠</li>
+            <li>후드 티셔츠</li>
+        </ul>
+    </div>
+    <div class="dropdown">
+        <span>반소매 티셔츠</span>
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/></svg>
+        </div>
+        <ul class="dropdown-menu">
+            <li>면 티셔츠</li>
+            <li>기능성 티셔츠</li>
+            <li>프린트 티셔츠</li>
+        </ul>
+    </div>
+</nav>
+<!-- 푸터 포함 -->
+<div th:replace="fragments/footer :: footer-container"></div>
+</body>
+</html>

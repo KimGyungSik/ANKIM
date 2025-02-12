@@ -19,6 +19,20 @@ function sendAjaxRequest(params) {
         .catch(error => console.error("Error:", error));
 }
 
+const productList = document.querySelector(".product-list");
+
+productList.addEventListener("click", function (event) {
+    // 클릭한 요소가 상품 카드 내부에 있는지 확인
+    const productCard = event.target.closest(".product-card");
+    if (productCard) {
+        const productId = productCard.getAttribute("data-product-id");
+        if (productId) {
+            // 상품 상세 페이지로 이동
+            window.location.href = `/product/detail/${productId}`;
+        }
+    }
+});
+
 // ✅ 상품 리스트 업데이트
 function updateProductList(products) {
     const productListContainer = document.querySelector(".product-list");
