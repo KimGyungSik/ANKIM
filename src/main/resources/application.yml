@@ -18,7 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-#    defer-datasource-initialization: true
+    defer-datasource-initialization: true
     open-in-view: true
   datasource:
         hikari:
@@ -34,10 +34,10 @@ spring:
         - redis
   main:
     allow-bean-definition-overriding: true
-#  sql:
-#    init:
-#      data-locations: classpath*:data.sql
-#      mode: always
+  sql:
+    init:
+      data-locations: classpath*:data.sql
+      mode: always
 
   servlet:
     multipart:
