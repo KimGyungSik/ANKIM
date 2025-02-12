@@ -7,6 +7,7 @@ import lombok.ToString;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
+import shoppingmall.ankim.global.util.MaskingUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -59,13 +60,12 @@ public class MemberInfoResponse {
     public static MemberInfoResponse of(Member member, MemberAddressResponse address, List<TermsAgreeResponse> agreedTerms) {
         return MemberInfoResponse.builder()
                 .no(member.getNo())
-                .loginId(member.getLoginId())
-                .name(member.getName())
-                .phoneNum(member.getPhoneNum())
+                .loginId(MaskingUtil.maskLoginId(member.getLoginId()))
+                .name(MaskingUtil.maskName(member.getName()))
+                .phoneNum(MaskingUtil.maskPhoneNum(member.getPhoneNum()))
                 .birth(member.getBirth())
                 .address(address)
                 .agreedTerms(agreedTerms)
                 .build();
     }
-
 }

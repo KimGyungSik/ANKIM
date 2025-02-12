@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>내 정보 수정</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/header.css}">
+    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
+</head>
+<body>
+
+<th:block th:replace="mypage/mypageUtils.html :: main">
+    <th:block th:fragment="content">
+        <!-- 비밀번호 검증 섹션 -->
+        <section id="passwordCheckSection" class="password-check-section">
+            <h2>비밀번호 재확인</h2>
+            <p>회원님의 소중한 정보를 보호하기 위해 비밀번호를 재확인하고 있습니다.</p>
+            <label for="password">비밀번호</label>
+            <input type="password" id="password">
+            <button id="verifyPasswordBtn">다음</button>
+        </section>
+
+        <!-- 회원정보 수정 섹션 (초기에 숨김) -->
+        <section id="infoEditSection" class="info-edit-section" style="display: none;">
+            <h2>회원정보 수정</h2>
+            <p>로그인 정보</p>
+            <p id="loginId">아이디(이메일): cat*****@*****.com</p>
+            <label for="newPassword">새 비밀번호</label>
+            <input type="password" id="newPassword">
+            <button>비밀번호 변경</button>
+        </section>
+    </th:block>
+</th:block>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+<script type="module" th:src="@{/js/mypage/myInfo.js}"></script>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+</html>

@@ -31,6 +31,7 @@ import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.service.TermsService;
 import shoppingmall.ankim.factory.MemberFactory;
 import shoppingmall.ankim.global.config.QuerydslConfig;
+import shoppingmall.ankim.global.util.MaskingUtil;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -240,9 +241,9 @@ class MemberEditServiceTest {
 
         // Then
         assertThat(response.getNo()).isEqualTo(member.getNo());
-        assertThat(response.getLoginId()).isEqualTo(loginId);
-        assertThat(response.getName()).isEqualTo(member.getName());
-        assertThat(response.getPhoneNum()).isEqualTo(member.getPhoneNum());
+        assertThat(response.getLoginId()).isEqualTo(MaskingUtil.maskLoginId(loginId));
+        assertThat(response.getName()).isEqualTo(MaskingUtil.maskName(member.getName()));
+        assertThat(response.getPhoneNum()).isEqualTo(MaskingUtil.maskPhoneNum(member.getPhoneNum()));
         assertThat(response.getAddress().getAddressMain()).isEqualTo(memberAddress.getBaseAddress().getAddressMain());
         assertThat(response.getAgreedTerms()).hasSize(agreedTerms.size());
         assertThat(response.getAgreedTerms().get(0).getAgreeYn()).isEqualTo("Y");
@@ -272,9 +273,9 @@ class MemberEditServiceTest {
 
         // Then
         assertThat(response.getNo()).isEqualTo(member.getNo());
-        assertThat(response.getLoginId()).isEqualTo(loginId);
-        assertThat(response.getName()).isEqualTo(member.getName());
-        assertThat(response.getPhoneNum()).isEqualTo(member.getPhoneNum());
+        assertThat(response.getLoginId()).isEqualTo(MaskingUtil.maskLoginId(loginId));
+        assertThat(response.getName()).isEqualTo(MaskingUtil.maskName(member.getName()));
+        assertThat(response.getPhoneNum()).isEqualTo(MaskingUtil.maskPhoneNum(member.getPhoneNum()));
         assertThat(response.getAddress()).isNull();
         assertThat(response.getAgreedTerms()).hasSize(agreedTerms.size());
         assertThat(response.getAgreedTerms().get(0).getAgreeYn()).isEqualTo("Y");

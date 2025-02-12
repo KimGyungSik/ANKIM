@@ -5,13 +5,6 @@ body {
     padding: 0;
 }
 
-header, footer {
-    background-color: #fff;
-    padding: 15px 0;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-}
-
 /* 마이페이지 전체 컨테이너 */
 .mypage-container {
     display: flex;
@@ -85,6 +78,7 @@ header, footer {
     border-radius: 8px;
     border: 1px solid #ddd;
 }
+
 /* 회원등급 & 쿠폰/마일리지 정보 */
 .membership-info {
     display: flex;

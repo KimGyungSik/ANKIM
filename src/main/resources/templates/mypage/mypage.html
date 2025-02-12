@@ -8,68 +8,12 @@
     <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
 </head>
 <body>
-<header th:replace="~{fragments/header :: header}"></header>
 
-<main class="mypage-container">
-    <aside class="mypage-sidebar">
-        <div class="user-info">
-            <h2 id="userName">알 수 없음</h2>
-            <p>좋아요 ♡ <span id="likeCount">-</span></p>
-        </div>
-        <nav class="sidebar-menu">
-            <h3>나의 쇼핑정보</h3>
-            <ul>
-                <li><a href="/mypage/orders">주문배송조회</a></li>
-                <li><a href="/mypage/reservations">숙박예약조회</a></li>
-                <li><a href="/mypage/cancel-returns">취소/교환/반품 내역</a></li>
-                <li><a href="/mypage/reviews">상품 리뷰</a></li>
-                <li><a href="/mypage/coupons">증빙서류 발급</a></li>
-            </ul>
-            <h3>나의 계정정보</h3>
-            <ul>
-                <li><a href="/mypage/edit-profile">회원정보수정</a></li>
-                <li><a href="/mypage/membership">회원등급</a></li>
-                <li><a href="/mypage/coupons">쿠폰</a></li>
-                <li><a href="/mypage/mileage">마일리지</a></li>
-            </ul>
-        </nav>
-    </aside>
-
-    <section class="mypage-main">
-        <div class="membership-info">
-            <div class="membership-level">
-                <h3>회원등급</h3>
-                <div class="membership-grade-container">
-                    <p id="userGrade">NONE</p>
-                    <a href="/mypage/membership" class="btn">할인혜택 보기</a>
-                </div>
-            </div>
-            <div class="membership-stats">
-                <div class="stats-item">
-                    <h4>사용가능쿠폰</h4>
-                    <p id="couponCount">-</p>
-                </div>
-                <div class="stats-item">
-                    <h4>마일리지</h4>
-                    <p id="mileage">-</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- 개별 페이지 본문 -->
-        <div class="mypage-content">
-            <p>데이터를 불러오는 중입니다...</p>
-        </div>
-    </section>
-
-    <!-- Modal -->
-    <div class="modal" id="cartModal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <div class="modal-body"></div>
-        </div>
-    </div>
-</main>
+<th:block th:replace="mypage/mypageUtils.html :: main">
+    <th:block th:fragment="content">
+        <p>데이터를 불러오는 중입니다...</p>
+    </th:block>
+</th:block>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>

@@ -35,7 +35,7 @@ public class MemberMyPageApiController {
 
         // 회원 데이터 조회 (가상의 예제)
         MemberResponse memberData = MemberResponse.builder()
-                .name("홍길동")
+                .name("홍*동")
                 .build();
 
         return ApiResponse.ok(memberData);
