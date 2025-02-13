@@ -212,6 +212,11 @@ public class Product extends BaseEntity {
                 .cauOrd(cauOrd)
                 .cauProd(cauProd)
                 .cauShip(cauShip)
+                .avgR(0)
+                .qnaCnt(0)
+                .rvwCnt(0)
+                .viewCnt(0)
+                .wishCnt(0)
                 .build();
     }
 
