@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
 import shoppingmall.ankim.domain.product.dto.ProductListResponse;
+import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
@@ -34,9 +35,13 @@ public class ProductController {
 
 
     // 상품 상세 by User
-    @GetMapping("detail/{productId}")
+    @GetMapping("/detail/{productId}")
     public String findProductUserDetailResponse(@PathVariable("productId") Long productId,Model model) {
-        model.addAttribute(productRepository.findAdminProductDetailResponse(productId));
+        ProductResponse product = productRepository.findAdminProductDetailResponse(productId);
+        model.addAttribute("product",product);
+        // 둘다 CategoryResponse를 반환받음
+        model.addAttribute("middleCategoryName",categoryQueryService.findMiddleCategoryForSubCategory(product.getCategoryResponse().getCategoryNo()));
+        model.addAttribute("childCategoryName",product.getCategoryResponse().getName()); // BOTTOM, OUTER, TOP, OPS/SK
         return "/product/detail";
     }
 

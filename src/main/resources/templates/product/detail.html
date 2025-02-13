@@ -11,31 +11,134 @@
 <body>
 <!-- 헤더 포함 -->
 <div th:replace="fragments/header :: header"></div>
+
 <!-- 네비게이션 바 -->
 <nav class="breadcrumb">
-    <div class="dropdown">
-        <span>상의</span>
+    <!-- 중분류 -->
+    <div class="breadcrumb-dropdown" data-dropdown id="middle-category">
+        <span id="middle-category-name">
+            <a th:href="@{/product/list(condition=${middleCategoryName.name})}"
+               th:text="${middleCategoryName?.name ?: '카테고리 없음'}">
+            </a>
+        </span>
         <div class="icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                <path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/>
+            </svg>
         </div>
-        <ul class="dropdown-menu">
-            <li>반소매 티셔츠</li>
-            <li>긴소매 티셔츠</li>
-            <li>후드 티셔츠</li>
-        </ul>
+        <ul class="breadcrumb-dropdown-menu" id="middle-category-menu"></ul>
     </div>
-    <div class="dropdown">
-        <span>반소매 티셔츠</span>
+
+    <!-- 소분류 -->
+    <div class="breadcrumb-dropdown" data-dropdown id="sub-category">
+        <span id="sub-category-name">
+            <a th:href="@{/product/list(condition=${middleCategoryName.name}, category=${product.categoryResponse.categoryNo})}"
+               th:text="${childCategoryName}">
+            </a>
+        </span>
         <div class="icon-wrapper">
-            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512"><path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                <path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/>
+            </svg>
         </div>
-        <ul class="dropdown-menu">
-            <li>면 티셔츠</li>
-            <li>기능성 티셔츠</li>
-            <li>프린트 티셔츠</li>
-        </ul>
+        <ul class="breadcrumb-dropdown-menu" id="sub-category-menu"></ul>
     </div>
 </nav>
+
+<!-- ✅ 중분류 ID와 소분류 ID를 JavaScript에서 사용할 수 있도록 전달 -->
+<script>
+    window.middleCategoryId = "[[${middleCategoryName.categoryNo}]]";
+    window.childCategoryId = "[[${product.categoryResponse.categoryNo}]]";
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/header')
+            .then(response => response.json())
+            .then(data => {
+                const { middleCategories, subCategories } = data;
+
+                const middleCategoryMenu = document.getElementById("middle-category-menu");
+                const subCategoryMenu = document.getElementById("sub-category-menu");
+
+                middleCategoryMenu.innerHTML = "";
+                subCategoryMenu.innerHTML = "";
+
+                // ✅ 고정 중분류 추가 (BEST, NEW, MADE)
+                const fixedCategories = [
+                    { name: "BEST", url: "/product/list?condition=BEST" },
+                    { name: "NEW", url: "/product/list?condition=NEW" },
+                    { name: "MADE", url: "/product/list?condition=HANDMADE" }
+                ];
+
+                fixedCategories.forEach(category => {
+                    const listItem = document.createElement("li");
+                    listItem.innerHTML = `<a href="${category.url}">${category.name}</a>`;
+                    listItem.addEventListener("click", () => {
+                        window.location.href = category.url;
+                    });
+                    middleCategoryMenu.appendChild(listItem);
+                });
+
+                // ✅ 동적 중분류 추가 (모든 중분류 표시)
+                middleCategories.forEach(category => {
+                    const categoryCondition = category.name === "OPS/SK" ? "OPS" : category.name;
+                    const categoryUrl = `/product/list?condition=${categoryCondition}`;
+                    const listItem = document.createElement("li");
+                    listItem.innerHTML = `<a href="${categoryUrl}">${category.name}</a>`;
+                    listItem.addEventListener("click", () => {
+                        window.location.href = categoryUrl;
+                    });
+                    middleCategoryMenu.appendChild(listItem);
+                });
+
+                // ✅ 초기 렌더링 시, 현재 상품의 중분류에 해당하는 소분류만 표시
+                const productMiddleCategoryNo = parseInt(window.middleCategoryId); // ✅ Thymeleaf에서 전달받은 값 사용
+
+                if (!isNaN(productMiddleCategoryNo)) {
+                    const filteredSubCategories = subCategories.filter(sub => sub.parentNo === productMiddleCategoryNo);
+                    filteredSubCategories.forEach(subCategory => {
+                        const parentCategory = middleCategories.find(cat => cat.categoryNo === subCategory.parentNo);
+                        if (parentCategory) {
+                            const parentCategoryCondition = parentCategory.name === "OPS/SK" ? "OPS" : parentCategory.name;
+                            const subCategoryUrl = `/product/list?condition=${parentCategoryCondition}&category=${subCategory.categoryNo}`;
+                            const subItem = document.createElement("li");
+                            subItem.innerHTML = `<a href="${subCategoryUrl}">${subCategory.name}</a>`;
+                            subItem.addEventListener("click", () => {
+                                window.location.href = subCategoryUrl;
+                            });
+                            subCategoryMenu.appendChild(subItem);
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error("Error loading categories:", error));
+
+        // ✅ 드롭다운 유지 기능
+        document.querySelectorAll("[data-dropdown]").forEach(dropdown => {
+            const menu = dropdown.querySelector(".breadcrumb-dropdown-menu");
+            if (menu) {
+                dropdown.addEventListener("mouseenter", () => menu.style.display = "block");
+                dropdown.addEventListener("mouseleave", () => setTimeout(() => {
+                    if (!menu.matches(":hover") && !dropdown.matches(":hover")) {
+                        menu.style.display = "none";
+                    }
+                }, 200));
+                menu.addEventListener("mouseenter", () => menu.style.display = "block");
+                menu.addEventListener("mouseleave", () => setTimeout(() => {
+                    if (!menu.matches(":hover") && !dropdown.matches(":hover")) {
+                        menu.style.display = "none";
+                    }
+                }, 200));
+            }
+        });
+    });
+</script>
+
+
+
+
+
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>
