@@ -4,30 +4,89 @@
     <meta charset="UTF-8">
     <title>내 정보 수정</title>
     <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/mypage/myInfo.css}">
     <link rel="stylesheet" th:href="@{/css/fragments/header.css}">
     <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
 </head>
 <body>
-
+<header th:replace="/fragments/header :: header-container"></header>
 <th:block th:replace="mypage/mypageUtils.html :: main">
     <th:block th:fragment="content">
         <!-- 비밀번호 검증 섹션 -->
         <section id="passwordCheckSection" class="password-check-section">
             <h2>비밀번호 재확인</h2>
             <p>회원님의 소중한 정보를 보호하기 위해 비밀번호를 재확인하고 있습니다.</p>
-            <label for="password">비밀번호</label>
-            <input type="password" id="password">
-            <button id="verifyPasswordBtn">다음</button>
+            <!-- 아이디 표시 (중복 방지를 위해 id="loginIdConfirm" 사용) -->
+            <p class="email-line">
+                아이디(이메일): <span id="loginIdConfirm">cat*****@*****.com</span>
+            </p>
+            <div class="password-input-wrapper password-line">
+                비밀번호 :
+                <input
+                        id="password"
+                        class="input-field"
+                        placeholder="8자 이상의 비밀번호"
+                        autocapitalize="none"
+                        autocomplete="current-password"
+                        type="password"
+                        name="password">
+                <button
+                        type="button"
+                        class="password-toggle-button"
+                        aria-label="비밀번호가 화면에서 보여지지 않습니다.">
+                    <!-- 기본 eye 아이콘 -->
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.52612 7.64835C8.15485 6.54396 9.98507 6 12 6C14.0149 6 15.8451 6.54396 17.4739 7.64835C19.1026 8.75275 20.278 10.2033 21 12C20.2948 13.7967 19.1194 15.2637 17.4739 16.3516C15.8451 17.456 14.0149 18 12 18C9.98507 18 8.15485 17.456 6.52612 16.3516C4.89739 15.2473 3.72202 13.7967 3 12C3.72202 10.2033 4.89739 8.73626 6.52612 7.64835ZM9.11194 14.8352C9.91791 15.6264 10.875 16.022 12 16.022C13.125 16.022 14.0821 15.6264 14.8881 14.8352C15.694 14.044 16.097 13.1044 16.097 12C16.097 10.8956 15.694 9.95604 14.8881 9.16483C14.0821 8.37363 13.125 7.97802 12 7.97802C10.875 7.97802 9.91791 8.37363 9.11194 9.16483C8.30597 9.95604 7.90299 10.8956 7.90299 12C7.90299 13.1044 8.30597 14.044 9.11194 14.8352ZM10.2705 10.3022C10.7575 9.84066 11.3284 9.59341 12 9.59341C12.6549 9.59341 13.2425 9.82418 13.7295 10.3022C14.1996 10.7802 14.4515 11.3407 14.4515 12C14.4515 12.6593 14.2164 13.2198 13.7295 13.6978C13.2425 14.1593 12.6549 14.4066 12 14.4066C11.3284 14.4066 10.7575 14.1758 10.2705 13.6978C9.80037 13.2198 9.54851 12.6593 9.54851 12C9.54851 11.3407 9.80037 10.7802 10.2705 10.3022Z" fill="#A0A0A0"></path></svg>
+                </button>
+            </div>
+            <div id="passwordError" class="error-message"></div>
+            <!-- 버튼을 오른쪽 정렬하기 위해 .button-row 래퍼 사용 -->
+            <div class="button-row">
+                <button id="verifyPasswordBtn">다음</button>
+            </div>
         </section>
 
         <!-- 회원정보 수정 섹션 (초기에 숨김) -->
         <section id="infoEditSection" class="info-edit-section" style="display: none;">
             <h2>회원정보 수정</h2>
-            <p>로그인 정보</p>
-            <p id="loginId">아이디(이메일): cat*****@*****.com</p>
-            <label for="newPassword">새 비밀번호</label>
-            <input type="password" id="newPassword">
-            <button>비밀번호 변경</button>
+
+            <!-- [1] 로그인 정보 -->
+            <div class="edit-section login-info-box">
+                <h3>로그인 정보</h3>
+                <p class="login-id">
+                    아이디(이메일): <span id="editLoginId">-</span>
+                </p>
+                <button class="btn-change-pw">비밀번호 변경</button>
+            </div>
+
+            <!-- [2] 회원 정보 -->
+            <div class="edit-section member-info-box">
+                <h3>회원 정보</h3>
+                <div class="row">
+                    <label>이름</label>
+                    <span id="editName">-</span>
+                </div>
+                <div class="row">
+                    <label>연락처</label>
+                    <span id="editPhoneNum">-</span>
+                </div>
+                <div class="row">
+                    <label>생년월일</label>
+                    <span id="editBirth">-</span>
+                </div>
+                <div class="row">
+                    <label>주소</label>
+                    <span id="editZipCode">-</span>
+                    <span id="editAddressMain">-</span>
+                    <span id="editAddressDetail">-</span>
+                </div>
+            </div>
+
+            <!-- [3] 마케팅 및 광고 알림 설정 -->
+            <div class="edit-section marketing-info-box">
+                <h3>마케팅 및 광고 알림 설정</h3>
+                <!-- 체크박스나 단순 텍스트 등 원하는 형태로 표시 -->
+                <ul id="termsList"></ul>
+            </div>
         </section>
     </th:block>
 </th:block>
@@ -35,5 +94,6 @@
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 <script type="module" th:src="@{/js/mypage/myInfo.js}"></script>
+<script type="module" th:src="@{/js/mypage/mypage.js}"></script>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 </html>

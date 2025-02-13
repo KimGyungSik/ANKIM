@@ -4,22 +4,26 @@ document.addEventListener("DOMContentLoaded", async () => {
     try {
         const response = await fetchWithAccessToken("/api/mypage", { method: "GET" });
 
-        if (!response || response.error) {
-            alert("서버문제");
-            throw new Error(response.message || "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
-        }
-
         if (response.code === 200 && response.data) {
             renderMyPage(response.data);
         } else {
-            alert("데이터 전송실패");
             showModal(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
         }
     } catch (error) {
-        alert("대실패");
-        showModal(error.message || "마이페이지 데이터를 가져오는 중 오류가 발생했습니다.");
         setTimeout(() => window.location.href = "/login/member", 2000); // 2초 후 로그인 페이지로 이동
     }
+
+    window.closeModal = function () {
+        var modal = document.querySelector('.modal');
+        modal.style.display = "none";
+    };
+
+    // ESC 키로도 모달 닫기 기능 추가
+    document.addEventListener("keydown", (event) => {
+        if (event.key === "Escape") {
+            closeModal();
+        }
+    });
 });
 
 // 마이페이지 데이터 렌더링
@@ -41,3 +45,9 @@ function showModal(message) {
     modalBody.textContent = message;
     modal.style.display = "flex";
 }
+
+function closeModal() {
+    var modal = document.querySelector('.modal');
+    modal.style.display = 'none'; // 모달 숨김
+}
+

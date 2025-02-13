@@ -105,6 +105,10 @@ INSERT INTO member (
              'ACTIVE'                   -- status
          );
 
+-- [ 회원 주소 삽입]
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
+VALUES (2, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
+
 -- 탈퇴사유
 INSERT INTO leave_rsn (reason, active_yn) VALUES
                                               ('탈퇴 후 재가입을 위해서', 'Y'),

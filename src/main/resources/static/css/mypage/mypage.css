@@ -15,10 +15,11 @@ body {
 /* 좌측 사이드바 */
 .mypage-sidebar {
     width: 250px;
+    /*min-width: 200px;*/
     background-color: #fff;
     padding: 20px;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
 }
 
 /* 사용자 정보 */
@@ -76,7 +77,7 @@ body {
     background-color: #fff;
     padding: 30px;
     border-radius: 8px;
-    border: 1px solid #ddd;
+    /*border: 1px solid #ddd;*/
 }
 
 /* 회원등급 & 쿠폰/마일리지 정보 */
