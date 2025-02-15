@@ -17,6 +17,14 @@
     padding-bottom: 8px;          /* 선과 글자 사이 여백 */
 }
 
+.info-edit-section h2 {
+    font-size: 16px;
+    font-weight: bold;
+    margin-bottom: 10px;
+    border-bottom: 2px solid #000; /* 굵은 선 */
+    padding-bottom: 8px;          /* 선과 글자 사이 여백 */
+}
+
 /* 섹션 내 일반 문구 */
 .password-check-section p,
 .info-edit-section p {
@@ -37,15 +45,28 @@
 }
 
 /* 비밀번호 입력 래퍼 - 아이콘 & 인풋 함께 배치 */
-.password-input-wrapper {
-    position: relative;  /* 아이콘 겹쳐서 배치 */
-    width: 100%;
-    margin: 0 auto 15px auto; /* 중앙 정렬 + 아래쪽 여백 */
+/* row: 라벨 + input-group */
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px; /* 각 줄 간격 */
 }
 
-/* 실제 입력 필드 */
-.password-input-wrapper input {
-    width: 70%;
+/* 라벨 고정 너비 */
+.row label {
+    width: 100px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* input-group: 인풋과 아이콘을 묶는 컨테이너 */
+.input-group {
+    position: relative; /* 아이콘을 절대 배치하기 위해 relative */
+    flex: 1;           /* 남은 공간 차지 */
+}
+
+.input-group input {
+    width: 80%;
     border: 1px solid #ddd;
     border-radius: 5px;
     padding: 10px 40px 10px 10px; /* 오른쪽 여백(40px) = 아이콘 자리 확보 */
@@ -55,20 +76,62 @@
     text-align: left; /* 텍스트 왼쪽 정렬 */
 }
 
+/* input + button을 함께 묶는 컨테이너 */
+.input-group-with-button {
+    display: flex;
+    align-items: center;
+    gap: 10px;    /* 입력창과 버튼 사이 여백 */
+    flex: 1;      /* 남은 공간 차지 -> 한 줄에 배치 */
+}
+
+.input-group-with-button input {
+    width: 80%;                /* 동일한 폭 */
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 40px 10px 10px;
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    text-align: left;
+}
+
+.input-group-with-button button {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+.input-group-with-button button:hover {
+    background-color: #f0f0f0;
+}
+
 /* 눈 아이콘 버튼 */
-.password-toggle-button {
+.toggle-button {
     position: absolute;
     top: 50%;
-    left: 75%;    /* 인풋 왼쪽에서 75% 떨어짐 */
+    /*right: 10px;  !* 인풋 오른쪽에서 10px 떨어짐 *!*/
+    left: 75%;
     transform: translateY(-50%);
     background: none;
     border: none;
     cursor: pointer;
 }
 
-.password-toggle-button svg {
+.toggle-button svg {
     width: 18px;
     height: 18px;
+}
+
+/* 체크 메시지 영역 */
+.pw-check-message {
+    margin-bottom: 10px;
+    font-size: 12px;
+    color: #999;
+    line-height: 1.4; /* 줄간격 */
 }
 
 /* 에러 메시지 (빨간색) */
@@ -85,7 +148,7 @@
 }
 
 /* '다음' 버튼 등 액션 버튼 스타일 */
-#verifyPasswordBtn {
+.submitBtn {
     /* 원하는 크기와 색상으로 조정 */
     border: 1px solid;
     background-color: #000;
@@ -97,7 +160,7 @@
 }
 
 /* 버튼 호버 시 효과 */
-#verifyPasswordBtn:hover {
+.submitBtn:hover{
     background-color: #333;
 }
 

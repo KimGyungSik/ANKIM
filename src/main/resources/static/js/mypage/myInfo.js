@@ -1,29 +1,52 @@
 import { fetchWithAccessToken } from '../utils/fetchUtils.js';
+import { execDaumPostcode } from '../utils/map.js';
 
 document.addEventListener("DOMContentLoaded", async () => {
     var passwordCheckSection = document.getElementById("passwordCheckSection");
     var infoEditSection = document.getElementById("infoEditSection");
+    var marketingSection = document.getElementById("marketingSection"); // 마케팅 섹션
     var verifyPasswordBtn = document.getElementById("verifyPasswordBtn");
     var passwordToggleButton = document.querySelector(".password-toggle-button");
 
+    // 비밀번호 변경 관련 요소
+    var pwChangeBtn    = document.getElementById("pwChangeBtn");
+    var pwChangeForm   = document.getElementById("pwChangeForm");
+    var pwSubmitBtn    = document.getElementById("pwSubmitBtn");
+    var currentPwInput = document.getElementById("currentPwInput");
+    var newPwInput     = document.getElementById("newPwInput");
+    var confirmPwInput = document.getElementById("confirmPwInput");
+    var newPwCheckLen  = document.getElementById("newPwCheckLen");   // 길이 체크
+    var newPwCheckChar = document.getElementById("newPwCheckChar");  // 문자 조합 체크
+    var confirmPwCheckMsg = document.getElementById("confirmPwCheckMsg"); // 일치여부 체크
+
+    // 주소 관련
+    var addrSearchBtn  = document.getElementById("addrSearchBtn");
+    var addrChangeBtn  = document.getElementById("addrChangeBtn");
+    var addrDetailInput= document.getElementById("addrDetailInput");
+
+    // 기타 버튼(연락처/이메일 수정) - 예시
+    var phoneEditBtn   = document.getElementById("phoneEditBtn");
+    var emailEditBtn   = document.getElementById("emailEditBtn");
+
     try {
+        // 기존 마이페이지 회원정보(이름, 좋아요수, 등급 등) + 상세(주소,약관)
         var response = await fetchWithAccessToken("/api/edit", { method: "GET" });
 
         if (response.code === 200 && response.data) {
-            // 화면에 데이터 세팅
-            renderMyPage(response.data);
-            showMemberInfoSection(response.data);
+            renderMyPage(response.data);         // 사이드바, 상단 등 공통 정보
+            showMemberInfoSection(response.data); // 회원정보 수정 섹션(이름, 주소, 약관 등)
         } else {
             alert("데이터 전송실패");
             showModal(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
         }
     } catch (error) {
         showModal(error.message || "마이페이지 데이터를 가져오는 중 오류가 발생했습니다.");
-        setTimeout(() => window.location.href = "/login/member", 2000); // 2초 후 로그인 페이지로 이동
+        setTimeout(() => window.location.href = "/login/member", 2000);
     }
 
+    // 비밀번호 재확인 -> 다음 버튼
     verifyPasswordBtn.addEventListener("click", async () => {
-        const password = document.getElementById("password").value;
+        var password = document.getElementById("password").value;
 
         if (!password) {
             showModal("비밀번호를 입력해주세요.");
@@ -31,39 +54,150 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         try {
-            const response = await fetchWithAccessToken("/api/mypage/confirm-password", {
+            var res = await fetchWithAccessToken("/api/mypage/confirm-password", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ password }),
             });
 
-            if (response.code === 200) {
+            if (res.code === 200) {
                 // 비밀번호 검증 성공 -> UI 변경
-                passwordCheckSection.style.display = "none"; // 비밀번호 확인 화면 숨기기
-                infoEditSection.style.display = "block"; // 회원정보 수정 화면 표시
-
+                passwordCheckSection.style.display = "none";
+                infoEditSection.style.display = "block";
+                marketingSection.style.display = "block"; // 마케팅 섹션도 함께 표시
             } else {
-                handleErrors(response.message || "비밀번호가 일치하지 않습니다.");
+                handleErrors(res.message || "비밀번호가 일치하지 않습니다.");
             }
         } catch (error) {
-            alert(error);
-            alert("서버 오류 발생");
+            alert("서버 오류 발생: " + error);
         }
     });
 
-    // 비밀번호 표시/숨기기 이벤트 리스너 추가
-    passwordToggleButton.addEventListener("click", togglePasswordVisibility);
+    // 모든 toggle 버튼에 이벤트 리스너 붙이기
+    document.querySelectorAll(".toggle-button").forEach(button => {
+        button.addEventListener("click", function() {
+            var targetInputId = this.getAttribute("data-target");
+            console.log(targetInputId);
+            toggleInputVisibility(targetInputId, this);
+        });
+    });
+
+    // ============== [비밀번호 변경 로직] ==============
+    pwChangeBtn?.addEventListener("click", () => {
+        // '******' 인풋 비활성화 상태 그대로 두거나 숨겨도 됨
+        // 아래는 폼을 보이도록
+        pwChangeForm.style.display = "block";
+    });
+
+    // 새 비밀번호/확인 인풋 실시간 검사
+    newPwInput?.addEventListener("input", checkNewPassword);
+    confirmPwInput?.addEventListener("input", checkNewPassword);
+
+    function checkNewPassword() {
+        var newVal = newPwInput.value;
+        var confirmVal = confirmPwInput.value;
+
+        // 길이 체크 (8~20자)
+        var lengthOk = (newVal.length >= 8 && newVal.length <= 20);
+        if (lengthOk) {
+            newPwCheckLen.style.color = "green";
+        } else {
+            newPwCheckLen.style.color = "#999";
+        }
+
+        // 문자 조합 체크 (대문자, 소문자, 숫자, 특수문자 각 1개 이상)
+        var charRegex = /^(?=.*[A-Z])(?=.*[a-z])(?=.*\d)(?=.*[!@#$%^&*(),.?":{}|<>])/;
+        var charOk = charRegex.test(newVal);
+        if (charOk) {
+            newPwCheckChar.style.color = "green";
+        } else {
+            newPwCheckChar.style.color = "#999";
+        }
+
+        // 비밀번호 재확인 (일치 여부)
+        if (newVal && newVal === confirmVal) {
+            confirmPwCheckMsg.style.color = "green";
+        } else {
+            confirmPwCheckMsg.style.color = "#999";
+        }
+
+        // 4) 최종: 길이/문자조합/재확인 모두 OK면 버튼 활성화
+        if (lengthOk && charOk && (newVal === confirmVal && newVal !== "")) {
+            pwSubmitBtn.disabled = false;
+        } else {
+            pwSubmitBtn.disabled = true;
+        }
+    }
+
+    // 비밀번호 변경 버튼
+    pwSubmitBtn?.addEventListener("click", async () => {
+        if (pwSubmitBtn.disabled) return;
+
+        var oldPw = currentPwInput.value;
+        var newPw = newPwInput.value;
+        var confirmPw = confirmPwInput.value;
+
+        try {
+            var res = await fetchWithAccessToken("/api/edit/change-password", {
+                method: "PUT",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    oldPassword: oldPw,
+                    newPassword: newPw,
+                    confirmPassword: confirmPw
+                }),
+            });
+
+            if (res.code === 200) {
+                alert(res.data);
+                localStorage.removeItem("access");
+                window.location.href = "/";
+            } else {
+                alert("비밀번호 변경 실패: " + res.message);
+            }
+        } catch (error) {
+            alert("서버 오류 발생: " + error);
+        }
+    });
+
+    // ============== [연락처/이메일 수정 버튼] ==============
+    phoneEditBtn?.addEventListener("click", () => {
+        alert("본인인증 로직 구현 필요 (인증코드 입력 등) 예: 모달 열기");
+    });
+    emailEditBtn?.addEventListener("click", () => {
+        alert("이메일 변경 로직 구현 필요 (인증코드 입력 등) 예: 모달 열기");
+    });
+
+    // ============== [주소 검색 로직] ==============
+    addrSearchBtn?.addEventListener("click", () => {
+        // 카카오 주소검색 API 연동 -> 주소 선택
+        execDaumPostcode();
+        addrDetailInput.disabled = false;
+        addrChangeBtn.disabled = false;
+    });
+
+    addrChangeBtn?.addEventListener("click", () => {
+        if (addrChangeBtn.disabled) return;
+
+        var zipCode = document.getElementById("zipCodeInput").value;
+        var mainAddr= document.getElementById("addrMainInput").value;
+        var detail  = addrDetailInput.value;
+
+        // 실제 API 호출
+        alert("주소 변경 API 호출 -> zip:"+zipCode+" main:"+mainAddr+" detail:"+detail);
+    });
 });
 
-// 마이페이지 데이터 렌더링
+// 기존 renderMyPage, showMemberInfoSection, togglePasswordVisibility, showModal, etc...
 function renderMyPage(data) {
+    // (기존) 사이드바, 상단 멤버십 등
     document.getElementById("userName").textContent = data.name || "알 수 없음";
     document.getElementById("likeCount").textContent = data.likeCount || 6;
     document.getElementById("userGrade").textContent = data.userGrade || "ORANGE";
     document.getElementById("couponCount").textContent = data.couponCount || 8;
     document.getElementById("mileage").textContent = data.mileage || 966;
 
-    // 비밀번호 재확인 섹션 아이디 표시
+    // 비밀번호 재확인 섹션의 아이디 표시
     var loginIdConfirm = document.getElementById("loginIdConfirm");
     if (loginIdConfirm) {
         loginIdConfirm.textContent = data.loginId || "알 수 없음";
@@ -72,28 +206,50 @@ function renderMyPage(data) {
     // 회원정보 수정 섹션 아이디 표시
     var editLoginId = document.getElementById("editLoginId");
     if (editLoginId) {
-        editLoginId.textContent = "아이디(이메일): " + (data.loginId || "알 수 없음");
+        editLoginId.textContent = (data.loginId || "알 수 없음");
     }
-
-    var contentContainer = document.querySelector(".mypage-content");
 }
 
-function togglePasswordVisibility() {
-    var passwordField = document.getElementById("password");
-    var passwordToggleButton = document.querySelector(".password-toggle-button");
+function showMemberInfoSection(memberData) {
+    // [회원 정보] 이름, 연락처, 생년월일
+    document.getElementById("editName").textContent     = memberData.name     || "-";
+    document.getElementById("editPhoneNum").textContent = memberData.phoneNum || "-";
+    document.getElementById("userEmailSpan").textContent = memberData.loginId || "-";
+    document.getElementById("editBirth").textContent    = memberData.birth    || "-";
 
-    if (!passwordToggleButton) {
-        console.error("passwordToggleButton 요소를 찾을 수 없습니다.");
-        return;
+    // [주소] - zipCodeInput, addrMainInput, addrDetailInput
+    if (memberData.address) {
+        document.getElementById("zipCodeInput").value    = memberData.address.zipCode       || "-";
+        document.getElementById("addrMainInput").value   = memberData.address.addressMain   || "-";
+        document.getElementById("addrDetailInput").value = memberData.address.addressDetail || "-";
     }
 
-    var isPasswordVisible = passwordField.type === "text";
+    // [마케팅/광고 알림 설정] -> marketingSection
+    // 기존에는 ul#termsList에 li로 표시했지만,
+    // 요구사항에 맞춰 체크박스 등으로 확장 가능
+    var termsList = document.getElementById("termsList");
+    termsList.innerHTML = "";
+    if (memberData.agreedTerms && Array.isArray(memberData.agreedTerms)) {
+        memberData.agreedTerms.forEach(term => {
+            // 간단히 li로 표시
+            var li = document.createElement("li");
+            li.textContent = `${term.name} (${term.agreeYn})`;
+            termsList.appendChild(li);
+        });
+    }
+}
 
-    // 비밀번호 표시 상태 변경
+// 비밀번호 표시/숨기기 (기존 로직)
+// 공통 함수
+function toggleInputVisibility(targetInputId, buttonElement) {
+    var passwordField = document.getElementById(targetInputId);
+    if (!passwordField) return;
+
+    // 현재 타입을 토글: password <-> text
+    var isPasswordVisible = passwordField.type === "text";
     passwordField.type = isPasswordVisible ? "password" : "text";
 
-    // aria-label 업데이트
-    passwordToggleButton.setAttribute(
+    buttonElement.setAttribute(
         "aria-label",
         isPasswordVisible
             ? "비밀번호가 화면에서 보여지지 않습니다."
@@ -114,81 +270,23 @@ function togglePasswordVisibility() {
         </svg>
     `;
 
-    passwordToggleButton.innerHTML = isPasswordVisible ? eyeIcon : crossedEyeIcon;
+    buttonElement.innerHTML = isPasswordVisible ? eyeIcon : crossedEyeIcon;
 }
 
-// 모달 표시 함수
+// 모달 표시 함수 (기존)
 function showModal(message) {
     var modal = document.querySelector('.modal');
     var modalBody = modal.querySelector('.modal-body');
     modalBody.textContent = message;
     modal.style.display = "flex";
 }
-
 function closeModal() {
     var modal = document.querySelector('.modal');
-    modal.style.display = 'none'; // 모달 숨김
+    modal.style.display = 'none';
 }
-
 function handleErrors(errorData) {
-    // 기존 에러 메시지 초기화
-    document.querySelectorAll('.error-message').forEach(function (element) {
-        element.textContent = '';
-    });
+    document.querySelectorAll('.error-message').forEach(e => e.textContent = '');
     var confirmError = document.getElementById('passwordError');
-
-    // 일반 에러 메시지 처리
-    if (errorData != null) {
-        confirmError.textContent = errorData;
-        confirmError.style.display = 'block';
-    } else {
-        // 기본 오류 메시지 처리
-        confirmError.textContent = '알 수 없는 오류가 발생했습니다. 다시 시도해주세요.';
-        confirmError.style.display = 'block';
-    }
-}
-
-// 회원정보 표시 함수
-function showMemberInfoSection(memberData) {
-    console.log("memberData:", memberData);
-    console.log("address:", memberData.address);
-
-    // [2] 회원 정보
-    document.getElementById("editName").textContent     = memberData.name     || "-";
-    document.getElementById("editPhoneNum").textContent = memberData.phoneNum || "-";
-    document.getElementById("editBirth").textContent    = memberData.birth    || "-";
-
-    // 주소 정보가 있는지 확인
-    if (memberData.address) {
-        // memberData.address가 null이 아니면 개별 필드 할당
-        document.getElementById("editZipCode").textContent       = memberData.address.zipCode         || "-";
-        document.getElementById("editAddressMain").textContent   = memberData.address.addressMain     || "-";
-        document.getElementById("editAddressDetail").textContent = memberData.address.addressDetail   || "-";
-    } else {
-        // address가 null인 경우 기본값("-")만 표시
-        document.getElementById("editZipCode").textContent       = "-";
-        document.getElementById("editAddressMain").textContent   = "-";
-        document.getElementById("editAddressDetail").textContent = "-";
-    }
-
-    // [3] 마케팅/광고 알림 설정(약관 동의 목록)
-    const termsList = document.getElementById("termsList");
-    termsList.innerHTML = ""; // 초기화
-
-    if (memberData.agreedTerms && Array.isArray(memberData.agreedTerms)) {
-        memberData.agreedTerms.forEach(term => {
-            // li에 표시
-            const li = document.createElement("li");
-            // 예) "이메일 수신 동의 (N)"
-            li.textContent = `${term.name} (${term.agreeYn})`;
-            termsList.appendChild(li);
-
-            // 체크박스로 표시하고 싶다면:
-            // const checkbox = document.createElement("input");
-            // checkbox.type = "checkbox";
-            // checkbox.checked = (term.agreeYn === "Y");
-            // li.appendChild(checkbox);
-            // li.appendChild(document.createTextNode(` ${term.name}`));
-        });
-    }
+    confirmError.textContent = errorData || '알 수 없는 오류가 발생했습니다.';
+    confirmError.style.display = 'block';
 }

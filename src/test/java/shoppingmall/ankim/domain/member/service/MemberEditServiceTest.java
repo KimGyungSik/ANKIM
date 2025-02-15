@@ -229,8 +229,8 @@ class MemberEditServiceTest {
         em.clear();
 
         List<TermsAgreeResponse> agreedTerms = List.of(
-                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2),
-                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3)
+                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2, 1L),
+                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3, 1L)
         );
 
         given(termsService.getTermsForMember(any(Long.class), eq(TermsCategory.JOIN)))
@@ -261,8 +261,8 @@ class MemberEditServiceTest {
         em.clear();
 
         List<TermsAgreeResponse> agreedTerms = List.of(
-                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2),
-                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3)
+                new TermsAgreeResponse(1L, "약관1", "약관내용1", 1, "Y", 2, 1L),
+                new TermsAgreeResponse(2L, "약관2", "약관내용2", 1, "N", 3, 1L)
         );
 
         given(termsService.getTermsForMember(any(Long.class), eq(TermsCategory.JOIN)))

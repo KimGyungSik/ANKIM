@@ -14,15 +14,17 @@ public class TermsAgreeResponse {
     private int termsVersion;
     private String agreeYn; // "Y" or "N"
     private Integer level; // 약관 레벨
+    private Long parentsNo;// 부모 약관
 
     @Builder
-    public TermsAgreeResponse(Long termsNo, String name, String contents, int termsVersion, String agreeYn, Integer level) {
+    public TermsAgreeResponse(Long termsNo, String name, String contents, int termsVersion, String agreeYn, Integer level, Long parentsNo) {
         this.termsNo = termsNo;
         this.name = name;
         this.contents = contents;
         this.termsVersion = termsVersion;
         this.agreeYn = agreeYn;
         this.level = level;
+        this.parentsNo = parentsNo;
     }
 
     public static TermsAgreeResponse of(Terms terms, String agreeYn) {
@@ -33,6 +35,7 @@ public class TermsAgreeResponse {
                 .termsVersion(terms.getTermsVersion())
                 .agreeYn(agreeYn)
                 .level(terms.getLevel())
+                .parentsNo(terms.getParentTerms().getNo())
                 .build();
     }
 

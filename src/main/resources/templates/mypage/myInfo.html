@@ -20,45 +20,142 @@
             <p class="email-line">
                 아이디(이메일): <span id="loginIdConfirm">cat*****@*****.com</span>
             </p>
-            <div class="password-input-wrapper password-line">
-                비밀번호 :
-                <input
-                        id="password"
-                        class="input-field"
-                        placeholder="8자 이상의 비밀번호"
-                        autocapitalize="none"
-                        autocomplete="current-password"
-                        type="password"
-                        name="password">
-                <button
-                        type="button"
-                        class="password-toggle-button"
-                        aria-label="비밀번호가 화면에서 보여지지 않습니다.">
-                    <!-- 기본 eye 아이콘 -->
+            <!-- 비밀번호 입력 row -->
+            <div class="row password-line">
+                <label>비밀번호</label>
+                <div class="input-group">
+                    <input
+                            id="password"
+                            class="input-field"
+                            placeholder="8자 이상의 비밀번호"
+                            autocapitalize="none"
+                            autocomplete="current-password"
+                            type="password"
+                            name="password"
+                    >
+                    <button
+                            type="button"
+                            class="toggle-button"
+                            data-target="password"
+                            aria-label="비밀번호가 화면에서 보여지지 않습니다."
+                    >
+                    <!-- 기본 눈모양 아이콘 -->
                     <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.52612 7.64835C8.15485 6.54396 9.98507 6 12 6C14.0149 6 15.8451 6.54396 17.4739 7.64835C19.1026 8.75275 20.278 10.2033 21 12C20.2948 13.7967 19.1194 15.2637 17.4739 16.3516C15.8451 17.456 14.0149 18 12 18C9.98507 18 8.15485 17.456 6.52612 16.3516C4.89739 15.2473 3.72202 13.7967 3 12C3.72202 10.2033 4.89739 8.73626 6.52612 7.64835ZM9.11194 14.8352C9.91791 15.6264 10.875 16.022 12 16.022C13.125 16.022 14.0821 15.6264 14.8881 14.8352C15.694 14.044 16.097 13.1044 16.097 12C16.097 10.8956 15.694 9.95604 14.8881 9.16483C14.0821 8.37363 13.125 7.97802 12 7.97802C10.875 7.97802 9.91791 8.37363 9.11194 9.16483C8.30597 9.95604 7.90299 10.8956 7.90299 12C7.90299 13.1044 8.30597 14.044 9.11194 14.8352ZM10.2705 10.3022C10.7575 9.84066 11.3284 9.59341 12 9.59341C12.6549 9.59341 13.2425 9.82418 13.7295 10.3022C14.1996 10.7802 14.4515 11.3407 14.4515 12C14.4515 12.6593 14.2164 13.2198 13.7295 13.6978C13.2425 14.1593 12.6549 14.4066 12 14.4066C11.3284 14.4066 10.7575 14.1758 10.2705 13.6978C9.80037 13.2198 9.54851 12.6593 9.54851 12C9.54851 11.3407 9.80037 10.7802 10.2705 10.3022Z" fill="#A0A0A0"></path></svg>
-                </button>
+                    </button>
+                </div>
             </div>
             <div id="passwordError" class="error-message"></div>
             <!-- 버튼을 오른쪽 정렬하기 위해 .button-row 래퍼 사용 -->
             <div class="button-row">
-                <button id="verifyPasswordBtn">다음</button>
+                <button id="verifyPasswordBtn" class="submitBtn">다음</button>
             </div>
         </section>
 
-        <!-- 회원정보 수정 섹션 (초기에 숨김) -->
+        <!-- [2] 회원정보 수정 섹션 (비밀번호 확인 성공 후 노출) -->
         <section id="infoEditSection" class="info-edit-section" style="display: none;">
             <h2>회원정보 수정</h2>
 
-            <!-- [1] 로그인 정보 -->
+            <!-- div 1) 로그인 정보 -->
             <div class="edit-section login-info-box">
                 <h3>로그인 정보</h3>
+
+                <!-- 아이디(이메일) -->
                 <p class="login-id">
                     아이디(이메일): <span id="editLoginId">-</span>
                 </p>
-                <button class="btn-change-pw">비밀번호 변경</button>
+
+                <!-- 비밀번호 변경 버튼 -->
+                <!-- 비밀번호는 기본적으로 '******' 표시 + disabled.
+                     버튼 누르면 '비밀번호 변경 폼'이 열리도록 JS에서 처리 -->
+                <div class="row">
+                    <label>비밀번호</label>
+                    <div class="input-group">
+                        <input type="password" id="pwPlaceholder" value="******" disabled>
+                    </div>
+                    <button class="btn-change-pw" id="pwChangeBtn">비밀번호 변경</button>
+                </div>
+
+                <!-- 비밀번호 변경 폼 (기본 hidden) -->
+                <div id="pwChangeForm" style="display: none; margin-left:100px;">
+                    <!-- [현재 비밀번호] -->
+                    <div class="row">
+                        <div class="input-group">
+                            <input type="password" id="currentPwInput" placeholder="현재 비밀번호를 입력해주세요">
+                            <button
+                                    type="button"
+                                    class="toggle-button"
+                                    data-target="currentPwInput"
+                                    aria-label="비밀번호가 화면에서 보여지지 않습니다."
+                            >
+                                <!-- 눈 아이콘 SVG -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.52612 7.64835C8.15485 6.54396 9.98507 6 12 6C14.0149 6 15.8451 6.54396 17.4739 7.64835C19.1026 8.75275 20.278 10.2033 21 12C20.2948 13.7967 19.1194 15.2637 17.4739 16.3516C15.8451 17.456 14.0149 18 12 18C9.98507 18 8.15485 17.456 6.52612 16.3516C4.89739 15.2473 3.72202 13.7967 3 12C3.72202 10.2033 4.89739 8.73626 6.52612 7.64835ZM9.11194 14.8352C9.91791 15.6264 10.875 16.022 12 16.022C13.125 16.022 14.0821 15.6264 14.8881 14.8352C15.694 14.044 16.097 13.1044 16.097 12C16.097 10.8956 15.694 9.95604 14.8881 9.16483C14.0821 8.37363 13.125 7.97802 12 7.97802C10.875 7.97802 9.91791 8.37363 9.11194 9.16483C8.30597 9.95604 7.90299 10.8956 7.90299 12C7.90299 13.1044 8.30597 14.044 9.11194 14.8352ZM10.2705 10.3022C10.7575 9.84066 11.3284 9.59341 12 9.59341C12.6549 9.59341 13.2425 9.82418 13.7295 10.3022C14.1996 10.7802 14.4515 11.3407 14.4515 12C14.4515 12.6593 14.2164 13.2198 13.7295 13.6978C13.2425 14.1593 12.6549 14.4066 12 14.4066C11.3284 14.4066 10.7575 14.1758 10.2705 13.6978C9.80037 13.2198 9.54851 12.6593 9.54851 12C9.54851 11.3407 9.80037 10.7802 10.2705 10.3022Z" fill="#A0A0A0"></path></svg>
+
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- [새 비밀번호] -->
+                    <div class="row">
+                        <div class="input-group">
+                            <input type="password" id="newPwInput" placeholder="새로운 비밀번호를 입력해주세요">
+                            <button
+                                    type="button"
+                                    class="toggle-button"
+                                    data-target="newPwInput"
+                                    aria-label="비밀번호가 화면에서 보여지지 않습니다."
+                            >
+                                <!-- 눈 아이콘 SVG -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.52612 7.64835C8.15485 6.54396 9.98507 6 12 6C14.0149 6 15.8451 6.54396 17.4739 7.64835C19.1026 8.75275 20.278 10.2033 21 12C20.2948 13.7967 19.1194 15.2637 17.4739 16.3516C15.8451 17.456 14.0149 18 12 18C9.98507 18 8.15485 17.456 6.52612 16.3516C4.89739 15.2473 3.72202 13.7967 3 12C3.72202 10.2033 4.89739 8.73626 6.52612 7.64835ZM9.11194 14.8352C9.91791 15.6264 10.875 16.022 12 16.022C13.125 16.022 14.0821 15.6264 14.8881 14.8352C15.694 14.044 16.097 13.1044 16.097 12C16.097 10.8956 15.694 9.95604 14.8881 9.16483C14.0821 8.37363 13.125 7.97802 12 7.97802C10.875 7.97802 9.91791 8.37363 9.11194 9.16483C8.30597 9.95604 7.90299 10.8956 7.90299 12C7.90299 13.1044 8.30597 14.044 9.11194 14.8352ZM10.2705 10.3022C10.7575 9.84066 11.3284 9.59341 12 9.59341C12.6549 9.59341 13.2425 9.82418 13.7295 10.3022C14.1996 10.7802 14.4515 11.3407 14.4515 12C14.4515 12.6593 14.2164 13.2198 13.7295 13.6978C13.2425 14.1593 12.6549 14.4066 12 14.4066C11.3284 14.4066 10.7575 14.1758 10.2705 13.6978C9.80037 13.2198 9.54851 12.6593 9.54851 12C9.54851 11.3407 9.80037 10.7802 10.2705 10.3022Z" fill="#A0A0A0"></path></svg>
+
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 체크 메시지 영역 -->
+                    <div class="pw-check-message">
+                        <!-- 길이 및 문자 조합 체크 메시지 -->
+                        <span id="newPwCheckLen">v 8~20자 이내</span>
+                        <span id="newPwCheckChar">v 대소문자,숫자,특수문자 포함</span>
+                    </div>
+
+                    <!-- [비밀번호 재확인] -->
+                    <div class="row">
+                        <div class="input-group">
+                            <input type="password" id="confirmPwInput" placeholder="새로운 비밀번호를 한 번 더 확인해 주세요">
+                            <button
+                                    type="button"
+                                    class="toggle-button"
+                                    data-target="confirmPwInput"
+                                    aria-label="비밀번호가 화면에서 보여지지 않습니다."
+                            >
+                                <!-- 눈 아이콘 SVG -->
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"><path d="M6.52612 7.64835C8.15485 6.54396 9.98507 6 12 6C14.0149 6 15.8451 6.54396 17.4739 7.64835C19.1026 8.75275 20.278 10.2033 21 12C20.2948 13.7967 19.1194 15.2637 17.4739 16.3516C15.8451 17.456 14.0149 18 12 18C9.98507 18 8.15485 17.456 6.52612 16.3516C4.89739 15.2473 3.72202 13.7967 3 12C3.72202 10.2033 4.89739 8.73626 6.52612 7.64835ZM9.11194 14.8352C9.91791 15.6264 10.875 16.022 12 16.022C13.125 16.022 14.0821 15.6264 14.8881 14.8352C15.694 14.044 16.097 13.1044 16.097 12C16.097 10.8956 15.694 9.95604 14.8881 9.16483C14.0821 8.37363 13.125 7.97802 12 7.97802C10.875 7.97802 9.91791 8.37363 9.11194 9.16483C8.30597 9.95604 7.90299 10.8956 7.90299 12C7.90299 13.1044 8.30597 14.044 9.11194 14.8352ZM10.2705 10.3022C10.7575 9.84066 11.3284 9.59341 12 9.59341C12.6549 9.59341 13.2425 9.82418 13.7295 10.3022C14.1996 10.7802 14.4515 11.3407 14.4515 12C14.4515 12.6593 14.2164 13.2198 13.7295 13.6978C13.2425 14.1593 12.6549 14.4066 12 14.4066C11.3284 14.4066 10.7575 14.1758 10.2705 13.6978C9.80037 13.2198 9.54851 12.6593 9.54851 12C9.54851 11.3407 9.80037 10.7802 10.2705 10.3022Z" fill="#A0A0A0"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                    <!-- 체크 메시지 영역 -->
+                    <div class="pw-check-message">
+                        <span id="confirmPwCheckMsg">v 비밀번호 일치</span>
+                    </div>
+
+                    <button id="pwSubmitBtn" class="submitBtn" disabled>
+                        비밀번호 변경
+                    </button>
+                </div>
             </div>
 
-            <!-- [2] 회원 정보 -->
+            <!-- div 2) SNS 계정연결 -->
+            <div class="edit-section sns-connect-box">
+                <h3>SNS 계정연결</h3>
+                <p>자주 사용하는 소셜 계정을 연동하면, 빠르게 로그인할 수 있어요.</p>
+                <!-- 실제 연동 로직은 아직 미개발 가정 -->
+                <div style="display:flex; gap:10px;">
+                    <img src="https://via.placeholder.com/40x40?text=N" alt="N" />
+                    <img src="https://via.placeholder.com/40x40?text=K" alt="K" />
+                    <img src="https://via.placeholder.com/40x40?text=G" alt="G" />
+                </div>
+            </div>
+
+            <!-- div 3) 회원 정보 -->
             <div class="edit-section member-info-box">
                 <h3>회원 정보</h3>
                 <div class="row">
@@ -68,25 +165,57 @@
                 <div class="row">
                     <label>연락처</label>
                     <span id="editPhoneNum">-</span>
+                    <button class="btn-change-pw" id="phoneEditBtn">본인인증으로 정보 수정하기</button>
+                </div>
+                <div class="row">
+                    <label>이메일</label>
+                    <span id="userEmailSpan"></span>
+                    <button class="btn-change-pw" id="emailEditBtn">이메일 변경</button>
                 </div>
                 <div class="row">
                     <label>생년월일</label>
                     <span id="editBirth">-</span>
                 </div>
+
                 <div class="row">
-                    <label>주소</label>
-                    <span id="editZipCode">-</span>
-                    <span id="editAddressMain">-</span>
-                    <span id="editAddressDetail">-</span>
+                    <label>주소 정보</label>
+                    <div class="input-group-with-button">
+                        <input type="text" id="zipCodeInput" value="-" disabled>
+                        <button id="addrSearchBtn">우편번호 검색</button>
+                    </div>
+                </div>
+                <div class="row">
+                    <label></label>
+                    <div id="layer"></div>
+                </div>
+                <div class="row">
+                    <label></label> <!-- 빈 라벨로 공간 확보 -->
+                    <div class="input-group-with-button">
+                        <input type="text" id="addrMainInput" value="-" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <label></label> <!-- 빈 라벨로 공간 확보 -->
+                    <div class="input-group-with-button">
+                        <input type="text" id="addrDetailInput" value="-" disabled>
+                    </div>
+                </div>
+                <div class="row">
+                    <label></label> <!-- 빈 라벨로 공간 확보 -->
+                    <button id="addrChangeBtn" class="submitBtn" disabled>
+                        주소 변경
+                    </button>
                 </div>
             </div>
+        </section>
 
-            <!-- [3] 마케팅 및 광고 알림 설정 -->
-            <div class="edit-section marketing-info-box">
-                <h3>마케팅 및 광고 알림 설정</h3>
-                <!-- 체크박스나 단순 텍스트 등 원하는 형태로 표시 -->
-                <ul id="termsList"></ul>
-            </div>
+        <!-- [3] 마케팅 및 광고 알림 설정 섹션 -->
+        <section id="marketingSection" class="info-edit-section" style="display: none;">
+            <h2>마케팅 및 광고 알림 설정</h2>
+            <!-- 여기는 약관(agreedTerms)에 따라 체크박스 표시 -->
+            <ul id="termsList">
+                <!-- JS에서 agreedTerms를 보고 li or checkbox로 렌더링 -->
+            </ul>
         </section>
     </th:block>
 </th:block>
@@ -94,6 +223,8 @@
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
 <script type="module" th:src="@{/js/mypage/myInfo.js}"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="module" th:src="@{/js/utils/map.js}"></script>
 <script type="module" th:src="@{/js/mypage/mypage.js}"></script>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 </html>
