@@ -61,7 +61,7 @@ public class TermsServiceImpl implements TermsService {
                 responseList.add(TermsAgreeResponse.of(latest, "N")); // 최신 약관이므로 다시 동의 필요
                 latestTermsMap.remove(termsName); // 최신 약관 리스트에서 제거 (중복 방지)
             } else {
-                responseList.add(TermsAgreeResponse.of(history.getTerms(), history.getAgreeYn())); // 기존 약관 유지
+                responseList.add(TermsAgreeResponse.of(history, history.getAgreeYn())); // 기존 약관 유지
             }
         }
 

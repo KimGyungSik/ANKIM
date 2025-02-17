@@ -60,23 +60,25 @@
                 <h3>로그인 정보</h3>
 
                 <!-- 아이디(이메일) -->
-                <p class="login-id">
+                <p class="login-id info-line">
                     아이디(이메일): <span id="editLoginId">-</span>
                 </p>
 
                 <!-- 비밀번호 변경 버튼 -->
                 <!-- 비밀번호는 기본적으로 '******' 표시 + disabled.
                      버튼 누르면 '비밀번호 변경 폼'이 열리도록 JS에서 처리 -->
-                <div class="row">
+                <div class="row info-line">
                     <label>비밀번호</label>
-                    <div class="input-group">
-                        <input type="password" id="pwPlaceholder" value="******" disabled>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="password" id="pwPlaceholder" value="******" disabled>
+                            <button class="btn-change-pw" id="pwChangeBtn">비밀번호 변경</button>
+                        </div>
                     </div>
-                    <button class="btn-change-pw" id="pwChangeBtn">비밀번호 변경</button>
                 </div>
 
                 <!-- 비밀번호 변경 폼 (기본 hidden) -->
-                <div id="pwChangeForm" style="display: none; margin-left:100px;">
+                <div id="pwChangeForm" class="info-line" style="display: none; margin-left:100px;">
                     <!-- [현재 비밀번호] -->
                     <div class="row">
                         <div class="input-group">
@@ -158,53 +160,76 @@
             <!-- div 3) 회원 정보 -->
             <div class="edit-section member-info-box">
                 <h3>회원 정보</h3>
-                <div class="row">
+                <div class="row info-line">
                     <label>이름</label>
                     <span id="editName">-</span>
                 </div>
-                <div class="row">
-                    <label>연락처</label>
-                    <span id="editPhoneNum">-</span>
-                    <button class="btn-change-pw" id="phoneEditBtn">본인인증으로 정보 수정하기</button>
-                </div>
-                <div class="row">
-                    <label>이메일</label>
-                    <span id="userEmailSpan"></span>
-                    <button class="btn-change-pw" id="emailEditBtn">이메일 변경</button>
-                </div>
-                <div class="row">
+                <div class="row info-line">
                     <label>생년월일</label>
                     <span id="editBirth">-</span>
+                </div>
+                <div class="row info-line">
+                    <label>연락처</label>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="text" id="phoneNumInput" value="" disabled>
+                            <button class="btn-change-pw" id="phoneEditBtn">본인인증으로 정보 수정하기</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row info-line">
+                    <label>이메일</label>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="text" id="userEmailInput" value="" disabled>
+                            <button class="btn-change-pw" id="emailEditBtn">이메일 변경</button>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="row">
                     <label>주소 정보</label>
-                    <div class="input-group-with-button">
-                        <input type="text" id="zipCodeInput" value="-" disabled>
-                        <button id="addrSearchBtn">우편번호 검색</button>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="text" id="zipCodeInput" value="-" disabled>
+                            <button id="addrSearchBtn">우편번호 검색</button>
+                        </div>
+                        <!-- 우편번호 에러 메시지 -->
+                        <span id="zipCodeError" class="error-message"></span>
                     </div>
                 </div>
                 <div class="row">
                     <label></label>
+                    <!-- 카카오 api 창 추가 공간-->
                     <div id="layer"></div>
                 </div>
                 <div class="row">
                     <label></label> <!-- 빈 라벨로 공간 확보 -->
-                    <div class="input-group-with-button">
-                        <input type="text" id="addrMainInput" value="-" disabled>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="text" id="addressMainInput" value="-" disabled>
+                        </div>
+                        <!-- 메인주소 에러 메시지 -->
+                        <span id="addressMainError" class="error-message"></span>
                     </div>
                 </div>
                 <div class="row">
                     <label></label> <!-- 빈 라벨로 공간 확보 -->
-                    <div class="input-group-with-button">
-                        <input type="text" id="addrDetailInput" value="-" disabled>
+                    <div class="input-button-group">
+                        <div class="input-group-with-button">
+                            <input type="text" id="addressDetailInput" value="-" disabled>
+                        </div>
+                        <!-- 상세주소 에러 메시지 -->
+                        <span id="addressDetailError" class="error-message"></span>
                     </div>
                 </div>
-                <div class="row">
+                <div class="row info-line">
                     <label></label> <!-- 빈 라벨로 공간 확보 -->
-                    <button id="addrChangeBtn" class="submitBtn" disabled>
-                        주소 변경
-                    </button>
+                    <div class="submit-btn">
+                        <button id="addrChangeBtn" class="submitBtn" disabled>
+                            주소 변경
+                        </button>
+                    </div>
                 </div>
             </div>
         </section>
@@ -217,6 +242,16 @@
                 <!-- JS에서 agreedTerms를 보고 li or checkbox로 렌더링 -->
             </ul>
         </section>
+
+        <div id="termsSection"></div>
+        <!-- 해제/체크시 뜨는 모달 구조(간단 예시) -->
+        <div class="modal" id="termsModal" style="display:none;">
+            <div class="modal-body">
+                <p id="termsModalMessage"></p>
+                <button id="modalConfirmBtn">확인</button>
+                <button id="modalCancelBtn">취소</button>
+            </div>
+        </div>
     </th:block>
 </th:block>
 

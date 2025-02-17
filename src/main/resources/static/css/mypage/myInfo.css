@@ -33,9 +33,17 @@
     margin-bottom: 15px;
 }
 
+/* SNS 계정 연결 */
+.sns-connect-box {
+    background-color: #ddd;
+    padding: 3%;
+    border-radius: 10px;
+}
+
 /* 아이디, 비밀번호 각각 얇은 선 */
 .email-line,
-.password-line {
+.password-line,
+.info-line {
     display: block;
     border-bottom: 1px solid #ddd; /* 얇은 선 */
     padding-bottom: 8px;
@@ -136,9 +144,23 @@
 
 /* 에러 메시지 (빨간색) */
 .error-message {
+    display: block;
     color: red;
     font-size: 14px;
     margin-bottom: 10px;
+}
+
+.input-button-group {
+    width: 100%;
+    /* block or flex-direction: column 등으로 */
+}
+.input-button-group .input-group-with-button input {
+    width: 60%; /* 혹은 90~95% 등 적절히 */
+}
+.input-button-group .error-message {
+    margin-top: 10px; /* 위로 약간 띄우기 */
+    display: block;  /* 혹은 기본 inline이어도 괜찮지만 block이면 확실히 줄바꿈 */
+    color: red;
 }
 
 /* 버튼 오른쪽에 배치 */
@@ -182,7 +204,7 @@
 }
 
 .edit-section h3 {
-    font-size: 14px;
+    font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
 }
@@ -200,22 +222,25 @@
     font-size: 14px;
 }
 
-.edit-section .row span {
-    color: #333;
+.submit-btn {
+    width: 100%;
+}
+
+.row span {
     font-size: 14px;
 }
 
-/* 비밀번호 변경 버튼 */
-.btn-change-pw {
-    border: 1px solid #333;
-    background-color: #fff;
-    color: #333;
-    padding: 6px 12px;
-    cursor: pointer;
-    font-size: 14px;
-    border-radius: 4px;
-}
+/*!* 비밀번호 변경 버튼 *!*/
+/*.btn-change-pw {*/
+/*    border: 1px solid #333;*/
+/*    background-color: #fff;*/
+/*    color: #333;*/
+/*    padding: 6px 12px;*/
+/*    cursor: pointer;*/
+/*    font-size: 14px;*/
+/*    border-radius: 4px;*/
+/*}*/
 
-.btn-change-pw:hover {
-    background-color: #f0f0f0;
-}
+/*.btn-change-pw:hover {*/
+/*    background-color: #f0f0f0;*/
+/*}*/

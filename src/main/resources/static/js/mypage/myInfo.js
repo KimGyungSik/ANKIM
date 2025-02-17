@@ -22,7 +22,7 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 주소 관련
     var addrSearchBtn  = document.getElementById("addrSearchBtn");
     var addrChangeBtn  = document.getElementById("addrChangeBtn");
-    var addrDetailInput= document.getElementById("addrDetailInput");
+    var addressDetailInput= document.getElementById("addressDetailInput");
 
     // 기타 버튼(연락처/이메일 수정) - 예시
     var phoneEditBtn   = document.getElementById("phoneEditBtn");
@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (response.code === 200 && response.data) {
             renderMyPage(response.data);         // 사이드바, 상단 등 공통 정보
             showMemberInfoSection(response.data); // 회원정보 수정 섹션(이름, 주소, 약관 등)
+            // renderTermsCheckboxes(response.data.agreedTerms); // 약관 정보
         } else {
             alert("데이터 전송실패");
             showModal(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
@@ -172,19 +173,46 @@ document.addEventListener("DOMContentLoaded", async () => {
     addrSearchBtn?.addEventListener("click", () => {
         // 카카오 주소검색 API 연동 -> 주소 선택
         execDaumPostcode();
-        addrDetailInput.disabled = false;
+        addressDetailInput.disabled = false;
         addrChangeBtn.disabled = false;
     });
 
-    addrChangeBtn?.addEventListener("click", () => {
+    addrChangeBtn?.addEventListener("click", async () => {
         if (addrChangeBtn.disabled) return;
-
         var zipCode = document.getElementById("zipCodeInput").value;
-        var mainAddr= document.getElementById("addrMainInput").value;
-        var detail  = addrDetailInput.value;
+        var addressMain = document.getElementById("addressMainInput").value;
+        var addressDetail = document.getElementById("addressDetailInput").value;
 
-        // 실제 API 호출
-        alert("주소 변경 API 호출 -> zip:"+zipCode+" main:"+mainAddr+" detail:"+detail);
+        try {
+            var res = await fetchWithAccessToken("/api/address/edit", {
+                method: "PUT",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify({
+                    zipCode: zipCode,
+                    addressMain: addressMain,
+                    addressDetail: addressDetail
+                }),
+            });
+
+            if (res.code === 200) {
+                alert(res.data);
+            } else {
+                // 만약 필드 에러가 있는 경우 각 에러 메시지 표시
+                if (res.fieldErrors) {
+                    res.fieldErrors.forEach(error => {
+                        var errorElement = document.getElementById(error.field + "Error");
+                        if (errorElement) {
+                            errorElement.textContent = error.reason;
+                            errorElement.style.display = "block";
+                        }
+                    });
+                } else {
+                    alert("주소 변경 실패: " + res.message);
+                }
+            }
+        } catch (error) {
+            alert("서버 오류 발생: " + error);
+        }
     });
 });
 
@@ -213,15 +241,15 @@ function renderMyPage(data) {
 function showMemberInfoSection(memberData) {
     // [회원 정보] 이름, 연락처, 생년월일
     document.getElementById("editName").textContent     = memberData.name     || "-";
-    document.getElementById("editPhoneNum").textContent = memberData.phoneNum || "-";
-    document.getElementById("userEmailSpan").textContent = memberData.loginId || "-";
     document.getElementById("editBirth").textContent    = memberData.birth    || "-";
+    document.getElementById("phoneNumInput").value = memberData.phoneNum || "-";
+    document.getElementById("userEmailInput").value = memberData.loginId || "-";
 
-    // [주소] - zipCodeInput, addrMainInput, addrDetailInput
+    // [주소] - zipCodeInput, addressMainInput, addressDetailInput
     if (memberData.address) {
         document.getElementById("zipCodeInput").value    = memberData.address.zipCode       || "-";
-        document.getElementById("addrMainInput").value   = memberData.address.addressMain   || "-";
-        document.getElementById("addrDetailInput").value = memberData.address.addressDetail || "-";
+        document.getElementById("addressMainInput").value   = memberData.address.addressMain   || "-";
+        document.getElementById("addressDetailInput").value = memberData.address.addressDetail || "-";
     }
 
     // [마케팅/광고 알림 설정] -> marketingSection

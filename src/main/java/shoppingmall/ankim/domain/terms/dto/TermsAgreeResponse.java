@@ -4,11 +4,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 
 @Getter
 @NoArgsConstructor
 public class TermsAgreeResponse {
     private Long termsNo;
+    private Long terms_hist_no;
     private String name;
     private String contents;
     private int termsVersion;
@@ -17,8 +19,9 @@ public class TermsAgreeResponse {
     private Long parentsNo;// 부모 약관
 
     @Builder
-    public TermsAgreeResponse(Long termsNo, String name, String contents, int termsVersion, String agreeYn, Integer level, Long parentsNo) {
+    public TermsAgreeResponse(Long termsNo, Long terms_hist_no, String name, String contents, int termsVersion, String agreeYn, Integer level, Long parentsNo) {
         this.termsNo = termsNo;
+        this.terms_hist_no = terms_hist_no;
         this.name = name;
         this.contents = contents;
         this.termsVersion = termsVersion;
@@ -36,6 +39,19 @@ public class TermsAgreeResponse {
                 .agreeYn(agreeYn)
                 .level(terms.getLevel())
                 .parentsNo(terms.getParentTerms().getNo())
+                .build();
+    }
+
+    public static TermsAgreeResponse of(TermsHistory termshist, String agreeYn) {
+        return TermsAgreeResponse.builder()
+                .termsNo(termshist.getTerms().getNo())
+                .terms_hist_no(termshist.getNo())
+                .name(termshist.getTerms().getName())
+                .contents(termshist.getTerms().getContents())
+                .termsVersion(termshist.getTerms().getTermsVersion())
+                .agreeYn(agreeYn)
+                .level(termshist.getTerms().getLevel())
+                .parentsNo(termshist.getTerms().getParentTerms().getNo())
                 .build();
     }
 
