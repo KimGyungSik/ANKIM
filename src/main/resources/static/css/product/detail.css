@@ -542,6 +542,114 @@
     color: #777;
 }
 
+/* ✅ 선택한 옵션 컨테이너 */
+#selected-options {
+    margin-top: 10px;
+}
+
+/* ✅ 선택한 옵션 아이템 */
+.selected-option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid #ddd; /* 기본 회색 구분선 */
+}
+
+/* ✅ 첫 번째 아이템은 상단 구분선 제거 */
+.selected-option-item:first-child {
+    border-top: none;
+}
+
+/* ✅ 마지막 아이템(가장 최근 추가된 아이템)만 아래쪽에 검정색 굵은 구분선 적용 */
+.selected-option-item:last-child {
+    border-bottom: 2px solid black !important;
+}
+
+/* ✅ 옵션명, 수량, 가격, 삭제 버튼을 가로 정렬 */
+.item-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+}
+
+/* ✅ 수량 조절 버튼 컨테이너 */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    overflow: hidden;
+    height: 32px;
+}
+
+/* ✅ 수량 조절 버튼 */
+.quantity-controls button {
+    width: 30px;
+    height: 32px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 32px;
+}
+
+/* ✅ 수량 값 (중앙 정렬) */
+.quantity {
+    width: 40px;
+    text-align: center;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* ✅ X 버튼 (원형 스타일) */
+.remove-option {
+    width: 24px;
+    height: 24px;
+    border: none;
+    background-color: white;
+    color: #ff4d4f;
+    font-size: 16px;
+    font-weight: bold;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+}
+
+.remove-option:hover {
+    background-color: #ff4d4f;
+    color: white;
+}
+/* ✅ 총 상품 금액 컨테이너 */
+#total-price-container {
+    margin-top: 5px;
+    padding-top: 5px;
+    border-top: none; /* ✅ 불필요한 구분선 제거 */
+    display: flex;
+    justify-content: flex-end; /* ✅ 총 금액을 오른쪽으로 정렬 */
+    align-items: center;
+    font-size: 18px;
+    font-weight: bold;
+    color: black;
+}
+
+/* ✅ 총 상품 금액 강조 */
+#total-price-container .price {
+    font-size: 22px;
+    color: #ff4d4f;
+    font-weight: bold;
+    margin-left: 10px; /* ✅ 텍스트와 금액 간격 추가 */
+}
+
+
+
+
 
 
 

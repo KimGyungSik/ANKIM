@@ -354,8 +354,8 @@
                 <th:block th:each="group, iterStat : ${optionGroups}">
                     <div class="custom-dropdown" th:data-group-index="${iterStat.index}">
                         <!-- 선택된 옵션 그룹명 -->
-                        <div class="dropdown-selected">
-                            <span class="group-label" th:data-original-label="${group.groupName}">[[${group.groupName}]]</span>
+                        <div class="dropdown-selected" th:data-group-name="${group.groupName}">
+                            <span class="group-label">[[${group.groupName}]]</span>
                             <span class="dropdown-arrow">∨</span>
                         </div>
 
@@ -394,6 +394,9 @@
 
             <!-- ✅ 선택한 옵션을 출력할 영역 -->
             <div id="selected-options"></div>
+
+            <!-- ✅ 총 상품 금액을 표시할 영역 -->
+            <div id="total-price-container"></div>
 
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
@@ -549,8 +552,19 @@
                     }
 
                     function addSelectedItem() {
-                        const selectedValues = Object.values(selectedOptions);
-                        const formattedText = selectedValues.join(" - ");
+                        const selectedTexts = [];
+
+                        Object.keys(selectedOptions).forEach(index => {
+                            const dropdown = dropdowns[index];
+                            const selectedElement = dropdown.querySelector(".dropdown-selected span:first-child");
+                            if (selectedElement) {
+                                let optionText = selectedElement.innerText.trim();
+                                optionText = optionText.replace(/\(\+\s?[0-9,]+원\)/g, "").trim();
+                                selectedTexts.push(optionText);
+                            }
+                        });
+
+                        const formattedText = selectedTexts.join(" - ");
                         console.log(`✅ 최종 선택된 옵션: ${formattedText}`);
 
                         let matchedItem = findMatchingItem();
@@ -564,32 +578,101 @@
                         selectedItems.push({
                             text: formattedText,
                             price: totalPrice,
-                            itemId: matchedItem.itemId
+                            itemId: matchedItem.itemId,
+                            quantity: 1 // ✅ 기본 수량 1로 설정
                         });
 
                         renderSelectedOptions();
                     }
 
+
+
                     function renderSelectedOptions() {
-                        selectedOptionsContainer.innerHTML = selectedItems.map(item => `
-            <div class="selected-option-item" data-item-id="${item.itemId}">
+                        selectedOptionsContainer.innerHTML = selectedItems.map((item, index, array) => `
+        <div class="selected-option-item" data-item-id="${item.itemId}">
+            <div class="item-info">
                 <span>${item.text}</span>
-                <span class="option-price">총 가격: ${item.price.toLocaleString()}원</span>
-                <button class="remove-option">✖</button>
+                <div class="quantity-controls">
+                    <button class="quantity-decrease" data-item-id="${item.itemId}">−</button>
+                    <span class="quantity">${item.quantity}</span>
+                    <button class="quantity-increase" data-item-id="${item.itemId}">+</button>
+                </div>
+                <span class="option-price">${(item.price * item.quantity).toLocaleString()}원</span>
+                <button class="remove-option" data-item-id="${item.itemId}">✖</button>
             </div>
-        `).join("");
+        </div>
+    `).join("");
+
+                        updateTotalPrice(); // ✅ 총 상품 금액 업데이트
+
+                        // ✅ 첫 번째 아이템은 상단 구분선 제거
+                        document.querySelectorAll(".selected-option-item").forEach((item, index) => {
+                            if (index === 0) {
+                                item.style.borderTop = "none"; // ✅ 첫 번째 아이템은 상단 구분선 제거
+                            } else {
+                                item.style.borderTop = "1px solid #ddd"; // ✅ 두 번째부터는 얇은 회색 구분선
+                            }
+                        });
+
+                        // ✅ 마지막 아이템(최근 추가된 아이템)만 검정색 구분선 적용
+                        document.querySelectorAll(".selected-option-item").forEach((item, index, array) => {
+                            if (index === array.length - 1) {
+                                item.style.borderBottom = "2px solid black"; // ✅ 마지막 아이템 아래만 검정색 구분선
+                            } else {
+                                item.style.borderBottom = "1px solid #ddd"; // ✅ 기존 아이템들은 회색 구분선 유지
+                            }
+                        });
+
+                        // ✅ 수량 증가/감소 이벤트 추가
+                        document.querySelectorAll(".quantity-increase").forEach(button => {
+                            button.addEventListener("click", function () {
+                                let itemId = this.dataset.itemId;
+                                let item = selectedItems.find(item => item.itemId == itemId);
+                                if (item) {
+                                    item.quantity++;
+                                    renderSelectedOptions(); // ✅ 수량 증가 후 다시 렌더링
+                                }
+                            });
+                        });
+
+                        document.querySelectorAll(".quantity-decrease").forEach(button => {
+                            button.addEventListener("click", function () {
+                                let itemId = this.dataset.itemId;
+                                let item = selectedItems.find(item => item.itemId == itemId);
+                                if (item && item.quantity > 1) {
+                                    item.quantity--;
+                                    renderSelectedOptions(); // ✅ 수량 감소 후 다시 렌더링
+                                }
+                            });
+                        });
 
                         document.querySelectorAll(".remove-option").forEach(button => {
                             button.addEventListener("click", function () {
-                                let itemElement = this.closest(".selected-option-item");
-                                let itemId = itemElement.dataset.itemId;
-                                selectedItems = selectedItems.filter(item => item.itemId !== parseInt(itemId));
-                                itemElement.remove();
+                                let itemId = this.dataset.itemId;
+                                selectedItems = selectedItems.filter(item => item.itemId != itemId);
+                                renderSelectedOptions(); // ✅ 아이템 삭제 후 다시 렌더링
                             });
                         });
                     }
+
+                    function updateTotalPrice() {
+                        const totalPriceContainer = document.getElementById("total-price-container");
+                        let totalPrice = selectedItems.reduce((sum, item) => sum + (item.price * item.quantity), 0);
+
+                        if (selectedItems.length > 0) {
+                            totalPriceContainer.innerHTML = `
+            <div class="total-price">
+                총 상품 금액: <span class="price">${totalPrice.toLocaleString()}원</span>
+            </div>
+        `;
+                        } else {
+                            totalPriceContainer.innerHTML = ''; // ✅ 선택된 아이템이 없으면 총 상품 금액 숨김
+                        }
+                    }
+
+
                     function resetDropdowns() {
-                        console.log("🔄 모든 옵션 선택 완료, 드롭다운 초기화");
+                        console.log("🔄 [초기화] 옵션 선택 가능 상태 초기화");
 
                         selectedOptions = {}; // 선택한 옵션 초기화
                         filteredItems = []; // ✅ 필터링된 아이템 리스트도 초기화
@@ -598,26 +681,21 @@
                             dropdown.classList.add("disabled");
 
                             const selected = dropdown.querySelector(".dropdown-selected");
-                            const groupLabel = selected.querySelector(".group-label");
+                            let originalLabel = selected.getAttribute("data-group-name") || "옵션 그룹"; // ✅ 저장된 그룹명 불러오기
 
-                            if (groupLabel) {
-                                // ✅ Thymeleaf에서 설정한 원래 그룹명 가져오기
-                                const originalLabel = groupLabel.getAttribute("data-original-label");
-                                if (originalLabel) {
-                                    groupLabel.textContent = originalLabel; // **🔥 그룹명 복원 확실히 적용**
-                                }
-                            }
+                            console.log(`🔄 옵션 ${index} 초기화 → ${originalLabel}`);
+
+                            selected.innerHTML = `
+            <span class="group-label">${originalLabel}</span>
+            <span class="dropdown-arrow">∨</span>
+        `;
 
                             const optionsList = dropdown.querySelector(".dropdown-options");
                             optionsList.style.display = "none";
                         });
 
-                        dropdowns[0].classList.remove("disabled");
-
-                        // ✅ 선택된 옵션 리스트를 유지
-                        renderSelectedOptions();
+                        dropdowns[0].classList.remove("disabled"); // ✅ 첫 번째 옵션 그룹만 다시 활성화
                     }
-
                 });
             </script>
 
