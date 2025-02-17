@@ -6,7 +6,7 @@ INSERT INTO product (
     restock_available, review_count, search_keywords, sell_price, selling_status,
     ship_fee, view_count, wish_count
 ) VALUES (
-             NULL, 18,
+             4.5, 18,
              '* 교환 및 반품이 불가능한 경우 *
              - 고객님의 책임 있는 사유로 상품이 멸실 또는 훼손된 경우 (상품 내용 확인을 위한 포장 훼손 제외)
              - 포장을 개봉하거나 훼손하여 상품 가치가 상실된 경우
@@ -26,7 +26,7 @@ INSERT INTO product (
 
              17, NULL, 'Y', 'Y',
              '2025-02-12 22:11:46',
-             'TC5-TS03 체인티 (17 Color)', 'Y', 25500, NULL, 0, NULL, 'Y', NULL, NULL, 21165, 'SELLING', 0, NULL, NULL
+             'TC5-TS03 체인티 (17 Color)', 'Y', 25500, 100, 40, NULL, 'Y', 580, '#0000FF, #FF0000', 21165, 'SELLING', 0, 500, 100
          );
 
 -- 제품 이미지 데이터 삽입
@@ -50,10 +50,10 @@ INSERT INTO option_value (color_code, name, optg_no) VALUES
 
 -- 상품 아이템 삽입
 INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
-                                                                                                                                      (2000, '1962858-1', 40, 40, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (3000, '1962858-1', 40, 40, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
                                                                                                                                       (2000, '1962858-2', 40, 40, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (2000, '1962858-3', 40, 40, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (2000, '1962858-4', 40, 40, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
+                                                                                                                                      (1000, '1962858-3', 40, 40, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (5000, '1962858-4', 40, 40, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
 
 -- 아이템 옵션 연결
 INSERT INTO item_option (item_no, optv_no) VALUES

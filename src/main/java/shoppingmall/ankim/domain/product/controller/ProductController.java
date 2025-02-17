@@ -12,6 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
+import shoppingmall.ankim.domain.item.dto.ItemResponse;
+import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
+import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
 import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
@@ -19,7 +22,8 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 import shoppingmall.ankim.global.response.ApiResponse;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -36,14 +40,66 @@ public class ProductController {
 
     // 상품 상세 by User
     @GetMapping("/detail/{productId}")
-    public String findProductUserDetailResponse(@PathVariable("productId") Long productId,Model model) {
+    public String findProductUserDetailResponse(@PathVariable("productId") Long productId, Model model) {
+        // 상품 상세 정보 조회
         ProductResponse product = productRepository.findAdminProductDetailResponse(productId);
-        model.addAttribute("product",product);
-        // 둘다 CategoryResponse를 반환받음
-        model.addAttribute("middleCategoryName",categoryQueryService.findMiddleCategoryForSubCategory(product.getCategoryResponse().getCategoryNo()));
-        model.addAttribute("childCategoryName",product.getCategoryResponse().getName()); // BOTTOM, OUTER, TOP, OPS/SK
+        model.addAttribute("product", product);
+
+        // 카테고리 정보 저장
+        Long categoryNo = product.getCategoryResponse().getCategoryNo();
+        model.addAttribute("middleCategoryName", categoryQueryService.findMiddleCategoryForSubCategory(categoryNo));
+        model.addAttribute("childCategoryName", product.getCategoryResponse().getName());
+
+        // 옵션 그룹별 존재하는 옵션값만 저장할 Map
+        Map<String, List<OptionValueResponse>> itemMap = new HashMap<>();
+        Map<Long, List<ItemResponse>> optionItemMap = new HashMap<>();
+
+        // ✅ 상품에서 실제 사용된 옵션 그룹만 필터링
+        Set<Long> usedOptionGroupNos = product.getItems().stream()
+                .flatMap(item -> item.getOptionValues().stream())
+                .map(OptionValueResponse::getOptionGroupNo)
+                .collect(Collectors.toSet());
+
+        List<OptionGroupResponse> filteredOptionGroups = product.getOptionGroups().stream()
+                .filter(group -> usedOptionGroupNos.contains(group.getOptionGroupNo()))
+                .collect(Collectors.toList());
+
+        // ✅ 필터링된 옵션 그룹만 모델에 추가
+        model.addAttribute("optionGroups", filteredOptionGroups);
+
+        for (ItemResponse item : product.getItems()) {
+            for (OptionValueResponse optionValue : item.getOptionValues()) {
+                Long optionGroupNo = optionValue.getOptionGroupNo();
+                String groupName = filteredOptionGroups.stream()
+                        .filter(group -> group.getOptionGroupNo().equals(optionGroupNo))
+                        .map(OptionGroupResponse::getGroupName)
+                        .findFirst().orElse(null);
+
+                if (groupName != null) {
+                    // 옵션값을 그룹별로 저장 (중복 방지)
+                    itemMap.computeIfAbsent(groupName, k -> new ArrayList<>());
+                    if (itemMap.get(groupName).stream().noneMatch(o -> o.getOptionValueNo().equals(optionValue.getOptionValueNo()))) {
+                        itemMap.get(groupName).add(optionValue);
+                    }
+
+                    // 옵션값과 Item을 매핑 (추가금액 표시를 위함)
+                    optionItemMap.computeIfAbsent(optionValue.getOptionValueNo(), k -> new ArrayList<>()).add(item);
+                }
+            }
+        }
+
+        System.out.println("필터링된 옵션 그룹: " + filteredOptionGroups);
+        System.out.println("옵션 매핑 결과: " + itemMap);
+        System.out.println("옵션-아이템 매핑 결과: " + optionItemMap);
+
+        // Thymeleaf에서 사용하도록 모델에 추가
+        model.addAttribute("itemMap", itemMap);
+        model.addAttribute("optionItemMap", optionItemMap);
+
         return "/product/detail";
     }
+
+
 
     /**
      * 상품 리스트 UI 반환
