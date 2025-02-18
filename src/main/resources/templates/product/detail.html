@@ -398,6 +398,15 @@
             <!-- ✅ 총 상품 금액을 표시할 영역 -->
             <div id="total-price-container"></div>
 
+            <!-- ✅ 옵션 중복 모달 -->
+            <div id="duplicate-option-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <p>이미 선택된 옵션입니다.</p>
+                    <button id="modal-confirm">확인</button>
+                </div>
+            </div>
+
             <script>
                 document.addEventListener("DOMContentLoaded", function () {
                     console.log("✅ Script Loaded!");
@@ -591,13 +600,19 @@
                         selectedOptionsContainer.innerHTML = selectedItems.map((item, index, array) => `
         <div class="selected-option-item" data-item-id="${item.itemId}">
             <div class="item-info">
-                <span>${item.text}</span>
+                <span style="
+                    font-size: 15px;
+                    font-weight: 550;
+                ">${item.text}</span>
                 <div class="quantity-controls">
                     <button class="quantity-decrease" data-item-id="${item.itemId}">−</button>
                     <span class="quantity">${item.quantity}</span>
                     <button class="quantity-increase" data-item-id="${item.itemId}">+</button>
                 </div>
-                <span class="option-price">${(item.price * item.quantity).toLocaleString()}원</span>
+                <span class="option-price" style="
+                        font-size: 15px;
+                        font-weight: 550;
+                    ">${(item.price * item.quantity).toLocaleString()}원</span>
                 <button class="remove-option" data-item-id="${item.itemId}">✖</button>
             </div>
         </div>
@@ -662,7 +677,7 @@
                         if (selectedItems.length > 0) {
                             totalPriceContainer.innerHTML = `
             <div class="total-price">
-                총 상품 금액: <span class="price">${totalPrice.toLocaleString()}원</span>
+                총 상품 금액 <span class="price">${totalPrice.toLocaleString()}</span><span class="price2">원</span>
             </div>
         `;
                         } else {
@@ -696,6 +711,65 @@
 
                         dropdowns[0].classList.remove("disabled"); // ✅ 첫 번째 옵션 그룹만 다시 활성화
                     }
+
+                    // ✅ 모달 관련 요소
+                    const duplicateModal = document.getElementById("duplicate-option-modal");
+                    const closeModal = document.querySelector(".close-modal");
+                    const modalConfirm = document.getElementById("modal-confirm");
+
+// ✅ 모달 닫기 이벤트
+                    closeModal.addEventListener("click", () => {
+                        duplicateModal.style.display = "none";
+                    });
+                    modalConfirm.addEventListener("click", () => {
+                        duplicateModal.style.display = "none";
+                    });
+
+// ✅ 이미 선택된 아이템인지 확인하는 함수
+                    function isDuplicateItem(selectedTexts) {
+                        return selectedItems.some(item => item.text === selectedTexts);
+                    }
+
+// ✅ 선택한 아이템 추가 로직
+                    function addSelectedItem() {
+                        const selectedTexts = [];
+
+                        Object.keys(selectedOptions).forEach(index => {
+                            const dropdown = dropdowns[index];
+                            const selectedElement = dropdown.querySelector(".dropdown-selected span:first-child");
+                            if (selectedElement) {
+                                let optionText = selectedElement.innerText.trim();
+                                optionText = optionText.replace(/\(\+\s?[0-9,]+원\)/g, "").trim();
+                                selectedTexts.push(optionText);
+                            }
+                        });
+
+                        const formattedText = selectedTexts.join(" - ");
+                        console.log(`✅ 최종 선택된 옵션: ${formattedText}`);
+
+                        // ✅ 중복 확인 후 모달 띄우기
+                        if (isDuplicateItem(formattedText)) {
+                            duplicateModal.style.display = "block";
+                            return;
+                        }
+
+                        let matchedItem = findMatchingItem();
+                        if (!matchedItem) {
+                            console.warn("⚠️ 매칭되는 아이템을 찾을 수 없습니다.");
+                            return;
+                        }
+
+                        let totalPrice = productPrice + matchedItem.addPrice;
+
+                        selectedItems.push({
+                            text: formattedText,
+                            price: totalPrice,
+                            itemId: matchedItem.itemId,
+                            quantity: 1 // ✅ 기본 수량 1로 설정
+                        });
+
+                        renderSelectedOptions();
+                    }
                 });
             </script>
 
@@ -718,6 +792,9 @@
             wishlistIcon.addEventListener("click", function () {
                 this.classList.toggle("active");
             });
+
+
+
         });
     </script>
 </div>
