@@ -230,17 +230,12 @@
     font-size: 14px;
 }
 
-/*!* 비밀번호 변경 버튼 *!*/
-/*.btn-change-pw {*/
-/*    border: 1px solid #333;*/
-/*    background-color: #fff;*/
-/*    color: #333;*/
-/*    padding: 6px 12px;*/
-/*    cursor: pointer;*/
-/*    font-size: 14px;*/
-/*    border-radius: 4px;*/
-/*}*/
+.terms-group-title {
+    font-weight: bold;
+    margin-left: 20px; /* 들여쓰기 효과 */
+    margin-bottom: 5px;
+}
 
-/*.btn-change-pw:hover {*/
-/*    background-color: #f0f0f0;*/
-/*}*/
+.term-children {
+    margin-left: 30px; /* 자식 항목 들여쓰기 */
+}

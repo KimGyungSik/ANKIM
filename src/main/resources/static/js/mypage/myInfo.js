@@ -1,10 +1,16 @@
 import { fetchWithAccessToken } from '../utils/fetchUtils.js';
 import { execDaumPostcode } from '../utils/map.js';
 
+// 전역 변수 (파일 상단)
+let allTerms = [];
+let marketingStatus = {}; // { 부모약관의 termsNo: "Y" 또는 "N" }
+
+
 document.addEventListener("DOMContentLoaded", async () => {
     var passwordCheckSection = document.getElementById("passwordCheckSection");
     var infoEditSection = document.getElementById("infoEditSection");
-    var marketingSection = document.getElementById("marketingSection"); // 마케팅 섹션
+    var termsSection = document.getElementById("termsSection"); // 마케팅 섹션
+    // var termsSection = document.getElementById("termsSection"); // 약관 섹션
     var verifyPasswordBtn = document.getElementById("verifyPasswordBtn");
     var passwordToggleButton = document.querySelector(".password-toggle-button");
 
@@ -35,7 +41,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (response.code === 200 && response.data) {
             renderMyPage(response.data);         // 사이드바, 상단 등 공통 정보
             showMemberInfoSection(response.data); // 회원정보 수정 섹션(이름, 주소, 약관 등)
-            // renderTermsCheckboxes(response.data.agreedTerms); // 약관 정보
+
+            // 약관 트리 렌더링 (agreedTerms가 있을 경우)
+            if(response.data.agreedTerms) {
+                const termsTree = buildTermsTree(response.data.agreedTerms);
+                const termsContainer = termsSection;
+                // termsContainer가 존재할 때만 렌더링
+                if (termsContainer) {
+                    renderTermsTree(termsTree, termsContainer);
+                }
+            }
         } else {
             alert("데이터 전송실패");
             showModal(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
@@ -65,7 +80,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // 비밀번호 검증 성공 -> UI 변경
                 passwordCheckSection.style.display = "none";
                 infoEditSection.style.display = "block";
-                marketingSection.style.display = "block"; // 마케팅 섹션도 함께 표시
+                termsSection.style.display = "block"; // 마케팅 섹션도 함께 표시
             } else {
                 handleErrors(res.message || "비밀번호가 일치하지 않습니다.");
             }
@@ -251,20 +266,6 @@ function showMemberInfoSection(memberData) {
         document.getElementById("addressMainInput").value   = memberData.address.addressMain   || "-";
         document.getElementById("addressDetailInput").value = memberData.address.addressDetail || "-";
     }
-
-    // [마케팅/광고 알림 설정] -> marketingSection
-    // 기존에는 ul#termsList에 li로 표시했지만,
-    // 요구사항에 맞춰 체크박스 등으로 확장 가능
-    var termsList = document.getElementById("termsList");
-    termsList.innerHTML = "";
-    if (memberData.agreedTerms && Array.isArray(memberData.agreedTerms)) {
-        memberData.agreedTerms.forEach(term => {
-            // 간단히 li로 표시
-            var li = document.createElement("li");
-            li.textContent = `${term.name} (${term.agreeYn})`;
-            termsList.appendChild(li);
-        });
-    }
 }
 
 // 비밀번호 표시/숨기기 (기존 로직)
@@ -301,6 +302,241 @@ function toggleInputVisibility(targetInputId, buttonElement) {
     buttonElement.innerHTML = isPasswordVisible ? eyeIcon : crossedEyeIcon;
 }
 
+// === 약관 트리구조 만들기 함수 ===
+function buildTermsTree(termsList) {
+    const map = {};
+    termsList.forEach(t => {
+        // 각 항목에 children 배열 추가
+        map[t.termsNo] = { ...t, children: [] };
+    });
+
+    const roots = [];
+    // 부모-자식 연결
+    Object.values(map).forEach(node => {
+        if (map[node.parentsNo]) {
+            map[node.parentsNo].children.push(node);
+        } else {
+            roots.push(node);
+        }
+    });
+
+    // 부모 노드(자식이 있는 노드)의 동의 상태를 marketingStatus에 저장
+    Object.values(map).forEach(node => {
+        if (node.children && node.children.length > 0) {
+            // 자식이 있으면 광고성 동의 그룹이므로, 동의 상태 저장
+            marketingStatus[node.termsNo] = node.agreeYn; // 서버에서 받은 값 ("Y" 또는 "N")
+        }
+    });
+
+    return roots;
+}
+
+// [마케팅/광고 알림 설정] -> termsSection에 랜더링
+/*
+약관 트리를 렌더링할 때
+자식 노드가 있는 경우(광고성 동의 그룹)는 체크박스 없이 제목(라벨)과 설명을 표시하고,
+자식 노드가 없는 항목은 체크박스 + 라벨로 렌더링
+자식 항목을 렌더링할 때 부모의 termsNo 값을 dataset.marketingParent에 저장
+ */
+function renderTermsTree(roots, container) {
+    roots.forEach(node => {
+        if (node.children && node.children.length > 0) {
+            // 부모 노드: 체크박스 없이 그룹 제목과 설명 표시
+            const groupDiv = document.createElement("div");
+            groupDiv.className = "terms-parent";
+
+            const titleSpan = document.createElement("span");
+            titleSpan.className = "terms-parent-title";
+            titleSpan.textContent = `[선택] ${node.name} 동의`; // 디자인에 맞게 수정
+
+            const descDiv = document.createElement("div");
+            descDiv.className = "terms-parent-desc";
+            descDiv.innerText = "하위 항목 중 하나라도 동의하면 광고성 동의로 처리됩니다.";
+
+            groupDiv.appendChild(titleSpan);
+            groupDiv.appendChild(descDiv);
+            container.appendChild(groupDiv);
+
+            // 자식 항목은 별도의 컨테이너에 렌더링
+            const childContainer = document.createElement("div");
+            childContainer.className = "term-children";
+            node.children.forEach(child => {
+                renderLeafTerm(child, childContainer, node); // 부모 정보(node) 전달
+            });
+            container.appendChild(childContainer);
+        } else {
+            // 자식이 없는 항목: 단순 체크박스+라벨 렌더링
+            renderLeafTerm(node, container, null);
+        }
+    });
+}
+
+function renderLeafTerm(node, container, parentNode) {
+    const itemDiv = document.createElement("div");
+    itemDiv.className = "term-leaf-item";
+
+    const checkbox = document.createElement("input");
+    checkbox.type = "checkbox";
+    checkbox.id = `termsCheck_${node.termsNo}`;
+    checkbox.checked = (node.agreeYn === "Y");
+    checkbox.dataset.termsNo = node.termsNo;
+    // 만약 부모 노드가 있다면, 해당 parent's termsNo를 저장 (즉, 마케팅 동의를 위한 부모)
+    if (parentNode) {
+        checkbox.dataset.marketingParent = parentNode.termsNo;
+    }
+
+    const label = document.createElement("label");
+    label.htmlFor = checkbox.id;
+    label.textContent = node.name;
+
+    // 리프 항목에 대해서만 체크 이벤트를 등록 (부모는 체크박스가 없으므로)
+    checkbox.addEventListener("change", e => onLeafCheckboxChange(e, node));
+
+    itemDiv.appendChild(checkbox);
+    itemDiv.appendChild(label);
+    container.appendChild(itemDiv);
+}
+
+/*
+ * buildTermsTree()로 만든 트리 구조(루트 배열)에서
+ * 부모 노드로 사용되지 않고(자식 노드가 없는) 마케팅 약관을 찾아 반환
+ * 여기서는 예시로 level이 2인 항목을 마케팅 약관으로 가정
+ *
+ * nodes - buildTermsTree()의 결과(루트 노드 배열)
+ * returns {Object|null} - 마케팅 약관 노드 또는 null
+ */
+function findMarketingTermFromTree(nodes) {
+    for (const node of nodes) {
+        // 자식 노드가 없으면 leaf node입니다.
+        if (!node.children || node.children.length === 0) {
+            // 여기서 "마케팅 약관" 조건은
+            // (예: level이 2) 또는 다른 조건을 추가할 수 있습니다.
+            if (node.level === 2) {
+                return node;
+            }
+        } else {
+            // 자식 노드가 있으면, 재귀적으로 검색
+            const found = findMarketingTermFromTree(node.children);
+            if (found) return found;
+        }
+    }
+    return null;
+}
+
+async function onLeafCheckboxChange(e, node) {
+    const isChecked = e.target.checked;
+    const termsNo = node.termsNo;
+
+    if (isChecked) {
+        // 광고성 자식 항목 체크 시, 마케팅 약관이 체크되어 있는지 확인
+        if (needMarketingAgreement()) {  // 아래 함수 참고
+            openConfirmModal(
+                `${node.name} 동의 시 마케팅 약관도 함께 동의해야 합니다. 진행하시겠습니까?`,
+                async () => {
+                    // 모달 확인 클릭 시: 자식 항목 + 마케팅 약관 payload 구성
+                    const marketingTerm = findMarketingTermFromTree(buildTermsTree(allTerms));
+                    const payload = [
+                        { terms_no: termsNo, terms_hist_agreeYn: "Y" }
+                    ];
+                    if (marketingTerm) {
+                        payload.push({ terms_no: marketingTerm.termsNo, terms_hist_agreeYn: "Y" });
+                    }
+                    const res = await postTermsUpdate(payload);
+                    if (res.code === 200) {
+                        showAlertModal(res.data);
+                    } else {
+                        e.target.checked = false;
+                        showAlertModal(res.message || "동의 처리 실패");
+                    }
+                },
+                () => {
+                    // 모달 취소 시 체크 해제
+                    e.target.checked = false;
+                }
+            );
+        } else {
+            // 마케팅 약관이 이미 체크되어 있다면, 자식 항목만 전송
+            try {
+                const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "Y" }];
+                const res = await postTermsUpdate(payload);
+                if (res.code === 200) {
+                    showAlertModal(res.data);
+                } else {
+                    e.target.checked = false;
+                    showAlertModal("동의 처리 실패");
+                }
+            } catch (err) {
+                e.target.checked = false;
+                console.error(err);
+            }
+        }
+    } else {
+        // 체크 해제 시 바로 API 호출 (모달 없이)
+        try {
+            const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "N" }];
+            const res = await postTermsUpdate(payload);
+            if (res.code === 200) {
+                showAlertModal(res.data);
+            } else {
+                e.target.checked = true;
+                showAlertModal("해제 실패");
+            }
+        } catch (err) {
+            e.target.checked = true;
+            console.error(err);
+        }
+    }
+}
+
+async function postTermsUpdate(termsArray) {
+    // termsArray 예시:
+    // [ { terms_no:4, terms_hist_agreeYn:"Y" }, { terms_no:7, terms_hist_agreeYn:"Y" } ]
+    const res = await fetchWithAccessToken("/api/terms/update", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(termsArray),
+    });
+    return await res;
+}
+
+function needMarketingAgreement() {
+    const marketingTerm = findMarketingTermFromTree(buildTermsTree(allTerms));
+    if (!marketingTerm) return false;
+    const marketingCheckbox = document.getElementById(`termsCheck_${marketingTerm.termsNo}`);
+    return marketingCheckbox && !marketingCheckbox.checked;
+}
+
+function openConfirmModal(message, onConfirm, onCancel) {
+    const modal = document.getElementById("termsModal");
+    const modalMsg = document.getElementById("termsModalMessage");
+    const confirmBtn = document.getElementById("modalConfirmBtn");
+    const cancelBtn = document.getElementById("modalCancelBtn");
+
+    modalMsg.textContent = message;
+    modal.style.display = "block";
+
+    // 기존 이벤트 리스너 제거
+    confirmBtn.onclick = null;
+    cancelBtn.onclick = null;
+
+    confirmBtn.onclick = () => {
+        modal.style.display = "none";
+        if (onConfirm) onConfirm();
+    };
+    cancelBtn.onclick = () => {
+        modal.style.display = "none";
+        if (onCancel) onCancel();
+    };
+}
+
+function showAlertModal(message) {
+    if(message.message != null) {
+        alert(message.message + "\n" +message.date + "\n" + message.sender);
+    } else {
+        alert(message);
+    }
+}
+
 // 모달 표시 함수 (기존)
 function showModal(message) {
     var modal = document.querySelector('.modal');
@@ -308,10 +544,12 @@ function showModal(message) {
     modalBody.textContent = message;
     modal.style.display = "flex";
 }
+
 function closeModal() {
     var modal = document.querySelector('.modal');
     modal.style.display = 'none';
 }
+
 function handleErrors(errorData) {
     document.querySelectorAll('.error-message').forEach(e => e.textContent = '');
     var confirmError = document.getElementById('passwordError');
