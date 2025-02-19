@@ -18,22 +18,24 @@ public class ApiResponse<T> {
     private final String message;
     private final List<FieldError> fieldErrors;
     private final T data;
+    private final boolean isJwtError;
 
     @Builder
-    public ApiResponse(HttpStatus status, String message, List<FieldError> fieldErrors, T data) {
+    public ApiResponse(HttpStatus status, String message, List<FieldError> fieldErrors, T data, boolean isJwtError) {
         this.code = status.value();
         this.status = status;
         this.message = message;
         this.fieldErrors = fieldErrors;
         this.data = data;
+        this.isJwtError = isJwtError;
     }
 
     public static <T> ApiResponse<T> of(HttpStatus httpStatus,String message, List<FieldError> fieldErrors, T data) {
-        return new ApiResponse<>(httpStatus, message,fieldErrors,data);
+        return new ApiResponse<>(httpStatus, message,fieldErrors,data, false);
     }
     public static <T> ApiResponse<T> of(BindingResult bindingResult) {
         List<FieldError> fieldErrors = FieldError.of(bindingResult);
-        return new ApiResponse<>(HttpStatus.BAD_REQUEST, "Validation failed", fieldErrors, null);
+        return new ApiResponse<>(HttpStatus.BAD_REQUEST, "Validation failed", fieldErrors, null, false);
     }
     public static <T> ApiResponse<T> of(HttpStatus httpStatus, T data) {
         return of(httpStatus, httpStatus.name(),null, data);
@@ -41,17 +43,18 @@ public class ApiResponse<T> {
     public static <T> ApiResponse<T> ok(T data) {
         return of(HttpStatus.OK, data);
     }
+
     public static ApiResponse<Void> ok() {
-        return new ApiResponse<>(HttpStatus.OK, "OK", null, null);
+        return new ApiResponse<>(HttpStatus.OK, "OK", null, null, false);
     }
 
     // ErrorCode를 받아 ApiResponse 생성
     public static <T> ApiResponse<T> of(ErrorCode errorCode) {
-        return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null, null);
+        return new ApiResponse<>(errorCode.getHttpStatus(), errorCode.getMessage(), null, null, errorCode.isJwtError());
     }
 
     public static <T> ApiResponse<T> ok(HttpStatus httpStatus, String message) {
-        return new ApiResponse<>(httpStatus, message, null, null);
+        return new ApiResponse<>(httpStatus, message, null, null, false);
     }
 
     @Getter
@@ -86,6 +89,7 @@ public class ApiResponse<T> {
                         .message(errorCode.getMessage())
                         .data(null)
                         .fieldErrors(null)
+                        .isJwtError(errorCode.isJwtError())
                         .build());
     }
 }

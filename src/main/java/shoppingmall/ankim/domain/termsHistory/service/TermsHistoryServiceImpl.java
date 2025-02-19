@@ -50,9 +50,9 @@ public class TermsHistoryServiceImpl implements TermsHistoryService {
     * 4. 동의 이력이 있으면
     *    - 기존 이력을 업데이트 -> 비활성화 상태로
     *    - terms_history에 새롭게 동의한 내용 insert
-    * 5. 현재 동의한 약관 레벨이 4인 경우
-    *    - 4레벨의 동의내역이 전부 동의인 경우 3레벨도 동의한 것으로 변경
-    *    - 4레벨의 동의내역 하나라도 동의를 철회한 경우 3레벨도 동의 철회한 것으로 변경
+    * 5. 현재 동의한 약관 레벨이 3인 경우
+    *    - 3레벨의 동의내역이 전부 동의인 경우 2레벨도 동의한 것으로 변경
+    *    - 3레벨의 동의내역 하나라도 동의를 철회한 경우 2레벨도 동의 철회한 것으로 변경
     * */
     @Override
     public TermsHistoryUpdateResponse updateTermsAgreement(String loginId, List<TermsUpdateServiceRequest> requestList) {
@@ -98,11 +98,11 @@ public class TermsHistoryServiceImpl implements TermsHistoryService {
             }
             TermsHistory parentHistory;
 
-            // 현재 동의한 약관 레벨이 4인 경우
-            if (terms.getLevel() == 4 && request.getTerms_hist_agreeYn().equals("N")) { // 약관레벨이 4이고 약관동의를 철회한 경우
+            // 현재 동의한 약관 레벨이 3인 경우
+            if (terms.getLevel() == 3 && request.getTerms_hist_agreeYn().equals("N")) { // 약관레벨이 3이고 약관동의를 철회한 경우
                 parentHistory = request.toEntity(member, parentTerms, now);
                 termsHistoryRepository.save(parentHistory);
-            } else if (terms.getLevel() == 4) { // 약관 레벨이 4이고 부모 약관이 같은 것들 모두 동의한 상태라면(광고성 동의)
+            } else if (terms.getLevel() == 3) { // 약관 레벨이 3이고 부모 약관이 같은 것들 모두 동의한 상태라면(광고성 동의)
                 boolean allSubTermsAgreed = termsRepository.findAllSubTerms(parentTerms.getNo())
                         .stream()
                         .allMatch(subTerm -> termsHistoryRepository.isAgreed(member.getNo(), subTerm.getNo()));

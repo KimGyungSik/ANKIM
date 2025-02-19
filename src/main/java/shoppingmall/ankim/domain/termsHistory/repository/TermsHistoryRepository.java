@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import shoppingmall.ankim.domain.terms.entity.Terms;
+import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.termsHistory.entity.TermsHistory;
 import shoppingmall.ankim.domain.termsHistory.repository.query.TermsHistoryQueryRepository;
 
@@ -41,4 +42,6 @@ public interface TermsHistoryRepository extends JpaRepository<TermsHistory, Long
             "AND th.terms.no = :termsNo")
     Optional<TermsHistory> findActiveByMemberAndTerms(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
 
+    @Query("SELECT th FROM TermsHistory th JOIN FETCH th.terms t WHERE th.member.no = :memberNo AND t.category = :category")
+    List<TermsHistory> findAgreedJoinByMember(@Param("memberNo") Long memberNo, @Param("category") TermsCategory category);
 }

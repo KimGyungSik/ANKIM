@@ -1,0 +1,168 @@
+/* Reset */
+body, h1, p, ul, li, label, input, button, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* Body 설정 */
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.5;
+    background-color: #ffffff;
+}
+
+/* 헤더 설정 */
+header {
+    background-color: #f8f8f8;
+    padding: 10px 0;
+}
+
+header nav ul {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+header nav ul li a {
+    text-decoration: none;
+    color: #333;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* 메인 */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 70vh;
+}
+
+.terms-container {
+    width: 50vw;
+    max-width: 400px;
+    padding: 20px;
+}
+
+.terms-title {
+    font-size: 24px;
+    text-align: center;
+    margin-bottom: 30px;
+    color: #333;
+}
+
+.terms-all {
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.terms-all label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 14px;
+}
+
+.terms-all p {
+    font-size: 12px;
+    color: #555;
+    margin-top: 5px;
+}
+
+.terms-list {
+    list-style: none;
+    margin: 20px 0;
+    font-size: 12px;
+}
+
+.terms-list li {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.details-link {
+    color: #007aff;
+    font-size: 12px;
+    cursor: pointer;
+}
+
+.details-link:hover {
+    text-decoration: underline;
+}
+
+.terms-footer p {
+    text-align: left;
+    font-size: 12px;
+    color: #555;
+}
+
+.submit-button {
+    margin-top: 20px;
+    width: 100%; /* 버튼이 가로 너비를 꽉 채우도록 설정 */
+    padding: 15px; /* 버튼 높이 증가 */
+    background-color: #ddd; /* 기본 비활성화 색상 */
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: not-allowed; /* 비활성 상태에서 커서 변경 */
+    text-align: center; /* 텍스트 가운데 정렬 */
+}
+
+.submit-button.active {
+    background-color: #000; /* 활성화 상태의 색상 */
+    cursor: pointer;
+}
+
+.error-message {
+    color: red;
+    font-size: 12px;
+    margin-top: 5px;
+    display: none; /* 기본적으로 숨김 */
+}
+
+/* Modal 스타일 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    top: 50%; /* 화면의 가운데 */
+    left: 50%; /* 화면의 가운데 */
+    transform: translate(-50%, -50%); /* 가운데 정렬 */
+    width: 100%; /* 화면 전체 크기 */
+    height: 100%; /* 화면 전체 크기 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 요소보다 위에 표시 */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%; /* 모달의 가로 크기 */
+    max-width: 500px; /* 최대 크기 */
+    position: relative;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+hr {
+    height : 3px;
+    background-color: #000;
+}

@@ -50,10 +50,10 @@ INSERT INTO option_value (color_code, name, optg_no) VALUES
 
 -- 상품 아이템 삽입
 INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
-                                                                                                                                      (3000, '1962858-1', 40, 40, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (2000, '1962858-2', 40, 40, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (1000, '1962858-3', 40, 40, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (5000, '1962858-4', 40, 40, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
+                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
 
 -- 아이템 옵션 연결
 INSERT INTO item_option (item_no, optv_no) VALUES
@@ -124,37 +124,37 @@ INSERT INTO item_option (item_no, optv_no) VALUES
 --                                                                                           ('cotton-tshirt-detail.jpg', '면 티셔츠 상세', 'http://example.com/images/cotton-tshirt-detail.jpg', 'N', 1, 3);
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 'v1', 1, 'Y');
---
--- -- 필수 약관
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 'v1', 2, 'Y');
---
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 'v1', 2, 'Y');
---
--- -- 선택 약관
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적으로 개인정보를 수집 및 이용하는 것에 대한 동의입니다.', 'N', 'v1', 2, 'Y');
---
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (4, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 3, 'Y');
---
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
---
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 'v1', 4, 'Y');
---
--- -- [ 주문/결제 약관 삽입 ]
--- INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
--- VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 'v1', 1, 'Y');
---
--- -- [ 회원 삽입 ]
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 1, 1, 'Y');
+
+-- 필수 약관
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 1, 2, 'Y');
+
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 1, 2, 'Y');
+
+-- 선택 약관
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 1, 2, 'Y');
+
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 2, 'Y');
+
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
+
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
+
+-- [ 주문/결제 약관 삽입 ]
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 1, 1, 'Y');
+
+-- [ 회원 삽입 ]
 INSERT INTO member (
     login_id,
-    pwd,
+    password,
     name,
     phone_num,
     birth,
@@ -173,12 +173,16 @@ INSERT INTO member (
              '2024-11-18T23:59:59',     -- join_date (현재 시간)
              'ACTIVE'                   -- status
          );
---
--- -- 탈퇴사유
--- INSERT INTO leave_rsn (reason, active_yn) VALUES
---                                               ('탈퇴 후 재가입을 위해서', 'Y'),
---                                               ('사고 싶은 상품이 없어서', 'Y'),
---                                               ('자주 이용하지 않아서', 'Y'),
---                                               ('서비스 및 고객지원이 만족스럽지 않아서', 'Y'),
---                                               ('광고성 알림이 너무 많이 와서', 'Y'),
---                                               ('기타', 'Y');
+
+-- [ 회원 주소 삽입]
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
+
+-- 탈퇴사유
+INSERT INTO leave_rsn (reason, active_yn) VALUES
+                                              ('탈퇴 후 재가입을 위해서', 'Y'),
+                                              ('사고 싶은 상품이 없어서', 'Y'),
+                                              ('자주 이용하지 않아서', 'Y'),
+                                              ('서비스 및 고객지원이 만족스럽지 않아서', 'Y'),
+                                              ('광고성 알림이 너무 많이 와서', 'Y'),
+                                              ('기타', 'Y');

@@ -25,6 +25,4 @@ class TermsRepositoryTest {
     @Autowired
     private TermsRepository termsRepository;
 
-
-
 }

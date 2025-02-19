@@ -89,6 +89,7 @@ public enum ErrorCode {
     INVALID_CURRENT_PASSWORD(HttpStatus.BAD_REQUEST,"현재 비밀번호를 정확히 입력하세요."),
     PASSWORD_CONFIRMATION_MISMATCH(HttpStatus.BAD_REQUEST, "새로운 비밀번호가 일치하지 않습니다."),
     PASSWORD_SAME_AS_OLD(HttpStatus.BAD_REQUEST, "현재와 다른 비밀번호를 입력해주시기 바랍니다."),
+    INVALID_MAIL_ID(HttpStatus.BAD_REQUEST, "아이디가 입력되지 않았습니다."),
     DUPLICATE_MAIL_VERIFICATION_REQUEST(HttpStatus.BAD_REQUEST, "이메일 인증이 진행 중 입니다. 잠시 후 다시 시도해주세요."),
     TOO_MANY_MAIL_CODE_REQUESTS(HttpStatus.TOO_MANY_REQUESTS, "요청이 너무 많습니다. 잠시 후 다시 시도해주세요."),
     MAIL_VERIFICATION_NOT_COMPLETED(HttpStatus.BAD_REQUEST, "이메일 인증이 완료되지 않았습니다."),
@@ -101,12 +102,16 @@ public enum ErrorCode {
     ADDRESS_REGISTER_ERROR(HttpStatus.INTERNAL_SERVER_ERROR, "주소 등록 중 에러가 발생했습니다."),
 
     // Token 관련 에러 코드
-    ACCESS_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Access Token이 요청에 포함되지 않았습니다."),
-    REFRESH_TOKEN_NOT_FOUND(HttpStatus.BAD_REQUEST, "Refresh Token이 요청에 포함되지 않았습니다."),
-    REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다."),
-    INVALID_REFRESH_TOKEN(HttpStatus.BAD_REQUEST, "유효하지 않은 Refresh Token입니다."),
-    TOKEN_REISSUE_FAILED(HttpStatus.BAD_REQUEST, "Token 재발급 중 오류가 발생했습니다."),
-    TOKEN_VALIDATION_ERROR(HttpStatus.BAD_REQUEST,"유효하지 않은 토큰 입니다."),
+    ACCESS_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Access Token이 요청에 포함되지 않았습니다.", true),
+    REFRESH_TOKEN_NOT_FOUND(HttpStatus.FORBIDDEN, "Refresh Token이 요청에 포함되지 않았습니다.", true),
+    REFRESH_TOKEN_EXPIRED(HttpStatus.BAD_REQUEST, "Refresh Token이 만료되었습니다.", true),
+    INVALID_REFRESH_TOKEN(HttpStatus.FORBIDDEN, "유효하지 않은 Refresh Token입니다.", true),
+    TOKEN_REISSUE_FAILED(HttpStatus.INTERNAL_SERVER_ERROR, "Token 재발급 중 오류가 발생했습니다.", true),
+    TOKEN_VALIDATION_ERROR(HttpStatus.FORBIDDEN,"유효하지 않은 토큰 입니다.", true),
+    INVALID_JWT_SIGNATURE(HttpStatus.FORBIDDEN, "잘못된 JWT 서명입니다.", true),
+    EXPIRED_JWT_TOKEN(HttpStatus.UNAUTHORIZED, "만료된 JWT 토큰입니다.", true),
+    UNSUPPORTED_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "지원되지 않는 JWT 토큰입니다.", true),
+    INVALID_JWT_TOKEN(HttpStatus.UNSUPPORTED_MEDIA_TYPE, "잘못된 JWT 토큰입니다.", true),
 
     // 쿠키 관련 에러 코드
     COOKIE_NOT_INCLUDED(HttpStatus.BAD_REQUEST, "쿠키가 요청에 포함되어 있지 않습니다."),
@@ -126,8 +131,19 @@ public enum ErrorCode {
 
     private final String message;
 
+    // JWT 관련 여부 추가
+    private final boolean isJwtError;
+
     ErrorCode(HttpStatus httpStatus, String message) {
         this.httpStatus = httpStatus;
         this.message = message;
+        this.isJwtError = false; // 기본값 false (JWT 관련 에러 아님)
+    }
+
+    // JWT 관련 에러를 구분하기 위한 생성자 추가
+    ErrorCode(HttpStatus httpStatus, String message, boolean isJwtError) {
+        this.httpStatus = httpStatus;
+        this.message = message;
+        this.isJwtError = isJwtError;
     }
 }

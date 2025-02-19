@@ -61,7 +61,7 @@ class MemberServiceTest {
         // given
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -93,7 +93,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -106,7 +107,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("나이 약관")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -118,7 +120,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -130,7 +133,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -142,7 +146,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -154,7 +159,8 @@ class MemberServiceTest {
                 .category(category)
                 .contents("광고성 이메일 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn("Y")
                 .build();
@@ -166,7 +172,8 @@ class MemberServiceTest {
                 .category(TermsCategory.ORDER)
                 .contents("ANKIM 주문결제 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -192,7 +199,7 @@ class MemberServiceTest {
         // 회원 정보
         MemberRegisterServiceRequest request = MemberRegisterServiceRequest.builder()
                 .loginId("test@example.com")
-                .pwd("ValidPassword123!")
+                .password("ValidPassword123!")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -205,12 +212,12 @@ class MemberServiceTest {
         // then
         Member savedMember = memberRepository.findById(memberResponse.getNo()).orElse(null);
 
-        System.out.println("savedMember.getPwd() = " + savedMember.getPwd());
+        System.out.println("savedMember.getPwd() = " + savedMember.getPassword());
 
         assertThat(savedMember).isNotNull();
         assertThat(savedMember.getName()).isEqualTo("홍길동");
         assertThat(savedMember.getPhoneNum()).isEqualTo("010-1234-5678");
-        assertThat(bCryptPasswordEncoder.matches("ValidPassword123!", savedMember.getPwd())).isTrue();
+        assertThat(bCryptPasswordEncoder.matches("ValidPassword123!", savedMember.getPassword())).isTrue();
     }
 
 }

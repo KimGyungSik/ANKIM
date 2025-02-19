@@ -13,12 +13,12 @@ public class LoginController {
 
     @GetMapping("/member")
     public String loginMember() {
-        return "loginFormMember"; // 사용자 로그인 선택 페이지
+        return "login/loginFormMember"; // 사용자 로그인 선택 페이지
     }
 
     @GetMapping("/email")
     public String loginEmail(Model model) {
-        return "loginEmail"; // 사용자 이메일 로그인 페이지
+        return "login/loginEmail"; // 사용자 이메일 로그인 페이지
     }
 
     @GetMapping("/admin")

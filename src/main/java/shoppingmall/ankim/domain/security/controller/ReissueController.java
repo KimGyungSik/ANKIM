@@ -4,6 +4,7 @@ import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +17,7 @@ import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 public class ReissueController {
@@ -23,10 +25,11 @@ public class ReissueController {
     private final ReissueService reissueService;
 
     @Value("${jwt.refresh.token.expire.time}")
-    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간(자동 로그인 X)
+    private long REFRESH_TOKEN_EXPIRE_TIME; // 토큰 만료시간
 
     @PostMapping("/reissue")
     public ApiResponse<?> reissue(HttpServletRequest request, HttpServletResponse response) {
+        System.out.println("재발행 컨트롤러 ReissueController = ");
         // 헤더에서 Access Token 추출
         String access = request.getHeader("access");
 
@@ -56,7 +59,6 @@ public class ReissueController {
 
             // Redis에서 access 토큰으로 refresh 토큰 추출 및 검증
             String refreshRedis = reissueService.validateRefreshToken(access);
-
             // 쿠키에서 꺼낸 refresh와 redis에서 꺼낸 refresh 비교
             if(!refreshCookie.equals(refreshRedis)){
                 return ApiResponse.of(INVALID_REFRESH_TOKEN); // 일치하지 않으면 동일한 사용자가 아님
@@ -65,13 +67,14 @@ public class ReissueController {
             // 새로운 Access Token 재발급
             Map<String, String> token = reissueService.reissueToken(access, refreshRedis);
             String newAccess = token.get("access");
-            String newRefresh = token.get("refreshRedis");
+            String newRefresh = token.get("refresh");
 
             // 응답 헤더에 Access Token 추가
             response.setHeader("access", newAccess);
+//            response.setHeader("Access-Control-Expose-Headers", "access"); // CORS 허용
             // 쿠키에 Refresh Token 추가
-            response.addCookie(createCookie("refreshRedis", newRefresh));
-
+            response.addCookie(createCookie("refresh", newRefresh));
+            log.info("토큰 재발급 완료");
             return ApiResponse.ok("토큰 재발급 완료");
         } catch (JwtTokenException e) {
             return ApiResponse.of(e.getErrorCode());
@@ -85,7 +88,7 @@ public class ReissueController {
         // 쿠키 설정
         cookie.setMaxAge((int) REFRESH_TOKEN_EXPIRE_TIME / 1000); // 쿠키 유효 시간 설정
         // cookie.setSecure(true); // https 통신시 사용
-        // cookie.setPath("/"); // cookie 적용 범위
+        cookie.setPath("/"); // cookie 적용 범위
         cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
         return cookie;
     }

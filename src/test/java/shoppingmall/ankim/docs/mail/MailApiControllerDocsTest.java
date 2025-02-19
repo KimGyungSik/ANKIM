@@ -39,7 +39,7 @@ public class MailApiControllerDocsTest extends RestDocsSupport {
     @Test
     public void sendMail() throws Exception {
         // given
-        Mockito.doNothing().when(mailService).sendMail(any());
+        Mockito.doAnswer(invocation -> null).when(mailService).sendMail(any());
         String loginId = "test@example.com";
 
         // when & then
@@ -58,7 +58,8 @@ public class MailApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터")
+                                fieldWithPath("data").description("응답 데이터"),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -93,7 +94,8 @@ public class MailApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.STRING)
+                                fieldWithPath("data").description("응답 데이터").optional().type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }

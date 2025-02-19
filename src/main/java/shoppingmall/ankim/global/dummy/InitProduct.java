@@ -148,7 +148,7 @@ public class InitProduct {
         public static Member createMember(EntityManager entityManager, String loginId) {
             Member member = Member.builder()
                     .loginId(loginId)
-                    .pwd("password")
+                    .password("password")
                     .name("홍길동")
                     .phoneNum("010-1234-5678")
                     .birth(LocalDate.of(1990, 1, 1))

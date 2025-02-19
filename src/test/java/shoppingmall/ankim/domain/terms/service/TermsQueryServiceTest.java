@@ -70,7 +70,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn("Y")
                 .build();
@@ -82,7 +83,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -94,7 +96,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn("Y")
                 .build();
@@ -127,7 +130,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn(activeYn)
                 .build();
@@ -140,7 +144,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn(activeYn)
                 .build();
@@ -152,7 +157,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn(activeYn)
                 .build();
@@ -165,7 +171,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn(activeYn)
                 .build();
@@ -215,7 +222,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("ANKIM 회원가입 약관")
                 .termsYn("N")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(1)
                 .activeYn(activeYn)
                 .build();
@@ -228,7 +236,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("만 14세 이상")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn(activeYn)
                 .build();
@@ -240,7 +249,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("광고성 연락 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(2)
                 .activeYn(activeYn)
                 .build();
@@ -253,7 +263,8 @@ class TermsQueryServiceTest {
                 .category(category)
                 .contents("광고성 문자 수신 동의")
                 .termsYn("Y")
-                .termsVersion("v1")
+//                .termsVersion("v1")
+                .termsVersion(1)
                 .level(3)
                 .activeYn(activeYn)
                 .build();

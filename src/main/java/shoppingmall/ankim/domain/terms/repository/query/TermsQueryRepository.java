@@ -12,4 +12,5 @@ public interface TermsQueryRepository {
     List<Terms> findSubTermsForParent(Long parentNo, Integer level, String activeYn);
     List<Terms> findSubTermsIncludingParent(Long parentNo, Integer level, String activeYn);
     List<Terms> findAllSubTermsIncludingParent(Long parentNo, String activeYn);
+    List<Terms> findLatestTerms(TermsCategory category, String activeYn);
 }

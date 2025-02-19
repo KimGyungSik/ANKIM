@@ -22,7 +22,7 @@ public class MemberRegisterRequest {
             regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,20}$",
             message = "비밀번호는 8~20자 이내의 영문 대소문자, 숫자, 특수문자를 포함해야 합니다."
     )
-    private String pwd; // 비밀번호
+    private String password; // 비밀번호
 
     @NotBlank(message = "이름을 입력해주세요.")
     @Pattern(
@@ -50,9 +50,9 @@ public class MemberRegisterRequest {
     private String gender; // 성별 (남자 M, 여자 F)
 
     @Builder
-    public MemberRegisterRequest(String loginId, String pwd, String name, String phoneNum, LocalDate birth, String gender) {
+    public MemberRegisterRequest(String loginId, String password, String name, String phoneNum, LocalDate birth, String gender) {
         this.loginId = loginId;
-        this.pwd = pwd;
+        this.password = password;
         this.name = name;
         this.phoneNum = phoneNum;
         this.birth = birth;
@@ -63,7 +63,7 @@ public class MemberRegisterRequest {
     public MemberRegisterServiceRequest toServiceRequest() {
         return MemberRegisterServiceRequest.builder()
                 .loginId(this.loginId)
-                .pwd(this.pwd)
+                .password(this.password)
                 .name(this.name)
                 .phoneNum(this.phoneNum)
                 .birth(this.birth)

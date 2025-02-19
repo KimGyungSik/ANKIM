@@ -6,10 +6,15 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import shoppingmall.ankim.domain.security.dto.CustomUserDetails;
+import shoppingmall.ankim.domain.security.exception.JwtTokenException;
 
 import java.nio.charset.StandardCharsets;
 import java.security.Key;
 import java.util.Date;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
+import static shoppingmall.ankim.global.exception.ErrorCode.EXPIRED_JWT_TOKEN;
+import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_JWT_SIGNATURE;
 
 // Jwt 토큰 생성, 인증, 권한 부여, 유효성 검사, pk 추출 등 기능 제공
 @Slf4j
@@ -59,24 +64,24 @@ public class JwtTokenProvider {
     }
 
     // Token 유효 여부 검증
-    public boolean isTokenValidate(String token) {
+    public void isTokenValidate(String token) {
         try {
-            // SecretKey를 사용하여 JWT를 파싱하고 검증
             Jwts.parser()
-                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8))) // SecretKey 생성 및 설정
+                    .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
                     .build()
-                    .parseSignedClaims(token); // 토큰 파싱 및 검증
-            return true;
-        } catch (SecurityException | MalformedJwtException e) {
-            log.info("잘못된 JWT 서명입니다.");
+                    .parseSignedClaims(token);
         } catch (ExpiredJwtException e) {
-            log.info("만료된 JWT 토큰입니다.");
+            throw new JwtTokenException(EXPIRED_JWT_TOKEN);
+        } catch (SecurityException | MalformedJwtException e) {
+            log.error("잘못된 JWT 서명입니다.");
+            throw new JwtTokenException(INVALID_JWT_SIGNATURE);
         } catch (UnsupportedJwtException e) {
-            log.info("지원되지 않는 JWT 토큰입니다.");
+            log.error("지원되지 않는 JWT 토큰입니다.");
+            throw new JwtTokenException(UNSUPPORTED_JWT_TOKEN);
         } catch (IllegalArgumentException e) {
-            log.info("JWT 토큰이 잘못되었습니다.");
+            log.error("JWT 토큰이 잘못되었습니다.");
+            throw new JwtTokenException(INVALID_JWT_TOKEN);
         }
-        return false; // 유효하지 않은 경우 false 반환
     }
 
     // Token 만료 여부 검증
@@ -121,5 +126,17 @@ public class JwtTokenProvider {
 
         // 클레임에서 "category" 값을 추출
         return claims.get("roles", String.class);
+    }
+
+    // Token의 만료 시간을 추출하는 메서드
+    public long getExpirationTimeFromToken(String token) {
+        Claims claims = Jwts.parser()
+                .verifyWith(Keys.hmacShaKeyFor(secretKey.getBytes(StandardCharsets.UTF_8)))
+                .build()
+                .parseSignedClaims(token)
+                .getPayload();
+
+        Date expiration = claims.getExpiration();
+        return expiration.getTime() - System.currentTimeMillis(); // 남은 만료 시간(ms)
     }
 }

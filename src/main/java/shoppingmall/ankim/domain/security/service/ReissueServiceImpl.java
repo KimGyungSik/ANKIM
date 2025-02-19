@@ -37,7 +37,8 @@ public class ReissueServiceImpl implements ReissueService {
         try {
             jwtTokenProvider.isTokenExpired(refresh);
         } catch (ExpiredJwtException e) {
-            // FIXME Refresh 토큰이 만료된 경우 로그아웃 또는 재인증 요청
+            // FIXME Refresh 토큰이 만료된 경우 로그아웃 요청
+            log.info("Refresh Token Expired");
             redisHandler.delete(access); // Refresh Token이 만료되었으므로 Redis에서 해당 데이터를 삭제
             throw new JwtTokenException(REFRESH_TOKEN_EXPIRED);
         }
@@ -59,7 +60,7 @@ public class ReissueServiceImpl implements ReissueService {
             // Member 엔티티 생성
             Member member = Member.builder()
                     .loginId(username)
-                    .pwd("tempPassword") // 가짜 비밀번호
+                    .password("tempPassword") // 가짜 비밀번호
                     .build();
 
             // UserDetails에 Member 엔티티 담기
@@ -89,6 +90,7 @@ public class ReissueServiceImpl implements ReissueService {
     @Override
     public void isAccessTokenExist(String accessToken) {
         boolean isExist = redisHandler.exists(accessToken);
+        System.out.println("isExist = " + isExist);
         if (!isExist) {
             throw new JwtTokenException(ACCESS_TOKEN_NOT_FOUND);
         }

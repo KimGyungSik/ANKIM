@@ -13,6 +13,9 @@ public interface TermsRepository extends JpaRepository<Terms, Long>, TermsQueryR
     @Query("SELECT t FROM Terms t WHERE t.parentTerms.no = :parentNo AND t.activeYn = 'Y'")
     List<Terms> findAllSubTerms(@Param("parentNo") Long parentNo);
 
+    @Query("SELECT t FROM Terms t WHERE t.parentTerms.no is null AND t.category = :category")
+    List<Terms> findByParentTerms(@Param("category") TermsCategory category);
+
     // 이름에 특정 키워드가 포함된 약관을 조회
     @Query("SELECT t FROM Terms t WHERE t.name LIKE %:keyword%")
     List<Terms> findTermsByNameKeyword(@Param("keyword") String keyword);

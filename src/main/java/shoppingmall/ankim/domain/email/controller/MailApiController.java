@@ -4,13 +4,19 @@ import jakarta.mail.internet.MimeMessage;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Pattern;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.email.service.Count;
 import shoppingmall.ankim.domain.email.service.MailService;
+import shoppingmall.ankim.domain.member.exception.MemberRegistrationException;
 import shoppingmall.ankim.global.response.ApiResponse;
 
+import static shoppingmall.ankim.global.exception.ErrorCode.INVALID_MAIL_ID;
+
+@Slf4j
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/mail")
@@ -22,8 +28,14 @@ public class MailApiController {
     @PostMapping("/send")
     public ApiResponse<String> sendMail(
             @RequestParam("loginId")
-            @Pattern(regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")
+            @Pattern(regexp = "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$", message = "유효하지 않은 이메일 형식입니다.")
             String loginId) {
+        log.info("Received loginId: {}", loginId);
+        if (loginId == null || loginId.isEmpty()) {
+            log.error("loginId is missing or empty");
+            throw new MemberRegistrationException(INVALID_MAIL_ID);
+        }
+
         String code = mailService.generateCode(); // 인증번호 생성
         MimeMessage mail = mailService.createMail(loginId, code); // 메일 생성
         mailService.sendMail(mail); // 메일 전송

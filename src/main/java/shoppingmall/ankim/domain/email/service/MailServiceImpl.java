@@ -6,15 +6,19 @@ import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Profile;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.email.exception.MailSendException;
 import shoppingmall.ankim.domain.email.handler.MailVerificationHandler;
 
 import java.io.UnsupportedEncodingException;
 import java.security.SecureRandom;
+import java.util.concurrent.CompletableFuture;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.MAIL_SEND_FAIL;
 
@@ -73,9 +77,22 @@ public class MailServiceImpl implements MailService {
     }
 
     // 이메일 전송
-    @Override
+/*    @Override
+    @Async("mailTaskExecutor") // 특정 Executor 지정 및 메서드 비동기 실행
+    @Transactional(propagation = Propagation.NOT_SUPPORTED) // 트랜잭션 제외
     public void sendMail(MimeMessage message) {
+//        long start = System.currentTimeMillis();
+        log.info("메세지 전송 메서드 호출");
+        javaMailSender.send(message); // 여기에서 반드시 호출되어야 함
+        //        long end = System.currentTimeMillis();
+//        log.info("이메일 전송시간 {} ms", (end - start));
+    }*/
+    @Override
+    @Async("mailTaskExecutor")
+    @Transactional(propagation = Propagation.NOT_SUPPORTED) // 트랜잭션 제외
+    public CompletableFuture<Void> sendMail(MimeMessage message) {
         javaMailSender.send(message);
+        return CompletableFuture.completedFuture(null); // 작업 완료 반환
     }
 
     @Override

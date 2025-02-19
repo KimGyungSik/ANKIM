@@ -52,7 +52,7 @@ class MemberLoginAttemptRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("test@example.com")
-                .pwd("password")
+                .password("password")
                 .name("user1")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -92,7 +92,7 @@ class MemberLoginAttemptRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("test@example.com")
-                .pwd("password")
+                .password("password")
                 .name("user1")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -117,7 +117,7 @@ class MemberLoginAttemptRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("test@example.com")
-                .pwd("password")
+                .password("password")
                 .name("user1")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))
@@ -166,7 +166,7 @@ class MemberLoginAttemptRepositoryTest {
         // given
         Member member = Member.builder()
                 .loginId("test@example.com")
-                .pwd("password")
+                .password("password")
                 .name("user1")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))

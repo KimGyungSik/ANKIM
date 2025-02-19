@@ -24,7 +24,7 @@ public class CustomUserDetails implements UserDetails {
     public CustomUserDetails(Member member) {
         this.name = member.getLoginId();
         this.nickName = member.getName();
-        this.password = member.getPwd();
+        this.password = member.getPassword();
 
         // 단일 권한 ROLE_USER 추가
         this.authorities = List.of(new SimpleGrantedAuthority("ROLE_USER"));

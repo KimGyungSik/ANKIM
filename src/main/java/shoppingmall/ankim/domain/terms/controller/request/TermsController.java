@@ -14,7 +14,8 @@ import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
-@RequestMapping("/api/terms")
+//@RequestMapping("/api/terms")
+@RequestMapping("/join")
 public class TermsController {
 
     private final TermsQueryService termsQueryService;
@@ -26,7 +27,7 @@ public class TermsController {
     }
 
     // 이메일로 가입하기 누르는 경우 약관동의 페이지로 이동한다.
-    @GetMapping("/join")
+    @GetMapping("/email")
     public String getJoinTerms(Model model) {
         httpSession.removeAttribute("termsAgreements");  // 약관 동의 초기화
 
@@ -34,6 +35,6 @@ public class TermsController {
 
         model.addAttribute("termsList", termsList);
 
-        return "registerTerms"; // FIXME 약관 동의 페이지 작성
+        return "join/termsJoin"; // FIXME 약관 동의 페이지 작성
     }
 }

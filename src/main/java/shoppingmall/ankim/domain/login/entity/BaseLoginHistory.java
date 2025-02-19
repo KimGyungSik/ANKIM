@@ -16,7 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class BaseLoginHistory {
-    @Column(name = "ip_addr", length = 45, nullable = false)
+    @Column(name = "ip_addr", length = 50, nullable = false)
     private String ipAddress;
 
     @Column(name = "login_att_dt", nullable = false)

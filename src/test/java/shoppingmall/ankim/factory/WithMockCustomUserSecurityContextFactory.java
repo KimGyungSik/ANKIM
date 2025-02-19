@@ -36,7 +36,7 @@ public class WithMockCustomUserSecurityContextFactory implements WithSecurityCon
         // 사용자 정보 생성 (CustomUserDetails 사용)
         Member member = Member.builder()
                 .loginId(annotation.username())
-                .pwd(annotation.password())
+                .password(annotation.password())
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1990, 1, 1))

@@ -5,6 +5,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
+import shoppingmall.ankim.domain.member.dto.MemberAddressResponse;
+import shoppingmall.ankim.domain.member.dto.MemberInfoResponse;
+import shoppingmall.ankim.domain.member.dto.TermsAgreementResponse;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -14,6 +19,14 @@ import shoppingmall.ankim.domain.memberHistory.entity.MemberHistory;
 import shoppingmall.ankim.domain.memberHistory.handler.MemberHistoryHandler;
 import shoppingmall.ankim.domain.memberHistory.repository.MemberHistoryRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
+import shoppingmall.ankim.domain.terms.entity.TermsCategory;
+import shoppingmall.ankim.domain.terms.service.TermsService;
+import shoppingmall.ankim.domain.termsHistory.repository.TermsHistoryRepository;
+
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -25,15 +38,16 @@ public class MemberEditServiceImpl implements MemberEditService {
 
     private final MemberRepository memberRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
-    private final JwtTokenProvider jwtTokenProvider;
     private final MemberHistoryRepository memberHistoryRepository;
+    private final MemberAddressRepository memberAddressRepository;
+    private final TermsService termsService;
 
     @Override
     public void isValidPassword(String loginId, PasswordServiceRequest request) {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getPassword(), member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getPassword(), member.getPassword());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_PASSWORD);
         }
@@ -53,7 +67,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(request.getOldPassword(), member.getPassword());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_CURRENT_PASSWORD);
         }
@@ -64,7 +78,7 @@ public class MemberEditServiceImpl implements MemberEditService {
         }
 
         // 새로운 비밀번호가 이전 비밀번호와 동일한지 비교
-        if (bCryptPasswordEncoder.matches(request.getNewPassword(), member.getPwd())) {
+        if (bCryptPasswordEncoder.matches(request.getNewPassword(), member.getPassword())) {
             throw new InvalidMemberException(PASSWORD_SAME_AS_OLD);
         }
 
@@ -78,6 +92,24 @@ public class MemberEditServiceImpl implements MemberEditService {
         member.changePassword(encodedNewPassword);
 
         memberHistoryRepository.save(history);
+    }
+
+    @Override
+    public MemberInfoResponse getMemberInfo(String loginId) {
+        Member member = getMember(loginId);
+
+        // 기본 배송지 조회
+        MemberAddressResponse addressResponse = memberAddressRepository.findDefaultAddressByMember(member)
+                .map(MemberAddressResponse::of)
+                .orElse(null);
+
+        // 약관 동의 내역 조회 (findAgreTermsByMember 활용)
+        List<TermsAgreeResponse> agreedTerms = termsService.getTermsForMember(member.getNo(), TermsCategory.JOIN);
+
+        log.info("getMemberInfo() - agreedTerms: {}", agreedTerms);
+
+        // MemberInfoResponse 생성 후 반환
+        return MemberInfoResponse.of(member, addressResponse, agreedTerms);
     }
 
     private Member getMember(String loginId) {

@@ -26,7 +26,7 @@ public class MemberMyPageServiceImpl implements MemberMyPageService {
         Member member = getMember(loginId);
 
         // 입력된 비밀번호와 저장된 비밀번호 해시 비교
-        boolean isPasswordValid = bCryptPasswordEncoder.matches(pwd, member.getPwd());
+        boolean isPasswordValid = bCryptPasswordEncoder.matches(pwd, member.getPassword());
         if (!isPasswordValid) {
             throw new InvalidMemberException(INVALID_PASSWORD);
         }

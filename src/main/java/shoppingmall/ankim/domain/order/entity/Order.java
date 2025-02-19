@@ -21,6 +21,7 @@ import java.util.stream.Collectors;
 import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.*;
 import static shoppingmall.ankim.domain.delivery.entity.DeliveryStatus.CANCELED;
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
+import static shoppingmall.ankim.global.constants.ShippingConstants.FREE_SHIPPING_THRESHOLD;
 
 @Entity
 @Getter @Setter
@@ -72,7 +73,6 @@ public class Order extends BaseEntity {
 
     @Column(name = "mod_date", columnDefinition = "DATETIME DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime modDate = LocalDateTime.now(); // 주문 상태 변경일
-
 
     public void addOrderItem(OrderItem orderItem) {
         orderItems.add(orderItem);
@@ -152,12 +152,18 @@ public class Order extends BaseEntity {
     // 총 상품금액
     private Integer calculateTotalPrice(List<OrderItem> items) {
         return items.stream()
-                .mapToInt(OrderItem::getPrice)
+                .mapToInt(item -> item.getPrice() * item.getQty()) // 가격 * 수량 적용
                 .sum();
     }
 
     // 총 배송비
     private Integer calculateTotalShipFee(List<OrderItem> items) {
+        int totalPrice = calculateTotalPrice(items) - calculateTotalDiscPrice(items);
+
+        if (totalPrice >= FREE_SHIPPING_THRESHOLD) {
+            return 0;
+        }
+
         return items.stream()
                 .mapToInt(OrderItem::getShipFee)
                 .sum();
@@ -166,7 +172,7 @@ public class Order extends BaseEntity {
     // 총 할인금액
     private Integer calculateTotalDiscPrice(List<OrderItem> items) {
         return items.stream()
-                .mapToInt(OrderItem::getDiscPrice)
+                .mapToInt(item -> item.getDiscPrice() * item.getQty()) // 할인금액 * 수량 적용
                 .sum();
     }
 

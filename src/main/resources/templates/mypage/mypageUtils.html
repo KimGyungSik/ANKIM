@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+<header th:replace="~{fragments/header :: header}"></header>
+
+<main class="mypage-container">
+    <aside class="mypage-sidebar">
+        <div class="user-info">
+            <h2 id="userName">알 수 없음</h2>
+            <p>좋아요 ♡ <span id="likeCount">-</span></p>
+        </div>
+        <nav class="sidebar-menu">
+            <h3>나의 쇼핑정보</h3>
+            <ul>
+                <li><a href="/mypage/orders">주문배송조회</a></li>
+                <li><a href="/mypage/reservations">숙박예약조회</a></li>
+                <li><a href="/mypage/cancel-returns">취소/교환/반품 내역</a></li>
+                <li><a href="/mypage/reviews">상품 리뷰</a></li>
+                <li><a href="/mypage/coupons">증빙서류 발급</a></li>
+            </ul>
+            <h3>나의 계정정보</h3>
+            <ul>
+                <li><a href="/mypage/edit/info">회원정보수정</a></li>
+                <li><a href="/mypage/membership">회원등급</a></li>
+                <li><a href="/mypage/coupons">쿠폰</a></li>
+                <li><a href="/mypage/mileage">마일리지</a></li>
+            </ul>
+        </nav>
+    </aside>
+
+    <section class="mypage-main">
+        <div class="membership-info">
+            <div class="membership-header">
+                <h3>회원등급</h3>
+                <h3>사용가능쿠폰</h3>
+                <h3>마일리지</h3>
+            </div>
+            <div class="membership-content">
+                <div class="membership-level">
+                    <p id="userGrade" class="membership-grade" th:text="${userGrade}">ORANGE</p>
+                    <a th:href="@{/mypage/membership}" class="btn">할인혜택 보기</a>
+                </div>
+                <p id="couponCount" th:text="${couponCount}" class="membership-stat">-</p>
+                <p id="mileage" th:text="${mileage}" class="membership-stat">-</p>
+            </div>
+        </div>
+
+        <!-- 개별 페이지 본문 -->
+<!--        <div class="mypage-content">-->
+<!--            <p>데이터를 불러오는 중입니다...</p>-->
+<!--        </div>-->
+        <div class="mypage-content">
+            <th:block th:replace="~{::content}"></th:block>
+        </div>
+    </section>
+
+    <!-- Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</main>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+<script type="module" th:src="@{/js/mypage/mypage.js}"></script>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+</html>

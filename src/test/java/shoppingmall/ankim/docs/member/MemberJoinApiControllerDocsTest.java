@@ -16,6 +16,7 @@ import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest
 import shoppingmall.ankim.domain.member.dto.MemberResponse;
 import shoppingmall.ankim.domain.member.service.MemberService;
 import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
+import shoppingmall.ankim.domain.terms.service.query.TermsQueryService;
 import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 
 import java.time.LocalDate;
@@ -38,10 +39,11 @@ import static shoppingmall.ankim.domain.category.entity.CategoryLevel.MIDDLE;
 public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
 
     private final MemberService memberService = mock(MemberService.class);
+    private final TermsQueryService termsQueryService = mock(TermsQueryService.class);
 
     @Override
     protected Object initController() {
-        return new MemberJoinApiController(memberService);
+        return new MemberJoinApiController(memberService, termsQueryService);
     }
 
     @DisplayName("회원가입을 위한 약관동의 내역을 전송하는 API")
@@ -99,7 +101,8 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터")
+                                fieldWithPath("data").description("응답 데이터"),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
 
                         )
                 ));
@@ -130,7 +133,8 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("status").description("응답 상태").type(JsonFieldType.STRING),
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
-                                fieldWithPath("data").description("응답 데이터")
+                                fieldWithPath("data").description("응답 데이터"),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
     }
@@ -141,7 +145,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
         // given
         MemberRegisterRequest request = MemberRegisterRequest.builder()
                 .loginId("test@example.com")
-                .pwd("testPassword!123")
+                .password("testPassword!123")
                 .name("홍길동")
                 .phoneNum("010-1234-5678")
                 .birth(LocalDate.of(1999, 12, 19))
@@ -187,7 +191,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                         requestFields(
                                 fieldWithPath("loginId").type(JsonFieldType.STRING)
                                         .description("이메일 아이디"),
-                                fieldWithPath("pwd").type(JsonFieldType.STRING)
+                                fieldWithPath("password").type(JsonFieldType.STRING)
                                         .description("비밀번호"),
                                 fieldWithPath("name").type(JsonFieldType.STRING)
                                         .description("이름"),
@@ -204,7 +208,8 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
                                 fieldWithPath("data.no").description("회원 번호").type(JsonFieldType.NUMBER),
-                                fieldWithPath("data.name").description("마스킹 처리된 회원 이름").type(JsonFieldType.STRING)
+                                fieldWithPath("data.name").description("마스킹 처리된 회원 이름").type(JsonFieldType.STRING),
+                                fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));
 

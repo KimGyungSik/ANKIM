@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>장바구니</title>
+    <link rel="stylesheet" th:href="@{/css/cart/cart.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+<header th:replace="/fragments/header :: header"></header>
+<main class="cart-container">
+<!--    <h1>장바구니</h1>-->
+    <!-- 단계 표시 -->
+    <div class="cart-steps">
+        <ol class="step-list">
+            <li class="step-item active-step">01 SHOPPING BAG
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" fill-rule="evenodd" stroke="rgb(212, 212, 212)" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item">02 ORDER
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" fill-rule="evenodd" stroke="rgb(212, 212, 212)" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item">03 ORDER CONFIRMED</li>
+        </ol>
+    </div>
+    <div class="cart-table">
+        <!-- 장바구니 항목이 Flexbox로 구성되도록 구조 변경 -->
+        <div class="cart-item cart-header">
+            <div class="item-checkbox"><input type="checkbox" id="selectAll"></div>
+            <div class="item-info">상품 정보</div>
+            <div class="item-qty">수량</div>
+            <div class="item-price">주문 금액</div>
+            <div class="item-shipping">배송비</div>
+        </div>
+        <div id="cartItemsContainer">
+            <!-- 장바구니 항목이 동적으로 렌더링됩니다. -->
+        </div>
+    </div>
+    <div id="cartSummaryContainer" class="cart-summary-container hidden">
+        <div class="summary-row">
+            <div>총 주문금액</div>
+            <div id="totalOrderAmount">0원</div>
+        </div>
+        <div class="summary-row">
+            <div>총 배송비</div>
+            <div id="totalShippingFee">0원</div>
+        </div>
+        <div class="summary-row total">
+            <div>총 결제금액</div>
+            <div id="totalPaymentAmount">0원</div>
+        </div>
+        <div class="summary-buttons">
+            <button class="continue-shopping-button">CONTINUE SHOPPING</button>
+            <button class="checkout-button">CHECK OUT</button>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="cartModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+</main>
+<footer th:replace="/fragments/footer :: footer-container"></footer>
+</body>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+<script type="module" th:src="@{/js/cart/cart.js}"></script>
+</html>

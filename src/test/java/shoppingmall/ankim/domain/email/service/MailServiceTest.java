@@ -14,22 +14,27 @@ import org.mockito.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.Import;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.email.controller.request.MailRequest;
 import shoppingmall.ankim.domain.email.handler.MailVerificationHandler;
 import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.global.config.TestMailAsyncConfig;
 
 import static org.mockito.Mockito.*;
 
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
 import java.util.regex.Pattern;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
 
+@Import(TestMailAsyncConfig.class)
 @SpringBootTest
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
@@ -58,6 +63,7 @@ class MailServiceTest {
     @BeforeEach
     void setUp() {
         MockitoAnnotations.openMocks(this); // Mock 객체 초기화
+        Mockito.reset(javaMailSender); // 이전 테스트의 영향을 제거
         ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
         validator = factory.getValidator();
 
@@ -120,7 +126,7 @@ class MailServiceTest {
 
     @Test
     @DisplayName("인증번호가 수신자 이메일에 잘 전송되는지 확인한다.")
-    public void test3() throws Exception {
+    public void mailSend_SUCCESS() throws Exception {
         // given
         String email = "test@example.com";
         String code = mailService.generateCode();
@@ -128,10 +134,11 @@ class MailServiceTest {
         MimeMessage mimeMessage = mailService.createMail(email, code); // 이메일 객체 생성
 
         // when
-        mailService.sendMail(mimeMessage);
+        CompletableFuture<Void> future = mailService.sendMail(mimeMessage); // 비동기 메서드 호출
+        future.join(); // 작업 완료 대기
 
         // then
-        verify(javaMailSender, times(1)).send(mimeMessage); // JavaMailSender의 send 메서드가 호출되었는지 확인
+        verify(javaMailSender, times(1)).send(any(MimeMessage.class));  // JavaMailSender의 send 메서드가 호출되었는지 확인
     }
 
     @Test

@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지</title>
+    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+
+<th:block th:replace="mypage/mypageUtils.html :: main">
+    <th:block th:fragment="content">
+        <p>데이터를 불러오는 중입니다...</p>
+    </th:block>
+</th:block>
+
+<footer th:replace="~{fragments/footer :: footer}"></footer>
+</body>
+<script type="module" th:src="@{/js/mypage/mypage.js}"></script>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+</html>

@@ -58,8 +58,8 @@ public class LogoutHandler {
         // 로그아웃 진행
         // refresh를 DB에서 제거
         redisHandler.delete(access);
-        // 쿠키에서 access 제거
-        Cookie deleteCookie = deleteCookie("access", null);
+        // 쿠키에서 refresh 제거
+        Cookie deleteCookie = deleteCookie("refresh", null);
         response.addCookie(deleteCookie);
 
         response.setStatus(HttpServletResponse.SC_OK);
@@ -70,7 +70,7 @@ public class LogoutHandler {
         // 쿠키 설정
         cookie.setHttpOnly(true); // javaScript로 접근하지 못하도록 설정
         cookie.setMaxAge(0); // 쿠키 유효 시간 설정(초단위)
-        cookie.setSecure(true); // https 통신시 사용
+//        cookie.setSecure(true); // https 통신시 사용
         cookie.setPath("/"); // cookie 적용 범위
         return cookie;
     }
