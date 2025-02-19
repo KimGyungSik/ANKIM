@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.category.repository.query;
 
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
+import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
 
 import java.util.List;
 import java.util.Optional;
@@ -11,6 +12,9 @@ public interface CategoryQueryRepository {
 
     // 특정 중분류에 속한 모든 소분류 조회
     List<CategoryResponse> findSubCategoriesByMiddleCategoryId(Long middleCategoryId);
+
+    // 특정 중분류에 속한 모든 소분류 조회 (이름으로)
+    List<CategoryResponse> findSubCategoriesByMiddleCategoryName(Condition condition);
 
     // 소분류 ID로 해당 소분류의 상위 중분류 조회
     Optional<CategoryResponse> findMiddleCategoryBySubCategoryId(Long subCategoryId);

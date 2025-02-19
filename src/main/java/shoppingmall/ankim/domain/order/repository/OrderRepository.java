@@ -12,8 +12,9 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.member " +
             "JOIN FETCH o.orderItems oi " +
-            "JOIN FETCH oi.item " +
-            "WHERE o.ordCode = :orderName")
+            "JOIN FETCH oi.item i " +
+            "WHERE o.ordCode = :orderName " +
+            "ORDER BY i.no ASC")
     Optional<Order> findByOrderNameWithMemberAndOrderItemsAndItem(@Param("orderName") String orderName);
 
 
@@ -41,4 +42,6 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     List<Order> findByOrdNoIn(@Param("ordNo") List<String> ordNo);
 
     boolean existsByOrdCode(String ordCode); // 주문번호 확인
+    @Query("SELECT o.ordCode FROM Order o")
+    List<String> findAllByOrdCode();
 }

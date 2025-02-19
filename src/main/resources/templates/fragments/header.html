@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANKIM Header</title>
+    <!-- 헤더 CSS -->
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+</head>
+<body>
+<div th:fragment="header">
+    <header class="header">
+        <!-- 로고 -->
+        <div class="logo">
+            <a href="/" th:href="@{/}" style="text-decoration: none; color: inherit;">ANKIM</a>
+        </div>
+
+        <!-- 메인 카테고리 -->
+        <nav class="nav">
+            <ul class="nav-list">
+                <!-- BEST와 NEW (고정) -->
+                <li><a href="/product/list?condition=BEST">BEST</a></li>
+                <li><a href="/product/list?condition=NEW">NEW</a></li>
+
+                <!-- MADE 메뉴 -->
+                <li class="dropdown">
+                    <a href="/product/list?condition=HANDMADE">MADE</a>
+                    <ul class="dropdown-menu" id="handmade-categories">
+                        <!-- 동적으로 추가될 하위 카테고리 -->
+                    </ul>
+                </li>
+
+                <!-- 중분류 및 하위 카테고리 (동적 추가) -->
+                <!-- 기존 구조와 동일하게 <ul> 사용 -->
+                <li class="dropdown" id="dynamic-categories-container">
+                    <!-- 동적으로 추가될 중분류 -->
+                    <ul class="dropdown-menu" id="dynamic-categories"></ul>
+                </li>
+            </ul>
+        </nav>
+        <script>
+            document.addEventListener("DOMContentLoaded", function () {
+                fetch('/header')
+                    .then(response => response.json())
+                    .then(data => {
+                        const handmadeCategories = data.handmadeCategories;
+                        const middleCategories = data.middleCategories;
+                        const subCategories = data.subCategories;
+
+                        // MADE 하위 카테고리 추가
+                        const handmadeCategoriesContainer = document.getElementById("handmade-categories");
+                        handmadeCategories.forEach(category => {
+                            const listItem = document.createElement("li");
+                            listItem.innerHTML = `
+                    <a href="/product/list?condition=HANDMADE&category=${category.categoryNo}">
+                        ${category.name}
+                    </a>
+                `;
+                            handmadeCategoriesContainer.appendChild(listItem);
+                        });
+
+                        // 동적 중분류 및 하위 카테고리 추가
+                        const dynamicCategoriesContainer = document.querySelector(".nav-list"); // 수정: 정확한 부모 컨테이너 선택
+                        middleCategories.forEach(category => {
+                            const listItem = document.createElement("li");
+                            listItem.classList.add("dropdown");
+
+                            listItem.innerHTML = `
+                                <a href="/product/list?condition=${category.name === "OPS/SK" ? "OPS" : category.name}">
+                                    ${category.name}
+                                </a>
+                                <ul class="dropdown-menu"></ul>
+                            `;
+
+                            const dropdownMenu = listItem.querySelector(".dropdown-menu");
+                            subCategories
+                                .filter(sub => sub.parentNo === category.categoryNo)
+                                .forEach(subCategory => {
+                                    const subListItem = document.createElement("li");
+                                    subListItem.innerHTML = `
+                            <a href="/product/list?condition=${category.name === "OPS/SK" ? "OPS" : category.name}&category=${subCategory.categoryNo}">
+                                ${subCategory.name}
+                            </a>
+                        `;
+                                    dropdownMenu.appendChild(subListItem);
+                                });
+
+                            // 중분류를 nav-list에 추가
+                            dynamicCategoriesContainer.appendChild(listItem);
+                        });
+                    })
+                    .catch(error => {
+                        console.error("Error loading categories:", error);
+                    });
+            });
+        </script>
+        <!-- 사용자 메뉴 -->
+        <div class="user-actions">
+            <a href="#" th:href="@{/mypage}" class="menu-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
+                    <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/>
+                </svg>
+                MY PAGE
+            </a>
+            <a href="#" th:href="@{/mypage}" class="menu-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" class="icon">
+                    <path d="M47.6 300.4L228.3 469.1c7.5 7 17.4 10.9 27.7 10.9s20.2-3.9 27.7-10.9L464.4 300.4c30.4-28.3 47.6-68 47.6-109.5v-5.8c0-69.9-50.5-129.5-119.4-141C347 36.5 300.6 51.4 268 84L256 96 244 84c-32.6-32.6-79-47.5-124.6-39.9C50.5 55.6 0 115.2 0 185.1v5.8c0 41.5 17.2 81.2 47.6 109.5z"/>
+                </svg>
+                MY LIKE
+            </a>
+            <a href="#" th:href="@{/shoppingbag}" class="menu-item">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="icon">
+                    <path d="M0 24C0 10.7 10.7 0 24 0L69.5 0c22 0 41.5 12.8 50.6 32l411 0c26.3 0 45.5 25 38.6 50.4l-41 152.3c-8.5 31.4-37 53.3-69.5 53.3l-288.5 0 5.4 28.5c2.2 11.3 12.1 19.5 23.6 19.5L488 336c13.3 0 24 10.7 24 24s-10.7 24-24 24l-288.3 0c-34.6 0-64.3-24.6-70.7-58.5L77.4 54.5c-.7-3.8-4-6.5-7.9-6.5L24 48C10.7 48 0 37.3 0 24zM128 464a48 48 0 1 1 96 0 48 48 0 1 1 -96 0zm336-48a48 48 0 1 1 0 96 48 48 0 1 1 0-96z"/>
+                </svg>
+                SHOPPING BAG
+            </a>
+            <!-- LOGIN/LOGOUT 조건 -->
+            <div th:if="${session.userId == null}">
+                <a href="#" th:href="@{/login}" class="menu-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
+                        <path d="M144 144l0 48 160 0 0-48c0-44.2-35.8-80-80-80s-80 35.8-80 80zM80 192l0-48C80 64.5 144.5 0 224 0s144 64.5 144 144l0 48 16 0c35.3 0 64 28.7 64 64l0 192c0 35.3-28.7 64-64 64L64 512c-35.3 0-64-28.7-64-64L0 256c0-35.3 28.7-64 64-64l16 0z"/>
+                    </svg>
+                    LOGIN
+                </a>
+            </div>
+            <div th:if="${session.userId != null}">
+                <a href="#" th:href="@{/logout}" class="menu-item">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 576 512" class="icon">
+                        <path d="M352 144c0-44.2 35.8-80 80-80s80 35.8 80 80l0 48c0 17.7 14.3 32 32 32s32-14.3 32-32l0-48C576 64.5 511.5 0 432 0S288 64.5 288 144l0 48L64 192c-35.3 0-64 28.7-64 64L0 448c0 35.3 28.7 64 64 64l320 0c35.3 0 64-28.7 64-64l0-192c0-35.3-28.7-64-64-64l-32 0 0-48z"/>
+                    </svg>
+                    LOGOUT
+                </a>
+            </div>
+        </div>
+    </header>
+</div>
+</body>
+</html>

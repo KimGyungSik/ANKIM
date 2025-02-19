@@ -127,6 +127,47 @@ public class OrderFactory {
         return order;
     }
 
+    public static Order createOrderWithDeliveryAndLocalDateTime(EntityManager entityManager,LocalDateTime now) {
+        // Product 및 관련 데이터 생성
+        Product product = ProductFactory.createProduct(entityManager);
+
+        // Item 추출
+        Item item1 = product.getItems().get(2); // 첫 번째 품목
+        Item item2 = product.getItems().get(3); // 두 번째 품목
+
+        // Order 생성
+        OrderItem orderItem1 = OrderItem.create(item1, 2); // 수량 2
+        OrderItem orderItem2 = OrderItem.create(item2, 3); // 수량 3
+
+        // Member 생성
+        Member member = MemberJwtFactory.createMember(entityManager, "0711kyungh@naver.com");
+
+        // Delivery 생성
+        Delivery delivery = createDelivery(entityManager, member);
+
+        // Order 생성
+        Order order = Order.create(
+                List.of(orderItem1, orderItem2),
+                member,
+                delivery,
+                now
+        );
+
+        entityManager.persist(order);
+
+        entityManager.flush();
+        entityManager.clear();
+
+        // Cart 생성
+        Cart cart = Cart.create(member, LocalDateTime.now());
+
+        createCartItem(entityManager, cart, member,product,item1,2);
+        createCartItem(entityManager, cart, member,product,item2,3);
+
+        entityManager.persist(cart);
+        return order;
+    }
+
     public static Order createOrderWithInvalidStockQuantityException(EntityManager entityManager) {
         // Product 및 관련 데이터 생성
         Product product = ProductFactory.createProduct(entityManager);

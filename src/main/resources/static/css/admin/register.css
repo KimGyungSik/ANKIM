@@ -1,0 +1,101 @@
+/* 공통 스타일 */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f9f9f9;
+}
+
+.right_col.register-page {
+    padding: 20px;
+    background-color: white;
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 20px auto;
+}
+
+.right_col.register-page h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    color: #333;
+}
+
+.right_col.register-page .required {
+    color: #ff6b6b;
+    margin-left: 5px;
+}
+
+/* 섹션 스타일 */
+.right_col.register-page > div {
+    margin-bottom: 30px;
+}
+
+.right_col.register-page label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 5px;
+    color: #555;
+}
+
+.right_col.register-page input,
+.right_col.register-page select,
+.right_col.register-page textarea,
+.right_col.register-page button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.right_col.register-page input:focus,
+.right_col.register-page select:focus,
+.right_col.register-page textarea:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.5);
+}
+
+.right_col.register-page textarea {
+    height: 100px;
+    resize: none;
+}
+
+.right_col.register-page button {
+    background-color: #007bff;
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+.right_col.register-page button:hover {
+    background-color: #0056b3;
+}
+
+/* 섹션별 스타일 */
+.right_col.register-page > div > div {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+}
+
+.right_col.register-page > div > div > * {
+    flex: 1 1 calc(50% - 15px); /* 두 개씩 배치 */
+    min-width: 200px; /* 최소 너비 */
+}
+
+/* 가격 설정 섹션 */
+.right_col.register-page > div:nth-child(4) input,
+.right_col.register-page > div:nth-child(4) select {
+    width: calc(50% - 10px);
+    margin-right: 10px;
+}
+
+.right_col.register-page > div:nth-child(4) input:last-of-type,
+.right_col.register-page > div:nth-child(4) select:last-of-type {
+    margin-right: 0;
+}

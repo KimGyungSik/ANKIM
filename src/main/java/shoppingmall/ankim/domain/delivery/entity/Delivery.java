@@ -25,6 +25,7 @@ public class Delivery {
 
     private String courier; // 택배사
 
+    @Setter
     @Enumerated(EnumType.STRING)
     private DeliveryStatus status; // 배송 상태
 

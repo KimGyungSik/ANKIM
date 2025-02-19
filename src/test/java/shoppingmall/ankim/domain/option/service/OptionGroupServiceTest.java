@@ -169,7 +169,7 @@ class OptionGroupServiceTest {
         assertThat(result.getOptionValueResponses()).hasSize(2)
                 .extracting("valueName", "colorCode")
                 .containsExactlyInAnyOrder(
-                        tuple("Red", null),
+                        tuple("Red", "#FF0000"),
                         tuple("Green", "#00FF00")
                 );
         // Product 객체의 옵션 그룹 수 확인

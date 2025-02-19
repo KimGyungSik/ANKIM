@@ -1,0 +1,177 @@
+/* Left Sidebar */
+.filter-sidebar {
+    width: 260px; /* 왼쪽 사이드바 고정 너비 */
+    flex-shrink: 0; /* 사이드바 크기 고정 */
+}
+/* 필터 섹션 */
+.filter-section {
+    padding: 22px;
+    max-width: 235px;
+    font-size: 14px;
+    padding-top: 0px;
+}
+.filter-line {
+    width: 100%; /* 가로로 꽉 채우기 */
+    height: 5px; /* 선 두께 */
+    background-color: #000; /* 선 색상 */
+    margin-top: 5px; /* 필터 제목과의 간격 */
+    margin-bottom: 15px; /* 다음 섹션과의 간격 */
+}
+/* 색상 필터 컨테이너 */
+.color-filter-container {
+    height: 246px;
+    overflow-y: auto;
+    padding: 3px 0;
+}
+
+/* 색상 필터 */
+.color-filter {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+}
+
+.color-filter li {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    border-radius: 50%;
+    padding: 3px;
+    transition: border 0.3s ease;
+    justify-content: flex-start;
+    font-size: 13px;
+}
+
+.color-filter li:hover,
+.color-filter li.selected {
+    border: 2px solid black; /* 클릭 시 및 hover 시 테두리 */
+}
+
+.color-box {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    margin-right: 6px;
+}
+
+/* 가격대 필터 */
+.price-filter li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 텍스트와 버튼을 양쪽 끝에 배치 */
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #ddd; /* 구분선 추가 */
+    margin-left: -41px;
+}
+
+.price-filter label {
+    margin-right: 10px; /* 텍스트와 버튼 간격 조정 */
+    order: -1; /* 라디오 버튼을 텍스트 오른쪽으로 이동 */
+}
+
+.price-filter input[type="radio"] {
+    cursor: pointer;
+}
+
+/* 사용자 지정 가격 입력 */
+.custom-price-input {
+    margin-top: 15px;
+}
+
+.custom-price-input label {
+    display: block;
+    margin-top: 8px;
+    font-size: 13px;
+}
+
+.input-wrapper {
+    position: relative;
+    margin-top: 8px;
+    margin-bottom: 10px;
+}
+
+.input-wrapper input {
+    width: 100%;
+    padding: 8px;
+    padding-right: 35px;
+    box-sizing: border-box;
+    background-color: #f9f9f9;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    font-size: 13px;
+}
+
+.input-wrapper input:enabled {
+    background-color: #fff;
+    border: 1px solid #007BFF;
+    box-shadow: 0 0 3px rgba(0, 123, 255, 0.3);
+}
+
+.input-wrapper .unit {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    color: #888;
+    font-size: 12px;
+}
+/* 상품정보 Section 스타일 */
+.product-info-section ul li {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 텍스트와 체크박스를 양쪽 끝에 배치 */
+    margin-bottom: 25px;
+    padding-bottom: 25px;
+    border-bottom: 1px solid #ddd;
+    margin-left: -41px;
+    margin-top: 27px;
+}
+
+.product-info-section ul li:last-child {
+    border-bottom: none;
+}
+
+.product-info-section label {
+    margin-right: 10px; /* 텍스트와 체크박스 간격 조정 */
+    order: -1; /* 체크박스를 텍스트 오른쪽으로 이동 */
+}
+
+.product-info-section input[type="checkbox"] {
+    cursor: pointer;
+}
+
+/* 버튼 Section 스타일 */
+.button-section {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+    gap: 10px; /* 버튼 간격 추가 */
+}
+
+.reset-button,
+.apply-button {
+    padding: 8px 16px; /* 버튼 크기 조정 */
+    font-size: 13px; /* 글씨 크기 줄임 */
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+    text-align: center;
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+}
+
+.reset-button {
+    background-color: #f5f5f5;
+    color: #333;
+    border: 1px solid #ccc;
+}
+
+.apply-button {
+    background-color: #000;
+    color: #fff;
+}
+
+

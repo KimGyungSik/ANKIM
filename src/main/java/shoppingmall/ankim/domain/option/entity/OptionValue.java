@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
+import shoppingmall.ankim.domain.product.repository.query.helper.ColorCondition;
 
 /*
  * 옵션 값 정책
@@ -46,6 +47,16 @@ public class OptionValue {
                 .colorCode(colorCode)
                 .build();
     }
+
+    public static OptionValue create(OptionGroup optionGroup, String name) {
+        String colorCode = ColorCondition.findHexCodeByName(name);
+        return OptionValue.builder()
+                .optionGroup(optionGroup)
+                .name(name)
+                .colorCode(colorCode)
+                .build();
+    }
+
     public static OptionValue fromResponse(OptionValueResponse response, OptionGroup optionGroup) {
         return OptionValue.builder()
                 .optionGroup(optionGroup)

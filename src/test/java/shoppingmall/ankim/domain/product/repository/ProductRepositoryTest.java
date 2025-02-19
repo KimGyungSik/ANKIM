@@ -54,9 +54,9 @@ class ProductRepositoryTest {
     void setup() {
         // 중분류 -> 소분류 구조 정의
         Map<String, List<String>> categoryStructure = new HashMap<>();
-        categoryStructure.put("Top", List.of("티셔츠", "맨투맨"));
-        categoryStructure.put("Outer", List.of("자켓", "코트"));
-        categoryStructure.put("Knit", List.of("스웨터", "가디건"));
+        categoryStructure.put("TOP", List.of("티셔츠", "맨투맨"));
+        categoryStructure.put("OUTER", List.of("자켓", "코트"));
+        categoryStructure.put("KNIT", List.of("스웨터", "가디건"));
 
         // 테스트 데이터 생성
         ProductFactory.createTestProductsWithSubcategories(em, 10, 10, 10, 10, categoryStructure);
@@ -236,7 +236,7 @@ class ProductRepositoryTest {
         Condition condition = Condition.TOP;
 
         // 중분류 카테고리 이름 설정 (예: "상의"가 중분류)
-        String middleCategoryName = "Top";
+        String middleCategoryName = "TOP";
 
         // 중분류 카테고리에 해당하는 소분류 이름 목록 가져옴
         List<String> subCategoryNames = em.createQuery("SELECT c.name FROM Category c WHERE c.parent.name = :middleCategoryName", String.class)

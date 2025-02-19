@@ -1,0 +1,155 @@
+/* 기본 스타일 */
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px; /* 헤더 높이를 늘리기 위해 패딩 증가 */
+    border-bottom: 1px solid #ccc;
+    background-color: #fff;
+    width: 100%;
+    box-sizing: border-box; /* 패딩 포함 계산 */
+    z-index: 1000; /* 헤더는 항상 최상위 */
+}
+
+/* 로고 */
+.logo {
+    font-size: 35px; /* 로고 글씨 크기 증가 */
+    font-weight: bold;
+    margin-right: 20px;
+    flex-shrink: 0; /* 로고 크기 유지 */
+    margin-right: 20px;
+}
+
+/* 카테고리 */
+.nav {
+    flex-grow: 1;
+    margin-left: 12px;
+    display: flex; /* 가로 정렬 */
+    justify-content: flex-start; /* 플렉스 정렬 */
+    min-width: 0; /* 축소 가능 */
+    overflow: visible; /* 자식 요소가 경계를 넘어도 표시 */
+}
+
+/* 메인 카테고리 */
+.nav-list {
+    display: flex;
+    gap: 8px; /* 메뉴 간격 증가 */
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    font-size: 15px; /* 글씨 크기 증가 */
+    font-weight: 600; /* 글씨를 진하게 설정 (로고보다 덜 진하게) */
+    line-height: 2; /* 높이를 더 늘림 */
+}
+
+.nav-list li a {
+    text-decoration: none;
+    color: #000;
+    transition: color 0.3s;
+    padding: 5px 10px; /* 클릭 영역 확대 */
+}
+
+.nav-list li a:hover {
+    color: #007BFF; /* 강조 색상 */
+}
+
+/* 사용자 메뉴 */
+.user-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* 메뉴 간격 */
+    font-size: 8px; /* 글씨 크기 */
+    white-space: nowrap; /* 텍스트 줄바꿈 방지 */
+    overflow: hidden; /* 잘린 경우에도 스크롤 생기지 않도록 설정 */
+}
+
+.user-actions a {
+    text-decoration: none;
+    color: #000;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 아이콘과 텍스트 간격 증가 */
+    transition: color 0.3s;
+}
+
+.user-actions a:hover {
+    color: #007BFF; /* 강조 색상 */
+}
+
+/* SVG 아이콘 스타일 */
+.icon {
+    width: 18px; /* 아이콘 크기 */
+    height: 18px;
+    fill: currentColor; /* 텍스트 색상과 동일 */
+}
+
+/* 검색 아이콘 */
+.search-icon i {
+    font-size: 20px; /* 검색 아이콘 크기 증가 */
+    margin-left: 5px;
+}
+
+/* 드롭다운 메뉴 기본 스타일 */
+.nav-list .dropdown {
+    position: relative; /* 하위 메뉴 위치를 설정하기 위한 기준 */
+}
+
+.nav-list .dropdown-menu {
+    display: none; /* 기본적으로 숨김 */
+    position: absolute;
+    top: 100%; /* 상위 항목 바로 아래에 표시 */
+    left: 0;
+    background-color: #f9f9f9;
+    padding: 10px 15px; /* 메뉴 간격 */
+    list-style: none;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    z-index: 10; /* 드롭다운이 다른 요소 위에 표시되도록 설정 */
+    font-size: 16px; /* 드롭다운 글씨 크기 */
+    border-radius: 4px;
+    min-width: 150px; /* 최소 너비 */
+    box-sizing: border-box; /* 패딩 포함 크기 계산 */
+}
+
+.nav-list .dropdown-menu li {
+    margin: 0; /* 간격 조정 */
+    width: 100%; /* 가로로 정렬되도록 설정 */
+}
+
+.nav-list .dropdown-menu li a {
+    text-decoration: none;
+    color: #333;
+    display: block; /* 클릭 영역을 넓게 확보 */
+    padding: 8px 0; /* 간격 증가 */
+    transition: color 0.3s;
+}
+
+.nav-list .dropdown-menu li a:hover {
+    color: #007BFF;
+    background-color: #f1f1f1; /* 강조 효과 */
+}
+
+/* 드롭다운 활성화 */
+.nav-list .dropdown:hover .dropdown-menu {
+    display: block;
+}
+
+/* 드롭다운 메뉴의 애니메이션 */
+.nav-list .dropdown-menu {
+    opacity: 0;
+    transform: translateY(-10px);
+    transition: all 0.3s ease;
+}
+
+.nav-list .dropdown:hover .dropdown-menu {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+
+
+

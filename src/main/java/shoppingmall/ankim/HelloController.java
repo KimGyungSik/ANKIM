@@ -12,9 +12,9 @@ import shoppingmall.ankim.global.response.ApiResponse;
 @RequiredArgsConstructor
 public class HelloController {
 
-    @GetMapping("/")
-    public String hello() {
-        return "hello";
-    }
+//    @GetMapping("/")
+//    public String hello() {
+//        return "hello";
+//    }
 
 }

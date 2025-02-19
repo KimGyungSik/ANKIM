@@ -1,0 +1,768 @@
+.breadcrumb {
+    padding: 50px 0;
+    background: #ffffff;
+    font-size: 14px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+/* 중분류와 소분류 드롭다운 */
+.breadcrumb-dropdown {
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    position: relative;
+    padding: 5px 10px;
+}
+
+/* 중분류와 소분류 사이 경계선 `/` */
+.breadcrumb-dropdown::after {
+    content: "/";
+    font-weight: normal;
+    color: #888;
+    margin-left: 22px;
+    font-size: 25px;
+}
+
+.breadcrumb-dropdown:last-child::after {
+    content: "";
+}
+
+/* 아이콘 컨테이너 */
+.breadcrumb-dropdown .icon-wrapper {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 1.2em;
+    height: 1.2em;
+    border-radius: 50%;
+    border: 2px solid #000;
+    margin-left: 8px;
+    position: relative;
+    z-index: 1; /* 가장 낮은 우선순위 */
+}
+
+/* 중분류/소분류 텍스트 색상 블랙 */
+.breadcrumb-dropdown span,
+.breadcrumb-dropdown a {
+    color: black;
+    text-decoration: none;
+}
+
+.breadcrumb-dropdown svg {
+    width: 0.8em;
+    height: 0.8em;
+}
+
+/* 드롭다운 메뉴 */
+.breadcrumb-dropdown-menu {
+    display: none;
+    position: absolute;
+    background: #fff;
+    border: 1px solid #ddd;
+    padding: 10px;
+    list-style: none;
+    top: calc(100% + 5px); /* 중분류 메뉴 바로 아래에 배치 */
+    left: 50%; /* 부모 요소(중분류 메뉴)의 정중앙에 위치 */
+    transform: translateX(-50%); /* 가운데 정렬 */
+    min-width: 180px; /* 최소 너비 설정 */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    z-index: 11; /* 드롭다운 메뉴는 헤더보다 위로 */
+}
+
+/* 마우스를 중분류나 드롭다운 메뉴 안에 올려두면 유지됨 */
+.breadcrumb-dropdown:hover .breadcrumb-dropdown-menu,
+.breadcrumb-dropdown-menu:hover {
+    display: block;
+}
+
+/* 드롭다운 항목 스타일 */
+.breadcrumb-dropdown-menu li {
+    padding: 10px 15px;
+    cursor: pointer;
+    font-size: 13px;
+    background: white;
+    white-space: nowrap;
+    color: black; /* 하위 메뉴 색상 블랙 */
+}
+
+
+.breadcrumb-dropdown-menu li:hover {
+    background: #f0f0f0;
+}
+
+.breadcrumb-dropdown-menu li a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    color: black;
+    text-decoration: none;
+}
+
+/* li 태그 전체 클릭 가능 */
+.breadcrumb-dropdown-menu li {
+    cursor: pointer;
+}
+
+
+
+/* 상품 상세 페이지 컨테이너 */
+.product-detail-container {
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    gap: 20px;
+    padding: 0 100px; /* 좌우 여백을 더 추가 */
+}
+
+/* 상품 이미지 */
+.product-image {
+    width: 40%;
+    position: relative;
+}
+
+.slider-container {
+    display: flex;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    max-width: 500px;
+    margin: auto;
+}
+
+.image-wrapper {
+    width: 100%;
+    display: flex;
+    overflow: hidden;
+    position: relative;
+}
+
+.slider-img {
+    width: 100%;
+    display: none;
+}
+
+.slider-img.active {
+    display: block;
+}
+
+/* 좌우 버튼 스타일 */
+.prev-btn, .next-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    background-color: white; /* 배경 흰색 */
+    color: gray; /* 색상 회색 */
+    border: none;
+    padding: 13px 13px;
+    cursor: pointer;
+    font-size: 24px;
+    font-weight: bold;
+    opacity: 0.8;
+    transition: 0.3s;
+    z-index: 10;
+}
+
+.prev-btn {
+    left: 0;
+    display: none; /* 첫 번째 이미지는 '<' 버튼 숨김 */
+}
+
+.next-btn {
+    right: 0;
+}
+
+/* 버튼이 비활성화될 때 */
+.prev-btn.disabled, .next-btn.disabled {
+    opacity: 0.3;
+    cursor: default;
+}
+
+/* 인디케이터 (점) 스타일 */
+.indicator-container {
+    display: flex;
+    justify-content: center;
+    margin-top: 10px;
+}
+
+.indicator-dot {
+    width: 10px;
+    height: 10px;
+    margin: 0 5px;
+    border-radius: 50%;
+    background-color: #ddd;
+    cursor: pointer;
+}
+
+.indicator-dot.active {
+    background-color: black;
+}
+
+
+
+
+
+/* 상품 정보 컨테이너 */
+.product-info-container {
+    display: flex;
+    flex-direction: column;
+    width: 43%;
+}
+
+/* 제목과 하트 전체 컨테이너 */
+.title-container {
+    display: flex;
+    align-items: center;
+    width: 98%;
+}
+
+/* 제목 박스 - 80% */
+.title-box {
+    flex: 80%;
+    display: flex;
+    align-items: center;
+}
+
+/* 얇은 회색 구별선 */
+.divider {
+    width: 1px;
+    height: 66px;
+    background-color: #ccc; /* 회색 */
+}
+
+/* 구별선 */
+.section-divider {
+    width: 98%;
+    height: 2px;
+    background-color: black;
+}
+
+/* 상품 제목 */
+.product-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin: 0;
+}
+/* 하트 박스 - 20% */
+.wishlist-box {
+    flex: 20%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+/* 하트 아이콘 */
+.wishlist-icon {
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+    fill: #aaa; /* 기본 색상 */
+    transition: fill 0.3s ease;
+}
+
+.wishlist-icon.active {
+    fill: red; /* 클릭하면 빨간색 */
+}
+
+
+/* 상품 정보 */
+.product-info {
+    width: 98%;
+}
+
+/* 상품 코드 */
+.product-code {
+    font-size: 12px; /* 리뷰 보기와 동일한 크기 */
+    color: gray;
+    margin-bottom: 5px;
+}
+
+/* 별점과 리뷰 개수를 감싸는 컨테이너 */
+.product-rating-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+/* 리뷰 개수 스타일 */
+.review-count {
+    font-size: 11px; /* 작은 사이즈 */
+    color: gray;
+    text-decoration: underline; /* 밑줄 추가 */
+    cursor: pointer;
+    margin-bottom: 5px;
+    margin-left: 6px;
+}
+
+/* 별점 아이콘 크기 조절 */
+.star-icon {
+    width: 14px;
+    height: 19px;
+}
+
+
+
+/* 가격 컨테이너 */
+.product-price {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin-top: 20px;
+    margin-bottom: 10px;
+}
+
+/* 원가 */
+.original-price-container {
+    font-size: 13px; /* 원가 크기 */
+    color: #888; /* 회색 */
+    text-decoration: line-through;
+    display: flex;
+    align-items: baseline;
+}
+
+/* 할인율 & 판매가 */
+.discount-container {
+    display: flex;
+    align-items: baseline;
+    gap: 10px; /* 할인율과 판매가 간격 */
+}
+
+/* 할인율 */
+.discount-rate {
+    font-size: 20px;
+    color: rgb(255, 72, 0);
+    font-weight: bold;
+}
+
+/* 판매가 */
+.sale-price {
+    display: flex;
+    align-items: baseline;
+    font-size: 24px; /* 가격 기본 크기 */
+    color: black;
+    font-weight: bold;
+}
+
+/* 판매가 금액 */
+.price-value {
+    font-size: 20px; /* 금액 크기 */
+}
+
+/* 원 단위 */
+.currency-unit {
+    font-size: 13px; /* 기본 크기 */
+    margin-left: 2px;
+}
+
+.currency-unit.small {
+    font-size: 14px; /* 판매가의 '원'만 작게 */
+}
+/* 얇은 회색 구별선 */
+.thin-divider {
+    width: 98%;
+    height: 1px;
+    background-color: #ddd; /* 연한 회색 */
+    margin: 10px 0;
+}
+
+
+
+/* shipping-info 컨테이너 */
+.shipping-info {
+    font-size: 14px;
+    color: #333;
+    margin-top: 15px;
+    max-width: 500px; /* 텍스트가 너무 넓지 않도록 제한 */
+}
+
+/* 각 행 스타일링 */
+.shipping-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0;
+}
+
+/* 라벨 (왼쪽 텍스트) */
+.shipping-label {
+    font-weight: bold;
+    color: #777; /* 기본적으로 회색 */
+    display: flex;
+    align-items: center;
+    min-width: 120px; /* 적당한 여백을 확보 */
+}
+
+/* 배송정보 옆 툴팁 아이콘 */
+.tooltip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 16px;
+    height: 16px;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+/* 아이콘 색상 기본 회색 → 마우스 호버 시 검정 */
+.tooltip-svg {
+    transition: fill 0.2s ease-in-out;
+}
+.tooltip-icon:hover .tooltip-svg {
+    fill: black;
+}
+
+/* 값 (오른쪽 텍스트) */
+.shipping-value {
+    color: #333;
+    flex: 1;
+    text-align: left; /* 너무 오른쪽 정렬되지 않도록 설정 */
+}
+
+/* 무이자 할부 - 회색 & 밑줄 */
+.gray-link {
+    color: #777;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 배송정보 - 연한 파랑 */
+.blue-light {
+    color: #4285F4;
+    font-weight: bold;
+}
+
+/* 배송비 라벨을 독립적으로 위치 */
+.shipping-cost {
+    align-items: flex-start;
+}
+
+/* 배송비 내용 가로 정렬 */
+.shipping-details {
+    display: flex;
+    align-items: center;
+    gap: 5px; /* 값과 값 사이 간격 */
+}
+
+
+/* 배송비 (무료배송, 배송비 금액 - 파랑) */
+.shipping-value .blue-light {
+    color: #4285F4;
+    font-weight: bold;
+}
+/* 추가 배송 정보 (배송비 아래 위치) */
+.shipping-note-container {
+    margin-left: 120px; /* 배송비 라벨과 동일한 시작점으로 맞춤 */
+}
+
+/* 배송 추가 정보 (회색) */
+.shipping-note {
+    font-size: 13px;
+    color: #777;
+    margin: 2px 0 0 0; /* 상단 여백 최소화 */
+    line-height: 1.5;
+}
+
+
+
+
+
+
+
+/* 상품 옵션 스타일 */
+.product-options {
+    margin: 20px 0;
+}
+
+/* 드롭다운 스타일 */
+.custom-dropdown {
+    width: 100%;
+    position: relative;
+    border: 1px solid #ccc;
+    background-color: white;
+    font-size: 14px;
+    color: #444;
+    cursor: pointer;
+    margin-bottom: 12px;
+    border-radius: 0px; /* 직사각형 */
+}
+
+/* 선택된 옵션 (기본 표시) */
+.dropdown-selected {
+    padding: 8px;
+    background: white;
+    color: #444;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+/* 옵션 목록 (ul) */
+.dropdown-options {
+    display: none;
+    position: absolute;
+    left: -1px;  /* 선택된 옵션과 일직선 정렬 */
+    top: 100%; /* 아래로 펼쳐지도록 위치 조정 */
+    width: 100%;
+    border: 1px solid #ccc;
+    background-color: white;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    z-index: 10;
+}
+
+
+/* 개별 옵션 스타일 */
+.dropdown-item {
+    padding: 8px;
+    color: #444;
+    background-color: white;
+    cursor: pointer;
+    border-bottom: 1px solid #eee;
+    text-align: left; /* 왼쪽 정렬 */
+}
+
+/* 옵션 hover 시 */
+.dropdown-item:hover {
+    background-color: #ddd;
+}
+
+
+/* 드롭다운 활성화 시 옵션 목록 표시 */
+.custom-dropdown.active .dropdown-options {
+    display: block;
+}
+
+/* 하드코딩된 꺾새 아이콘 스타일 */
+.dropdown-arrow {
+    font-size: 14px;
+    color: #777;
+}
+
+/* ✅ 선택한 옵션 컨테이너 */
+#selected-options {
+    margin-top: 10px;
+}
+
+/* ✅ 선택한 옵션 아이템 */
+.selected-option-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd; /* 기본 회색 구분선 */
+}
+
+/* ✅ 첫 번째 아이템은 상단 구분선 제거 */
+.selected-option-item:first-child {
+    border-top: none;
+}
+
+/* ✅ 마지막 아이템(가장 최근 추가된 아이템)만 아래쪽에 검정색 굵은 구분선 적용 */
+.selected-option-item:last-child {
+    border-bottom: 2px solid black !important;
+}
+
+/* ✅ 옵션명, 수량, 가격, 삭제 버튼을 한 줄로 정렬 */
+.item-info {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    justify-content: space-between;
+    padding: 8px 0;
+}
+
+/* ✅ 옵션명 (왼쪽 정렬) */
+.item-info span:first-child {
+    flex-grow: 1;
+    text-align: left;
+    font-size: 15px;
+    font-weight: 550;
+    white-space: nowrap;
+}
+
+/* ✅ 수량 조절 버튼 컨테이너 (중앙 기준 살짝 오른쪽 정렬) */
+.quantity-controls {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ccc;
+    overflow: hidden;
+    height: 32px;
+    margin-left: auto; /* ✅ 가운데보다 살짝 오른쪽 */
+    margin-right: 50px; /* ✅ 가격과 X 버튼과의 간격 */
+}
+
+/* ✅ 수량 조절 버튼 */
+.quantity-controls button {
+    width: 30px;
+    height: 32px;
+    border: none;
+    background: none;
+    font-size: 16px;
+    cursor: pointer;
+    text-align: center;
+    line-height: 32px;
+}
+
+/* ✅ 수량 값 (중앙 정렬) */
+.quantity {
+    width: 35px;
+    text-align: center;
+    border-left: 1px solid #ccc;
+    border-right: 1px solid #ccc;
+    font-size: 16px;
+}
+
+/* ✅ 가격 (오른쪽 정렬) */
+.option-price {
+    font-size: 15px;
+    font-weight: 550;
+    margin-right: 8px; /* ✅ X 버튼과 간격 조정 */
+}
+
+/* ✅ X 버튼 (원형 스타일 + 테두리 추가) */
+.remove-option {
+    width: 18px;
+    height: 18px;
+    border: 1px solid #ccc; /* ✅ 연한 회색 테두리 추가 */
+    background-color: white;
+    color: #ccc;
+    font-size: 10px; /* ✅ X 아이콘을 더 얇게 조정 */
+    font-weight: normal; /* ✅ 굵기를 줄여 얇게 보이도록 */
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
+    transition: all 0.2s ease-in-out;
+}
+
+/* ✅ 총 상품 금액 컨테이너 */
+#total-price-container {
+    margin-top: 5px;
+    margin-bottom: 10px;
+    padding-top: 5px;
+    border-top: none; /* ✅ 불필요한 구분선 제거 */
+    display: flex;
+    justify-content: flex-end; /* ✅ 총 금액을 오른쪽으로 정렬 */
+    align-items: center;
+    font-size: 14px;
+    color: black;
+}
+
+/* ✅ 총 상품 금액 강조 */
+#total-price-container .price {
+    font-size: 24px;
+    color: rgb(255, 72, 0);
+    font-weight: 600;
+    margin-left: 10px; /* ✅ 텍스트와 금액 간격 추가 */
+    margin-right: 2px; /* ✅ 텍스트와 금액 간격 추가 */
+}
+
+
+#total-price-container .price2 {
+    font-size: 16px;
+    color: rgb(255, 72, 0);
+}
+
+/* ✅ 모달 스타일 */
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    z-index: 1000;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 220px;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    text-align: center;
+    padding: 25px 20px;
+}
+
+/* ✅ 모달 내부 내용 */
+.modal-content {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* ✅ 닫기 버튼 (X) */
+.close-modal {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* ✅ 확인 버튼 */
+#modal-confirm {
+    width: 70%;
+    padding: 12px 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+}
+
+
+
+
+
+
+
+
+
+/* ✅ 구매 버튼 컨테이너 */
+.purchase-buttons {
+    display: flex;
+    border: 1px solid #ccc; /* ✅ 직사각형 테두리 추가 */
+    border-radius: 0; /* ✅ 직사각형 유지 */
+    overflow: hidden; /* ✅ 테두리 밖 요소 제거 */
+}
+
+/* ✅ 장바구니 담기 & 바로 구매하기 버튼 */
+.cart-button, .buy-now-button {
+    flex: 1;
+    padding: 12px 0;
+    font-size: 13px; /* ✅ 폰트 크기 조정 */
+    font-weight: 600; /* ✅ 폰트 굵기 설정 */
+    border: none;
+    cursor: pointer;
+    text-align: center;
+}
+
+/* ✅ 장바구니 버튼 (흰색 배경) */
+.cart-button {
+    background-color: white;
+    color: black;
+    border-right: 1px solid #ccc; /* ✅ 버튼 사이 구분선 */
+}
+
+/* ✅ 바로 구매하기 버튼 (검은색 배경) */
+.buy-now-button {
+    background-color: black;
+    color: white;
+}
+
+/* ✅ 바로 구매하기 버튼에 그림자 추가 */
+.buy-now-button {
+    box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+
+
+

@@ -39,6 +39,7 @@ import shoppingmall.ankim.global.dummy.InitProduct;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -67,7 +68,6 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
 
     @Autowired
     private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
-
 
     @Autowired
     private PaymentQueryService paymentQueryService;
@@ -109,27 +109,69 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
     private List<String> paymentkeys = new ArrayList<>();
 
     @BeforeAll
-    void setUp() {
-        mockServer = MockRestServiceServer.createServer(restTemplate);
-        transactionTemplate.execute(status -> {
-            try {
-                // Member와 Product 생성
-                Member member = MemberJwtFactory.createMember(entityManager, "test-user@domain.com");
-                Product product = ProductFactory.createProduct(entityManager);
-                entityManager.persist(product);
+    void setUp() throws Exception{
+        if (!orderRepository.existsByOrdCode("ORD20241130-0000000")) { // 데이터가 이미 존재하는지 확인
+            mockServer = MockRestServiceServer.createServer(restTemplate);
+            transactionTemplate.execute(status -> {
+                try {
+                    // Member와 Product 생성
+                    Member member = MemberJwtFactory.createMember(entityManager, "test-user@domain.com");
+                    Product product = ProductFactory.createProduct(entityManager);
+                    entityManager.persist(product);
 
-                Item item = product.getItems().get(0);
-                Item item2 = product.getItems().get(1);
+                    Item item = product.getItems().get(0);
+                    Item item2 = product.getItems().get(1);
 
-                // 결제 요청에 대한 더미 (재고 감소)
-                for (int i = 0; i < 150; i++) {
+                    // 결제 요청에 대한 더미 (재고 감소)
+                    for (int i = 0; i < 100; i++) {
+                        OrderItem orderItem = OrderItem.create(item, 1);
+                        OrderItem orderItem2 = OrderItem.create(item2, 1);
+                        entityManager.persist(orderItem);
+                        entityManager.persist(orderItem2);
+
+                        String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
+                        orderNames.add(dynamicOrderName);
+
+                        Order order = Order.create(List.of(orderItem, orderItem2), member, null, LocalDateTime.now());
+                        order.setOrdCode(dynamicOrderName);
+
+                        orderRepository.save(order);
+                    }
+                    // flush를 통해 DB에 반영
+                    entityManager.flush();
+                    entityManager.clear();
+                } catch (Exception e) {
+                    // 데이터 준비가 완료될 때까지 대기
+                    while (!orderRepository.existsByOrdCode("ORD20241130-0000000")) {
+                        try {
+                            Thread.sleep(100); // 데이터 준비 대기
+                        } catch (InterruptedException ex) {
+                            throw new RuntimeException(ex);
+                        }
+                    }
+                    // 예외가 발생하면 rollback
+                    status.setRollbackOnly();
+                    throw e;
+                }
+                return null;
+            });
+        } else { // 데이터가 이미 존재하는 경우 orderNames 리스트를 초기화
+            // 결제 요청에 대한 더미 (재고 감소)
+            mockServer = MockRestServiceServer.createServer(restTemplate);
+            transactionTemplate.execute(status -> {
+                Member member = memberRepository.findByLoginId("test-user@domain.com");
+                Item item = itemRepository.findById(1L).orElseThrow();
+                Item item2 = itemRepository.findById(2L).orElseThrow();
+                for (int i = 0; i < 100; i++) {
                     OrderItem orderItem = OrderItem.create(item, 1);
+                    OrderItem orderItem2 = OrderItem.create(item2, 1);
                     entityManager.persist(orderItem);
+                    entityManager.persist(orderItem2);
 
-                    String dynamicOrderName = "ORD20241130-" + String.format("%07d", i);
+                    String dynamicOrderName = "ORD20251132-" + UUID.randomUUID().toString().substring(0, 6);
                     orderNames.add(dynamicOrderName);
 
-                    Order order = Order.create(List.of(orderItem), member, null, LocalDateTime.now());
+                    Order order = Order.create(List.of(orderItem, orderItem2), member, null, LocalDateTime.now());
                     order.setOrdCode(dynamicOrderName);
 
                     orderRepository.save(order);
@@ -137,13 +179,9 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
                 // flush를 통해 DB에 반영
                 entityManager.flush();
                 entityManager.clear();
-            } catch (Exception e) {
-                // 예외가 발생하면 rollback
-                status.setRollbackOnly();
-                throw e;
-            }
-            return null;
-        });
+                return null;
+            });
+        }
     }
 
     @DisplayName("100명의 사용자가 결제 요청 시 첫 번째 품목의 재고 차감에 대한 동시성 제어가 가능하다.")
@@ -191,7 +229,9 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
         latch.await();
 
         Item item = itemRepository.findById(1L).orElseThrow();
+        Item item2 = itemRepository.findById(2L).orElseThrow();
         assertThat(item.getQty()).isEqualTo(0);
+        assertThat(item2.getQty()).isEqualTo(0);
     }
 
     @Test

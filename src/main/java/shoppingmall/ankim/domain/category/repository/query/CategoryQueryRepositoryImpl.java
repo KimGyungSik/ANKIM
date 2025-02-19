@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.entity.CategoryLevel;
+import shoppingmall.ankim.domain.product.repository.query.helper.Condition;
 
 import java.util.List;
 import java.util.Optional;
@@ -47,6 +48,22 @@ public class CategoryQueryRepositoryImpl implements CategoryQueryRepository{
                 ))
                 .from(category)
                 .where(category.parent.no.eq(middleCategoryId)
+                        .and(category.level.eq(CategoryLevel.SUB)))
+                .fetch();
+    }
+
+    // 특정 중분류에 속한 모든 소분류 조회
+    @Override
+    public List<CategoryResponse> findSubCategoriesByMiddleCategoryName(Condition condition) {
+        return queryFactory
+                .select(Projections.bean(CategoryResponse.class,
+                        category.no.as("categoryNo"),
+                        category.parent.no.as("parentNo"),
+                        category.level,
+                        category.name
+                ))
+                .from(category)
+                .where(category.parent.name.eq(condition.getCategoryName())
                         .and(category.level.eq(CategoryLevel.SUB)))
                 .fetch();
     }

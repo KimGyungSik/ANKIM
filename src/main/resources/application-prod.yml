@@ -5,7 +5,7 @@ spring:
     password: 1234
     hikari:
       minimum-idle: 10
-      maximum-pool-size: 102
+      maximum-pool-size: 103
       idle-timeout: 30000
       connection-timeout: 60000
       max-lifetime: 1800000
@@ -16,7 +16,7 @@ spring:
 
   jpa:
     hibernate:
-      ddl-auto: create # 자동으로 엔티티에 맞는 테이블 업데이트
+      ddl-auto: create #자동으로 엔티티에 맞는 테이블 업데이트
     show-sql: true
     properties:
       hibernate:

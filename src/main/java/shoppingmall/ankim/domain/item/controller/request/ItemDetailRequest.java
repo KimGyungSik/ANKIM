@@ -14,7 +14,7 @@ import java.util.List;
 @Getter
 @NoArgsConstructor
 public class ItemDetailRequest {
-    @NotNull(message = "품목명은 필수 입력 값입니다.") // 필수
+    @NotNull(message = "항목명은 필수 입력 값입니다.") // 필수
     private String name;
 
     @NotNull(message = "옵션 값 이름 리스트는 필수 입력 값입니다.") // 필수
@@ -50,7 +50,7 @@ public class ItemDetailRequest {
         this.addPrice = addPrice;
         this.qty = qty;
         this.safQty = safQty;
-        this.sellingStatus = sellingStatus;
+        this.sellingStatus = sellingStatus == null ? ProductSellingStatus.SELLING : sellingStatus;
         this.maxQty = maxQty;
         this.minQty = minQty;
     }
