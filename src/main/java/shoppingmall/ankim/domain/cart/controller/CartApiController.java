@@ -25,11 +25,13 @@ public class CartApiController {
     // 장바구니에 상품 담기 ( C )
     @PostMapping("/items")
     public ApiResponse<String> addToCart(
-            @RequestBody AddToCartRequest request
+            @RequestBody List<AddToCartRequest> requestList
     ) {
         String loginId = securityContextHelper.getLoginId();
 
-        cartService.addToCart(request.toServiceRequest(), loginId);
+        for (AddToCartRequest request : requestList) {
+            cartService.addToCart(request.toServiceRequest(), loginId);
+        }
 
         return ApiResponse.ok("장바구니에 상품이 담겼습니다.");
     }
