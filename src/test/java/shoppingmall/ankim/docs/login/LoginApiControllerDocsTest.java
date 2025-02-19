@@ -38,7 +38,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object initController() {
-        return new LoginApiController(loginService, null, null);
+        return new LoginApiController(loginService);
     }
 
 
