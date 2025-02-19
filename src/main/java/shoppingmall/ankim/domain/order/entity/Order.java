@@ -176,8 +176,11 @@ public class Order extends BaseEntity {
                 .sum();
     }
 
-    // 결제 취소 -> 배송 준비 상태일떄만 가능
+    // 결제 취소 -> 결제완료, 배송 준비 상태일떄만 가능
     public void cancelOrder() {
+        if (orderStatus!=PAID) {
+            throw new IllegalStateException("결제를 완료해야 취소할 수 있습니다.");
+        }
         if (!delivery.getStatus().canCancel()) {
             throw new IllegalStateException("배송이 이미 시작되어 주문을 취소할 수 없습니다.");
         }

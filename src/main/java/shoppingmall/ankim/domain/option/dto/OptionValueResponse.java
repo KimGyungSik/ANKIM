@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 
+import java.util.Objects;
+
 @Getter
 @NoArgsConstructor
 public class OptionValueResponse {
@@ -32,5 +34,18 @@ public class OptionValueResponse {
                 .colorCode(optionValue.getColorCode())
                 .optionGroupNo(optionValue.getOptionGroup().getNo())
                 .build();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        OptionValueResponse that = (OptionValueResponse) o;
+        return Objects.equals(optionValueNo, that.optionValueNo);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(optionValueNo);
     }
 }

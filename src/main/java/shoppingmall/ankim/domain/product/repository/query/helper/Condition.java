@@ -6,13 +6,12 @@ public enum Condition {
     BEST(null),
     HANDMADE(null),
     DISCOUNT(null),
-    BOTTOM("Bottom"),
-    KNIT("Knit"),
-    OUTER("Outer"),
-    TOP("Top"),
-    SHIRT("Shirt"),
-    OPS("Ops"),
-    ACC("Acc");
+    BOTTOM("BOTTOM"),
+    KNIT("KNIT"),
+    OUTER("OUTER"),
+    TOP("TOP"),
+    SHIRT("SHIRT"),
+    OPS("OPS/SK");
 
     private final String categoryName;
 

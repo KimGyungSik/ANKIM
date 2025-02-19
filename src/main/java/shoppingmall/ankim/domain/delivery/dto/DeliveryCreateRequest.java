@@ -1,11 +1,15 @@
 package shoppingmall.ankim.domain.delivery.dto;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 
 @Data
 @NoArgsConstructor
+@AllArgsConstructor
+@Builder
 public class DeliveryCreateRequest {
 
     private Long addressId; // 주소 ID

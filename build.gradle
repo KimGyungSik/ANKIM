@@ -66,6 +66,9 @@ dependencies {
     // Redis 추가
     implementation 'org.springframework.boot:spring-boot-starter-data-redis'
 
+    // redisson 추가
+    implementation 'org.redisson:redisson-spring-boot-starter:3.23.2'
+
     // RestDocs
     asciidoctorExt 'org.springframework.restdocs:spring-restdocs-asciidoctor'
     testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc:3.0.0'

@@ -358,6 +358,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                         optionValue.no.as("optionValueNo"),
                         optionValue.name.as("valueName"),
                         optionValue.colorCode.as("colorCode"),
+                        optionValue.optionGroup.no.as("optionGroupNo"),
                         itemOption.item.no.as("itemId") // Item과 매핑을 위한 필드
                 ))
                 .from(itemOption)

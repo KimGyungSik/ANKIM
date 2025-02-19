@@ -1,8 +1,9 @@
 package shoppingmall.ankim.domain.payment.service;
 
-import jakarta.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.cart.entity.Cart;
@@ -28,8 +29,10 @@ import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.global.config.lock.LockHandler;
+import shoppingmall.ankim.global.config.lock.NamedLock;
 
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAYMENT;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
@@ -39,6 +42,8 @@ import static shoppingmall.ankim.global.exception.ErrorCode.*;
 // TODO 배송 상태 이력 테이블도 고려해야함 -> 배송 상태가 바뀔 때마다 이력이 쌓이도록
 // TODO 트랜잭션 경계에 맞춰서 결제 처리 실패시 재고 차감, 복구도 같이 롤백 시켜야하는 문제도 고려해봐야함
 // TODO 결제를 요청하고 나서 재고차감을 했는데 결제 요청 API에서 에러 발생 시 재고 감소 롤백 말하는거임
+
+// FIXME 비동기처리는 즉 @Async는 @Transactional과 동일하게 AOP방식으로 동작하므로 다른 서비스 클래스로 분리시켜줘야함
 @Service
 @Slf4j
 @Transactional
@@ -75,6 +80,13 @@ public class PaymentFacadeWithNamedLock {
         // 결제 요청 처리
         return paymentService.requestTossPayment(request);
     }
+
+//    @Async
+//    public void createDelivery(DeliveryCreateServiceRequest deliveryRequest, MemberAddressCreateServiceRequest addressRequest, Order order) {
+//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+//        order.setDelivery(delivery);
+//    }
+
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequest(String paymentKey, String orderId, Integer amount) {
         // 주문상태를 결제완료로 수정
@@ -83,10 +95,16 @@ public class PaymentFacadeWithNamedLock {
         order.successOrder();
 
         // 주문 상품은 장바구니에서 비우기
+        // 주문 상품과 장바구니 상품 매핑하여 비활성화
+        deactivateCartItemsMappedToOrder(order);
+        return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
+    }
+
+    @Async
+    public void deactivateCartItemsMappedToOrder(Order order) {
         Cart cart = cartRepository.findByMemberAndActiveYn(order.getMember(), "Y")
                 .orElseThrow(() -> new CartNotFoundException(CART_NOT_FOUND));
 
-        // 주문 상품과 장바구니 상품 매핑하여 비활성화
         List<OrderItem> orderItems = order.getOrderItems();
         List<CartItem> cartItems = cart.getCartItems();
 
@@ -95,8 +113,8 @@ public class PaymentFacadeWithNamedLock {
                     .filter(cartItem -> isMatchingCartAndOrder(cartItem, orderItem)) // 일치 여부 확인
                     .forEach(CartItem::deactivate); // 비활성화
         }
-        return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
     }
+
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
     public PaymentFailResponse toFailRequest(String code, String message, String orderId) {
         // 주문 상태를 결제실패로 수정 & 배송지 삭제
@@ -114,7 +132,7 @@ public class PaymentFacadeWithNamedLock {
 
         Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(payment.getOrder().getOrdNo())
                 .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));;
-        // 단, 결제 취소 시 배송 상태가 배송 준비 상태일때만 가능
+        // 단, 결제 취소 시 결제상태가 결제완료, 배송 상태가 배송 준비 상태일때만 가능
         order.cancelOrder(); // 주문 및 배송 취소 처리
 
         // 재고 복구
@@ -128,35 +146,19 @@ public class PaymentFacadeWithNamedLock {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Reducing stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            String key = String.valueOf(itemNo);
-            try {
-                // 아이템별 락
-                lockHandler.lock(key);
 
-                // 아이템 단위로 재고 감소
-                itemService.reduceStock(itemNo, quantity);
-            } finally {
-                // 락 해제
-                lockHandler.unlock(key);
-            }
+            // 재고 감소 로직
+            itemService.reduceStock(itemNo, quantity);
         }
     }
+
     private void restoreStock(Order order) {
         for (OrderItem orderItem : order.getOrderItems()) {
             Long itemNo = orderItem.getItem().getNo();
             Integer quantity = orderItem.getQty();
             log.debug("Restore stock for itemNo: {}, quantity: {}", itemNo, quantity);
-            String key = String.valueOf(itemNo);
-            try {
-                // 아이템별 락
-                lockHandler.lock(key);
 
-                // 아이템 단위로 재고 감소
-                itemService.restoreStock(itemNo, quantity);
-            } finally {
-                // 락 해제
-                lockHandler.unlock(key);
-            }
+            itemService.restoreStock(itemNo, quantity);
         }
     }
     private boolean isMatchingCartAndOrder(CartItem cartItem, OrderItem orderItem) {

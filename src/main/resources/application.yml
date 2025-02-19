@@ -1,4 +1,13 @@
 spring:
+  devtools:
+    livereload:
+      enabled: true
+    restart:
+      enabled: true
+  thymeleaf:
+      prefix: classpath:/templates/
+      suffix: .html
+      cache: false
   output:
     ansi:
       enabled: always
@@ -37,12 +46,6 @@ spring:
     multipart:
       maxFileSize: 20MB   # 파일 한 개당 최대 사이즈
       maxRequestSize: 100MB  # 요청당 최대 파일 크기
-
-  # 타임리프
-  thymeleaf:
-    prefix: classpath:/templates/
-    suffix: .html
-
 
 # 상품 이미지 업로드 경로
 itemImgLocation: C:/shop/item

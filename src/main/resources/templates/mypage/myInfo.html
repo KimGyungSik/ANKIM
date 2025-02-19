@@ -5,11 +5,11 @@
     <title>내 정보 수정</title>
     <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
     <link rel="stylesheet" th:href="@{/css/mypage/myInfo.css}">
-    <link rel="stylesheet" th:href="@{/css/fragments/header.css}">
-    <link rel="stylesheet" th:href="@{/css/fragments/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header-container"></header>
+<header th:replace="/fragments/header :: header"></header>
 <th:block th:replace="mypage/mypageUtils.html :: main">
     <th:block th:fragment="content">
         <!-- 비밀번호 검증 섹션 -->

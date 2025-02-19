@@ -12,18 +12,27 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.RequestBuilder;
+import shoppingmall.ankim.domain.address.controller.request.MemberAddressCreateRequest;
+import shoppingmall.ankim.domain.cart.repository.CartRepository;
+import shoppingmall.ankim.domain.delivery.dto.DeliveryCreateRequest;
+import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.image.service.S3Service;
+import shoppingmall.ankim.domain.item.service.ItemService;
+import shoppingmall.ankim.domain.order.repository.OrderRepository;
+import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequest;
 import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
 import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
 import shoppingmall.ankim.domain.payment.entity.PayType;
-import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
+import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
+import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedLock;
 import shoppingmall.ankim.global.config.JpaAuditingConfig;
 import shoppingmall.ankim.global.config.QuerydslConfig;
 import shoppingmall.ankim.global.config.RestTemplateConfig;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
+import shoppingmall.ankim.global.config.lock.LockHandler;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -48,44 +57,99 @@ class PaymentControllerTest {
     private MockMvc mockMvc;
 
     @MockBean
-    private PaymentService paymentServiceImpl;
+    private PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
-//    @Test
-//    @DisplayName("결제 요청 성공 시 PaymentResponse를 반환한다")
-//    void requestTossPayment_shouldReturnPaymentResponse() throws Exception {
-//        // given
-//        PaymentCreateRequest request = PaymentCreateRequest.builder()
-//                .payType(PayType.CARD)
-//                .amount(50000)
-//                .orderName("ORD12345678")
-//                .build();
-//
-//        PaymentResponse mockResponse = PaymentResponse.builder()
-//                .orderName("ORD12345678")
-//                .amount(50000)
-//                .payType("카드")
-//                .successUrl("https://example.com/success")
-//                .failUrl("https://example.com/fail")
-//                .build();
-//
-//        given(paymentServiceImpl.requestTossPayment(request.toServiceRequest())).willReturn(mockResponse);
-//
-//        // when & then
-//        mockMvc.perform(post("/api/v1/payments/toss")
-//                        .contentType(MediaType.APPLICATION_JSON)
-//                        .content("""
-//                        {
-//                            "payType": "CARD",
-//                            "amount": 50000,
-//                            "orderName": "ORD12345678"
-//                        }
-//                        """))
-//                .andExpect(status().isOk())
-//                .andExpect(jsonPath("$.code").value("200"))
-//                .andExpect(jsonPath("$.status").value("OK"))
-//                .andExpect(jsonPath("$.message").value("OK")) // 응답 HTTP 상태 코드 검증
-//                .andExpect(jsonPath("$.data").isNotEmpty());
-//    }
+    @MockBean
+    private LockHandler lockHandler;
+
+    @MockBean
+    private ItemService itemService;
+
+    @MockBean
+    private DeliveryService deliveryService;
+
+    @MockBean
+    private PaymentService paymentService;
+
+    @MockBean
+    private OrderRepository orderRepository;
+
+    @MockBean
+    private PaymentRepository paymentRepository;
+
+    @MockBean
+    private CartRepository cartRepository;
+
+    @Test
+    @DisplayName("결제 요청 성공 시 PaymentResponse를 반환한다")
+    void requestTossPayment_shouldReturnPaymentResponse() throws Exception {
+        // given
+        PaymentCreateRequest request = PaymentCreateRequest.builder()
+                .payType(PayType.CARD)
+                .amount(50000)
+                .orderName("ORD12345678")
+                .build();
+
+        DeliveryCreateRequest deliveryRequest = DeliveryCreateRequest.builder()
+                .addressId(null)
+                .courier("FastCourier")
+                .delReq("문 앞에 놓아주세요")
+                .build();
+
+        MemberAddressCreateRequest addressRequest = MemberAddressCreateRequest.builder()
+                .addressMain("서울특별시 강남구 테헤란로 123")
+                .addressName("집")
+                .addressDetail("1층")
+                .zipCode(12345)
+                .phoneNumber("010-1234-5678")
+                .emergencyPhoneNumber("010-5678-1234")
+                .defaultAddressYn("Y")
+                .build();
+
+        PaymentResponse mockResponse = PaymentResponse.builder()
+                .orderName("ORD12345678")
+                .amount(50000)
+                .payType("카드")
+                .successUrl("https://example.com/success")
+                .failUrl("https://example.com/fail")
+                .build();
+
+        given(paymentFacadeWithNamedLock.createPaymentWithNamedLock(request.toServiceRequest(),
+                deliveryRequest.toServiceRequest(),
+                addressRequest.toServiceRequest())).willReturn(mockResponse);
+
+        // when & then
+        mockMvc.perform(post("/api/v1/payments/toss")
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("""
+                        {
+                            "paymentRequest": {
+                                "payType": "CARD",
+                                "amount": 50000,
+                                "orderName": "ORD12345678"
+                            },
+                            "deliveryRequest": {
+                                "addressId": null,
+                                "courier": "FastCourier",
+                                "delReq": "문 앞에 놓아주세요"
+                            },
+                            "addressRequest": {
+                                "addressMain": "서울특별시 강남구 테헤란로 123",
+                                "addressName": "집",
+                                "addressDetail": "1층",
+                                "zipCode": 12345,
+                                "phoneNumber": "010-1234-5678",
+                                "emergencyPhoneNumber": "010-5678-1234",
+                                "defaultAddressYn": "Y"
+                            }
+                        }
+                        """))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.code").value("200"))
+                .andExpect(jsonPath("$.status").value("OK"))
+                .andExpect(jsonPath("$.message").value("OK"))
+                .andExpect(jsonPath("$.data").isNotEmpty());
+    }
 
     @Test
     @DisplayName("결제 성공 시 PaymentSuccessResponse를 반환한다")
@@ -97,7 +161,7 @@ class PaymentControllerTest {
                 .status("SUCCESS")
                 .build();
 
-        given(paymentServiceImpl.tossPaymentSuccess("paymentKey123", "ORD12345678", 50000)).willReturn(mockResponse);
+        given(paymentFacadeWithNamedLock.toSuccessRequest("paymentKey123", "ORD12345678", 50000)).willReturn(mockResponse);
 
         // when & then
         mockMvc.perform(post("/api/v1/payments/toss/success")
@@ -126,7 +190,7 @@ class PaymentControllerTest {
                 .orderId("ORD12345678")
                 .build();
 
-        given(paymentServiceImpl.tossPaymentFail("ERR001", "결제 실패", "ORD12345678")).willReturn(mockResponse);
+        given(paymentFacadeWithNamedLock.toFailRequest("ERR001", "결제 실패", "ORD12345678")).willReturn(mockResponse);
 
         // when & then
         mockMvc.perform((RequestBuilder) get("/api/v1/payments/toss/fail")
@@ -152,7 +216,7 @@ class PaymentControllerTest {
                 .details(request)
                 .build();
 
-        given(paymentServiceImpl.cancelPayment("paymentKey123", "단순 변심")).willReturn(mockResponse);
+        given(paymentFacadeWithNamedLock.toCancelRequest("paymentKey123", "단순 변심")).willReturn(mockResponse);
 
         // when & then
         mockMvc.perform(post("/api/v1/payments/toss/cancel")

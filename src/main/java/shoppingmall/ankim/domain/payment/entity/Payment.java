@@ -1,10 +1,7 @@
 package shoppingmall.ankim.domain.payment.entity;
 
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.payment.exception.InvalidPaymentKeyException;
 import shoppingmall.ankim.global.audit.BaseEntity;
@@ -40,6 +37,7 @@ public class Payment extends BaseEntity {
     @Column
     private boolean cancelYN; // 결제 취소 여부
 
+    @Setter
     @Column
     private String cancelReason; // 결제 취소 이유
 

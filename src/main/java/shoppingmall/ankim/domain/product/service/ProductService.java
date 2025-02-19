@@ -64,6 +64,7 @@ public class ProductService {
         // 5. 품목 생성
         itemService.createItems(savedProduct.getNo(), request.getItems());
 
+        savedProduct.updateSearchKeywords();
         return ProductResponse.of(savedProduct);
     }
 
@@ -140,7 +141,6 @@ public class ProductService {
                 request.getCauOrd(),
                 request.getCauShip()
         );
-        product.updateSearchKeywords();
         return productRepository.save(product);
     }
 

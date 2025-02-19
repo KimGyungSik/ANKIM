@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.item.service;
 
 import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
@@ -25,11 +26,13 @@ import shoppingmall.ankim.domain.option.service.request.OptionValueCreateService
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.exception.ProductNotFoundException;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.global.config.lock.NamedLock;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
@@ -39,6 +42,7 @@ import static shoppingmall.ankim.global.exception.ErrorCode.PRODUCT_NOT_FOUND;
 // 옵션 조합 생성 후 품목 반환 → 각 품목에 대한 세부 값 입력 및 저장
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ItemService {
 
     private final ItemRepository itemRepository;
@@ -63,7 +67,7 @@ public class ItemService {
     }
 
     // 재고 차감
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @NamedLock(key = "'LOCK_' + #itemNo", timeout = 30)
     public void reduceStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));
@@ -71,7 +75,7 @@ public class ItemService {
     }
 
     // 재고 복구
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @NamedLock(key = "'LOCK_' + #itemNo", timeout = 30)
     public void restoreStock(Long itemNo, Integer quantity) {
         Item item = itemRepository.findByNo(itemNo)
                 .orElseThrow(()-> new ItemNotFoundException(ITEM_NOT_FOUND));

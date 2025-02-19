@@ -36,5 +36,12 @@ public enum ColorCondition {
     public String getHexCode() {
         return hexCode;
     }
+    public static String findHexCodeByName(String name) {
+        return java.util.Arrays.stream(values())
+                .filter(color -> color.name().equalsIgnoreCase(name))
+                .map(ColorCondition::getHexCode)
+                .findFirst()
+                .orElse(null);
+    }
 }
 

@@ -47,7 +47,7 @@ public class CategoryController {
         return ApiResponse.ok();
     }
 
-    // 카테고리 중분류 수정
+    // 카테고리 소분류 수정
     @PutMapping("/sub/{categoryId}") // 매핑 경로의 변수명을 "categoryId"로 변경
     public ApiResponse<Void> updateSubCategory(
             @PathVariable("categoryId") Long categoryId, // 변수명도 "categoryId"로 유지

@@ -1,0 +1,260 @@
+<div class="filter-sidebar" th:fragment="listSide">
+    <!-- 필터 Section -->
+    <div class="filter-section">
+        <h2>필터</h2>
+        <div class="filter-line"></div>
+        <h3>색상</h3>
+        <div class="color-filter-container">
+            <ul class="color-filter">
+                <li data-color="BLACK"><span class="color-box" style="background-color: #000000;"></span> 블랙</li>
+                <li data-color="GRAY"><span class="color-box" style="background-color: #808080;"></span> 그레이</li>
+                <li data-color="BROWN"><span class="color-box" style="background-color: #A52A2A;"></span> 브라운</li>
+                <li data-color="WHITE"><span class="color-box" style="background-color: #FFFFFF; border: 1px solid #ccc;"></span> 화이트</li>
+                <li data-color="BEIGE"><span class="color-box" style="background-color: #F5F5DC;"></span> 베이지</li>
+                <li data-color="BLUE"><span class="color-box" style="background-color: #0000FF;"></span> 블루</li>
+                <li data-color="NAVY"><span class="color-box" style="background-color: #000080;"></span> 네이비</li>
+                <li data-color="IVORY"><span class="color-box" style="background-color: #FFFFF0;"></span> 아이보리</li>
+                <li data-color="SKYBLUE"><span class="color-box" style="background-color: #87CEEB;"></span> 스카이블루</li>
+                <li data-color="PINK"><span class="color-box" style="background-color: #FFC0CB;"></span> 핑크</li>
+                <li data-color="GREEN"><span class="color-box" style="background-color: #008000;"></span> 그린</li>
+                <li data-color="LIGHTGRAY"><span class="color-box" style="background-color: #D3D3D3;"></span> 라이트그레이</li>
+                <li data-color="YELLOW"><span class="color-box" style="background-color: #FFFF00;"></span> 옐로우</li>
+                <li data-color="CHARCOAL"><span class="color-box" style="background-color: #36454F;"></span> 차콜</li>
+                <li data-color="KHAKI"><span class="color-box" style="background-color: #BDB76B;"></span> 카키</li>
+                <li data-color="RED"><span class="color-box" style="background-color: #FF0000;"></span> 레드</li>
+                <li data-color="PURPLE"><span class="color-box" style="background-color: #800080;"></span> 퍼플</li>
+                <li data-color="MINT"><span class="color-box" style="background-color: #3EB489;"></span> 민트</li>
+                <li data-color="ORANGE"><span class="color-box" style="background-color: #FFA500;"></span> 오렌지</li>
+                <li data-color="BURGUNDY"><span class="color-box" style="background-color: #800020;"></span> 버건디</li>
+                <li data-color="TAN"><span class="color-box" style="background-color: #D2B48C;"></span> 탄</li>
+                <li data-color="BABYPINK"><span class="color-box" style="background-color: #F4C2C2;"></span> 베이비핑크</li>
+                <li data-color="LAVENDER"><span class="color-box" style="background-color: #E6E6FA;"></span> 라벤더</li>
+                <li data-color="CAMEL"><span class="color-box" style="background-color: #C19A6B;"></span> 카멜</li>
+            </ul>
+        </div>
+        <!-- 가격대 필터 -->
+        <h3 style="margin-top: 35px;margin-bottom: 23px;">가격대</h3>
+        <div class="price-filter-container">
+            <ul class="price-filter">
+                <li>
+                    <input type="radio" name="price" id="below10k" value="BELOW_10K">
+                    <label for="below10k">1만 원 이하</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="10kto50k" value="FROM_10K_TO_50K">
+                    <label for="10kto50k">1만 원 ~ 5만 원</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="50kto100k" value="FROM_50K_TO_100K">
+                    <label for="50kto100k">5만 원 ~ 10만 원</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="100kto300k" value="FROM_100K_TO_300K">
+                    <label for="100kto300k">10만 원 ~ 30만 원</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="300kto500k" value="FROM_300K_TO_500K">
+                    <label for="300kto500k">30만 원 ~ 50만 원</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="500kto1m" value="FROM_500K_TO_1M">
+                    <label for="500kto1m">50만 원 ~ 100만 원</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="above1m" value="ABOVE_1M">
+                    <label for="above1m">100만 원 이상</label>
+                </li>
+                <li>
+                    <input type="radio" name="price" id="custom" value="CUSTOM">
+                    <label for="custom">직접 설정</label>
+                </li>
+            </ul>
+
+            <!-- 직접 설정 입력 -->
+            <div class="custom-price-input">
+                <label for="min-price">최소 가격</label>
+                <div class="input-wrapper">
+                    <input type="number" id="min-price" placeholder="최소 가격">
+                    <span class="unit">원</span>
+                </div>
+                <label for="max-price">최대 가격</label>
+                <div class="input-wrapper">
+                    <input type="number" id="max-price" placeholder="최대 가격">
+                    <span class="unit">원</span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 상품정보 Section -->
+        <div class="product-info-section">
+            <h3 style="margin-top: 35px;">상품정보</h3>
+            <ul>
+                <li>
+                    <input type="checkbox" id="FREESHIP">
+                    <label for="FREESHIP">무료배송</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="EXCLUDE_OUT_OF_STOCK">
+                    <label for="EXCLUDE_OUT_OF_STOCK">품절상품 제외</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="DISCOUNT_ONLY">
+                    <label for="DISCOUNT_ONLY">할인상품만</label>
+                </li>
+                <li>
+                    <input type="checkbox" id="HANDMADE_ONLY">
+                    <label for="HANDMADE_ONLY">핸드메이드 상품만</label>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 버튼 Section -->
+        <div class="button-section">
+            <button class="reset-button">초기화</button>
+            <button class="apply-button">필터링된 상품보기</button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const resetButton = document.querySelector(".reset-button");
+            const applyButton = document.querySelector(".apply-button");
+            const checkboxes = document.querySelectorAll(".product-info-section input[type='checkbox']");
+            const priceFilterInputs = document.querySelectorAll(".price-filter input");
+            const minPriceInput = document.getElementById("min-price");
+            const maxPriceInput = document.getElementById("max-price");
+            const colorFilterItems = document.querySelectorAll(".color-filter li");
+
+            // ✅ 전역 변수 활용 (이미 선언된 전역 변수 사용)
+            const urlParams = new URLSearchParams(window.location.search); // 기존 URL 유지
+
+            // ✅ 새로고침 시 최소 가격/최대 가격 필드 비활성화 확인
+            const savedPriceCondition = urlParams.get("priceCondition");
+            if (!savedPriceCondition || savedPriceCondition !== "CUSTOM") {
+                minPriceInput.disabled = true;
+                maxPriceInput.disabled = true;
+            }
+
+            // ✅ 색상 필터 클릭 이벤트 핸들러
+            colorFilterItems.forEach(item => {
+                item.addEventListener("click", function () {
+                    const color = this.getAttribute("data-color");
+                    if (this.classList.contains("selected")) {
+                        this.classList.remove("selected");
+                        window.selectedColors = window.selectedColors.filter(c => c !== color);
+                    } else {
+                        this.classList.add("selected");
+                        window.selectedColors.push(color);
+                    }
+                });
+            });
+
+            // ✅ 가격대 필터 클릭 이벤트 핸들러
+            priceFilterInputs.forEach(input => {
+                input.addEventListener("change", function () {
+                    window.selectedPriceCondition = this.value;
+                    if (this.value === "CUSTOM") {
+                        minPriceInput.disabled = false;
+                        maxPriceInput.disabled = false;
+                    } else {
+                        minPriceInput.disabled = true;
+                        maxPriceInput.disabled = true;
+                        minPriceInput.value = "";
+                        maxPriceInput.value = "";
+                        window.customMinPrice = null;
+                        window.customMaxPrice = null;
+                    }
+                });
+            });
+
+            // ✅ 사용자 지정 가격 입력 이벤트
+            minPriceInput.addEventListener("input", function () {
+                window.customMinPrice = this.value || null;
+            });
+
+            maxPriceInput.addEventListener("input", function () {
+                window.customMaxPrice = this.value || null;
+            });
+
+            // ✅ 상품정보 체크박스 선택 이벤트 핸들러
+            checkboxes.forEach(checkbox => {
+                checkbox.addEventListener("change", function () {
+                    const infoSearch = this.id;
+                    if (this.checked) {
+                        if (!window.selectedInfoSearches.includes(infoSearch)) {
+                            window.selectedInfoSearches.push(infoSearch);
+                        }
+                    } else {
+                        window.selectedInfoSearches = window.selectedInfoSearches.filter(s => s !== infoSearch);
+                    }
+                });
+            });
+
+            // ✅ 초기화 버튼 클릭 이벤트
+            resetButton.addEventListener("click", function () {
+                // 체크박스 초기화
+                checkboxes.forEach(checkbox => checkbox.checked = false);
+                window.selectedInfoSearches = [];
+
+                // 색상 필터 초기화
+                colorFilterItems.forEach(item => item.classList.remove("selected"));
+                window.selectedColors = [];
+
+                // 가격 필터 초기화
+                priceFilterInputs.forEach(input => input.checked = false);
+                minPriceInput.value = "";
+                maxPriceInput.value = "";
+                minPriceInput.disabled = true;
+                maxPriceInput.disabled = true;
+                window.selectedPriceCondition = null;
+                window.customMinPrice = null;
+                window.customMaxPrice = null;
+
+                console.log("필터 초기화 완료");
+            });
+
+            // ✅ 필터링 적용 버튼 클릭 (비동기 요청 유지)
+            applyButton.addEventListener("click", function () {
+                const urlParams = new URLSearchParams(window.location.search);
+
+                // ✅ 색상 필터 조건 추가
+                if (window.selectedColors.length > 0) {
+                    urlParams.set("colorConditions", [...new Set(window.selectedColors)].join(",")); // 중복 제거
+                } else {
+                    urlParams.delete("colorConditions");
+                }
+
+                // ✅ 가격대 필터 조건 추가
+                if (window.selectedPriceCondition) {
+                    urlParams.set("priceCondition", window.selectedPriceCondition);
+                    if (window.selectedPriceCondition === "CUSTOM") {
+                        if (window.customMinPrice) urlParams.set("customMinPrice", window.customMinPrice);
+                        if (window.customMaxPrice) urlParams.set("customMaxPrice", window.customMaxPrice);
+                    }
+                } else {
+                    urlParams.delete("priceCondition");
+                    urlParams.delete("customMinPrice");
+                    urlParams.delete("customMaxPrice");
+                }
+
+                // ✅ 상품정보 필터 조건 추가
+                if (window.selectedInfoSearches.length > 0) {
+                    urlParams.set("infoSearches", [...new Set(window.selectedInfoSearches)].join(",")); // 중복 제거
+                } else {
+                    urlParams.delete("infoSearches");
+                }
+
+                // ✅ 페이지 초기화
+                urlParams.set("page", 0);
+
+                console.log("Updated URL:", urlParams.toString());
+
+                // ✅ 비동기 요청
+                sendAjaxRequest(urlParams);
+
+                // ✅ 필터 태그 업데이트
+                updateSelectedFilters();
+            });
+        });
+    </script>
+</div>

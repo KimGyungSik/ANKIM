@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ANKIM</title>
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+    <link rel="stylesheet" th:href="@{/css/product/detail.css}">
+</head>
+<body>
+<!-- 헤더 포함 -->
+<div th:replace="fragments/header :: header"></div>
+
+<!-- 네비게이션 바 -->
+<nav class="breadcrumb">
+    <!-- 중분류 -->
+    <div class="breadcrumb-dropdown" data-dropdown id="middle-category">
+        <span id="middle-category-name">
+            <a th:href="@{/product/list(condition=${middleCategoryName.name})}"
+               th:text="${middleCategoryName?.name ?: '카테고리 없음'}">
+            </a>
+        </span>
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                <path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/>
+            </svg>
+        </div>
+        <ul class="breadcrumb-dropdown-menu" id="middle-category-menu"></ul>
+    </div>
+
+    <!-- 소분류 -->
+    <div class="breadcrumb-dropdown" data-dropdown id="sub-category">
+        <span id="sub-category-name">
+            <a th:href="@{/product/list(condition=${middleCategoryName.name}, category=${product.categoryResponse.categoryNo})}"
+               th:text="${childCategoryName}">
+            </a>
+        </span>
+        <div class="icon-wrapper">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 384 512">
+                <path d="M19.7 34.5c16.3-6.8 35 .9 41.8 17.2L192 364.8 322.5 51.7c6.8-16.3 25.5-24 41.8-17.2s24 25.5 17.2 41.8l-160 384c-5 11.9-16.6 19.7-29.5 19.7s-24.6-7.8-29.5-19.7L2.5 76.3c-6.8-16.3 .9-35 17.2-41.8z"/>
+            </svg>
+        </div>
+        <ul class="breadcrumb-dropdown-menu" id="sub-category-menu"></ul>
+    </div>
+</nav>
+<!-- ✅ 중분류 ID와 소분류 ID를 JavaScript에서 사용할 수 있도록 전달 -->
+<script>
+    window.middleCategoryId = "[[${middleCategoryName.categoryNo}]]";
+    window.childCategoryId = "[[${product.categoryResponse.categoryNo}]]";
+</script>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        fetch('/header')
+            .then(response => response.json())
+            .then(data => {
+                const { middleCategories, subCategories } = data;
+
+                const middleCategoryMenu = document.getElementById("middle-category-menu");
+                const subCategoryMenu = document.getElementById("sub-category-menu");
+
+                middleCategoryMenu.innerHTML = "";
+                subCategoryMenu.innerHTML = "";
+
+                // ✅ 고정 중분류 추가 (BEST, NEW, MADE)
+                const fixedCategories = [
+                    { name: "BEST", url: "/product/list?condition=BEST" },
+                    { name: "NEW", url: "/product/list?condition=NEW" },
+                    { name: "MADE", url: "/product/list?condition=HANDMADE" }
+                ];
+
+                fixedCategories.forEach(category => {
+                    const listItem = document.createElement("li");
+                    listItem.innerHTML = `<a href="${category.url}">${category.name}</a>`;
+                    listItem.addEventListener("click", () => {
+                        window.location.href = category.url;
+                    });
+                    middleCategoryMenu.appendChild(listItem);
+                });
+
+                // ✅ 동적 중분류 추가 (모든 중분류 표시)
+                middleCategories.forEach(category => {
+                    const categoryCondition = category.name === "OPS/SK" ? "OPS" : category.name;
+                    const categoryUrl = `/product/list?condition=${categoryCondition}`;
+                    const listItem = document.createElement("li");
+                    listItem.innerHTML = `<a href="${categoryUrl}">${category.name}</a>`;
+                    listItem.addEventListener("click", () => {
+                        window.location.href = categoryUrl;
+                    });
+                    middleCategoryMenu.appendChild(listItem);
+                });
+
+                // ✅ 초기 렌더링 시, 현재 상품의 중분류에 해당하는 소분류만 표시
+                const productMiddleCategoryNo = parseInt(window.middleCategoryId); // ✅ Thymeleaf에서 전달받은 값 사용
+
+                if (!isNaN(productMiddleCategoryNo)) {
+                    const filteredSubCategories = subCategories.filter(sub => sub.parentNo === productMiddleCategoryNo);
+                    filteredSubCategories.forEach(subCategory => {
+                        const parentCategory = middleCategories.find(cat => cat.categoryNo === subCategory.parentNo);
+                        if (parentCategory) {
+                            const parentCategoryCondition = parentCategory.name === "OPS/SK" ? "OPS" : parentCategory.name;
+                            const subCategoryUrl = `/product/list?condition=${parentCategoryCondition}&category=${subCategory.categoryNo}`;
+                            const subItem = document.createElement("li");
+                            subItem.innerHTML = `<a href="${subCategoryUrl}">${subCategory.name}</a>`;
+                            subItem.addEventListener("click", () => {
+                                window.location.href = subCategoryUrl;
+                            });
+                            subCategoryMenu.appendChild(subItem);
+                        }
+                    });
+                }
+            })
+            .catch(error => console.error("Error loading categories:", error));
+
+        // ✅ 드롭다운 유지 기능
+        document.querySelectorAll("[data-dropdown]").forEach(dropdown => {
+            const menu = dropdown.querySelector(".breadcrumb-dropdown-menu");
+            if (menu) {
+                dropdown.addEventListener("mouseenter", () => menu.style.display = "block");
+                dropdown.addEventListener("mouseleave", () => setTimeout(() => {
+                    if (!menu.matches(":hover") && !dropdown.matches(":hover")) {
+                        menu.style.display = "none";
+                    }
+                }, 200));
+                menu.addEventListener("mouseenter", () => menu.style.display = "block");
+                menu.addEventListener("mouseleave", () => setTimeout(() => {
+                    if (!menu.matches(":hover") && !dropdown.matches(":hover")) {
+                        menu.style.display = "none";
+                    }
+                }, 200));
+            }
+        });
+    });
+</script>
+
+<!-- 상품 상세 페이지 -->
+<div class="product-detail-container">
+    <!-- 상품 이미지 영역 -->
+    <div class="product-image">
+        <div class="slider-container">
+            <button class="prev-btn">&lt;</button>
+            <div class="image-wrapper">
+                <th:block th:each="img, iterStat : ${product.productImgs}">
+                    <img th:src="${img.imgUrl}" class="slider-img" th:classappend="${iterStat.index == 0} ? 'active' : ''"
+                         alt="상품 이미지">
+                </th:block>
+            </div>
+            <button class="next-btn">&gt;</button>
+        </div>
+
+        <!-- 인디케이터 (점) -->
+        <div class="indicator-container">
+            <th:block th:each="img, iterStat : ${product.productImgs}">
+                <span class="indicator-dot" th:classappend="${iterStat.index == 0} ? 'active' : ''"></span>
+            </th:block>
+        </div>
+    </div>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const images = document.querySelectorAll(".slider-img");
+            const indicators = document.querySelectorAll(".indicator-dot");
+            const prevBtn = document.querySelector(".prev-btn");
+            const nextBtn = document.querySelector(".next-btn");
+
+            let currentIndex = 0;
+
+            function showImage(index) {
+                images.forEach(img => img.classList.remove("active"));
+                indicators.forEach(dot => dot.classList.remove("active"));
+
+                images[index].classList.add("active");
+                indicators[index].classList.add("active");
+
+                // 첫 번째 이미지에서는 '<' 버튼 숨김
+                if (index === 0) {
+                    prevBtn.style.display = "none";
+                } else {
+                    prevBtn.style.display = "block";
+                }
+
+                // 마지막 이미지에서는 '>' 버튼 비활성화
+                if (index === images.length - 1) {
+                    nextBtn.classList.add("disabled");
+                } else {
+                    nextBtn.classList.remove("disabled");
+                }
+            }
+
+            function nextImage() {
+                if (currentIndex < images.length - 1) {
+                    currentIndex++;
+                    showImage(currentIndex);
+                }
+            }
+
+            function prevImage() {
+                if (currentIndex > 0) {
+                    currentIndex--;
+                    showImage(currentIndex);
+                }
+            }
+
+            nextBtn.addEventListener("click", nextImage);
+            prevBtn.addEventListener("click", prevImage);
+
+            // 초기 이미지 설정
+            showImage(currentIndex);
+        });
+
+    </script>
+
+    <!-- 상품 정보 영역 -->
+    <div class="product-info-container">
+        <!-- 구별선 -->
+        <div class="section-divider"></div>
+
+        <!-- 제목과 하트를 감싸는 컨테이너 -->
+        <div class="title-container">
+            <div class="title-box">
+                <h1 class="product-title" th:text="${product.name}"></h1>
+            </div>
+            <!-- 얇은 회색 구별선 -->
+            <div class="divider"></div>
+            <div class="wishlist-box">
+                <svg class="wishlist-icon" id="wishlist" viewBox="0 0 24 24">
+                    <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                </svg>
+            </div>
+        </div>
+
+        <div class="product-info">
+            <!-- 상품 코드 -->
+            <p class="product-code">상품 코드: <span th:text="${product.code}"></span></p>
+
+            <!-- 평점과 리뷰 개수 -->
+            <div class="product-rating-container">
+                <!-- 별점 표시 -->
+                <div class="star-rating" data-rating="4.5"></div>
+                <!-- 리뷰 개수 -->
+                <a href="#" class="review-count">
+                    <span th:text="${product.rvwCnt}"></span>개 리뷰 보기
+                </a>
+            </div>
+
+            <script>
+                document.addEventListener("DOMContentLoaded", function () {
+                    const starRating = document.querySelector(".star-rating");
+                    const rating = parseFloat(starRating.dataset.rating); // 예: 4.5
+
+                    let stars = "";
+
+                    const fullStar = `<svg class="star-icon" viewBox="0 0 576 512">
+        <path d="M316.9 18C311.6 7 300.4 0 288.1 0s-23.4 7-28.8 18L195 150.3 51.4 171.5c-12 1.8-22 10.2-25.7 21.7s-.7 24.2 7.9 32.7L137.8 329 113.2 474.7c-2 12 3 24.2 12.9 31.3s23 8 33.8 2.3l128.3-68.5 128.3 68.5c10.8 5.7 23.9 4.9 33.8-2.3s14.9-19.3 12.9-31.3L438.5 329 542.7 225.9c8.6-8.5 11.7-21.2 7.9-32.7s-13.7-19.9-25.7-21.7L381.2 150.3 316.9 18z"/>
+    </svg>`;
+
+                    const halfStar = `<svg class="star-icon" viewBox="0 0 576 512">
+        <path d="M288 376.4l.1-.1 26.4 14.1 85.2 45.5-16.5-97.6-4.8-28.7 20.7-20.5 70.1-69.3-96.1-14.2-29.3-4.3-12.9-26.6L288.1 86.9l-.1 .3 0 289.2zm175.1 98.3c2 12-3 24.2-12.9 31.3s-23 8-33.8 2.3L288.1 439.8 159.8 508.3C149 514 135.9 513.1 126 506s-14.9-19.3-12.9-31.3L137.8 329 33.6 225.9c-8.6-8.5-11.7-21.2-7.9-32.7s13.7-19.9 25.7-21.7L195 150.3 259.4 18c5.4-11 16.5-18 28.8-18s23.4 7 28.8 18l64.3 132.3 143.6 21.2c12 1.8 22 10.2 25.7 21.7s.7 24.2-7.9 32.7L438.5 329l24.6 145.7z"/>
+    </svg>`;
+
+                    const emptyStar = `<svg class="star-icon" viewBox="0 0 576 512">
+        <path d="M287.9 0c9.2 0 17.6 5.2 21.6 13.5l68.6 141.3 153.2 22.6c9 1.3 16.5 7.6 19.3 16.3s.5 18.1-5.9 24.5L433.6 328.4l26.2 155.6c1.5 9-2.2 18.1-9.7 23.5s-17.3 6-25.3 1.7l-137-73.2L151 509.1c-8.1 4.3-17.9 3.7-25.3-1.7s-11.2-14.5-9.7-23.5l26.2-155.6L31.1 218.2c-6.5-6.4-8.7-15.9-5.9-24.5s10.3-14.9 19.3-16.3l153.2-22.6L266.3 13.5C270.4 5.2 278.7 0 287.9 0zm0 79L235.4 187.2c-3.5 7.1-10.2 12.1-18.1 13.3L99 217.9 184.9 303c5.5 5.5 8.1 13.3 6.8 21L171.4 443.7l105.2-56.2c7.1-3.8 15.6-3.8 22.6 0l105.2 56.2L384.2 324.1c-1.3-7.7 1.2-15.5 6.8-21l85.9-85.1L358.6 200.5c-7.8-1.2-14.6-6.1-18.1-13.3L287.9 79z"/>
+    </svg>`;
+
+                    for (let i = 1; i <= 5; i++) {
+                        if (rating >= i) {
+                            stars += fullStar; // 꽉 찬 별
+                        } else if (rating >= i - 0.5) {
+                            stars += halfStar; // 반 별
+                        } else {
+                            stars += emptyStar; // 빈 별
+                        }
+                    }
+
+                    starRating.innerHTML = stars;
+                });
+            </script>
+
+            <div class="product-price">
+                <!-- 원가 -->
+                <div class="original-price-container">
+                    <span class="original-price" th:text="${#numbers.formatInteger(product.origPrice, 3, 'COMMA')}"></span>
+                    <span class="currency-unit">원</span>
+                </div>
+
+                <!-- 할인율 & 판매가 -->
+                <div class="discount-container">
+                    <span class="discount-rate" th:text="${product.discRate} + '%'"></span>
+                    <span class="sale-price">
+                        <span class="price-value" th:text="${#numbers.formatInteger(product.sellPrice, 3, 'COMMA')}"></span>
+                        <span class="currency-unit small">원</span>
+                    </span>
+                </div>
+            </div>
+            <!-- 얇은 회색 구별선 -->
+            <div class="thin-divider"></div>
+
+            <div class="shipping-info">
+                <!-- 구매 적립금 -->
+                <div class="shipping-row">
+                    <span class="shipping-label">구매 적립금</span>
+                    <span class="shipping-value">최대 255 마일리지 적립 예정</span>
+                </div>
+
+                <!-- 무이자 할부 -->
+                <div class="shipping-row">
+                    <span class="shipping-label">무이자 할부</span>
+                    <span class="shipping-value">
+            <span class="gray-link">카드사별 할부 혜택 안내</span>
+        </span>
+                </div>
+
+                <!-- 배송정보 -->
+                <div class="shipping-row">
+        <span class="shipping-label">
+            배송정보
+            <span class="tooltip-icon" title="출고일 기준 배송 소요 기간">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+                    <path fill="#888" class="tooltip-svg"
+                          d="M464 256A208 208 0 1 0 48 256a208 208 0 1 0 416 0zM0 256a256 256 0 1 1 512 0A256 256 0 1 1 0 256zm169.8-90.7c7.9-22.3 29.1-37.3 52.8-37.3l58.3 0c34.9 0 63.1 28.3 63.1 63.1c0 22.6-12.1 43.5-31.7 54.8L280 264.4c-.2 13-10.9 23.6-24 23.6c-13.3 0-24-10.7-24-24l0-13.5c0-8.6 4.6-16.5 12.1-20.8l44.3-25.4c4.7-2.7 7.6-7.7 7.6-13.1c0-8.4-6.8-15.1-15.1-15.1l-58.3 0c-3.4 0-6.4 2.1-7.5 5.3l-.4 1.2c-4.4 12.5-18.2 19-30.6 14.6s-19-18.2-14.6-30.6l.4-1.2zM224 352a32 32 0 1 1 64 0 32 32 0 1 1 -64 0z"/>
+                </svg>
+            </span>
+        </span>
+                    <span class="shipping-value blue-light">2일 이내 출고</span>
+                </div>
+
+                <!-- 배송비 -->
+                <div class="shipping-row">
+                    <span class="shipping-label">배송비</span>
+                    <div class="shipping-value shipping-details">
+                        <span th:if="${product.freeShip == 'Y'}" class="blue-light">무료배송</span>
+                        <span th:if="${product.freeShip != 'Y'}" class="blue-light" th:text="${#numbers.formatInteger(product.shipFee, 3, 'COMMA')} + '원'"></span>
+                    </div>
+                </div>
+                <div class="shipping-note-container">
+                    <p th:if="${product.freeShip != 'Y'}" class="shipping-note">50,000원 이상 구매 시 무료배송</p>
+                    <p class="shipping-note">제주/도서산간 3,000원 추가</p>
+                </div>
+            </div>
+
+            <script th:inline="javascript">
+                /*<![CDATA[*/
+                const itemMap = /*[[${itemMap}]]*/ {};
+                const optionItemMap = /*[[${optionItemMap}]]*/ {};
+                const optionGroups = /*[[${optionGroups}]]*/ {};
+                const productPrice = /*[[${product.sellPrice}]]*/ 0; // ✅ 기본 상품 가격
+                const productNo = /*[[${product.no}]]*/ 0; // ✅ 상품 번호
+                console.log("🟢 itemMap 데이터:", itemMap);
+                console.log("🟢 optionItemMap 데이터:", optionItemMap);
+                console.log("🟢 optionGroups 데이터:", optionGroups);
+                /*]]>*/
+            </script>
+
+            <div class="product-options">
+                <th:block th:each="group, iterStat : ${optionGroups}">
+                    <div class="custom-dropdown" th:data-group-index="${iterStat.index}">
+                        <!-- 선택된 옵션 그룹명 -->
+                        <div class="dropdown-selected" th:data-group-name="${group.groupName}">
+                            <span class="group-label">[[${group.groupName}]]</span>
+                            <span class="dropdown-arrow">∨</span>
+                        </div>
+
+                        <!-- 옵션 목록 -->
+                        <ul class="dropdown-options" th:data-group-index="${iterStat.index}">
+                            <th:block th:if="${itemMap != null and itemMap[group.groupName] != null}">
+                                <th:block th:each="option : ${itemMap[group.groupName]}">
+                                    <li class="dropdown-item"
+                                        th:data-value="${option.optionValueNo}"
+                                        th:data-group-index="${iterStat.index}">
+                                        [[${option.valueName}]]
+
+                                        <!-- ✅ 추가 금액 표시 -->
+                                        <th:block th:if="${iterStat.index > 0}">
+                                            <th:block th:if="${optionItemMap != null and optionItemMap.containsKey(option.optionValueNo)}">
+                                                <th:block th:with="matchedItems=${optionItemMap[option.optionValueNo]}">
+                                                    <th:block th:if="${matchedItems != null and not #lists.isEmpty(matchedItems)}">
+                                                        <th:block th:with="firstItem=${matchedItems[0]}">
+                                                            <th:block th:if="${firstItem.addPrice > 0}">
+                                                    <span class="extra-price">
+                                                        (+[[${#numbers.formatInteger(firstItem.addPrice, 3, 'COMMA')}]]원)
+                                                    </span>
+                                                            </th:block>
+                                                        </th:block>
+                                                    </th:block>
+                                                </th:block>
+                                            </th:block>
+                                        </th:block>
+                                    </li>
+                                </th:block>
+                            </th:block>
+                        </ul>
+                    </div>
+                </th:block>
+            </div>
+
+            <!-- ✅ 선택한 옵션을 출력할 영역 -->
+            <div id="selected-options"></div>
+
+            <!-- ✅ 총 상품 금액을 표시할 영역 -->
+            <div id="total-price-container"></div>
+
+            <!-- ✅ 옵션 중복 모달 -->
+            <div id="duplicate-option-modal" class="modal">
+                <div class="modal-content">
+                    <span class="close-modal">&times;</span>
+                    <p>이미 선택된 옵션입니다.</p>
+                    <button id="modal-confirm">확인</button>
+                </div>
+            </div>
+
+            <!-- 구매 버튼 -->
+            <div class="purchase-buttons">
+                <button class="cart-button">장바구니 담기</button>
+                <button class="buy-now-button">바로 구매하기</button>
+            </div>
+        </div>
+    </div>
+</div>
+<script type="module" th:src="@{/js/product/detail.js}"></script>
+
+
+
+
+
+<!-- 푸터 포함 -->
+<div th:replace="fragments/footer :: footer-container"></div>
+</body>
+</html>

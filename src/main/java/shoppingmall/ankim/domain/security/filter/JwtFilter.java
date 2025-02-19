@@ -43,7 +43,9 @@ public class JwtFilter extends OncePerRequestFilter {
                 || path.equals("/docs")
 //                || path.equals("/api/mail/send")
                 || path.equals("/api/login/admin")
-                || path.equals("/reissue");
+                || path.equals("/reissue")
+                || path.equals("/product/admin/new")
+                || path.equals("/dashboard");
 //                || path.equals("/api/admin/register");
 //                || path.equals("/admin/join");
     }
