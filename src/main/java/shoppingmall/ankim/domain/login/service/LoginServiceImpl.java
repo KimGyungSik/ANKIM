@@ -313,7 +313,7 @@ public class LoginServiceImpl implements LoginService {
     private Map<String, Object> successfulAuthentication(CustomUserDetails userDetails, String autoLogin) {
         String access = jwtTokenProvider.generateAccessToken(userDetails, "access");
 
-        long expireTime = autoLogin.equals("rememberMe") ? REFRESH_TOKEN_REMEBER_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME;
+        long expireTime = autoLogin != null && autoLogin.equals("rememberMe") ? REFRESH_TOKEN_REMEBER_EXPIRE_TIME : REFRESH_TOKEN_EXPIRE_TIME;
 
         String refresh = jwtTokenProvider.generateRefreshToken(userDetails, "refresh", expireTime);
 
@@ -329,7 +329,7 @@ public class LoginServiceImpl implements LoginService {
 
     // refresh token 저장
     private void addRefreshToken(String access, String refresh, String autoLogin) {
-        if(autoLogin.equals("rememberMe")) {
+        if(autoLogin != null && autoLogin.equals("rememberMe")) {
             redisHandler.save(access, refresh, REFRESH_TOKEN_REMEBER_EXPIRE_TIME);
         } else {
             redisHandler.save(access, refresh, REFRESH_TOKEN_EXPIRE_TIME);

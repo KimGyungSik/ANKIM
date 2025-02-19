@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.admin.service;
 
 import shoppingmall.ankim.domain.admin.controller.request.AdminRegisterRequest;
+import shoppingmall.ankim.domain.admin.dto.AdminResponse;
 import shoppingmall.ankim.domain.admin.service.request.AdminIdValidServiceRequest;
 import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
 
@@ -10,5 +11,5 @@ public interface AdminService {
     void isLoginIdDuplicated(AdminIdValidServiceRequest request);
 
     // 회원 가입
-    void register(AdminRegisterServiceRequest request);
+    AdminResponse register(AdminRegisterServiceRequest request);
 }

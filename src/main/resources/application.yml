@@ -38,6 +38,9 @@ spring:
     init:
       data-locations: classpath*:data.sql
       mode: always
+  web:
+    resources:
+      static-locations: classpath:/static/  # 정적 리소스 경로
 
   servlet:
     multipart:

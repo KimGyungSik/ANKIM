@@ -54,3 +54,25 @@ include::{snippets}/member-register/request-fields.adoc[]
 ==== HTTP Response
 include::{snippets}/member-register/http-response.adoc[]
 include::{snippets}/member-register/response-fields.adoc[]
+
+[[member-confirm-password]]
+=== 회원 비밀번호 검증
+
+==== HTTP Request
+include::{snippets}/member-confirm-password/http-request.adoc[]
+include::{snippets}/member-confirm-password/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-confirm-password/http-response.adoc[]
+include::{snippets}/member-confirm-password/response-fields.adoc[]
+
+[[member-change-password]]
+=== 회원 비밀번호 변경
+
+==== HTTP Request
+include::{snippets}/member-change-password/http-request.adoc[]
+include::{snippets}/member-change-password/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-change-password/http-response.adoc[]
+include::{snippets}/member-change-password/response-fields.adoc[]

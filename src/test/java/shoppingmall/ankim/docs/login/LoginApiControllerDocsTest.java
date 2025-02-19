@@ -48,7 +48,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // given
         LoginRequest loginRequest = LoginRequest.builder()
                 .loginId("test@example.com")
-                .pwd("password123")
+                .password("password123")
                 .autoLogin("rememberMe")
                 .build();
 
@@ -78,7 +78,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("loginTime").optional().type(JsonFieldType.ARRAY)
                                         .description("로그인 시각"),
                                 fieldWithPath("autoLogin").optional().type(JsonFieldType.STRING)
-                                        .description("자동 로그인 여부")
+                                        .description("자동 로그인 여부( 자동 로그인 : \"rememberMe\" ")
                         ),
                         responseFields(
                                 fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),
@@ -100,7 +100,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
         // given
         LoginRequest loginRequest = LoginRequest.builder()
                 .loginId("admin")
-                .pwd("adminPass123")
+                .password("adminPass123")
                 .build();
 
         Map<String, Object> tokenResponse = Map.of(
@@ -129,7 +129,7 @@ public class LoginApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("loginTime").optional().type(JsonFieldType.ARRAY)
                                         .description("로그인 시각"),
                                 fieldWithPath("autoLogin").optional().type(JsonFieldType.STRING)
-                                        .description("자동 로그인 여부")
+                                        .description("자동 로그인 여부( 자동 로그인 : \"rememberMe\" ")
                         ),
                         responseFields(
                                 fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),

@@ -1,0 +1,21 @@
+[[admin-login-id-check]]
+=== 관리자 회원 가입을 위한 사용 가능 아이디 검증
+
+==== HTTP Request
+include::{snippets}/admin-login-id-check/http-request.adoc[]
+include::{snippets}/admin-login-id-check/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/admin-login-id-check/http-response.adoc[]
+include::{snippets}/admin-login-id-check/response-fields.adoc[]
+
+[[admin-register]]
+=== 관리자 회원 가입을 위한 개인 정보 입력
+
+==== HTTP Request
+include::{snippets}/admin-register/http-request.adoc[]
+include::{snippets}/admin-register/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/admin-register/http-response.adoc[]
+include::{snippets}/admin-register/response-fields.adoc[]

@@ -7,11 +7,11 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import shoppingmall.ankim.domain.address.service.request.AddressRegisterServiceRequest;
 import shoppingmall.ankim.domain.admin.entity.AdminStatus;
 import shoppingmall.ankim.domain.admin.service.request.AdminRegisterServiceRequest;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Getter
 @NoArgsConstructor
@@ -25,7 +25,7 @@ public class AdminRegisterRequest {
             regexp = "^(?=.*[a-zA-Z])(?=.*\\d)(?=.*[!@#$%^&*(),.?\":{}|<>])[A-Za-z\\d!@#$%^&*(),.?\":{}|<>]{8,20}$",
             message = "비밀번호는 8~20자 이내의 영문 대소문자, 숫자, 특수문자를 포함해야 합니다."
     )
-    private String pwd; // 비밀번호
+    private String password; // 비밀번호
 
     @NotBlank(message = "이름을 입력해주세요.")
     @Pattern(
@@ -57,7 +57,7 @@ public class AdminRegisterRequest {
     @NotNull(message = "성별을 선택해주세요.")
     private String gender; // 성별 (남자 M, 여자 F)
 
-    private String joinDate; // 입사일
+    private LocalDate joinDate; // 입사일
 
     private AdminStatus status; // 관리자 상태
 
@@ -69,9 +69,9 @@ public class AdminRegisterRequest {
     private String addressDetail; // 상세주소(필수기재는 아님)
 
     @Builder
-    public AdminRegisterRequest(String loginId, String pwd, String name, String email, String phoneNum, String officeNum, LocalDate birth, String gender, String joinDate, AdminStatus status, Integer zipCode, String addressMain, String addressDetail) {
+    public AdminRegisterRequest(String loginId, String password, String name, String email, String phoneNum, String officeNum, LocalDate birth, String gender, LocalDate joinDate, AdminStatus status, Integer zipCode, String addressMain, String addressDetail) {
         this.loginId = loginId;
-        this.pwd = pwd;
+        this.password = password;
         this.name = name;
         this.email = email;
         this.phoneNum = phoneNum;
@@ -88,7 +88,7 @@ public class AdminRegisterRequest {
     public AdminRegisterServiceRequest toServiceRequest() {
         return AdminRegisterServiceRequest.builder()
                 .loginId(loginId)
-                .pwd(pwd)
+                .pwd(password)
                 .name(name)
                 .email(email)
                 .phoneNum(phoneNum)

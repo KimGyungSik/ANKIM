@@ -33,7 +33,8 @@ public class OptionValue {
     private String colorCode;
 
     @Builder
-    private OptionValue(OptionGroup optionGroup, String name, String colorCode) {
+    private OptionValue(Long no, OptionGroup optionGroup, String name, String colorCode) {
+        this.no = no;
         this.optionGroup = optionGroup;
         this.name = name;
         this.colorCode = colorCode;

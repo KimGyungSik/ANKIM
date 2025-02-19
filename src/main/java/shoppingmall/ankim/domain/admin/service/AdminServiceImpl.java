@@ -6,6 +6,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.admin.controller.request.AdminRegisterRequest;
+import shoppingmall.ankim.domain.admin.dto.AdminResponse;
 import shoppingmall.ankim.domain.admin.entity.Admin;
 import shoppingmall.ankim.domain.admin.exception.AdminRegistrationException;
 import shoppingmall.ankim.domain.admin.repository.AdminRepository;
@@ -53,7 +54,7 @@ public class AdminServiceImpl implements AdminService {
     * */
 
     @Override
-    public void register(AdminRegisterServiceRequest request) {
+    public AdminResponse register(AdminRegisterServiceRequest request) {
         String loginId = request.getLoginId();
         log.info("Starting admin registration process for loginId: {}", loginId);
 
@@ -75,6 +76,8 @@ public class AdminServiceImpl implements AdminService {
 
         // Redis에서 검증된 로그인 아이디 제거
         redisHandler.delete(redisKey);
+
+        return AdminResponse.of(admin);
     }
 
 }

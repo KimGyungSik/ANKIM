@@ -1,0 +1,10 @@
+[[member-terms-update]]
+=== 회원 약관 변경(동의 및 철회)
+
+==== HTTP Request
+include::{snippets}/member-terms-update/http-request.adoc[]
+include::{snippets}/member-terms-update/request-fields.adoc[]
+
+==== HTTP Response
+include::{snippets}/member-terms-update/http-response.adoc[]
+include::{snippets}/member-terms-update/response-fields.adoc[]
