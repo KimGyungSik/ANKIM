@@ -21,6 +21,7 @@ import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.MemberFactory;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -68,10 +69,13 @@ class CartApiControllerTest {
         request.setOptionValueNoList(List.of(1L, 3L));
         request.setQty(2);
 
+        List<AddToCartRequest> requests = new ArrayList<>();
+        requests.add(request);
+
         // when & then
         mockMvc.perform(post("/api/cart/items")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(request))) // 요청 본문 설정
+                        .content(objectMapper.writeValueAsString(requests))) // 요청 본문 설정
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.data").value("장바구니에 상품이 담겼습니다.")); // 응답 메시지 확인
     }
