@@ -368,25 +368,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // ✅ 장바구니 담기 성공 시 모달창 띄우기
     function showCartModal() {
-    const modalHtml = `
-            <div class="modal" id="cart-modal">
-                <span class="close-modal" onclick="closeCartModal()">✖</span>
-                <div class="modal-content">장바구니에 상품이 담겼습니다.</div>
-                <button id="modal-confirm">장바구니 바로가기</button>
-            </div>
-            <div class="modal-overlay" onclick="closeCartModal()"></div>
-        `;
-    document.body.insertAdjacentHTML("beforeend", modalHtml);
-    document.getElementById("cart-modal").style.display = "block";
+        const modalHtml = `
+        <div class="modal" id="cart-modal">
+            <span class="close-modal" onclick="closeCartModal()">✖</span>
+            <div class="modal-content">장바구니에 상품이 담겼습니다.</div>
+            <button id="cart-modal-confirm">장바구니 바로가기 ></button>
+        </div>
+        <div class="cart-modal-overlay" onclick="closeCartModal()"></div>
+    `;
 
-    document.getElementById("modal-confirm").addEventListener("click", () => {
-    window.location.href = "/cart"; // ✅ 장바구니 페이지로 이동
-});
-}
+        // 기존 장바구니 모달 제거 (중복 방지)
+        const existingModal = document.getElementById("cart-modal");
+        if (existingModal) existingModal.remove();
+
+        document.body.insertAdjacentHTML("beforeend", modalHtml);
+        document.getElementById("cart-modal").style.display = "block";
+
+        // ✅ 장바구니 버튼 클릭 시 이동 (옵션 모달과 충돌 방지)
+        document.getElementById("cart-modal-confirm").addEventListener("click", () => {
+            window.location.href = "/cart"; // ✅ 장바구니 페이지로 이동
+        });
+    }
 
     // ✅ 모달 닫기 함수
     window.closeCartModal = function () {
-    document.getElementById("cart-modal")?.remove();
-    document.querySelector(".modal-overlay")?.remove();
-};
+        console.log("🛑 장바구니 모달 닫기: 선택된 아이템 초기화");
+
+        selectedItems = []; // ✅ 장바구니 리스트 초기화
+        renderSelectedOptions(); // ✅ 선택된 옵션 UI 갱신 (비워짐)
+
+        document.getElementById("cart-modal")?.remove();
+        document.querySelector(".cart-modal-overlay")?.remove();
+    };
 });

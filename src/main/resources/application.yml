@@ -18,7 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-#    defer-datasource-initialization: true
+    defer-datasource-initialization: true
     open-in-view: true
   datasource:
         hikari:
@@ -36,8 +36,8 @@ spring:
     allow-bean-definition-overriding: true
   sql:
     init:
-#      data-locations: classpath*:data.sql
-#      mode: always
+      data-locations: classpath*:data.sql
+      mode: always
   web:
     resources:
       static-locations: classpath:/static/  # 정적 리소스 경로
