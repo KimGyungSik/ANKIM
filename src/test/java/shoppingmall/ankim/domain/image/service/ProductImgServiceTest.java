@@ -43,7 +43,8 @@ import static org.mockito.Mockito.*;
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @ActiveProfiles("test")
-class ProductImgServiceTest {
+class
+ProductImgServiceTest {
 
     @Autowired
     private ProductImgService productImgService;
