@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>마이페이지</title>
-    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/mypage/mypageUtils.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
@@ -60,18 +60,10 @@
             <th:block th:replace="~{::content}"></th:block>
         </div>
     </section>
-
-    <!-- Modal -->
-    <div class="modal" id="cartModal">
-        <div class="modal-content">
-            <span class="close-button" onclick="closeModal()">&times;</span>
-            <div class="modal-body"></div>
-        </div>
-    </div>
 </main>
 
 <footer th:replace="~{fragments/footer :: footer}"></footer>
 </body>
-<script type="module" th:src="@{/js/mypage/mypage.js}"></script>
+<script type="module" th:src="@{/js/mypage/mypageUtils.js}"></script>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 </html>

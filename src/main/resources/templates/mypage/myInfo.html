@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <title>내 정보 수정</title>
-    <link rel="stylesheet" th:href="@{/css/mypage/mypage.css}">
+    <link rel="stylesheet" th:href="@{/css/mypage/mypageUtils.css}">
     <link rel="stylesheet" th:href="@{/css/mypage/myInfo.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
     <link rel="stylesheet" th:href="@{/css/footer.css}">
@@ -245,12 +245,18 @@
 
 <!--        <div id="termsSection"  style="display: none;"></div>-->
 
-        <!-- 해제/체크시 뜨는 모달 구조(간단 예시) -->
+        <!-- 마케팅+광고성 안내 모달 -->
         <div class="modal" id="termsModal" style="display:none;">
-            <div class="modal-body">
-                <p id="termsModalMessage"></p>
-                <button id="modalConfirmBtn">확인</button>
-                <button id="modalCancelBtn">취소</button>
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <!-- 제목 -->
+                <h2 id="termsModalTitle"></h2>
+                <!-- 본문 메세지 (멀티라인 가능하도록 pre-wrap 스타일 권장) -->
+                <p id="termsModalMessage" style="white-space: pre-wrap;"></p>
+                <div class="modal-footer">
+                    <button id="termsModalCancelBtn">다음에 하기</button>
+                    <button id="termsModalConfirmBtn">함께 동의하기</button>
+                </div>
             </div>
         </div>
     </th:block>
@@ -261,6 +267,6 @@
 <script type="module" th:src="@{/js/mypage/myInfo.js}"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="module" th:src="@{/js/utils/map.js}"></script>
-<script type="module" th:src="@{/js/mypage/mypage.js}"></script>
+<script type="module" th:src="@{/js/mypage/mypageUtils.js}"></script>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 </html>

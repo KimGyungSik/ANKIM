@@ -3,7 +3,9 @@ import { execDaumPostcode } from '../utils/map.js';
 
 // 전역 변수 (파일 상단)
 let allTerms = [];
-let marketingStatus = {}; // { 부모약관의 termsNo: "Y" 또는 "N" }
+let termsTree = [];
+let marketingStatus = {
+};
 
 
 document.addEventListener("DOMContentLoaded", async () => {
@@ -44,7 +46,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
             // 약관 트리 렌더링 (agreedTerms가 있을 경우)
             if(response.data.agreedTerms) {
-                const termsTree = buildTermsTree(response.data.agreedTerms);
+                // 1) 전역 변수에 먼저 할당
+                allTerms = response.data.agreedTerms;
+
+                // 2) 트리 빌드 & 렌더링
+                termsTree = buildTermsTree(allTerms);
                 const termsContainer = termsSection;
                 // termsContainer가 존재할 때만 렌더링
                 if (termsContainer) {
@@ -65,7 +71,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         var password = document.getElementById("password").value;
 
         if (!password) {
-            showModal("비밀번호를 입력해주세요.");
+            handleErrors("비밀번호를 입력해주세요.");
             return;
         }
 
@@ -327,7 +333,7 @@ function buildTermsTree(termsList) {
             marketingStatus[node.termsNo] = node.agreeYn; // 서버에서 받은 값 ("Y" 또는 "N")
         }
     });
-
+    console.log(roots);
     return roots;
 }
 
@@ -351,7 +357,7 @@ function renderTermsTree(roots, container) {
 
             const descDiv = document.createElement("div");
             descDiv.className = "terms-parent-desc";
-            descDiv.innerText = "하위 항목 중 하나라도 동의하면 광고성 동의로 처리됩니다.";
+            descDiv.innerText = "서비스의 중요 안내사항 및 주문/배송에 대한 정보는 위 수신 여부와 관계없이 발송됩니다.\n하위 항목 중 하나라도 동의하면 광고성 동의로 처리됩니다.";
 
             groupDiv.appendChild(titleSpan);
             groupDiv.appendChild(descDiv);
@@ -407,10 +413,9 @@ function renderLeafTerm(node, container, parentNode) {
  */
 function findMarketingTermFromTree(nodes) {
     for (const node of nodes) {
-        // 자식 노드가 없으면 leaf node입니다.
+        // 자식 노드가 없으면 leaf node
         if (!node.children || node.children.length === 0) {
-            // 여기서 "마케팅 약관" 조건은
-            // (예: level이 2) 또는 다른 조건을 추가할 수 있습니다.
+            // 여기서 "마케팅 약관"은 2 level
             if (node.level === 2) {
                 return node;
             }
@@ -428,29 +433,30 @@ async function onLeafCheckboxChange(e, node) {
     const termsNo = node.termsNo;
 
     if (isChecked) {
-        // 광고성 자식 항목 체크 시, 마케팅 약관이 체크되어 있는지 확인
-        if (needMarketingAgreement()) {  // 아래 함수 참고
+        if (needMarketingAgreement()) {
             openConfirmModal(
                 `${node.name} 동의 시 마케팅 약관도 함께 동의해야 합니다. 진행하시겠습니까?`,
                 async () => {
-                    // 모달 확인 클릭 시: 자식 항목 + 마케팅 약관 payload 구성
-                    const marketingTerm = findMarketingTermFromTree(buildTermsTree(allTerms));
-                    const payload = [
-                        { terms_no: termsNo, terms_hist_agreeYn: "Y" }
-                    ];
+                    const marketingTerm = findMarketingTermFromTree(termsTree);
+                    const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "Y" }];
                     if (marketingTerm) {
                         payload.push({ terms_no: marketingTerm.termsNo, terms_hist_agreeYn: "Y" });
                     }
                     const res = await postTermsUpdate(payload);
                     if (res.code === 200) {
+                        // 마케팅 노드도 체크 표시
+                        if (marketingTerm) {
+                            const mkCb = document.getElementById(`termsCheck_${marketingTerm.termsNo}`);
+                            if (mkCb) mkCb.checked = true;
+                        }
                         showAlertModal(res.data);
                     } else {
+                        // 실패 시 다시 해제
                         e.target.checked = false;
                         showAlertModal(res.message || "동의 처리 실패");
                     }
                 },
                 () => {
-                    // 모달 취소 시 체크 해제
                     e.target.checked = false;
                 }
             );
@@ -471,19 +477,63 @@ async function onLeafCheckboxChange(e, node) {
             }
         }
     } else {
-        // 체크 해제 시 바로 API 호출 (모달 없이)
-        try {
-            const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "N" }];
-            const res = await postTermsUpdate(payload);
-            if (res.code === 200) {
-                showAlertModal(res.data);
-            } else {
+        // [체크 해제 시 로직]
+        // (1) 만약 "마케팅 노드"를 해제하는 경우 => 광고성도 함께 해제 모달
+        if (isMarketingNode(node)) {
+            openConfirmModalForMarketingCancel(
+                "마케팅 목적의 개인정보 수집 및 이용 동의를 철회할 경우,\n광고성 정보 수신 동의도 함께 철회됩니다.\n모두 동의 철회하기를 선택하면 광고성 동의(푸시, 문자, 이메일)도 해제됩니다.",
+                async () => {
+                    // "모두 동의 철회하기"
+                    // 마케팅 노드 + 이미 체크된 광고성 노드들
+                    // const roots = buildTermsTree(allTerms);
+                    const advChecked = findCheckedAdvertisementNodes(termsTree);
+
+                    // payload: 마케팅 본인 + 광고성 체크된 것들 -> N
+                    const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "N" }];
+                    advChecked.forEach(advNode => {
+                        payload.push({
+                            terms_no: advNode.termsNo,
+                            terms_hist_agreeYn: "N"
+                        });
+                    });
+
+                    const res = await postTermsUpdate(payload);
+                    if (res.code === 200) {
+                        // 모두 해제
+                        const mkCb = document.getElementById(`termsCheck_${termsNo}`);
+                        if (mkCb) mkCb.checked = false;
+                        advChecked.forEach(n => {
+                            const c = document.getElementById(`termsCheck_${n.termsNo}`);
+                            if (c) c.checked = false;
+                        });
+                        showAlertModal(res.data);
+                    } else {
+                        // 실패하면 다시 체크
+                        const mkCb = document.getElementById(`termsCheck_${termsNo}`);
+                        if (mkCb) mkCb.checked = true;
+                        showAlertModal("해제 실패");
+                    }
+                },
+                () => {
+                    // "모두 동의 유지하기" => 다시 체크
+                    e.target.checked = true;
+                }
+            );
+        } else {
+            // (2) 일반 노드 해제
+            try {
+                const payload = [{ terms_no: termsNo, terms_hist_agreeYn: "N" }];
+                const res = await postTermsUpdate(payload);
+                if (res.code === 200) {
+                    showAlertModal(res.data);
+                } else {
+                    e.target.checked = true;
+                    showAlertModal("해제 실패");
+                }
+            } catch (err) {
                 e.target.checked = true;
-                showAlertModal("해제 실패");
+                console.error(err);
             }
-        } catch (err) {
-            e.target.checked = true;
-            console.error(err);
         }
     }
 }
@@ -499,49 +549,200 @@ async function postTermsUpdate(termsArray) {
     return await res;
 }
 
+// 마케팅 노드 식별
+function isMarketingNode(node) {
+    if (!node.children || node.children.length === 0) {
+        // 여기서 "마케팅 약관"은 2 level
+        if (node.level === 2) {
+            return true;
+        }
+    } else {
+        return false;
+    }
+}
+
 function needMarketingAgreement() {
-    const marketingTerm = findMarketingTermFromTree(buildTermsTree(allTerms));
+    const marketingTerm = findMarketingTermFromTree(termsTree);
     if (!marketingTerm) return false;
     const marketingCheckbox = document.getElementById(`termsCheck_${marketingTerm.termsNo}`);
     return marketingCheckbox && !marketingCheckbox.checked;
 }
 
-function openConfirmModal(message, onConfirm, onCancel) {
-    const modal = document.getElementById("termsModal");
-    const modalMsg = document.getElementById("termsModalMessage");
-    const confirmBtn = document.getElementById("modalConfirmBtn");
-    const cancelBtn = document.getElementById("modalCancelBtn");
+// 광고성(푸시/문자/이메일 등) 노드 중 체크된 것들을 찾는 함수
+function findCheckedAdvertisementNodes(roots) {
+    const result = [];
 
-    modalMsg.textContent = message;
+    function dfs(node) {
+        // (예) 광고성 노드는 level=2 + 자식있음(광고성 부모) or level=3(문자/이메일)
+        const cb = document.getElementById(`termsCheck_${node.termsNo}`);
+        if (cb && cb.checked) {
+            // 여기에 "node.level === 3" or "부모가 광고성" 등 추가 조건을 넣을 수도 있음
+            result.push(node);
+        }
+        if (node.children) {
+            node.children.forEach(dfs);
+        }
+    }
+
+    roots.forEach(dfs);
+    return result;
+}
+
+// 마케팅 동의 해제시 모달 함수
+function openConfirmModalForMarketingCancel(message, onConfirm, onCancel) {
+    // 버튼 영역이 보이도록 모달을 엽니다.
+    showModal(message, true);
+
+    const modal = document.getElementById("termsModal");
+    const titleEl = document.getElementById("termsModalTitle");
+    const msgEl = document.getElementById("termsModalMessage");
+    const confirmBtn = document.getElementById("termsModalConfirmBtn");
+    const cancelBtn = document.getElementById("termsModalCancelBtn");
+    const closeBtn  = modal.querySelector(".close-button"); // X 버튼
+
+    // 모달 내용
+    titleEl.textContent = "마케팅 동의 해제 안내";
+    msgEl.textContent = message;
+
+    // 버튼 텍스트
+    confirmBtn.textContent = "모두 동의 철회하기";
+    cancelBtn.textContent = "모두 동의 유지하기";
+
+    // 기존 리스너를 제거
+    confirmBtn.onclick = null;
+    cancelBtn.onclick = null;
+    closeBtn.onclick   = null;
+
+    // 모달창 열기
     modal.style.display = "block";
+
+    // 동의, 철회 확인 버튼
+    confirmBtn.onclick = () => {
+        closeModal();
+        // ESC 키 이벤트도 제거
+        document.removeEventListener("keydown", escHandler);
+        // 콜백 실행
+        if (onConfirm) onConfirm();
+    };
+
+    // 동의, 철회 취소 버튼
+    cancelBtn.onclick = () => {
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
+        if (onCancel) onCancel();
+    };
+
+    // x 버튼(취소 버튼이랑 동일하게 동작해야됨)
+    closeBtn.onclick = () => {
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
+        if (onCancel) onCancel();
+    };
+
+    // ESC 키 → 취소와 동일 로직
+    function escHandler(e) {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            closeModal();
+            document.removeEventListener("keydown", escHandler);
+            if (onCancel) onCancel();
+        }
+    }
+    document.addEventListener("keydown", escHandler);
+}
+
+function openConfirmModal(message, onConfirm, onCancel) {
+    // 버튼 영역이 보이도록 모달을 엽니다.
+    showModal(message, true);
+
+    // 모달 요소들 가져오기
+    const modal = document.getElementById("termsModal");
+    // ↑ 기존에 termsModal인지 marketingModal인지 확인 후 수정
+    const titleEl = document.getElementById("termsModalTitle");
+    const msgEl = document.getElementById("termsModalMessage");
+    const confirmBtn = document.getElementById("termsModalConfirmBtn");
+    const cancelBtn = document.getElementById("termsModalCancelBtn");
+    const closeBtn  = modal.querySelector(".close-button"); // X 버튼
+
+    // 모달 제목/메시지 설정
+    titleEl.textContent = "광고성 정보 수신 동의";
+    // 예시: "광고성 정보 수신 동의" 라고 표시
+    // 멀티라인 문구 (white-space: pre-wrap 적용)
+    msgEl.textContent = message;
+    // 예: "광고성 정보 알림을 받으시려면\n마케팅 목적의 개인정보 수집 및 이용 동의가 필요해요."
+
+    // 모달 열기
+    modal.style.display = "block";
+
+    // 버튼 텍스트 강제 지정(필요하면)
+    cancelBtn.textContent = "다음에 하기";
+    confirmBtn.textContent = "함께 동의하기";
 
     // 기존 이벤트 리스너 제거
     confirmBtn.onclick = null;
     cancelBtn.onclick = null;
 
+    // [함께 동의하기] 버튼
     confirmBtn.onclick = () => {
-        modal.style.display = "none";
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
         if (onConfirm) onConfirm();
     };
+    // [다음에 하기] 버튼
     cancelBtn.onclick = () => {
-        modal.style.display = "none";
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
         if (onCancel) onCancel();
     };
+    // x 버튼(취소 버튼이랑 동일하게 동작해야됨)
+    closeBtn.onclick = () => {
+        closeModal();
+        document.removeEventListener("keydown", escHandler);
+        if (onCancel) onCancel();
+    };
+
+    // ESC 키 → 취소와 동일 로직
+    function escHandler(e) {
+        if (e.key === "Escape") {
+            e.preventDefault();
+            closeModal();
+            document.removeEventListener("keydown", escHandler);
+            if (onCancel) onCancel();
+        }
+    }
+    document.addEventListener("keydown", escHandler);
 }
 
-function showAlertModal(message) {
-    if(message.message != null) {
-        alert(message.message + "\n" +message.date + "\n" + message.sender);
+function showAlertModal(serverData, showButtons = false) {
+    const titleEl = document.getElementById("termsModalTitle");
+
+    // 모달 제목/메시지 설정
+    titleEl.textContent = "약관 동의 변경";
+
+    if (serverData && serverData.message) {
+        let lines = serverData.message;
+        // 만약 lines가 배열이 아니라면 배열로 처리
+        if (!Array.isArray(lines)) {
+            lines = [lines];
+        }
+        const joined = lines.join("\n");
+        const finalMsg = joined + "\n" + (serverData.date || "") + "\n" + (serverData.sender || "");
+        showModal(finalMsg.trim(), showButtons); // trim()으로 앞뒤 공백 정리
     } else {
-        alert(message);
+        // 그냥 문자열인 경우
+        showModal(serverData, showButtons);
     }
 }
 
-// 모달 표시 함수 (기존)
-function showModal(message) {
-    var modal = document.querySelector('.modal');
-    var modalBody = modal.querySelector('.modal-body');
-    modalBody.textContent = message;
+// 모달 표시 함수
+function showModal(message, showButtons = false) {
+    var modal = document.getElementById("termsModal");
+    var modalMessage = document.getElementById("termsModalMessage");
+    var modalFooter = modal.querySelector(".modal-footer");
+    modalMessage.textContent = message;
+    modalMessage.style.whiteSpace = "pre-wrap"; // 줄바꿈을 유지
+    // 버튼 영역 보이기/숨기기 설정
+    modalFooter.style.display = showButtons ? "flex" : "none";
     modal.style.display = "flex";
 }
 

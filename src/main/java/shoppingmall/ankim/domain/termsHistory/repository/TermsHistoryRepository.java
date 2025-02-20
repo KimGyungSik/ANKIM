@@ -42,6 +42,6 @@ public interface TermsHistoryRepository extends JpaRepository<TermsHistory, Long
             "AND th.terms.no = :termsNo")
     Optional<TermsHistory> findActiveByMemberAndTerms(@Param("memberNo") Long memberNo, @Param("termsNo") Long termsNo);
 
-    @Query("SELECT th FROM TermsHistory th JOIN FETCH th.terms t WHERE th.member.no = :memberNo AND t.category = :category")
+    @Query("SELECT th FROM TermsHistory th JOIN FETCH th.terms t WHERE th.member.no = :memberNo AND t.category = :category AND th.activeYn = 'Y'")
     List<TermsHistory> findAgreedJoinByMember(@Param("memberNo") Long memberNo, @Param("category") TermsCategory category);
 }
