@@ -54,7 +54,7 @@ public class ProductController {
         Map<String, List<OptionValueResponse>> itemMap = new HashMap<>();
         Map<Long, List<ItemResponse>> optionItemMap = new HashMap<>();
 
-        // ✅ 상품에서 실제 사용된 옵션 그룹만 필터링
+        // 상품에서 실제 사용된 옵션 그룹만 필터링
         Set<Long> usedOptionGroupNos = product.getItems().stream()
                 .flatMap(item -> item.getOptionValues().stream())
                 .map(OptionValueResponse::getOptionGroupNo)
@@ -64,7 +64,7 @@ public class ProductController {
                 .filter(group -> usedOptionGroupNos.contains(group.getOptionGroupNo()))
                 .collect(Collectors.toList());
 
-        // ✅ 필터링된 옵션 그룹만 모델에 추가
+        // 필터링된 옵션 그룹만 모델에 추가
         model.addAttribute("optionGroups", filteredOptionGroups);
 
         for (ItemResponse item : product.getItems()) {
@@ -82,17 +82,11 @@ public class ProductController {
                         itemMap.get(groupName).add(optionValue);
                     }
 
-                    // 옵션값과 Item을 매핑 (추가금액 표시를 위함)
                     optionItemMap.computeIfAbsent(optionValue.getOptionValueNo(), k -> new ArrayList<>()).add(item);
                 }
             }
         }
 
-        System.out.println("필터링된 옵션 그룹: " + filteredOptionGroups);
-        System.out.println("옵션 매핑 결과: " + itemMap);
-        System.out.println("옵션-아이템 매핑 결과: " + optionItemMap);
-
-        // Thymeleaf에서 사용하도록 모델에 추가
         model.addAttribute("itemMap", itemMap);
         model.addAttribute("optionItemMap", optionItemMap);
 

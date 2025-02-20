@@ -29,3 +29,6 @@ GET http://localhost:8080/category/middle
 
 ### 카테고리 삭제 (중분류 또는 소분류)
 DELETE http://localhost:8080/category/24
+
+### 헤더 요청
+GET http://localhost:8080/header
