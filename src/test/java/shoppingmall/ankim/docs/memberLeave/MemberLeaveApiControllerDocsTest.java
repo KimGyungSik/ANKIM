@@ -3,26 +3,14 @@ package shoppingmall.ankim.docs.memberLeave;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.MediaType;
-import org.springframework.mock.web.MockHttpSession;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import shoppingmall.ankim.docs.RestDocsSupport;
-import shoppingmall.ankim.domain.member.controller.MemberJoinApiController;
-import shoppingmall.ankim.domain.member.controller.request.MemberEmailRequest;
-import shoppingmall.ankim.domain.member.controller.request.MemberRegisterRequest;
-import shoppingmall.ankim.domain.member.dto.MemberResponse;
-import shoppingmall.ankim.domain.member.service.MemberService;
-import shoppingmall.ankim.domain.member.service.request.MemberRegisterServiceRequest;
-import shoppingmall.ankim.domain.memberLeave.controller.MemberLeaveController;
+import shoppingmall.ankim.domain.memberLeave.controller.MemberLeaveApiController;
 import shoppingmall.ankim.domain.memberLeave.controller.request.LeaveRequest;
 import shoppingmall.ankim.domain.memberLeave.service.MemberLeaveService;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
-import shoppingmall.ankim.domain.termsHistory.controller.request.TermsAgreement;
 import shoppingmall.ankim.global.handler.LogoutHandler;
-import shoppingmall.ankim.global.response.ApiResponse;
-
-import java.time.LocalDate;
-import java.util.List;
 
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
@@ -32,7 +20,7 @@ import static org.springframework.restdocs.payload.PayloadDocumentation.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-public class MemberLeaveControllerDocsTest extends RestDocsSupport {
+public class MemberLeaveApiControllerDocsTest extends RestDocsSupport {
 
     private final MemberLeaveService memberLeaveService = mock(MemberLeaveService.class);
     private final SecurityContextHelper securityContextHelper = mock(SecurityContextHelper.class);
@@ -41,7 +29,7 @@ public class MemberLeaveControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object initController() {
-        return new MemberLeaveController(memberLeaveService, securityContextHelper, logoutHandler);
+        return new MemberLeaveApiController(memberLeaveService, securityContextHelper, logoutHandler);
     }
 
     @DisplayName("회원 탈퇴 API")
