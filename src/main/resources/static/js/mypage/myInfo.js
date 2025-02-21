@@ -11,8 +11,8 @@ let marketingStatus = {
 document.addEventListener("DOMContentLoaded", async () => {
     var passwordCheckSection = document.getElementById("passwordCheckSection");
     var infoEditSection = document.getElementById("infoEditSection");
-    var termsSection = document.getElementById("termsSection"); // 마케팅 섹션
-    // var termsSection = document.getElementById("termsSection"); // 약관 섹션
+    var termsSection = document.getElementById("termsSection"); // 약관
+    var leaveSection = document.getElementById("leaveSection"); // 약관
     var verifyPasswordBtn = document.getElementById("verifyPasswordBtn");
     var passwordToggleButton = document.querySelector(".password-toggle-button");
 
@@ -35,6 +35,9 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 기타 버튼(연락처/이메일 수정) - 예시
     var phoneEditBtn   = document.getElementById("phoneEditBtn");
     var emailEditBtn   = document.getElementById("emailEditBtn");
+
+    // 회원 탈퇴
+    var leaveBtn = document.getElementById("leaveBtn");
 
     try {
         // 기존 마이페이지 회원정보(이름, 좋아요수, 등급 등) + 상세(주소,약관)
@@ -86,7 +89,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 // 비밀번호 검증 성공 -> UI 변경
                 passwordCheckSection.style.display = "none";
                 infoEditSection.style.display = "block";
-                termsSection.style.display = "block"; // 마케팅 섹션도 함께 표시
+                termsSection.style.display = "block";
+                leaveSection.style.display = "block";
             } else {
                 handleErrors(res.message || "비밀번호가 일치하지 않습니다.");
             }
@@ -99,7 +103,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     document.querySelectorAll(".toggle-button").forEach(button => {
         button.addEventListener("click", function() {
             var targetInputId = this.getAttribute("data-target");
-            console.log(targetInputId);
             toggleInputVisibility(targetInputId, this);
         });
     });
@@ -235,6 +238,8 @@ document.addEventListener("DOMContentLoaded", async () => {
             alert("서버 오류 발생: " + error);
         }
     });
+
+
 });
 
 // 기존 renderMyPage, showMemberInfoSection, togglePasswordVisibility, showModal, etc...
@@ -333,7 +338,6 @@ function buildTermsTree(termsList) {
             marketingStatus[node.termsNo] = node.agreeYn; // 서버에서 받은 값 ("Y" 또는 "N")
         }
     });
-    console.log(roots);
     return roots;
 }
 
@@ -351,21 +355,24 @@ function renderTermsTree(roots, container) {
             const groupDiv = document.createElement("div");
             groupDiv.className = "terms-parent";
 
-            const titleSpan = document.createElement("span");
+            const titleSpan = document.createElement("h4");
             titleSpan.className = "terms-parent-title";
-            titleSpan.textContent = `[선택] ${node.name} 동의`; // 디자인에 맞게 수정
+            titleSpan.textContent = `[선택] ${node.name}`;
 
             const descDiv = document.createElement("div");
             descDiv.className = "terms-parent-desc";
             descDiv.innerText = "서비스의 중요 안내사항 및 주문/배송에 대한 정보는 위 수신 여부와 관계없이 발송됩니다.\n하위 항목 중 하나라도 동의하면 광고성 동의로 처리됩니다.";
+            descDiv.style.fontSize = "13px";  // 원하는 크기로 설정
+            descDiv.style.marginBottom = "1.3%";
 
             groupDiv.appendChild(titleSpan);
-            groupDiv.appendChild(descDiv);
             container.appendChild(groupDiv);
+            groupDiv.appendChild(descDiv);
 
             // 자식 항목은 별도의 컨테이너에 렌더링
             const childContainer = document.createElement("div");
             childContainer.className = "term-children";
+
             node.children.forEach(child => {
                 renderLeafTerm(child, childContainer, node); // 부모 정보(node) 전달
             });
@@ -373,6 +380,10 @@ function renderTermsTree(roots, container) {
         } else {
             // 자식이 없는 항목: 단순 체크박스+라벨 렌더링
             renderLeafTerm(node, container, null);
+            // 자식 항목을 렌더링하기 전에 구분선 추가
+            const separator = document.createElement("div");
+            separator.className = "info-line"; // 구분선 추가
+            container.appendChild(separator);
         }
     });
 }
@@ -386,6 +397,7 @@ function renderLeafTerm(node, container, parentNode) {
     checkbox.id = `termsCheck_${node.termsNo}`;
     checkbox.checked = (node.agreeYn === "Y");
     checkbox.dataset.termsNo = node.termsNo;
+
     // 만약 부모 노드가 있다면, 해당 parent's termsNo를 저장 (즉, 마케팅 동의를 위한 부모)
     if (parentNode) {
         checkbox.dataset.marketingParent = parentNode.termsNo;
@@ -393,7 +405,7 @@ function renderLeafTerm(node, container, parentNode) {
 
     const label = document.createElement("label");
     label.htmlFor = checkbox.id;
-    label.textContent = node.name;
+    label.textContent = "[선택] " + node.name;
 
     // 리프 항목에 대해서만 체크 이벤트를 등록 (부모는 체크박스가 없으므로)
     checkbox.addEventListener("change", e => onLeafCheckboxChange(e, node));
@@ -473,7 +485,6 @@ async function onLeafCheckboxChange(e, node) {
                 }
             } catch (err) {
                 e.target.checked = false;
-                console.error(err);
             }
         }
     } else {
@@ -532,7 +543,6 @@ async function onLeafCheckboxChange(e, node) {
                 }
             } catch (err) {
                 e.target.checked = true;
-                console.error(err);
             }
         }
     }
@@ -614,7 +624,7 @@ function openConfirmModalForMarketingCancel(message, onConfirm, onCancel) {
     closeBtn.onclick   = null;
 
     // 모달창 열기
-    modal.style.display = "block";
+    modal.style.display = "flex";
 
     // 동의, 철회 확인 버튼
     confirmBtn.onclick = () => {
@@ -672,7 +682,7 @@ function openConfirmModal(message, onConfirm, onCancel) {
     // 예: "광고성 정보 알림을 받으시려면\n마케팅 목적의 개인정보 수집 및 이용 동의가 필요해요."
 
     // 모달 열기
-    modal.style.display = "block";
+    modal.style.display = "flex";
 
     // 버튼 텍스트 강제 지정(필요하면)
     cancelBtn.textContent = "다음에 하기";
@@ -726,7 +736,7 @@ function showAlertModal(serverData, showButtons = false) {
             lines = [lines];
         }
         const joined = lines.join("\n");
-        const finalMsg = joined + "\n" + (serverData.date || "") + "\n" + (serverData.sender || "");
+        const finalMsg = joined + "\n\n" + (serverData.date || "") + "\n" + (serverData.sender || "");
         showModal(finalMsg.trim(), showButtons); // trim()으로 앞뒤 공백 정리
     } else {
         // 그냥 문자열인 경우
