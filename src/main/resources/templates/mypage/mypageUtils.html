@@ -19,18 +19,31 @@
         <nav class="sidebar-menu">
             <h3>나의 쇼핑정보</h3>
             <ul>
-                <li><a href="/mypage/orders">주문배송조회</a></li>
-                <li><a href="/mypage/reservations">숙박예약조회</a></li>
-                <li><a href="/mypage/cancel-returns">취소/교환/반품 내역</a></li>
-                <li><a href="/mypage/reviews">상품 리뷰</a></li>
-                <li><a href="/mypage/coupons">증빙서류 발급</a></li>
+                <li><a th:href="@{/mypage/orders}">주문배송조회</a></li>
+                <li><a th:href="@{/mypage/reservations}">숙박예약조회</a></li>
+                <li><a th:href="@{/mypage/cancel-returns}">취소/교환/반품 내역</a></li>
+                <li><a th:href="@{/mypage/reviews}">상품 리뷰</a></li>
+                <li><a th:href="@{/mypage/coupons}">증빙서류 발급</a></li>
             </ul>
             <h3>나의 계정정보</h3>
             <ul>
-                <li><a href="/mypage/edit/info">회원정보수정</a></li>
-                <li><a href="/mypage/membership">회원등급</a></li>
-                <li><a href="/mypage/coupons">쿠폰</a></li>
-                <li><a href="/mypage/mileage">마일리지</a></li>
+                <li><a th:href="@{/mypage/edit/info}">회원정보수정</a></li>
+                <li><a th:href="@{/mypage/membership}">회원등급</a></li>
+                <li><a th:href="@{/mypage/coupons}">쿠폰</a></li>
+                <li><a th:href="@{/mypage/mileage}">마일리지</a></li>
+            </ul>
+            <h3>고객센터</h3>
+            <ul>
+                <li><a th:href="@{/support/inquiry}">1:1 문의</a></li>
+                <li><a th:href="@{/support/faq}">FAQ</a></li>
+                <li><a th:href="@{/support/opinion}">고객의 소리</a></li>
+            </ul>
+
+            <h3>ABOUT ANKIM</h3>
+            <ul>
+                <li><a th:href="@{/support/notice}">공지사항</a></li>
+                <li><a th:href="@{/support/recruit}">인재채용</a></li>
+                <li><a th:href="@{/support/about}">29CM 소개</a></li>
             </ul>
         </nav>
     </aside>

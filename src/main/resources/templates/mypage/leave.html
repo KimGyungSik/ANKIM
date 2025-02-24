@@ -12,15 +12,75 @@
 <header th:replace="/fragments/header :: header"></header>
 <th:block th:replace="mypage/mypageUtils.html :: main">
     <th:block th:fragment="content">
-    <section class="leave-section" id="leaveSection" style="display: none;">
+    <!-- 탈퇴사유 선택 섹션 -->
+    <section class="leave-section" id="leaveSection">
         <h2>탈퇴하는 이유가 무엇인가요?</h2>
         <p>아래의 사유 중 하나를 선택하여 회원 탈퇴를 진행하실 수 있습니다.</p>
-        <div id="leaveReasonList">
-            <!-- 이곳에 API로 받은 탈퇴 사유가 렌더링됩니다 -->
+        <!-- 일반 사유 목록 -->
+        <div id="leaveReasonList"></div>
+
+        <!-- 기타 사유 영역 (체크박스 + textarea) -->
+        <div id="etcReasonContainer">
+            <div class="item-info">
+                <label for="etcReasonCheck">기타</label>
+                <input type="checkbox" id="etcReasonCheck" name="leaveReason" value="기타">
+            </div>
+            <!-- textarea + 글자수 표시 -->
+            <div id="etcTextareaWrapper">
+                <textarea
+                        id="etcReasonTextarea"
+                        rows="3"
+                        placeholder="기타 사유를 입력하세요 (최대 500자)"
+                ></textarea>
+                <div id="etcReasonCount">0/500</div>
+            </div>
         </div>
         <div class="button-row">
-            <button id="leaveCancelBtn" class="submitBtn">취소하기</button>
+            <button id="leaveCancelBtn" class="cancleBtn">취소하기</button>
             <button id="leaveNextBtn" class="submitBtn">다음</button>
+        </div>
+    </section>
+
+    <!-- 탈퇴 섹션 -->
+    <section id="leaveConfirmSection" class="leave-confirm-section" style="display: none;">
+        <h2>회원 탈퇴</h2>
+        <p>회원 탈퇴 신청 시 아래 내용을 반드시 확인해주세요.</p>
+
+        <!-- 탈퇴 약관 내용 렌더링 (예시로 leaveTerm 데이터를 보여줌) -->
+        <div id="leaveTermContainer">
+            <!-- API에서 받은 탈퇴 약관 내용이 여기에 렌더링됩니다 -->
+        </div>
+        <!-- (필수) 위 내용을 모두 확인했습니다 -->
+        <div class="agree-leave-term item-info">
+            <label for="agreeLeaveTerm">(필수) 위 내용을 모두 확인했습니다</label>
+            <input type="checkbox" id="agreeLeaveTerm" />
+        </div>
+        <div>
+            <!-- 회원 개인정보 -->
+            <p class="email-line">
+                아이디(이메일): <span id="loginIdConfirm"></span>
+            </p>
+            <!-- 비밀번호 입력 row -->
+            <div class="row password-line">
+                <label>비밀번호</label>
+                <div class="input-group">
+                    <input
+                            id="password"
+                            class="input-field"
+                            placeholder="8자 이상의 비밀번호"
+                            autocapitalize="none"
+                            autocomplete="current-password"
+                            type="password"
+                            name="password"
+                    >
+                </div>
+            </div>
+        </div>
+
+        <!-- 버튼을 오른쪽 정렬하기 위해 .button-row 래퍼 사용 -->
+        <div class="button-row">
+            <button id="leaveCancelBtn2" class="submitBtn">취소하기</button>
+            <button id="leaveBtn" class="leaveBtn">탈퇴하기</button>
         </div>
     </section>
 </th:block>

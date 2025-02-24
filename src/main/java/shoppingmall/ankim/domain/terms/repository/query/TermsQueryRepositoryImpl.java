@@ -5,6 +5,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
+import shoppingmall.ankim.domain.terms.dto.TermsLeaveResponse;
 import shoppingmall.ankim.domain.terms.entity.QTerms;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
@@ -45,6 +46,25 @@ public class TermsQueryRepositoryImpl implements TermsQueryRepository {
                         terms.contents,
                         terms.termsYn,
                         terms.level))
+                .from(terms)
+                .where(
+                        terms.category.eq(category)
+                                .and(terms.activeYn.eq(activeYn))
+                                .and(terms.level.eq(level))
+                )
+                .orderBy(terms.level.asc())
+                .fetch();
+    }
+
+    @Override
+    public List<TermsLeaveResponse> findLeaveTerms(TermsCategory category, Integer level, String activeYn) {
+        QTerms terms = QTerms.terms;
+
+        return queryFactory
+                .select(Projections.fields(TermsLeaveResponse.class,
+                        terms.no,
+                        terms.name,
+                        terms.contents))
                 .from(terms)
                 .where(
                         terms.category.eq(category)

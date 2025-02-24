@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-
+<header th:replace="/fragments/header :: header"></header>
 <th:block th:replace="mypage/mypageUtils.html :: main">
     <th:block th:fragment="content">
         <p>데이터를 불러오는 중입니다...</p>

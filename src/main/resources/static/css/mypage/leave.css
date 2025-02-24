@@ -1,7 +1,193 @@
-.leave-section h2 {
+.leave-section h2,
+.leave-confirm-section h2{
     font-size: 16px;
     font-weight: bold;
     margin-bottom: 10px;
     border-bottom: 2px solid #000; /* 굵은 선 */
     padding-bottom: 8px;          /* 선과 글자 사이 여백 */
+}
+
+.leave-section p,
+.leave-confirm-section p{
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 15px;
+}
+
+.leave-section .item-info {
+    flex: 0 0 40%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 좌: 라벨, 우: 체크박스 */
+    gap: 10px;
+    margin-top: 10px;
+    padding: 10px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+
+}
+
+.agree-leave-term .item-info {
+    display: flex;
+    justify-content: space-between; /* 왼쪽에 라벨, 오른쪽에 체크박스 */
+    align-items: center;
+    gap: 6px; /* 체크박스와 라벨 사이 간격 */
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+
+.leave-section .item-info p {
+    font-size: 13px; /* 탈퇴 사유 설명 텍스트 크기 작게 */
+}
+
+.leave-section textarea {
+    width: 100%;
+    margin-top: 5px;
+    padding: 5px;
+    resize: vertical;
+}
+
+/* 약관을 보여주는 상자 스타일 */
+.leaveTermBox, .agree-leave-term {
+    background-color: #f9f9f9; /* 연한 배경색 */
+    border: 1px solid #ddd;
+    padding: 16px;
+    margin-bottom: 16px;
+    border-radius: 5px;
+}
+
+.leaveTermBox h4 {
+    font-size: 14px;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+
+.leaveTermContent {
+    font-size: 13px;
+    line-height: 1.4;
+    color: #666;
+    white-space: pre-line;
+}
+
+.agree-leave-term {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+    display: flex;
+    align-items: center;
+    gap: 6px; /* 체크박스와 라벨 사이 간격 */
+}
+
+.item-info input[type="checkbox"],
+.agree-leave-term input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #000;
+}
+
+#etcReasonContainer {
+    margin-top: 20px;
+}
+
+#etcReasonCount {
+    text-align:right;
+    font-size:13px;
+    color:#666;
+}
+
+#etcReasonTextarea {
+    width:100%
+}
+
+.email-line,
+.password-line,
+.info-line {
+    display: block;
+    border-bottom: 1px solid #ddd; /* 얇은 선 */
+    padding-bottom: 8px;
+    margin-bottom: 16px;
+    width: 100%;                  /* 부모(.password-check-section)와 동일 폭 */
+    box-sizing: border-box;
+}
+
+/* 비밀번호 입력 래퍼 - 아이콘 & 인풋 함께 배치 */
+/* row: 라벨 + input-group */
+.row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 16px; /* 각 줄 간격 */
+}
+
+/* 라벨 고정 너비 */
+.row label {
+    width: 100px;
+    font-size: 14px;
+    color: #666;
+}
+
+/* input-group: 인풋과 아이콘을 묶는 컨테이너 */
+.input-group {
+    position: relative; /* 아이콘을 절대 배치하기 위해 relative */
+    flex: 1;           /* 남은 공간 차지 */
+}
+
+.input-group input {
+    width: 80%;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 10px 40px 10px 10px; /* 오른쪽 여백(40px) = 아이콘 자리 확보 */
+    font-size: 14px;
+    outline: none;
+    box-sizing: border-box;
+    text-align: left; /* 텍스트 왼쪽 정렬 */
+}
+
+/* 버튼 오른쪽에 배치 */
+.button-row {
+    text-align: right;   /* 내부 버튼 오른쪽 정렬 */
+    margin-top: 10px;    /* 위에 약간 간격 */
+}
+
+/* '다음' 버튼 등 액션 버튼 스타일 */
+.submitBtn {
+    /* 원하는 크기와 색상으로 조정 */
+    border: 1px solid;
+    background-color: #000;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+
+/* 버튼 호버 시 효과 */
+.submitBtn:hover{
+    background-color: #333;
+}
+
+.cancleBtn {
+    border: 1px solid #ddd;
+    background-color: #fff;
+    color: #000;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.cancleBtn:hover{
+    background-color: #f0f0f0;
+}
+
+.leaveBtn {
+    border: 1px solid;
+    background-color: #cc1414;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.leaveBtn:hover{
+    background-color: #ff7a7a;
 }

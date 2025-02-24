@@ -6,38 +6,30 @@ import lombok.NoArgsConstructor;
 import lombok.ToString;
 import shoppingmall.ankim.domain.member.entity.Member;
 
+import static shoppingmall.ankim.global.util.MaskingUtil.maskLoginId;
+import static shoppingmall.ankim.global.util.MaskingUtil.maskName;
+
 @Data
 @NoArgsConstructor
 @ToString(of = {"name"})
 public class MemberResponse {
 
     private Long no;
+    private String loginId;
     private String name;
 
     @Builder
-    public MemberResponse(Long no, String name) {
+    public MemberResponse(Long no, String loginId, String name) {
         this.no = no;
+        this.loginId = loginId;
         this.name = name;
     }
 
     public static MemberResponse of(Member member) {
         return MemberResponse.builder()
                 .no(member.getNo())
+                .loginId(maskLoginId(member.getLoginId()))
                 .name(maskName(member.getName()))
                 .build();
-    }
-
-    // 이름의 첫 글자와 마지막 글자를 제외한 중간 글자를 *로 변경하는 로직
-    // 만약 두글자 이름이면 마지막 글자를 *로 변경
-    public static String maskName(String name) {
-        if(name.length() == 2) {
-            return name.charAt(0) + "*";
-        }
-
-        String firstChar = name.substring(0, 1);
-        String lastChar = name.substring(name.length() - 1);
-        String middle = "*".repeat(name.length() - 2);
-
-        return firstChar + middle + lastChar;
     }
 }

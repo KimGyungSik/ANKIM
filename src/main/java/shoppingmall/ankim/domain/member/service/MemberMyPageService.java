@@ -10,5 +10,5 @@ public interface MemberMyPageService {
 
     // 비밀번호 일치여부 검증
     void isValidPassword(String loginId, String password);
-
+    MemberResponse getMemberInfo(String loginId);
 }
