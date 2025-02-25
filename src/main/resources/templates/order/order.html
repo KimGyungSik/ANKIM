@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>주문하기</title>
+    <link rel="stylesheet" th:href="@{/css/order/order.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+<header th:replace="/fragments/header :: header"></header>
+<main class="checkout-container">
+    <div class="checkout-steps">
+        <ol class="step-list">
+            <li class="step-item completed">
+                01 SHOPPING BAG
+                <!-- 화살표 SVG 예시 -->
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path></g></svg>
+            </li>
+            <li class="step-item active-step">
+                02 ORDER
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path></g></svg>
+            </li>
+            <li class="step-item">
+                03 ORDER CONFIRMED
+            </li>
+        </ol>
+    </div>
+    <!-- [2] 메인 컨테이너: 왼쪽(주문정보) + 오른쪽(결제 요약) -->
+    <div class="checkout-content">
+        <!-- 왼쪽 정보 영역 -->
+        <div class="checkout-left">
+            <!-- 배송 정보 -->
+            <section class="shipping-info">
+                <h2>배송 정보</h2>
+                <!-- [TODO] 배송 정보 입력 폼 -->
+                <p>이름: <input type="text" placeholder="이름"></p>
+                <p>연락처: <input type="text" placeholder="010-1234-5678"></p>
+                <p>주소: <input type="text" placeholder="도로명 주소"></p>
+            </section>
+
+            <!-- 쿠폰/상품 정보 -->
+            <section class="coupon-and-product">
+                <h2>쿠폰 사용 및 상품 정보</h2>
+                <!-- [TODO] 쿠폰 목록, 상품 리스트, 가격 표시 등 -->
+                <p>상품 목록/쿠폰 영역</p>
+            </section>
+
+            <!-- 마일리지 -->
+            <section class="mileage-info">
+                <h2>마일리지</h2>
+                <!-- [TODO] 마일리지 사용 -->
+                <p>마일리지 사용/잔액 등</p>
+            </section>
+
+            <!-- 결제 방법 -->
+            <section class="payment-method">
+                <h2>결제방법</h2>
+                <!-- [TODO] 결제 수단 선택 -->
+                <p>신용카드 / 네이버페이 / 카카오페이 등</p>
+            </section>
+
+            <!-- 현금 영수증 -->
+            <section class="cash-receipt">
+                <h2>현금영수증</h2>
+                <!-- [TODO] 현금영수증 발급 정보 -->
+                <p>발급 유형 / 휴대폰 번호 / 사업자번호 등</p>
+            </section>
+        </div>
+
+        <!-- 오른쪽 결제 요약 -->
+        <aside class="checkout-summary">
+            <h2>결제 금액</h2>
+            <!-- [TODO] 결제 금액 상세 -->
+            <div class="summary-total">
+                <p>상품 금액: <strong>43,200원</strong></p>
+                <p>배송비: <strong>+3,000원</strong></p>
+                <p>할인: <strong>-7,430원</strong></p>
+                <p>총 결제 금액: <strong>35,770원</strong></p>
+            </div>
+            <p style="font-size: 13px; color: #666;">
+                주문 내용을 재확인하세요. 이 영역에 안내 문구가 들어갑니다.
+            </p>
+            <button>CHECK OUT</button>
+        </aside>
+    </div>
+</main>
+<footer th:replace="/fragments/footer :: footer-container"></footer>
+</body>
+<script type="module" th:src="@{/js/fragments/header.js}"></script>
+<script type="module" th:src="@{/js/cart/cart.js}"></script>
+</html>

@@ -1,0 +1,111 @@
+/* 간단한 레이아웃/스타일 (필요에 맞게 수정하세요) */
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+    background-color: #fafafa;
+}
+main.checkout-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* 주문 단계 표시 */
+.checkout-steps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.step-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.step-item {
+    font-size: 16px;
+    color: rgb(212, 212, 212);
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.step-item.active-step {
+    font-weight: bold;
+    color: rgb(50, 50, 50);
+}
+
+.step-arrow {
+    width: 15px;
+    height: 30px;
+    margin-left: 10px;
+}
+
+/* 메인 레이아웃: 왼쪽 정보영역 + 오른쪽 결제 요약 */
+.checkout-content {
+    display: flex;
+    flex-wrap: wrap; /* 반응형 시 줄바꿈 가능 */
+    gap: 20px;
+}
+.checkout-left {
+    flex: 1;
+    min-width: 300px; /* 너비가 너무 줄어드는 것 방지 */
+}
+aside.checkout-summary {
+    width: 300px; /* 고정 혹은 원하는 값 */
+    min-width: 280px;
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 섹션 기본 스타일 */
+section {
+    background-color: #fff;
+    border: 1px solid #000;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+section h2 {
+    margin-top: 0;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+}
+
+/* 결제 요약 영역 */
+.checkout-summary h2 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #000;
+    padding-bottom: 8px;
+}
+.checkout-summary .summary-total {
+    margin: 10px 0;
+    font-size: 14px;
+    color: #333;
+}
+.checkout-summary button {
+    width: 100%;
+    padding: 12px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 15px;
+    margin-top: 20px;
+}
+.checkout-summary button:hover {
+    background-color: #333;
+}
