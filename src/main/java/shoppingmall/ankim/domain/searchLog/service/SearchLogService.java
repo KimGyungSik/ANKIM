@@ -10,11 +10,11 @@ import shoppingmall.ankim.domain.searchLog.repository.SearchLogRepository;
 import java.util.List;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class SearchLogService {
     private final SearchLogRepository searchLogRepository;
 
-    @Transactional
     public void saveSearchKeyword(String keyword) {
         int updatedRows = searchLogRepository.incrementSearchCount(keyword);
 

@@ -13,7 +13,7 @@ import java.util.List;
 
 public interface SearchLogRepository extends JpaRepository<SearchLog, Long> {
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("UPDATE SearchLog s SET s.searchCount = s.searchCount + 1 WHERE s.keyword = :keyword")
     int incrementSearchCount(@Param("keyword") String keyword);
 
