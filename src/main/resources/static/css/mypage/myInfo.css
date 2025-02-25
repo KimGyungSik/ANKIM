@@ -314,3 +314,9 @@ input[type="checkbox"] {
     align-items: center;
     margin-bottom: 8px;
 }
+
+#leaveBtn {
+    color: black;
+    font-weight: bold;
+    text-decoration: underline;
+}

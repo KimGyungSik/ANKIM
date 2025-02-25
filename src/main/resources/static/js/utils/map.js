@@ -1,3 +1,5 @@
+import { selectedAddress } from './addressStore.js';
+
 // 우편번호 찾기 화면을 넣을 element
 var element_layer = document.getElementById('layer');
 
@@ -39,12 +41,18 @@ export async function execDaumPostcode() {
                 if(extraAddr !== ''){
                     extraAddr = ' (' + extraAddr + ')';
                 }
+
                 // 조합된 참고항목을 해당 필드에 넣는다.
                 document.getElementById("addressMainInput").value = extraAddr;
 
             } else {
                 document.getElementById("addressMainInput").value = '';
             }
+
+
+            // 실제 데이터 저장
+            selectedAddress.zipCode = data.zonecode;
+            selectedAddress.addressMain = addr;
 
             // 우편번호와 주소 정보를 해당 필드에 넣는다.
             document.getElementById('zipCodeInput').value = data.zonecode;

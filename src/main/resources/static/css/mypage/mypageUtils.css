@@ -10,6 +10,7 @@ body {
     display: flex;
     max-width: 1200px;
     margin: 20px auto;
+    min-height: 70vh;
 }
 
 /* 좌측 사이드바 */

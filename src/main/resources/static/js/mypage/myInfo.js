@@ -1,5 +1,6 @@
 import { fetchWithAccessToken } from '../utils/fetchUtils.js';
 import { execDaumPostcode } from '../utils/map.js';
+import { selectedAddress } from '../utils/addressStore.js'; // 저장된 주소
 
 // 전역 변수 (파일 상단)
 let allTerms = [];
@@ -7,14 +8,12 @@ let termsTree = [];
 let marketingStatus = {
 };
 
-
 document.addEventListener("DOMContentLoaded", async () => {
     var passwordCheckSection = document.getElementById("passwordCheckSection");
     var infoEditSection = document.getElementById("infoEditSection");
     var termsSection = document.getElementById("termsSection"); // 약관
     var leaveSection = document.getElementById("leaveSection"); // 약관
     var verifyPasswordBtn = document.getElementById("verifyPasswordBtn");
-    var passwordToggleButton = document.querySelector(".password-toggle-button");
 
     // 비밀번호 변경 관련 요소
     var pwChangeBtn    = document.getElementById("pwChangeBtn");
@@ -30,6 +29,8 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 주소 관련
     var addrSearchBtn  = document.getElementById("addrSearchBtn");
     var addrChangeBtn  = document.getElementById("addrChangeBtn");
+    var zipCodeInput = document.getElementById("zipCodeInput");
+    var addressMainInput = document.getElementById("addressMainInput");
     var addressDetailInput= document.getElementById("addressDetailInput");
 
     // 기타 버튼(연락처/이메일 수정) - 예시
@@ -203,8 +204,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     addrChangeBtn?.addEventListener("click", async () => {
         if (addrChangeBtn.disabled) return;
-        var zipCode = document.getElementById("zipCodeInput").value;
-        var addressMain = document.getElementById("addressMainInput").value;
+        // input 필드에서 가져오는 대신, 저장된 데이터를 사용
+        var zipCode = selectedAddress.zipCode;
+        var addressMain = selectedAddress.addressMain;
         var addressDetail = document.getElementById("addressDetailInput").value;
 
         try {
@@ -236,6 +238,28 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         } catch (error) {
             alert("서버 오류 발생: " + error);
+        }
+    });
+
+    // 주소 에러 비우는 이벤트
+    zipCodeInput.addEventListener("input", function() {
+        const errorElement = document.getElementById("zipCodeError");
+        if (errorElement) {
+            errorElement.style.display = "none";
+        }
+    });
+
+    addressMainInput.addEventListener("input", function() {
+        const errorElement = document.getElementById("addressMainError");
+        if (errorElement) {
+            errorElement.style.display = "none";
+        }
+    });
+
+    addressDetailInput.addEventListener("input", function() {
+        const errorElement = document.getElementById("addressDetailError");
+        if (errorElement) {
+            errorElement.style.display = "none";
         }
     });
 

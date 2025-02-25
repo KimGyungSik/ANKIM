@@ -1,3 +1,13 @@
+/* 메인 */
+main {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 20px;
+    min-height: 70vh;
+}
+
 .cart-container {
     margin: 40px auto;
     max-width: 1200px;

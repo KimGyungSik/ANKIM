@@ -19,6 +19,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     var leaveBtn            = document.getElementById("leaveBtn");
     var agreeLeaveTermChk   = document.getElementById("agreeLeaveTerm");
 
+    // [C] 모달 관련 요소
+    var modal               = document.getElementById("leaveModal");
+    var leaveModalConfirmBtn = document.getElementById("leaveModalConfirmBtn");
+    var leaveModalCancelBtn  = document.getElementById("leaveModalCancelBtn");
+    var modalCloseButton     = modal.querySelector(".close-button");
+
+
     // 최종 서버에 보낼 객체
     let leaveRequest = {
         leaveReasonNo : null,  // 사유 번호(예: DB PK)
@@ -32,17 +39,16 @@ document.addEventListener("DOMContentLoaded", async () => {
      * "다음" 버튼 활성/비활성 로직
      */
     function updateNextButtonState() {
-        // (1) 사유가 전혀 선택되지 않으면 비활성
+        // 아무 사유도 선택되지 않은 경우
         if (!leaveRequest.leaveReason) {
-            leaveNextBtn.disabled = true;
+            leaveNextBtn.classList.add("inactive");
             return;
         }
-        // (2) "기타"인 경우, textarea 내용 필수
-        if (leaveRequest.leaveReason === "기타") {
-            leaveNextBtn.disabled = (leaveRequest.leaveMessage.trim().length === 0);
+        // "기타"인 경우, textarea 내용이 없으면 inactive 처리
+        if (leaveRequest.leaveReason === "기타" && leaveRequest.leaveMessage.trim().length === 0) {
+            leaveNextBtn.classList.add("inactive");
         } else {
-            // 그 외 사유는 체크만으로 OK
-            leaveNextBtn.disabled = false;
+            leaveNextBtn.classList.remove("inactive");
         }
     }
 
@@ -180,13 +186,15 @@ document.addEventListener("DOMContentLoaded", async () => {
             window.location.href = "/mypage/edit/info";
         }
     } catch (error) {
-        console.error("Error fetching leave reasons:", error);
         alert("탈퇴 사유를 불러오는데 오류가 발생했습니다.");
         window.location.href = "/mypage/edit/info";
     }
 
     // [3] "다음" 버튼 -> 약관/비밀번호 섹션으로 전환
     leaveNextBtn.addEventListener("click", () => {
+        console.log("leaveRequest.leaveReason =", leaveRequest.leaveReason);
+        console.log("leaveRequest.leaveMessage =", leaveRequest.leaveMessage);
+
         // 사유가 전혀 선택되지 않았으면
         if (!leaveRequest.leaveReason) {
             alert("탈퇴 사유를 선택해주세요.");
@@ -210,8 +218,26 @@ document.addEventListener("DOMContentLoaded", async () => {
         window.location.href = "/mypage/edit/info";
     });
 
-    // [5] "탈퇴하기" 버튼
-    leaveBtn.addEventListener("click", async () => {
+
+    // [5] 모달 열기
+    leaveBtn.addEventListener("click", () => {
+        // 모달 열기
+        modal.style.display = "flex";
+    });
+
+    // 모달의 취소 버튼 (leaveModalCancelBtn)와 close 버튼 클릭 시 모달 닫기
+    leaveModalCancelBtn.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+    modalCloseButton.addEventListener("click", () => {
+        modal.style.display = "none";
+    });
+
+    // [6] "탈퇴하기"버튼
+    leaveModalConfirmBtn.addEventListener("click", async () => {
+        // 모달 닫기
+        modal.style.display = "none";
+
         // 비밀번호
         var passwordInput = document.getElementById("password");
         leaveRequest.password = passwordInput.value.trim();

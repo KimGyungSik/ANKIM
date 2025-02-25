@@ -37,7 +37,7 @@
         </div>
         <div class="button-row">
             <button id="leaveCancelBtn" class="cancleBtn">취소하기</button>
-            <button id="leaveNextBtn" class="submitBtn">다음</button>
+            <button id="leaveNextBtn" class="submitBtn inactive">다음</button>
         </div>
     </section>
 
@@ -83,6 +83,18 @@
             <button id="leaveBtn" class="leaveBtn">탈퇴하기</button>
         </div>
     </section>
+
+    <!-- 탈퇴 철회 안내 모달 -->
+    <div class="modal" id="leaveModal" style="display:none;">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <h2 id="leaveModalTitle">정말 탈퇴하시겠습니까?</h2>
+            <div class="modal-footer">
+                <button id="leaveModalCancelBtn">취소</button>
+                <button id="leaveModalConfirmBtn">확인</button>
+            </div>
+        </div>
+    </div>
 </th:block>
 </th:block>
 
