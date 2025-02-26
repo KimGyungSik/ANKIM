@@ -84,6 +84,44 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
     }
 
+//    @Override
+//    public Page<ProductListResponse> findUserProductListResponse(
+//            Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
+//            List<ColorCondition> colorConditions, PriceCondition priceCondition,
+//            Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
+//
+//        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(
+//                condition, category, keyword, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product
+//        );
+//
+//        List<Long> productIds = null;
+//
+//        // 1️⃣ keyword가 존재하면 Full-Text Search 실행
+//        if (keyword != null && !keyword.trim().isEmpty()) {
+//            productIds = productRepository.findProductIdsByFullTextSearch(keyword);
+//
+//            // 검색 결과가 있다면 QueryDSL 필터와 결합
+//            if (!productIds.isEmpty()) {
+//                filterBuilder.and(product.no.in(productIds));
+//            } else {
+//                return Page.empty(pageable); // 검색 결과가 없으면 빈 페이지 반환
+//            }
+//        }
+//
+//        // 2️⃣ 정렬 적용
+//        OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
+//
+//        // 3️⃣ 필터링 및 정렬 수행
+//        List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
+//
+//        // 4️⃣ 전체 개수 조회 쿼리
+//        JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
+//                .where(filterBuilder);
+//
+//        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+//    }
+
+
     // 필터링 및 정렬 수행하는 메서드
     private List<ProductListResponse> getFilteredAndSortedResults(OrderSpecifier orderSpecifier, BooleanBuilder filterBuilder, Pageable pageable) {
         List<ProductListResponse> response = queryFactory

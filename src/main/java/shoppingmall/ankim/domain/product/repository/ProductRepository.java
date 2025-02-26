@@ -8,6 +8,7 @@ import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.query.ProductQueryRepository;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface ProductRepository extends JpaRepository<Product,Long>, ProductQueryRepository {
@@ -22,4 +23,13 @@ public interface ProductRepository extends JpaRepository<Product,Long>, ProductQ
     void updateCategoryForProducts(@Param("oldCategoryId") Long oldCategoryId, @Param("newCategory") Category newCategory);
 
     boolean existsByCategory(Category category);
+
+//    @Query(value = """
+//        SELECT p.no
+//        FROM product p
+//        WHERE MATCH(p.name, p.search_keywords, p.description)
+//        AGAINST(:keyword IN NATURAL LANGUAGE MODE)
+//    """, nativeQuery = true)
+//    List<Long> findProductIdsByFullTextSearch(@Param("keyword") String keyword);
+
 }
