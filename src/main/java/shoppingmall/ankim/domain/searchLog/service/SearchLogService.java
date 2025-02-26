@@ -15,6 +15,12 @@ import java.util.List;
 public class SearchLogService {
     private final SearchLogRepository searchLogRepository;
 
+    // MySQL ON DUPLICATE KEY UPDATE 사용 -> mySQL prod
+    public void saveSearchKeywordWithCurrency(String keyword) {
+        searchLogRepository.upsertSearchKeyword(keyword);
+    }
+
+    // h2 local용
     public void saveSearchKeyword(String keyword) {
         int updatedRows = searchLogRepository.incrementSearchCount(keyword);
 

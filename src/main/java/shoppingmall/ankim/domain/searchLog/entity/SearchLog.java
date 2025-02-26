@@ -7,7 +7,9 @@ import lombok.NoArgsConstructor;
 import shoppingmall.ankim.global.audit.BaseEntity;
 
 @Entity
-@Table(name = "search_logs")
+@Table(name = "search_logs", uniqueConstraints = {
+        @UniqueConstraint(name = "unique_keyword", columnNames = "keyword")
+})
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class SearchLog extends BaseEntity {
@@ -16,7 +18,7 @@ public class SearchLog extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
+    @Column(nullable = false, unique = true)
     private String keyword;
 
     @Column(nullable = false)
@@ -31,4 +33,3 @@ public class SearchLog extends BaseEntity {
         this.searchCount++;
     }
 }
-

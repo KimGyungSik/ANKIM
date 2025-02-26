@@ -36,8 +36,9 @@ spring:
     allow-bean-definition-overriding: true
   sql:
     init:
-      data-locations: classpath*:data.sql
       mode: always
+      data-locations: classpath*:data.sql
+      schema-locations: classpath*:schema-mysql.sql
   web:
     resources:
       static-locations: classpath:/static/  # 정적 리소스 경로

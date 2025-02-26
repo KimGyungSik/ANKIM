@@ -63,6 +63,28 @@ INSERT INTO item_option (item_no, optv_no) VALUES
                                                (1684, 2522), (1684, 2524);
 
 
+-- 인기 검색어
+INSERT INTO search_logs (keyword, search_count) VALUES
+                                                                            ('데님1', FLOOR(1 + RAND() * 50)),
+                                                                            ('데님2', FLOOR(1 + RAND() * 50)),
+                                                                            ('데님3', FLOOR(1 + RAND() * 50)),
+                                                                            ('팬츠1', FLOOR(1 + RAND() * 50)),
+                                                                            ('팬츠2', FLOOR(1 + RAND() * 50)),
+                                                                            ('팬츠3', FLOOR(1 + RAND() * 50)),
+                                                                            ('슬랙스1', FLOOR(1 + RAND() * 50)),
+                                                                            ('슬랙스2', FLOOR(1 + RAND() * 50)),
+                                                                            ('슬랙스3', FLOOR(1 + RAND() * 50)),
+                                                                            ('니트1', FLOOR(1 + RAND() * 50)),
+                                                                            ('니트2', FLOOR(1 + RAND() * 50)),
+                                                                            ('니트3', FLOOR(1 + RAND() * 50)),
+                                                                            ('코트1', FLOOR(1 + RAND() * 50)),
+                                                                            ('코트2', FLOOR(1 + RAND() * 50)),
+                                                                            ('코트3', FLOOR(1 + RAND() * 50)),
+                                                                            ('티셔츠1', FLOOR(1 + RAND() * 50)),
+                                                                            ('티셔츠2', FLOOR(1 + RAND() * 50)),
+                                                                            ('티셔츠3', FLOOR(1 + RAND() * 50)),
+                                                                            ('셔츠1', FLOOR(1 + RAND() * 50)),
+                                                                            ('셔츠2', FLOOR(1 + RAND() * 50));
 
 
 
