@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.product.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -20,6 +21,7 @@ import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
+import shoppingmall.ankim.domain.searchLog.service.SearchLogService;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.*;
@@ -32,6 +34,7 @@ public class ProductController {
 
     private final ProductRepository productRepository;
     private final CategoryQueryService categoryQueryService;
+    private final SearchLogService searchLogService;
     @GetMapping("/admin/new")
     public String productForm(Model model) {
         return "/admin/product/registerForm";
@@ -111,8 +114,9 @@ public class ProductController {
      * @param model 모델 객체
      * @return 상품 리스트 페이지 뷰 이름
      */
-    @GetMapping("/list")
+    @GetMapping({"/list", "/search"})
     public String getFilteredAndSortedProductList(
+            HttpServletRequest request,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "24") int size,
             @RequestParam(name = "condition", required = false) Condition condition,
@@ -135,16 +139,25 @@ public class ProductController {
                 customMinPrice, customMaxPrice, infoSearches
         );
 
+        // ✅ 검색 모드 여부 확인 (요청 URL이 "/search"라면 true)
+        boolean isSearchMode = request.getRequestURI().contains("/search");
+
+        // ✅ 검색 모드일 경우 검색어 저장
+        if (isSearchMode && keyword != null && !keyword.isEmpty()) {
+            searchLogService.saveSearchKeyword(keyword);
+        }
+
         // ✅ 중분류 카테고리에 해당하는 하위 카테고리 조회
-        // condition이 중분류 카테고리
-        if(condition.isCategoryCondition()) {
+        if (condition != null && condition.isCategoryCondition()) {
             model.addAttribute("subCategoryTitle", condition.getCategoryName());
             model.addAttribute("subCategories", categoryQueryService.getSubCategoriesUnderMiddleCategoryWithCondition(condition));
-        }else { // condition이 BEST, NEW, HANDMADE
-            model.addAttribute("subCategoryTitle", condition.name());
-            if(condition.name().equals("HANDMADE"))
+        } else { // BEST, NEW, HANDMADE
+            model.addAttribute("subCategoryTitle", condition != null ? condition.name() : "전체");
+            if (condition != null && condition.name().equals("HANDMADE")) {
                 model.addAttribute("subCategories", categoryQueryService.fetchHandmadeCategories());
-            else model.addAttribute("subCategories", null);
+            } else {
+                model.addAttribute("subCategories", null);
+            }
         }
 
 
@@ -152,6 +165,7 @@ public class ProductController {
         boolean isCategorySelected = (category != null);
 
         // ✅ 페이지네이션 정보 추가
+        model.addAttribute("isSearchMode", isSearchMode);
         model.addAttribute("products", productList.getContent());  // 상품 리스트
         model.addAttribute("page", productList.getNumber());       // 현재 페이지 번호
         model.addAttribute("size", productList.getSize());         // 페이지 크기 (한 페이지 당 개수)
@@ -168,6 +182,4 @@ public class ProductController {
         // 상품 리스트 페이지 반환
         return "product/list";
     }
-
-
 }

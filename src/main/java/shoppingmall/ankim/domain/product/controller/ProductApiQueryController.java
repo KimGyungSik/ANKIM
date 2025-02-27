@@ -68,13 +68,16 @@ public class ProductApiQueryController {
     ) {
         Pageable pageable = PageRequest.of(page, size);
 
+        // ✅ 검색 모드 여부 확인
+        boolean isSearchMode = (keyword != null && !keyword.isEmpty());
+
         Page<ProductListResponse> productList = productRepository.findUserProductListResponse(
                 pageable, condition, order, category, keyword, colorConditions, priceCondition,
                 customMinPrice, customMaxPrice, infoSearches
         );
 
         Map<String, Object> response = new HashMap<>();
-        response.put("products", productList.getContent()); // 상품 리스트
+        response.put("products", productList.getContent());
         response.put("pageInfo", Map.of(
                 "currentPage", productList.getNumber(),
                 "totalPages", productList.getTotalPages(),
@@ -83,6 +86,7 @@ public class ProductApiQueryController {
                 "hasNext", productList.hasNext(),
                 "hasPrevious", productList.hasPrevious()
         ));
+        response.put("isSearchMode", isSearchMode); // ✅ 검색 모드 여부 추가
 
         return ApiResponse.ok(response);
     }

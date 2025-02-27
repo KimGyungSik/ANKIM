@@ -1,15 +1,24 @@
 <div class="list-main" th:fragment="listMain">
     <!-- 중분류 카테고리 이름과 검색 -->
     <div class="category-header">
-        <h2 class="subcategory-title" th:text="${subCategoryTitle}">중분류 카테고리 이름</h2>
-        <div class="search-bar">
-            <input type="text" id="search-input" />
-            <button type="button">
-                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon-search">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                </svg>
-            </button>
+        <!-- ✅ 검색 모드가 아닐 때 중분류 카테고리 제목 표시 -->
+        <h2 class="subcategory-title" th:text="${subCategoryTitle}" th:if="${!isSearchMode}">
+            중분류 카테고리 이름
+        </h2>
+
+        <!-- ✅ 검색 모드일 때 검색 바 표시 -->
+        <div class="search-bar-container" th:if="${isSearchMode}">
+            <div class="search-bar">
+                <input type="text" id="search-input" th:value="${keyword}" placeholder="Search" />
+                <button type="button" id="clear-search" class="clear-button" style="display: none;">✕</button>
+                <button type="button" id="search-button" class="search-icon-button">
+                    <!-- 기본 돋보기 아이콘 -->
+                    <svg id="search-icon" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" class="search-icon">
+                        <path fill="black" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+                    </svg>
+                </button>
+            </div>
+            <div class="search-underline"></div>
         </div>
     </div>
     <!-- 카테고리와 정렬 -->
@@ -118,9 +127,11 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const select = document.querySelector(".custom-select");
-            const selectedOption = select.querySelector(".selected-option");
-            const searchInput = document.getElementById("search-input"); // 검색 입력창
-            const searchButton = document.querySelector(".search-bar button"); // 검색 버튼
+            const selectedOption = select ? select.querySelector(".selected-option") : null;
+            const searchInput = document.getElementById("search-input");
+            const clearButton = document.getElementById("clear-search");
+            const searchButton = document.getElementById("search-button"); // 검색 버튼
+            const searchIcon = document.getElementById("search-icon"); // 돋보기 아이콘
             const urlParams = new URLSearchParams(window.location.search);
 
             // ✅ 기존 URL 유지하면서 검색 파라미터 유지 + 페이지 초기화
@@ -143,39 +154,72 @@
             }
 
             // ✅ 정렬 드롭다운 열기/닫기
-            selectedOption.addEventListener("click", () => {
-                select.classList.toggle("open");
-            });
-
-            // ✅ 정렬 옵션 선택 이벤트 (기존 URL 유지)
-            document.querySelectorAll(".dropdown-options li").forEach(option => {
-                option.addEventListener("click", function () {
-                    const selectedOrder = this.getAttribute("data-value");
-                    updateURLParam("order", selectedOrder);
-                    updateSelectedOrderText(this.textContent);
-                    select.classList.remove("open");
+            if (select && selectedOption) {
+                selectedOption.addEventListener("click", () => {
+                    select.classList.toggle("open");
                 });
-            });
 
-            // ✅ 정렬 선택 UI 업데이트
-            function updateSelectedOrderText(text) {
-                selectedOption.childNodes[0].nodeValue = text + " "; // `dropdown-arrow` 유지
+                // ✅ 정렬 옵션 선택 이벤트 (기존 URL 유지)
+                document.querySelectorAll(".dropdown-options li").forEach(option => {
+                    option.addEventListener("click", function () {
+                        const selectedOrder = this.getAttribute("data-value");
+                        updateURLParam("order", selectedOrder);
+                        updateSelectedOrderText(this.textContent);
+                        select.classList.remove("open");
+                    });
+                });
+
+                // ✅ 정렬 선택 UI 업데이트
+                function updateSelectedOrderText(text) {
+                    selectedOption.childNodes[0].nodeValue = text + " "; // `dropdown-arrow` 유지
+                }
             }
 
-            // ✅ 검색 버튼 클릭 이벤트 (페이지 초기화 유지)
-            searchButton.addEventListener("click", function () {
-                const keyword = searchInput.value.trim();
-                updateURLParam("keyword", keyword);
-            });
+            // ✅ 검색란이 존재할 경우만 이벤트 리스너 추가
+            if (searchInput && clearButton && searchButton && searchIcon) {
+                // ✅ 검색어 입력 시 X 버튼 표시 및 아이콘 변경
+                searchInput.addEventListener("input", function () {
+                    if (searchInput.value.trim()) {
+                        clearButton.style.display = "block"; // X 버튼 표시
+                        searchIcon.style.display = "none"; // 돋보기 아이콘 숨김
+                    } else {
+                        clearButton.style.display = "none"; // X 버튼 숨기기
+                        searchIcon.style.display = "block"; // 돋보기 아이콘 표시
+                    }
+                });
 
+                // ✅ X 버튼 클릭 시 검색 입력창만 초기화 (URL 영향 없음)
+                clearButton.addEventListener("click", function () {
+                    searchInput.value = ""; // 입력창 초기화
+                    clearButton.style.display = "none"; // X 버튼 숨기기
+                    searchIcon.style.display = "block"; // 돋보기 아이콘 다시 표시
+                });
 
-            // ✅ 검색창 Enter 키 입력 이벤트
-            searchInput.addEventListener("keypress", function (event) {
-                if (event.key === "Enter") {
-                    event.preventDefault();
-                    searchButton.click();
+                // ✅ 검색 버튼 클릭 이벤트 (URL 업데이트)
+                searchButton.addEventListener("click", function () {
+                    const keyword = searchInput.value.trim();
+                    if (keyword) { // 키워드가 있을 때만 요청 수행
+                        updateURLParam("keyword", keyword);
+                    }
+                });
+
+                // ✅ 검색창 Enter 키 입력 이벤트 (검색 실행)
+                searchInput.addEventListener("keypress", function (event) {
+                    if (event.key === "Enter") {
+                        event.preventDefault();
+                        const keyword = searchInput.value.trim();
+                        if (keyword) { // 키워드가 있을 때만 요청 수행
+                            searchButton.click();
+                        }
+                    }
+                });
+
+                // ✅ 페이지 로드 시 검색어가 있다면 X 버튼 표시
+                if (searchInput.value.trim()) {
+                    clearButton.style.display = "block"; // X 버튼 표시
+                    searchIcon.style.display = "none"; // 돋보기 아이콘 숨김
                 }
-            });
+            }
 
             // ✅ 헤더 카테고리 메뉴 클릭 이벤트 (기본 이동 유지)
             document.querySelectorAll(".nav-list a").forEach(link => {
@@ -192,7 +236,6 @@
                     window.location.href = this.href; // 직접 페이지 이동 (새로고침)
                 });
             });
-
 
             // ✅ 페이지네이션 클릭 이벤트 (기존 URL 유지)
             document.body.addEventListener("click", function (event) {
