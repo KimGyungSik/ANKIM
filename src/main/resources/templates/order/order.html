@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html xmlns:th="http://www.thymeleaf.org">
 <head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>주문하기</title>
     <link rel="stylesheet" th:href="@{/css/order/order.css}">
     <link rel="stylesheet" th:href="@{/css/header.css}">
@@ -233,280 +234,26 @@
 
             <!-- 마일리지 -->
             <section class="mileage-info section-info">
-                <h2>마일리지</h2>
-                <p>마일리지 사용/잔액 등</p>
-            </section>
-
-            <!-- 결제 방법 -->
-            <section class="payment-method section-info">
-                <h2>결제방법</h2>
-                <p>신용카드 / 네이버페이 / 카카오페이 등</p>
-            </section>
-
-            <!-- 현금 영수증 -->
-            <section class="cash-receipt section-info">
-                <h2>현금영수증</h2>
-                <p>발급 유형 / 휴대폰 번호 / 사업자번호 등</p>
-            </section>
-        </div>
-
-        <!-- 오른쪽 결제 요약 -->
-        <aside class="checkout-summary">
-            <h2>결제 금액</h2>
-            <div class="summary-total">
-                <p>상품 금액: <strong>43,200원</strong></p>
-                <p>배송비: <strong>+3,000원</strong></p>
-                <p>할인: <strong>-7,430원</strong></p>
-                <p>총 결제 금액: <strong>35,770원</strong></p>
-            </div>
-            <p style="font-size: 13px; color: #666;">
-                주문 내용을 재확인하세요. 이 영역에 안내 문구가 들어갑니다.
-            </p>
-            <button>CHECK OUT</button>
-        </aside>
-    </div>
-</main>
-<footer th:replace="/fragments/footer :: footer-container"></footer>
-<script type="module" th:src="@{/js/fragments/header.js}"></script>
-<script type="module" th:src="@{/js/order/order.js}"></script>
-</body>
-</html><!DOCTYPE html>
-<html xmlns:th="http://www.thymeleaf.org">
-<head>
-    <title>주문하기</title>
-    <link rel="stylesheet" th:href="@{/css/order/order.css}">
-    <link rel="stylesheet" th:href="@{/css/header.css}">
-    <link rel="stylesheet" th:href="@{/css/footer.css}">
-</head>
-<body>
-<header th:replace="/fragments/header :: header"></header>
-<main class="checkout-container">
-    <div class="checkout-steps">
-        <ol class="step-list">
-            <li class="step-item completed">
-                01 SHOPPING BAG
-                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
-                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
-                        <path d="M1 0l40 40.083L1.166 80"></path>
-                    </g>
-                </svg>
-            </li>
-            <li class="step-item active-step">
-                02 ORDER
-                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
-                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
-                        <path d="M1 0l40 40.083L1.166 80"></path>
-                    </g>
-                </svg>
-            </li>
-            <li class="step-item">
-                03 ORDER CONFIRMED
-            </li>
-        </ol>
-    </div>
-    <!-- [2] 메인 컨테이너: 왼쪽(주문정보) + 오른쪽(결제 요약) -->
-    <div class="checkout-content">
-        <!-- 왼쪽 정보 영역 -->
-        <div class="checkout-left">
-            <!-- 배송 정보 -->
-            <section class="shipping-info section-info">
-                <header class="shipping-header">
-                    <h2 class="shipping-title">
-                        배송 정보
-                        <button type="button" class="info-button">?</button>
-                    </h2>
-                    <p class="shipping-required-notice">
-                        <i class="required-asterisk">*</i> 표시는 필수입력 항목
-                    </p>
+                <header class="mileage-header">
+                    <h2>마일리지</h2>
                 </header>
+                <div class="mileage-line">
+                    <!-- (1) 라벨 -->
+                    <label for="mileageInput" class="mileage-label">사용 금액 입력</label>
 
-                <!-- [A] 탭 영역 -->
-                <div class="shipping-tab">
-                    <ul class="tab-list">
-                        <li class="tab-item active" role="button">기존 배송지</li>
-                        <li class="tab-item" role="button">신규입력</li>
-                    </ul>
+                    <!-- (2) 인풋 + "모두 사용" 버튼 -->
+                    <input type="number" id="mileageInput" value="0" class="mileage-input" />
+                    <button type="button" class="mileage-use-all-btn searchBtn">모두 사용</button>
+
+                    <!-- (3) 사용 가능/보유 P -->
+                    <span class="available-mileage">
+      사용 가능 <em>966P</em>
+    </span>
+                    <span class="owned-mileage">
+      / 보유 <em>966P</em>
+      <button type="button" class="info-btn">?</button>
+    </span>
                 </div>
-
-                <!-- [B] 주소 입력 폼: 두 개의 컨테이너로 분리 -->
-                <div class="shipping-form">
-                    <!-- 기존 배송지 영역 -->
-                    <div class="existing-address">
-                        <!-- 배송지명과 이전 배송지 목록 버튼을 같은 행에 배치 -->
-                        <div class="form-row input-name">
-                            <h3 class="form-label">배송지명</h3>
-                            <div class="form-field">
-                                <div class="input-group-with-button">
-                                    <input type="text" name="addressName" placeholder="배송지명">
-                                    <button type="button" class="prev-address-btn searchBtn">이전 배송지 목록</button>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 수령인 -->
-                        <div class="form-row required input-name">
-                            <h3 class="form-label">수령인</h3>
-                            <div class="form-field">
-                                <input type="text" name="receiverName" placeholder="이름을 입력해주세요">
-                            </div>
-                        </div>
-                        <!-- 주소 (우편번호, 메인주소, 상세주소) -->
-                        <div class="form-row required">
-                            <h3 class="form-label">배송지</h3>
-                            <div class="form-field">
-                                <div class="input-group-with-button">
-                                    <input type="text" id="zipCodeInput" value="-" disabled>
-                                    <button id="addrSearchBtn" class="searchBtn">우편번호 검색</button>
-                                </div>
-                                <div class="row">
-                                    <label></label>
-                                    <!-- 카카오 api 창 추가 공간-->
-                                    <div id="layer"></div>
-                                </div>
-                                <div class="input-group-with-button">
-                                    <input type="text" id="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
-                                </div>
-                                <div class="input-group-with-button">
-                                    <input type="text" id="addressDetailInput" value="상세주소 입력">
-                                </div>
-                            </div>
-                        </div>
-                        <!-- 연락처1 -->
-                        <div class="form-row required">
-                            <h3 class="form-label">연락처1</h3>
-                            <div class="form-field phone-field">
-                                <input type="text" maxlength="4" name="tel1_0" value="010">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_1" value="1234">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_2" value="5678">
-                            </div>
-                        </div>
-                        <!-- 연락처2 -->
-                        <div class="form-row">
-                            <h3 class="form-label">연락처2</h3>
-                            <div class="form-field phone-field">
-                                <input type="text" maxlength="4" name="tel2_0" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel2_1" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel2_2" placeholder="">
-                            </div>
-                        </div>
-                        <!-- 기본 배송지 안내 -->
-                        <div class="form-row">
-                            <h3 class="form-label"></h3>
-                            <div class="form-field">
-                                <p class="default-address-notice">
-                                    기본 배송지입니다. 주문 시 변경하신 내용으로 기본 배송지 주소가 수정됩니다.
-                                </p>
-                            </div>
-                        </div>
-                        <!-- 배송시 요청사항 -->
-                        <div class="form-row">
-                            <h3 class="form-label"></h3>
-                            <div class="form-field">
-                                <div class="request-dropdown">
-                                    <input type="text" class="request-dropdown-input" readonly value="배송시 요청사항을 선택해 주세요">
-                                    <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 16">
-                                        <g fill="none" stroke="#d4d4d4" stroke-width="3">
-                                            <path d="M28 1L13.97 15 0 1.058"></path>
-                                        </g>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <!-- 신규입력 영역 (초기에는 숨김) -->
-                    <div class="new-address" style="display: none;">
-                        <!-- 신규 배송지 입력폼 (기존 내용과 동일 구조이나 값은 빈 상태) -->
-                        <div class="form-row input-name">
-                            <h3 class="form-label">배송지명</h3>
-                            <div class="form-field">
-                                <input type="text" name="addressName" placeholder="배송지명">
-                            </div>
-                        </div>
-                        <div class="form-row required input-name">
-                            <h3 class="form-label">수령인</h3>
-                            <div class="form-field">
-                                <input type="text" name="receiverName" placeholder="이름을 입력해주세요">
-                            </div>
-                        </div>
-                        <div class="form-row required">
-                            <h3 class="form-label">배송지</h3>
-                            <div class="form-field">
-                                <div class="input-group-with-button">
-                                    <input type="text" id="zipCodeInput" value="-" disabled>
-                                    <button id="addrSearchBtn" class="searchBtn">우편번호 검색</button>
-                                </div>
-                                <div class="row">
-                                    <label></label>
-                                    <!-- 카카오 api 창 추가 공간-->
-                                    <div id="layer"></div>
-                                </div>
-                                <div class="input-group-with-button">
-                                    <input type="text" id="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
-                                </div>
-                                <div class="input-group-with-button">
-                                    <input type="text" id="addressDetailInput" value="상세주소 입력">
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row required">
-                            <h3 class="form-label">연락처1</h3>
-                            <div class="form-field phone-field">
-                                <input type="text" maxlength="4" name="tel1_0" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_1" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_2" placeholder="">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <h3 class="form-label">연락처2</h3>
-                            <div class="form-field phone-field">
-                                <input type="text" maxlength="4" name="tel2_0" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel2_1" placeholder="">
-                                <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel2_2" placeholder="">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <h3 class="form-label"></h3>
-                            <div class="form-field">
-                                <div class="default-address-container">
-                                    <input id="defaultAddressInput" type="checkbox">
-                                    <label for="defaultAddressInput">기본 배송지로 등록</label>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <h3 class="form-label"></h3>
-                            <div class="form-field">
-                                <div class="request-dropdown">
-                                    <input type="text" class="request-dropdown-input" readonly value="배송시 요청사항을 선택해 주세요">
-                                    <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 16">
-                                        <g fill="none" stroke="#d4d4d4" stroke-width="3">
-                                            <path d="M28 1L13.97 15 0 1.058"></path>
-                                        </g>
-                                    </svg>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- 쿠폰/상품 정보 -->
-            <section class="coupon-and-product section-info">
-                <h2>쿠폰 사용 및 상품 정보</h2>
-                <p>상품 목록/쿠폰 영역</p>
-            </section>
-
-            <!-- 마일리지 -->
-            <section class="mileage-info section-info">
-                <h2>마일리지</h2>
-                <p>마일리지 사용/잔액 등</p>
             </section>
 
             <!-- 결제 방법 -->
@@ -517,8 +264,43 @@
 
             <!-- 현금 영수증 -->
             <section class="cash-receipt section-info">
-                <h2>현금영수증</h2>
-                <p>발급 유형 / 휴대폰 번호 / 사업자번호 등</p>
+                <header class="cash-receipt-header">
+                    <h2 class="cash-receipt-title">현금 영수증</h2>
+                </header>
+                <div class="cash-receipt-description">
+                    <p>선택한 결제수단의 현금결제(머니, 계좌 등) 시 현금영수증이 발급됩니다.</p>
+                </div>
+                <div class="cash-receipt-options">
+                    <div class="cash-receipt-radio-group">
+                        <label>
+                            <input type="radio" name="receiptType" value="INCOME" checked>
+                            소득공제용
+                        </label>
+                        <label>
+                            <input type="radio" name="receiptType" value="SPENDING">
+                            지출증빙용
+                        </label>
+                        <label>
+                            <input type="radio" name="receiptType" value="NONE">
+                            미발행
+                        </label>
+                    </div>
+                </div>
+                <div class="cash-receipt-extra">
+                    <div class="cash-receipt-contact">
+                        <select class="contact-method-select">
+                        </select>
+                    </div>
+                    <div class="cash-receipt-input">
+                        <input type="text" placeholder="숫자만 입력해 주세요." value="01012345678">
+                    </div>
+                </div>
+                <div class="cash-receipt-save">
+                    <label>
+                        <input type="checkbox" id="saveCashReceiptInfo">
+                        <span>현금영수증 정보를 다음에도 사용</span>
+                    </label>
+                </div>
             </section>
         </div>
 
@@ -530,9 +312,6 @@
                 <p>배송비: <strong>+3,000원</strong></p>
                 <p>할인: <strong>-7,430원</strong></p>
                 <p>총 결제 금액: <strong>35,770원</strong></p>
-            </div>
-            <div class="orderTermsList">
-                <!--   주문 약관 리스트 등록    -->
             </div>
             <p style="font-size: 13px; color: #666;">
                 주문 내용을 재확인하세요. 이 영역에 안내 문구가 들어갑니다.
