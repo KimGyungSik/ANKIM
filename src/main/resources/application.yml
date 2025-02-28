@@ -32,6 +32,11 @@ spring:
         - jwt
         - login
         - redis
+      prod:
+        - email
+        - jwt
+        - login
+        - redis
   main:
     allow-bean-definition-overriding: true
   sql:

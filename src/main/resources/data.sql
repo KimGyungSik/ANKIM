@@ -124,41 +124,51 @@ INSERT INTO item_option (item_no, optv_no) VALUES
 --                                                                                           ('cotton-tshirt-detail.jpg', '면 티셔츠 상세', 'http://example.com/images/cotton-tshirt-detail.jpg', 'N', 1, 3);
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
+-- 1
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 1, 1, 'Y');
 
 -- 필수 약관
+-- 2
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 1, 2, 'Y');
-
+-- 3
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 1, 2, 'Y');
 
 -- 선택 약관
+-- 4
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 1, 2, 'Y');
 
+-- 5
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 2, 'Y');
 
+-- 6
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
+-- 7
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
+-- 8
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 1, 1, 'Y');
 
 -- [ 탈퇴 약관 삽입 ]
+-- 9
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'LEAVE', '탈퇴 약관', 'ANKIM 탈퇴 약관', 'Y', 1, 1, 'Y');
 
+-- 10
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 삭제되는 내용','- 탈퇴 시 고객님께서 보유하셨던 쿠폰과 마일리지는 모두 소멸되며 환불할 수 없습니다. 또한 다른 계정으로 양도 또는 이관할 수 없습니다.
 - 탈퇴한 계정 및 이용 내역은 복구할 수 없으니 탈퇴 시 유의하시기 바랍니다.', 'Y', 1, 2, 'Y');
 
+-- 11
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
         '- 탈퇴 시 법령에 따라 보관해야 하는 항목은 관련 법령에 따라 일정 기간 보관하며 다른 목적으로 이용하지 않습니다. 전자상거래 등에서의 소비자보호에 관한 법률에 의거하여 대금결제 및 재화 등의 공급에 관한 기록 5년, 계약 또는 청약철회 등에 관한 기록 5년, 소비자의 불만 또는 분쟁처리에 관한 기록은 3년동안 보관됩니다.
