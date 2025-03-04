@@ -382,7 +382,7 @@
                                     <input type="checkbox" />
                                     (필수) 개인정보 수집/이용 동의
                                 </label>
-                                <button type="button" class="view-btn">보기</button>
+                                <button type="button" class="view-btn"  data-fetch-url="/html/terms/v1/terms-personal.html">보기</button>
                             </div>
                         </li>
                         <li>
@@ -391,7 +391,7 @@
                                     <input type="checkbox" />
                                     (필수) 개인정보 제3자 제공 동의
                                 </label>
-                                <button type="button" class="view-btn">보기</button>
+                                <button type="button" class="view-btn" data-fetch-url="/html/terms/v1/third-party.html">보기</button>
                             </div>
                         </li>
                         <li>
@@ -424,6 +424,22 @@
                 </div>
             </section>
         </aside>
+    </div>
+
+    <!-- 약관 Modal -->
+    <div class="modal-overlay" id="termsModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
+    </div>
+
+    <!--  상품 할인 적용 Modal  -->
+    <div class="modal" id="saleModal">
+        <div class="modal-content">
+            <span class="close-button" onclick="closeModal()">&times;</span>
+            <div class="modal-body"></div>
+        </div>
     </div>
 </main>
 <footer th:replace="/fragments/footer :: footer-container"></footer>

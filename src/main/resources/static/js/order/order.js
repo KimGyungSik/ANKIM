@@ -26,6 +26,13 @@ document.addEventListener("DOMContentLoaded", () => {
     var agreementInputs = document.querySelectorAll(".agreement-list input[type='checkbox']");
 
 
+    // 모달 초기상태 안보이게 설정
+    window.closeModal = function () {
+        var modal = document.querySelector('.modal');
+        var modalOverlay = document.querySelector('.modal-overlay');
+        modal.style.display = "none";
+        modalOverlay.style.display = "none";
+    };
 
     // 초기 상태: 기존 배송지 보이고 신규입력 숨김
     if (existingAddress && newAddress) {
@@ -124,6 +131,40 @@ document.addEventListener("DOMContentLoaded", () => {
                 var allChecked = Array.from(agreementInputs).every((cb) => cb.checked);
                 checkAllInput.checked = allChecked;
             }
+        });
+    });
+
+    // 약관 보기 버튼 눌렀을 경우
+    // "보기" 버튼 선택
+    var viewButtons = document.querySelectorAll(".view-btn");
+
+    // [B] 각 보기 버튼 클릭 시 -> fetch & 모달 표시
+    viewButtons.forEach(btn => {
+        btn.addEventListener("click", () => {
+
+            viewButtons.forEach(btn => {
+                btn.addEventListener("click", () => {
+                    // 버튼에 있는 data-fetch-url 속성값으로 fetch할 주소 결정
+                    var fetchUrl = btn.getAttribute("data-fetch-url");
+                    console.log("약관 버튼 클릭 : "+ fetchUrl);
+                    if (!fetchUrl) return;
+
+                    // HTML fetch
+                    fetch(fetchUrl)
+                        .then(response => response.text())
+                        .then(html => {
+                            // 모달 내부의 .modal-body에 삽입
+                            var modalBody = document.querySelector("#termsModal .modal-body");
+                            modalBody.innerHTML = html;
+
+                            // 모달 열기
+                            document.getElementById("termsModal").style.display = "flex";
+                        })
+                        .catch(err => {
+                            console.error("약관 파일을 불러오는 중 오류 발생:", err);
+                        });
+                });
+            });
         });
     });
 });

@@ -1,0 +1,49 @@
+.third-party-content {
+    max-width: 700px;
+    margin: 0 auto;
+    font-family: sans-serif;
+    font-size: 14px;
+    color: #333;
+}
+
+.third-party-content h2 {
+    font-size: 18px;
+    margin-bottom: 10px;
+    font-weight: bold;
+}
+
+.third-party-content p {
+    margin: 8px 0;
+    line-height: 1.4;
+}
+
+.third-party-table-container {
+    margin-top: 16px;
+    overflow-x: auto; /* 필요 시 테이블 가로 스크롤 */
+}
+
+.third-party-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #ddd;
+    table-layout: fixed; /* 컬럼 너비를 고정할 때 사용 */
+}
+
+.third-party-table th,
+.third-party-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    vertical-align: top;
+    word-break: break-word; /* 내용 길 때 줄바꿈 */
+}
+
+.third-party-table th {
+    width: 120px;        /* 첫 번째 열(항목명) 너비 조절 */
+    background-color: #f9f9f9;
+    text-align: left;
+    font-weight: bold;
+}
+
+.third-party-table td {
+    text-align: left;
+}
