@@ -7,6 +7,7 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import shoppingmall.ankim.docs.RestDocsSupport;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
@@ -38,6 +39,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OrderTempControllerDocsTest extends RestDocsSupport {
 
     private final OrderService orderService = mock(OrderService.class);
+    private final CartService cartService = mock(CartService.class);
     private final SecurityContextHelper securityContextHelper = mock(SecurityContextHelper.class);
 
     private static final String ACCESS_TOKEN = "example-access-token";
@@ -45,7 +47,7 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object initController() {
-        return new OrderTempController(orderService, securityContextHelper);
+        return new OrderTempController(orderService, cartService, securityContextHelper);
     }
 
     @DisplayName("임시 주문 생성 API")

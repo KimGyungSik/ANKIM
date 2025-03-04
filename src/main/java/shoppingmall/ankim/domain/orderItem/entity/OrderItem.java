@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.orderItem.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.aspectj.weaver.ast.Or;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.order.entity.Order;
@@ -16,6 +17,7 @@ import java.time.LocalDateTime;
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
+@Slf4j
 @Entity
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
@@ -43,7 +45,7 @@ public class OrderItem extends BaseEntity {
     @Setter
     private Integer qty; // 주문 수량
 
-    private Integer price; // 주문 상품 가격, 정상가격(원가) + 추가금액
+    private Integer price; // 주문 상품 가격, 정상가격(원가) + 추가금액 <- item.totalPrice
 
     private Integer discPrice; // 주문 할인 가격 = price(원가 + 추가금액) - sellPrice (할인 적용된 금액)
 
@@ -68,6 +70,8 @@ public class OrderItem extends BaseEntity {
             throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID);
         }
 
+        log.info("Create OrderItem, item.getTotalPrice={}, qty={}", item.getTotalPrice(), qty);
+
         OrderItem orderItem = OrderItem.builder()
                 .item(item)
                 .productName(item.getProduct().getName())
@@ -85,7 +89,7 @@ public class OrderItem extends BaseEntity {
 
     private void calculateDiscPrice(Integer sellPrice) {
         // 할인 금액 계산
-        discPrice = this.price - sellPrice;
+        discPrice = this.price - sellPrice; // 정상 금액 - 할인 적용된 금액
 
         // 할인 금액이 음수인 경우 예외 발생
         if (discPrice < 0) {

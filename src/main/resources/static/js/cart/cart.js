@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         items.forEach((item) => {
-            var unitPrice = parseInt(item.totalPrice || 0, 10); // 개별 단가
+            var unitPrice = parseInt(item.sellPrice || 0, 10) + parseInt(item.addPrice || 0, 10); // 개별 단가
             var calculatedTotalPrice = unitPrice * parseInt(item.qty || 1, 10); // 수량에 따른 총 가격 계산
             var isSoldOut = item.itemQty === 0; // 품절 여부 확인
 

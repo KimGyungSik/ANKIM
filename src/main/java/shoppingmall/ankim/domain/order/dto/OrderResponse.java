@@ -43,6 +43,7 @@ public class OrderResponse {
                 .totalQty(order.getTotalQty())
                 .totalPrice(order.getTotalPrice())
                 .totalShipFee(order.getTotalShipFee())
+//                .totalDiscPrice(order.getTotalDiscPrice())
                 .totalDiscPrice(order.getTotalDiscPrice())
                 .payAmt(order.getPayAmt())
                 .regDate(order.getRegDate())

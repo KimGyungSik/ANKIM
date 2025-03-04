@@ -5,6 +5,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
+import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
+import shoppingmall.ankim.domain.cart.entity.CartItem;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
 import shoppingmall.ankim.domain.order.service.OrderService;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
@@ -18,6 +21,8 @@ import java.util.List;
 public class OrderTempController {
 
     private final OrderService orderService;
+    private final CartService cartService;
+
     private final SecurityContextHelper securityContextHelper;
 
     /*
@@ -32,6 +37,20 @@ public class OrderTempController {
         String loginId = securityContextHelper.getLoginId();
 
         OrderResponse tempOrder = orderService.createTempOrder(loginId, cartItemNoList);
+        return ApiResponse.ok(tempOrder);
+    }
+
+
+    // 바로 구매하기
+    @PostMapping("/item")
+    public ApiResponse<OrderResponse> addToCartAndOrder(
+            @RequestBody AddToCartRequest request
+    ) {
+        String loginId = securityContextHelper.getLoginId();
+
+        CartItem cartItem = cartService.addToCart(request.toServiceRequest(), loginId);
+
+        OrderResponse tempOrder = orderService.createTempOrder(loginId, List.of(cartItem.getNo()));
         return ApiResponse.ok(tempOrder);
     }
 
