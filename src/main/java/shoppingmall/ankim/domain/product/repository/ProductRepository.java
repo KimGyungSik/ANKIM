@@ -23,13 +23,4 @@ public interface ProductRepository extends JpaRepository<Product,Long>, ProductQ
     void updateCategoryForProducts(@Param("oldCategoryId") Long oldCategoryId, @Param("newCategory") Category newCategory);
 
     boolean existsByCategory(Category category);
-
-//    @Query(value = """
-//        SELECT p.no
-//        FROM product p
-//        WHERE MATCH(p.name, p.search_keywords, p.description)
-//        AGAINST(:keyword IN NATURAL LANGUAGE MODE)
-//    """, nativeQuery = true)
-//    List<Long> findProductIdsByFullTextSearch(@Param("keyword") String keyword);
-
 }

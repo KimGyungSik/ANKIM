@@ -50,7 +50,8 @@ public class InitProduct {
 
         @Transactional
         public void init() {
-            int productCountPerSubCategory = 40; // 소분류당 40개씩 상품 생성
+            int batchSize = 500; // ✅ Batch Size 지정 (조정 가능)
+            int productCountPerSubCategory = 5000; // ✅ 한 소분류당 생성할 상품 개수
 
             // 중분류 카테고리(최상위) 생성
             Map<Condition, List<Category>> conditionToSubCategoryMap = new HashMap<>();
@@ -73,8 +74,8 @@ public class InitProduct {
                     conditionToSubCategoryMap.put(condition, subCategories);
                 }
             }
-
-            // 더미 데이터 생성 (소분류에 매핑)
+            int count = 0;
+            // ✅ 더미 데이터 생성 (소분류에 매핑)
             for (Map.Entry<Condition, List<Category>> entry : conditionToSubCategoryMap.entrySet()) {
                 Condition condition = entry.getKey();
                 List<Category> subCategories = entry.getValue();
@@ -82,24 +83,32 @@ public class InitProduct {
                 for (Category subCategory : subCategories) {
                     for (int i = 0; i < productCountPerSubCategory; i++) {
                         createProduct(em, condition, subCategory, i);
+                        count++;
+
+                        // ✅ Batch Size마다 Flush & Clear 실행
+                        if (count % batchSize == 0) {
+                            em.flush();
+                            em.clear();
+                            System.out.println("🔄 Batch Insert 실행: " + count + "개 저장 완료");
+                        }
                     }
                 }
             }
 
-            System.out.println("각 소분류에 40개씩 총 " + (productCountPerSubCategory * conditionToSubCategoryMap.values().stream().mapToInt(List::size).sum()) + "개의 더미 상품이 생성되었습니다.");
+            // ✅ 남은 데이터 처리
+            em.flush();
+            em.clear();
+
+            System.out.println("✅ 총 " + count + "개의 더미 상품이 생성되었습니다.");
         }
 
         private void createProduct(EntityManager em, Condition condition, Category subCategory, int index) {
             condition = getRandomCondition(); // 랜덤 Condition 적용
 
-            OrderBy orderBy = getRandomOrderBy();
             List<InfoSearch> infoSearches = getRandomInfoSearches();
             List<ColorCondition> colorConditions = getRandomColorConditions();
-            PriceCondition priceCondition = getRandomPriceCondition();
-            Integer customMinPrice = priceCondition == PriceCondition.CUSTOM ? 10000 : null;
-            Integer customMaxPrice = priceCondition == PriceCondition.CUSTOM ? 50000 : null;
 
-            // 상품 생성
+            // ✅ 상품 생성
             Product product = Product.builder()
                     .category(subCategory)
                     .name(subCategory.getName() + " 상품 " + index)
@@ -115,35 +124,35 @@ public class InitProduct {
                     .sellingStatus(ProductSellingStatus.SELLING)
                     .shipFee(2000)
                     .build();
-            product.setCreatedAt(LocalDateTime.now().minusDays(index));
             em.persist(product);
 
             // ✅ 옵션 그룹 생성
             OptionGroup colorGroup = createOptionGroup(em, "컬러", product);
             OptionGroup sizeGroup = createOptionGroup(em, "사이즈", product);
 
-            // ✅ 옵션 값 생성
+            // ✅ 옵션 값 생성 (Batch Insert)
+            List<OptionValue> optionValues = new ArrayList<>();
             for (ColorCondition colorCondition : colorConditions) {
-                createOptionValue(em, colorCondition.name(), colorCondition.getHexCode(), colorGroup);
+                optionValues.add(createOptionValue(em, colorCondition.name(), colorCondition.getHexCode(), colorGroup));
             }
-            createOptionValue(em, "M", null, sizeGroup);
-            createOptionValue(em, "L", null, sizeGroup);
-            product.updateSearchKeywords();
+            optionValues.add(createOptionValue(em, "M", null, sizeGroup));
+            optionValues.add(createOptionValue(em, "L", null, sizeGroup));
 
-            // ✅ 상품 이미지 생성
+            // ✅ 상품 이미지 생성 (Batch Insert)
             addProductImages(em, product, index);
 
-            // ✅ 품목(Item) 생성
-            createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: M", List.of(
-                    colorGroup.getOptionValues().get(0),
-                    sizeGroup.getOptionValues().get(0)
-            ), product, index);
+            // ✅ 품목(Item) 생성 (Batch Insert)
+            List<OptionValue> selectedColorValues = colorGroup.getOptionValues();
+            if (!selectedColorValues.isEmpty()) {
+                createItem(em, "색상: " + selectedColorValues.get(0).getName() + ", 사이즈: M",
+                        List.of(selectedColorValues.get(0), sizeGroup.getOptionValues().get(0)), product, index);
 
-            createItem(em, "색상: " + colorConditions.get(0).name() + ", 사이즈: L", List.of(
-                    colorGroup.getOptionValues().get(0),
-                    sizeGroup.getOptionValues().get(1)
-            ), product, index);
+                createItem(em, "색상: " + selectedColorValues.get(0).getName() + ", 사이즈: L",
+                        List.of(selectedColorValues.get(0), sizeGroup.getOptionValues().get(1)), product, index);
+            }
         }
+
+
 
         public static Member createMember(EntityManager entityManager, String loginId) {
             Member member = Member.builder()
@@ -262,41 +271,46 @@ public class InitProduct {
         }
 
         // 옵션 값 생성
-        private void createOptionValue(EntityManager em, String name, String colorCode, OptionGroup optionGroup) {
+        private OptionValue createOptionValue(EntityManager em, String name, String colorCode, OptionGroup optionGroup) {
             OptionValue optionValue = OptionValue.builder()
                     .name(name)
                     .colorCode(colorCode)
                     .optionGroup(optionGroup)
                     .build();
-            optionGroup.addOptionValue(optionValue);
             em.persist(optionValue);
+            optionGroup.addOptionValue(optionValue);
+            return optionValue;
         }
+
 
         // 상품 이미지 생성
         private void addProductImages(EntityManager em, Product product, int index) {
-            ProductImg thumbnailImg = ProductImg.builder()
-                    .imgName("thumbnail_" + index + ".jpg")
-                    .oriImgName("썸네일 이미지 " + index)
-                    .imgUrl("http://example.com/images/thumbnail_" + index + ".jpg")
-                    .repimgYn("Y") // 대표 이미지
-                    .ord(1)
-                    .product(product)
-                    .build();
-            em.persist(thumbnailImg);
+            List<ProductImg> productImgs = List.of(
+                    ProductImg.builder()
+                            .imgName("thumbnail_" + index + ".jpg")
+                            .oriImgName("썸네일 이미지 " + index)
+                            .imgUrl("http://example.com/images/thumbnail_" + index + ".jpg")
+                            .repimgYn("Y")
+                            .ord(1)
+                            .product(product)
+                            .build(),
 
-            ProductImg detailImg = ProductImg.builder()
-                    .imgName("detail_" + index + ".jpg")
-                    .oriImgName("상세 이미지 " + index)
-                    .imgUrl("http://example.com/images/detail_" + index + ".jpg")
-                    .repimgYn("N")
-                    .ord(2)
-                    .product(product)
-                    .build();
-            em.persist(detailImg);
+                    ProductImg.builder()
+                            .imgName("detail_" + index + ".jpg")
+                            .oriImgName("상세 이미지 " + index)
+                            .imgUrl("http://example.com/images/detail_" + index + ".jpg")
+                            .repimgYn("N")
+                            .ord(2)
+                            .product(product)
+                            .build()
+            );
 
-            product.addProductImg(thumbnailImg);
-            product.addProductImg(detailImg);
+            for (ProductImg productImg : productImgs) {
+                em.persist(productImg);
+                product.addProductImg(productImg);
+            }
         }
+
 
         // 품목 생성
         private void createItem(EntityManager em, String name, List<OptionValue> optionValues, Product product, int index) {
@@ -314,6 +328,7 @@ public class InitProduct {
             em.persist(item);
             product.addItem(item);
         }
+
 
         private Condition getRandomCondition() {
             return Condition.values()[ThreadLocalRandom.current().nextInt(Condition.values().length)];
