@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import shoppingmall.ankim.domain.category.entity.Category;
@@ -27,7 +26,6 @@ import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 
 import java.util.List;

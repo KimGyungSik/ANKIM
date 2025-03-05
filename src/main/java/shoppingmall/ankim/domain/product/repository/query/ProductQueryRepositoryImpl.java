@@ -20,8 +20,6 @@ import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
-import shoppingmall.ankim.domain.product.entity.QProduct;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
 import java.util.List;
@@ -34,7 +32,6 @@ import static shoppingmall.ankim.domain.item.entity.QItem.*;
 import static shoppingmall.ankim.domain.itemOption.entity.QItemOption.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionGroup.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionValue.*;
-import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.domain.product.entity.QProduct.*;
 
 @Repository

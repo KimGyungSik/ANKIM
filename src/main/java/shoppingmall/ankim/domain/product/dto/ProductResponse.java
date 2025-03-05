@@ -1,9 +1,7 @@
 package shoppingmall.ankim.domain.product.dto;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgResponse;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;

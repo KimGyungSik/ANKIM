@@ -10,17 +10,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-import shoppingmall.ankim.domain.category.dto.CategoryResponse;
 import shoppingmall.ankim.domain.category.service.query.CategoryQueryService;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
 import shoppingmall.ankim.domain.option.dto.OptionValueResponse;
 import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
-import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
-import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;

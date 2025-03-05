@@ -1,12 +1,8 @@
 package shoppingmall.ankim.domain.item.service;
 
-import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import shoppingmall.ankim.domain.item.dto.ItemPreviewResponse;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.item.entity.Item;
@@ -19,8 +15,6 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.option.repository.OptionGroupRepository;
 import shoppingmall.ankim.domain.option.repository.OptionValueRepository;
-import org.springframework.transaction.annotation.Propagation;
-import shoppingmall.ankim.domain.option.service.OptionGroupService;
 import shoppingmall.ankim.domain.option.service.request.OptionGroupCreateServiceRequest;
 import shoppingmall.ankim.domain.option.service.request.OptionValueCreateServiceRequest;
 import shoppingmall.ankim.domain.product.entity.Product;
@@ -31,8 +25,6 @@ import shoppingmall.ankim.global.config.lock.NamedLock;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
-import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
@@ -107,7 +99,7 @@ public class ItemService {
     public List<ItemResponse> createItems(Long productId, ItemCreateServiceRequest request) {
         Product product = getProduct(productId);
 
-        List<ItemResponse> itemResponses = new ArrayList<>();
+        List<ItemResponse> orderItemRespons = new ArrayList<>();
         for (ItemDetailServiceRequest detail : request.getItems()) {
 
             // 1. 옵션 값 이름으로 OptionValue 조회
@@ -129,9 +121,9 @@ public class ItemService {
             // 3. 품목 저장
             Item savedItem = itemRepository.save(item);
             product.addItem(savedItem);
-            itemResponses.add(ItemResponse.of(savedItem));
+            orderItemRespons.add(ItemResponse.of(savedItem));
         }
-        return itemResponses;
+        return orderItemRespons;
     }
 
     /**

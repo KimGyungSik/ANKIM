@@ -4,23 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
-import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
-import shoppingmall.ankim.domain.order.dto.OrderResponse;
+import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.exception.InvalidOrderItemQtyException;
-import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -42,8 +41,9 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final CartItemRepository cartItemRepository;
+    private final MemberAddressRepository memberAddressRepository;
 
-    public OrderResponse createTempOrder(String loginId, List<Long> cartItemNoList) {
+    public OrderTempResponse createOrderTemp(String loginId, List<Long> cartItemNoList) {
         LocalDateTime registeredDateTime = LocalDateTime.now();
 
         // 회원 조회
@@ -72,7 +72,10 @@ public class OrderService {
         log.info("ordCode: {}", ordCode);
         order.setOrdCode(ordCode);
 
-        return OrderResponse.tempOf(order);
+        List<MemberAddress> memberAddresses = memberAddressRepository.findByMember(member);
+
+        return OrderTempResponse.tempOf(order)
+                .withAddresses(memberAddresses);
     }
 
     private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {

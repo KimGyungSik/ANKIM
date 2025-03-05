@@ -50,10 +50,10 @@ INSERT INTO option_value (color_code, name, optg_no) VALUES
 
 -- 상품 아이템 삽입
 INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
-                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 28500),
                                                                                                                                       (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
+                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 26500),
+                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 30500);
 
 -- 아이템 옵션 연결
 INSERT INTO item_option (item_no, optv_no) VALUES
@@ -203,6 +203,9 @@ INSERT INTO member (
 -- [ 회원 주소 삽입]
 INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
+
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 98765, '제주특별시 서귀포구', 'oo아파트 101호', '안정훈', '010-1234-5678', '010-8282-8282', 'N', 'Y');
 
 -- 탈퇴사유
 INSERT INTO leave_rsn (reason, active_yn) VALUES
