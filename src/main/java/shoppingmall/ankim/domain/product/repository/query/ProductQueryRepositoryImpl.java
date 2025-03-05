@@ -25,10 +25,7 @@ import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.domain.category.entity.QCategory.category;
@@ -91,15 +88,12 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
             }
         }
 
-        // 2️⃣ 정렬 적용
         OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
 
-        // 3️⃣ 필터링 및 정렬 수행
         List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
 
         System.out.println("[DEBUG] 조회된 상품 개수: " + content.size()); // 🔍 디버깅 로그
 
-        // 4️⃣ 전체 개수 조회 쿼리
         JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
                 .where(filterBuilder);
 
@@ -113,17 +107,22 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
             return Collections.emptyList();
         }
 
+        String formattedKeyword = Arrays.stream(keyword.trim().split("\\s+"))
+                .map(word -> "+" + word) // 각 단어 앞에 `+` 추가
+                .collect(Collectors.joining(" ")); // 공백으로 결합
+
         String sql = """
-    SELECT p.no
-    FROM product p
-    WHERE MATCH(p.name, p.search_keywords, p.description)
-    AGAINST(:keyword IN BOOLEAN MODE)
+        SELECT p.no
+        FROM product p
+        WHERE MATCH(p.name, p.search_keywords, p.description)
+        AGAINST(:keyword IN BOOLEAN MODE)
     """;
 
         return entityManager.createNativeQuery(sql)
-                .setParameter("keyword", keyword.trim()) // `*` 제거
+                .setParameter("keyword", formattedKeyword)
                 .getResultList();
     }
+
 
 
 
