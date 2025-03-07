@@ -45,24 +45,34 @@ public class OrderItem extends BaseEntity {
     @Setter
     private Integer qty; // 주문 수량
 
+    @Column(name = "discount_rate")
+    private Integer discRate; // 할인율
+
+    private Integer origPrice; // 주문 상품 원가
+
     private Integer price; // 주문 상품 가격, 정상가격(원가) + 추가금액 <- item.totalPrice
 
-    private Integer discPrice; // 주문 할인 가격 = price(원가 + 추가금액) - sellPrice (할인 적용된 금액)
+    private Integer discPrice; // 주문 할인 가격 = 정상가격(원가) - sellPrice (할인 적용된 금액)
+
+    private Integer sellPrice; // 판매가격 ( price - discPrice )
 
     private Integer shipFee; // 배송비
 
 
     @Builder
     private OrderItem(Item item, String productName, String thumbNailImgUrl,
-                     Integer qty, Integer price,
-                     Integer shipFee, Integer discPrice) {
+                     Integer qty, Integer discRate, Integer origPrice, Integer price,
+                     Integer discPrice, Integer sellPrice, Integer shipFee) {
         this.item = item;
         this.productName = productName;
         this.thumbNailImgUrl = thumbNailImgUrl;
         this.qty = qty;
+        this.discRate = discRate;
+        this.origPrice = origPrice; // 원가
         this.price = price; // 정상가격(원가) + 추가금액
+        this.discPrice = discPrice; // 할인 금액
+        this.sellPrice = sellPrice; // 할인적용된 원가
         this.shipFee = shipFee;
-        this.discPrice = discPrice;
     }
 
     public static OrderItem create(Item item, Integer qty) {
@@ -77,25 +87,25 @@ public class OrderItem extends BaseEntity {
                 .productName(item.getProduct().getName())
                 .thumbNailImgUrl(item.getThumbNailImgUrl())
                 .qty(qty)
+                .origPrice(item.getProduct().getOrigPrice())
                 .price(item.getTotalPrice())
+                .sellPrice(item.getProduct().getSellPrice())
                 .shipFee(item.getProduct().getShipFee() != null ? item.getProduct().getShipFee() : 0)
                 .build();
 
         // 할인 금액 계산
-        orderItem.calculateDiscPrice(item.getProduct().getSellPrice());
+        orderItem.calculateDiscPrice(orderItem.sellPrice);
 
         return orderItem;
     }
 
     private void calculateDiscPrice(Integer sellPrice) {
         // 할인 금액 계산
-        discPrice = this.price - sellPrice; // 정상 금액 - 할인 적용된 금액
+        discPrice = this.origPrice - sellPrice; // 원가 - 할인 적용된 금액
 
         // 할인 금액이 음수인 경우 예외 발생
         if (discPrice < 0) {
             throw new DiscountPriceException(DISCOUNT_PRICE_INVALID);
         }
     }
-
-
 }

@@ -227,9 +227,14 @@
             </section>
 
             <!-- 쿠폰/상품 정보 -->
-            <section class="coupon-and-product section-info">
-                <h2>쿠폰 사용 및 상품 정보</h2>
-                <p>상품 목록/쿠폰 영역</p>
+            <section class="product-section coupon-and-product section-info">
+                <header class="product-header">
+                    <!-- 총 몇 개인지 JS로 표시 예정 -->
+                    <h2>쿠폰 사용 및 상품 정보 / 총 <span id="total-product-count">0</span>개</h2>
+                </header>
+                <ul class="product-list" id="product-list">
+                    <!-- 여기 안에 JS로 <li>들을 삽입 -->
+                </ul>
             </section>
 
             <!-- 마일리지 -->

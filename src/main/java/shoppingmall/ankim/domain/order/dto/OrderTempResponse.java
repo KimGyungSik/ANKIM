@@ -4,6 +4,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import shoppingmall.ankim.domain.address.dto.ExistAddressResponse;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
 import shoppingmall.ankim.domain.item.dto.ItemResponse;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -31,6 +33,7 @@ public class OrderTempResponse {
     private Integer payAmt;           // 최종 결제 금액
 
     public static OrderTempResponse tempOf(Order order) {
+        log.info("Order total Qty : {}", order.getTotalQty());
         return OrderTempResponse.builder()
                 .orderNo(order.getOrdNo())
                 .orderCode(order.getOrdCode())

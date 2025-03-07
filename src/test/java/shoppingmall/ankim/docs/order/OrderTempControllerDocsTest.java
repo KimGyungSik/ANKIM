@@ -50,7 +50,7 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
 
     @Override
     protected Object initController() {
-        return new OrderTempController(orderService, cartService, securityContextHelper);
+        return new OrderTempController(orderService, securityContextHelper);
     }
 
     @DisplayName("임시 주문 생성 API")
@@ -198,7 +198,7 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
 
 
         // when & then
-        mockMvc.perform(post("/api/temp-order")
+        mockMvc.perform(post("/api/check-out")
                         .header("access", ACCESS_TOKEN)
                         .cookie(new Cookie("refresh", REFRESH_TOKEN))
                         .content(objectMapper.writeValueAsString(request))

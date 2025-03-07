@@ -20,6 +20,8 @@ import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.exception.InvalidOrderItemQtyException;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.domain.product.exception.ProductNotSellingException;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -30,6 +32,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Slf4j
@@ -126,6 +129,8 @@ public class OrderService {
                 .map(cartItem -> {
                     Item item = cartItem.getItem();
                     Integer qty = cartItem.getQty();
+                    ProductSellingStatus sellingStatus = item.getProduct().getSellingStatus();
+                    log.info("cartItem qyt : {}", qty);
                     // Item 검증
                     if (item == null) {
                         throw new ItemNotFoundException(ITEM_NOT_FOUND); // Item이 null일 경우 예외 발생
@@ -134,6 +139,15 @@ public class OrderService {
                     if (qty == null || qty <= 0) {
                         throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID); // 수량이 유효하지 않은 경우 예외 발생
                     }
+
+                    // 상품 상태 검증
+                    if(sellingStatus == HOLD) {
+                        throw new ProductNotSellingException(PRODUCT_HOLD); // 품절보류 상태여서 판매할 수 없는 경우 예외 발생
+                    }
+                    if(sellingStatus == STOP_SELLING) {
+                        throw new ProductNotSellingException(PRODUCT_STOP_SELLING); // 품절중단 상태여서 판매할 수 없는 경우 예외 발생
+                    }
+
                     return OrderItem.create(item, qty); // 유효한 Item과 Qty로 OrderItem 생성
                 })
                 .collect(Collectors.toList());

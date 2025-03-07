@@ -427,22 +427,25 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
+    // CHECKOUT 버튼 클릭 이벤트
     checkoutButton.addEventListener("click", async () => {
-        var selectedItems = document.querySelectorAll(".select-item:checked");
-
+        // 선택된 상품 체크박스 찾기 (활성화된 것들)
+        const selectedItems = document.querySelectorAll(".select-item:checked");
         if (selectedItems.length === 0) {
             showModal("주문할 상품을 선택해주세요.");
             return;
         }
 
-        // 선택된 상품의 cartItemNo 리스트 생성
-        var cartItemNoList = Array.from(selectedItems).map((checkbox) => {
-            var cartItem = checkbox.closest(".cart-item");
+        // 선택된 상품의 cartItemNo 목록 생성 (숫자 배열)
+        const cartItemNoList = Array.from(selectedItems).map(checkbox => {
+            const cartItem = checkbox.closest(".cart-item");
+            // 데이터셋에 저장된 cartItemNo를 사용 (숫자로 변환)
             return parseInt(cartItem.querySelector(".decrease-qty").dataset.id, 10);
         });
 
         try {
-            var response = await fetchWithAccessToken("/api/temp-order", {
+            // POST 요청으로 임시 주문 생성 API 호출
+            const response = await fetchWithAccessToken("/api/check-out", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -450,14 +453,13 @@ document.addEventListener("DOMContentLoaded", async () => {
                 body: JSON.stringify(cartItemNoList),
             });
 
-            var data = await response.json();
-
-            if (data.code === 200 && data.data) {
-                alert("임시 주문 생성 성공"); // FIXME 주문페이지로 랜더링 해야됨!!!
-                // 주문 생성 성공 -> /order 페이지로 이동
-                // window.location.href = "/order";
+            const res = await response;
+            console.log(res);
+            if (res.status === "OK") {
+                // 임시 주문 생성 성공 시, 주문 페이지로 이동
+                window.location.href = "/order";
             } else {
-                showModal(data.message || "주문 요청 중 오류가 발생했습니다.");
+                showModal(res.message || "주문 요청 중 오류가 발생했습니다.");
             }
         } catch (error) {
             showModal(error.message || "주문 요청을 보내는 중 오류가 발생했습니다.");

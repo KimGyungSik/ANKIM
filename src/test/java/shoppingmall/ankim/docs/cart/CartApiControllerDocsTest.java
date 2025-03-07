@@ -49,11 +49,18 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
     @Test
     public void addToCart() throws Exception {
         // given
-        AddToCartRequest request = AddToCartRequest.builder()
-                .productNo(1L)
-                .optionValueNoList(List.of(1L, 3L))
-                .qty(3)
-                .build();
+        List<AddToCartRequest> requests = List.of(
+                AddToCartRequest.builder()
+                        .productNo(1L)
+                        .optionValueNoList(List.of(1L, 3L))
+                        .qty(4)
+                        .build(),
+                AddToCartRequest.builder()
+                        .productNo(1L)
+                        .optionValueNoList(List.of(1L, 2L))
+                        .qty(3)
+                        .build()
+        );
         String loginId = "test@example.com";
 
         given(securityContextHelper.getLoginId()).willReturn(loginId);
@@ -63,18 +70,16 @@ public class CartApiControllerDocsTest extends RestDocsSupport {
                         .contentType(MediaType.APPLICATION_JSON)
                         .header("access", ACCESS_TOKEN)
                         .cookie(new Cookie("refresh", REFRESH_TOKEN))
-                        .content(objectMapper.writeValueAsString(request)))
+                        .content(objectMapper.writeValueAsString(requests)))
                 .andExpect(status().isOk())
                 .andDo(document("cart-add-item",
                         preprocessRequest(prettyPrint()),
                         preprocessResponse(prettyPrint()),
                         requestFields(
-                                fieldWithPath("productNo").type(JsonFieldType.NUMBER)
-                                        .description("상품 번호"),
-                                fieldWithPath("optionValueNoList").type(JsonFieldType.ARRAY)
-                                        .description("옵션 번호"),
-                                fieldWithPath("qty").type(JsonFieldType.NUMBER)
-                                        .description("상품 수량")
+                                fieldWithPath("[]").description("장바구니 상품 추가 요청 목록"),
+                                fieldWithPath("[].productNo").type(JsonFieldType.NUMBER).description("상품 번호"),
+                                fieldWithPath("[].optionValueNoList").type(JsonFieldType.ARRAY).description("옵션 번호 목록"),
+                                fieldWithPath("[].qty").type(JsonFieldType.NUMBER).description("상품 수량")
                         ),
                         responseFields(
                                 fieldWithPath("code").description("응답 코드").type(JsonFieldType.NUMBER),

@@ -208,6 +208,7 @@ public class MemberJoinApiControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("message").description("응답 메시지").type(JsonFieldType.STRING),
                                 fieldWithPath("fieldErrors").description("필드 오류 목록").optional().type(JsonFieldType.ARRAY),
                                 fieldWithPath("data.no").description("회원 번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data.loginId").description("마스킹 처리된 회원 이메일 아이디").optional().type(JsonFieldType.STRING),
                                 fieldWithPath("data.name").description("마스킹 처리된 회원 이름").type(JsonFieldType.STRING),
                                 fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )

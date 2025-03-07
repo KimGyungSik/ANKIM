@@ -63,7 +63,7 @@ aside.checkout-summary {
     width: 40%; /* 고정 혹은 원하는 값 */
     min-width: 480px;
     min-height: 300px; /* 최소 높이 지정 */
-    border: 3px solid #000;
+    border: 2px solid #000;
     border-radius: 5px;
     padding: 20px;
     box-sizing: border-box;
@@ -71,7 +71,7 @@ aside.checkout-summary {
 
 /* 섹션 기본 스타일 */
 .section-info {
-    border-top: 2px solid #000;
+    border-top: 3px solid #000;
     margin-bottom: 20px;
     padding: 20px;
     box-sizing: border-box;
@@ -333,6 +333,155 @@ input[type="checkbox"] {
     pointer-events: none;
 }
 
+/* 쿠폰 및 상품 섹션 */
+/* [A] 섹션 기본 (이미 order.css에 있다면 중복 생략) */
+.coupon-and-product.section-info {
+    /* 필요한 기본 스타일 (예: border, padding 등) */
+    /* 여기서는 이미 .section-info에 공통 스타일이 들어가 있으므로 생략 */
+}
+
+/* 섹션 헤더 */
+.coupon-and-product h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* [B] "최대 할인이 적용됐어요" 등 안내 영역 */
+.coupon-notice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.coupon-tip-btn {
+    width: 20px;
+    height: 20px;
+    background: url('data:image/svg+xml;base64,...') no-repeat center/cover; /* 예: 아이콘 */
+    border: none;
+    cursor: pointer;
+}
+.coupon-tip-text {
+    font-size: 13px;
+    color: #FF4800; /* 강조 색상 */
+}
+
+/* [C] 상품 리스트 */
+.product-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.product-item {
+    display: flex; /* 이미지 + 정보 나란히 */
+    gap: 16px;
+    margin-bottom: 20px; /* 아이템 간 간격 */
+}
+
+/* (1) 상품 이미지 */
+.item-img img {
+    width: 120px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* (2) 상품 정보 */
+.item-info {
+    flex: 1; /* 이미지 옆 공간 최대 사용 */
+    display: flex;
+    flex-direction: column; /* 수직 쌓임 */
+    gap: 4px;
+}
+
+.brand-name {
+    font-size: 13px;
+    color: #666;
+}
+
+.product-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.product-option {
+    font-size: 13px;
+    color: #999;
+}
+
+/* 가격, 수량 */
+.product-price {
+    font-size: 14px;
+    color: #333;
+    margin: 6px 0;
+}
+.product-price .coupon-applied-price {
+    margin-left: 8px;
+    color: #FF4800;
+    font-size: 13px;
+}
+
+/* (3) 쿠폰 정보 (상품 쿠폰 / 장바구니 쿠폰 등) */
+.coupon-info {
+    list-style: none;
+    margin: 8px 0 0 0;
+    padding: 0;
+    font-size: 13px;
+    color: #666;
+}
+.coupon-info li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.coupon-label {
+    min-width: 80px; /* 라벨 폭 */
+    color: #333;
+    font-weight: bold;
+}
+.coupon-name {
+    color: #999;
+}
+.coupon-discount-amount {
+    color: #FF4800;
+    font-weight: bold;
+}
+
+/* (4) 전체 쿠폰 할인 금액, 쿠폰 변경 버튼 */
+.coupon-total-line {
+    display: flex;
+    justify-content: space-between; /* 좌: 라벨 / 우: 할인 금액 */
+    margin: 12px 0;
+    font-size: 14px;
+    color: #333;
+}
+.coupon-total-line .coupon-total-amount {
+    color: #FF4800;
+    font-weight: bold;
+}
+.coupon-change-btn {
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* 반응형: 화면이 작을 때 (ex. max-width: 600px) */
+@media (max-width: 600px) {
+    .product-item {
+        flex-direction: column; /* 이미지 위, 정보 아래로 세로 배치 */
+    }
+    .item-img img {
+        width: 100px; /* 조금 줄이거나 가변으로 */
+    }
+}
+
+
 /* 마일리지 섹션 영역 */
 /* (1) 하나의 flex 컨테이너: .mileage-line */
 .mileage-line {
@@ -466,6 +615,14 @@ input[type="checkbox"] {
     box-sizing: border-box;
 }
 
+/* 헤더: "결제금액" 제목 + 오른쪽 금액 버튼 */
+.payment-summary-header {
+    display: flex;
+    justify-content: space-between; /* 좌: 제목, 우: 버튼 */
+    align-items: center;
+    margin-bottom: 16px;
+}
+
 /* 결제 내역 리스트 */
 .payment-details ul {
     list-style: none;
@@ -474,20 +631,18 @@ input[type="checkbox"] {
     font-size: 14px;
     color: #333;
 }
-
 .payment-details li {
     display: flex;
     justify-content: space-between; /* 좌: label, 우: value */
-    align-items: flex-start;  /* 왼쪽 라벨영역이 세로로 늘어나도 어색하지 않게 */
+    align-items: flex-start;  /* 왼쪽 라벨-area가 세로로 늘어나도 어색하지 않게 */
     margin-bottom: 8px;
 }
-
 /* 최종 결제 금액 */
 .payment-details li.final-amount .final-line {
     display: flex;
     justify-content: space-between;
     align-items: center; /* 수직 중앙 정렬 */
-    width: 100%;
+    width: 100%;         /* 혹은 필요하다면 100% */
 }
 
 .payment-details li.final-amount {
@@ -505,27 +660,27 @@ input[type="checkbox"] {
 }
 
 /* 쿠폰 할인 */
-/* coupon-discount li는 세로 배치 */
+/* (1) coupon-discount li는 세로 배치 */
 .payment-details li.coupon-discount {
     display: block;          /* block으로 바꿔서 한 줄 정렬 해제 */
     margin-bottom: 8px;      /* 아래 간격 유지 */
 }
 
-/* 쿠폰 버튼 + 할인금액은 flex로 한 줄 */
+/* (2) 쿠폰 버튼 + 할인금액은 flex로 한 줄 */
 .payment-details li.coupon-discount .coupon-line {
     display: flex;
     justify-content: space-between; /* 왼쪽 버튼 - 오른쪽 할인금액 */
     align-items: center;
 }
 
-/* 상세 내역은 block으로 아래쪽 배치 */
+/* (3) 상세 내역은 block으로 아래쪽 배치 */
 .payment-details li.coupon-discount .coupon-breakdown {
     display: none;    /* 토글 전 초기 상태 */
     margin-top: 8px;  /* coupon-line과 간격 */
     font-size: 13px;
     color: #666;
 }
-
+/* (A) coupon-discount 자체는 세로 방향으로 쌓이도록 */
 /* 쿠폰 할인 영역 전체 컨테이너 */
 .coupon-discount {
     /* 필요하다면 margin-bottom 등으로 공간 조절 */
@@ -537,6 +692,7 @@ input[type="checkbox"] {
     display: flex;
     align-items: center;
     justify-content: space-between; /* 왼쪽 버튼 - 오른쪽 할인금액 */
+    /* 여기서 coupon-line은 한 줄만 차지 */
 }
 
 /* 버튼 + 아이콘 */
@@ -562,7 +718,7 @@ input[type="checkbox"] {
 /* 상세 내역(줄바꿈) */
 .coupon-breakdown {
     display: none; /* 초기 숨김 -> JS로 토글 */
-    margin-top: 8px;
+    margin-top: 8px; /* coupon-line과 약간 간격 */
     font-size: 13px;
     color: #666;
 }
@@ -572,7 +728,7 @@ input[type="checkbox"] {
     margin-top: 4px;
 }
 
-/* 아이콘 회전 애니메이션 */
+/* 아이콘 회전 애니메이션(선택사항) */
 .coupon-toggle-btn .arrow-icon {
     transition: transform 0.2s;
 }
@@ -677,6 +833,7 @@ input[type="checkbox"] {
     background-color: #333;
 }
 
+
 /* Modal 스타일 */
 .modal-overlay {
     display: none; /* 기본적으로 숨김 */
@@ -724,6 +881,7 @@ input[type="checkbox"] {
     font-size: 18px;
     cursor: pointer;
 }
+
 
 /* 600px 이하에서 라벨+인풋 세로 배치 */
 @media (max-width: 600px) {

@@ -1,4 +1,24 @@
-document.addEventListener("DOMContentLoaded", () => {
+import { fetchWithAccessToken } from '../utils/fetchUtils.js';
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    try {
+        var data = await fetchWithAccessToken("/api/temp-order", { method: "GET" });
+
+        if (!data || data.error) {
+            throw new Error(data.message || "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요.");
+        }
+
+        if (data.code === 200 && data.data) {
+            renderProducts(data.data.items);
+        } else {
+            showErrorModal(data.message);
+        }
+    } catch (error) {
+        showErrorModal(error.message);
+    }
+
+
     // 배송지 기존/신규 선택
     var tabs = document.querySelectorAll(".shipping-tab .tab-item");
     var existingAddress = document.querySelector(".existing-address");
@@ -134,37 +154,99 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 
-    // 약관 보기 버튼 눌렀을 경우
-    // "보기" 버튼 선택
-    var viewButtons = document.querySelectorAll(".view-btn");
+    // "약관 보기" 버튼들
+    const viewButtons = document.querySelectorAll(".view-btn");
 
-    // [B] 각 보기 버튼 클릭 시 -> fetch & 모달 표시
+    // [수정] 단일 forEach만 사용하여 클릭 이벤트를 등록
     viewButtons.forEach(btn => {
         btn.addEventListener("click", () => {
+            // 버튼에 있는 data-fetch-url 속성값 가져오기
+            const fetchUrl = btn.getAttribute("data-fetch-url");
+            console.log("약관 버튼 클릭 :", fetchUrl);
 
-            viewButtons.forEach(btn => {
-                btn.addEventListener("click", () => {
-                    // 버튼에 있는 data-fetch-url 속성값으로 fetch할 주소 결정
-                    var fetchUrl = btn.getAttribute("data-fetch-url");
-                    console.log("약관 버튼 클릭 : "+ fetchUrl);
-                    if (!fetchUrl) return;
+            if (!fetchUrl) return;
 
-                    // HTML fetch
-                    fetch(fetchUrl)
-                        .then(response => response.text())
-                        .then(html => {
-                            // 모달 내부의 .modal-body에 삽입
-                            var modalBody = document.querySelector("#termsModal .modal-body");
-                            modalBody.innerHTML = html;
+            // HTML 파일 fetch
+            fetch(fetchUrl)
+                .then(response => response.text())
+                .then(html => {
+                    // 모달 내부의 .modal-body에 삽입
+                    const modalBody = document.querySelector("#termsModal .modal-body");
+                    if (modalBody) {
+                        modalBody.innerHTML = html;
+                    }
 
-                            // 모달 열기
-                            document.getElementById("termsModal").style.display = "flex";
-                        })
-                        .catch(err => {
-                            console.error("약관 파일을 불러오는 중 오류 발생:", err);
-                        });
+                    // 모달 열기
+                    document.getElementById("termsModal").style.display = "flex";
+                })
+                .catch(err => {
+                    console.error("약관 파일을 불러오는 중 오류 발생:", err);
                 });
-            });
         });
     });
 });
+
+// 상품 데이터를 받아서 화면에 렌더링하는 함수
+function renderProducts(products) {
+    const productList = document.getElementById("product-list");
+    const totalCountSpan = document.getElementById("total-product-count");
+    if (!productList || !totalCountSpan) return;
+
+    // 실제로는 API에서 couponDiscount 등을 받아야 함
+    // 여기서는 예시로 "사용 가능한 쿠폰 없음" / "쿠폰적용가" 등 하드코딩
+    let html = "";
+    products.forEach(product => {
+        // 임의 쿠폰 적용가
+        const couponAppliedPrice = 135592;
+        // 임의 장바구니 쿠폰 할인액
+        const cartCouponDiscount = 3408;
+
+        html += `
+      <li class="product-item">
+        <!-- 왼쪽: 상품 이미지 -->
+        <div class="item-img">
+          <img src="${product.thumbNailImgUrl}" alt="${product.productName}" />
+        </div>
+        <!-- 오른쪽: 상품 정보 -->
+        <div class="item-info">
+          <h3 class="product-name">${product.productName}</h3>
+          <p class="product-option">옵션: ${product.name}</p>
+
+          <!-- 가격/수량 + 쿠폰적용가 -->
+          <p class="product-price">
+            ${(product.finalPrice * product.qty).toLocaleString()}원 / 수량 ${product.qty}개
+            <span class="coupon-applied-price">
+              쿠폰적용가 : ${couponAppliedPrice.toLocaleString()}원
+            </span>
+          </p>
+
+          <!-- 쿠폰 정보 -->
+          <ul class="coupon-info">
+            <li>
+              <span class="coupon-label">상품 쿠폰</span>
+              <span class="coupon-value">사용 가능한 쿠폰 없음</span>
+            </li>
+            <li>
+              <span class="coupon-label">장바구니 쿠폰</span>
+              <span class="coupon-name">ORANGE 회원 10% 할인 쿠폰</span>
+              <span class="coupon-discount-amount">-${cartCouponDiscount.toLocaleString()}원</span>
+            </li>
+          </ul>
+        </div>
+      </li>
+    `;
+    });
+
+    productList.innerHTML = html;
+    totalCountSpan.textContent = products.length;
+}
+
+function showErrorModal(message) {
+    var modal = document.querySelector('.modal');
+    var modalBody = modal.querySelector('.modal-body');
+
+    modalBody.textContent = message; // 약관 내용 설정
+    modal.style.display = 'flex'; // 모달 표시
+
+    // FIXME 이전 페이지 이동 작업 추가 고려 필요
+}
