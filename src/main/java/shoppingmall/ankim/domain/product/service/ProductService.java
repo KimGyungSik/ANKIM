@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
@@ -41,6 +42,12 @@ public class ProductService {
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
     private final ItemService itemService;
+
+    // 조회수 증가
+    public void increaseViewCount(Long productId) {
+        productRepository.increaseViewCount(productId);
+    }
+
     /*
         1. 카테고리 검증 및 조회
         2. 상품 생성 및 저장

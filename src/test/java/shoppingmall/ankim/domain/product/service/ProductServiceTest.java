@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.product.service;
 
+import jakarta.persistence.EntityManager;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -49,6 +50,9 @@ import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
@@ -260,6 +264,7 @@ class ProductServiceTest {
                 .desc("기존 상세 설명")
                 .discRate(10)
                 .origPrice(12000)
+                .viewCnt(0)
                 .qty(100)
                 .sellingStatus(ProductSellingStatus.SELLING) // 기본적으로 판매 상태
                 .build());

@@ -523,6 +523,7 @@ public class ProductFactory {
                 .desc("부드럽고 고급스러운 캐시미어 코트")
                 .discRate(10)
                 .origPrice(120000)
+                .viewCnt(0)
                 .qty(100)
                 .shipFee(2000)
                 .sellingStatus(ProductSellingStatus.SELLING)
