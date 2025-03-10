@@ -38,6 +38,9 @@ import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedQuery;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
+import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
+import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
+import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
 import shoppingmall.ankim.factory.MemberJwtFactory;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.S3Config;
@@ -76,7 +79,8 @@ public class CurrencyIncreaseViewCountTest {
     @Autowired
     private ProductService productService;
 
-
+    @Autowired
+    private ViewRollingRepository viewRollingRepository;
     @Autowired
     private EntityManager entityManager;
 
@@ -95,6 +99,8 @@ public class CurrencyIncreaseViewCountTest {
             try {
                 Product product = ProductFactory.createProduct(entityManager);
                 entityManager.persist(product);
+
+                viewRollingRepository.initializeViewRolling(product.getCategory().getNo(),product.getNo());
 
                 // flush를 통해 DB에 반영
                 entityManager.flush();
@@ -138,6 +144,13 @@ public class CurrencyIncreaseViewCountTest {
         entityManager.clear();
         Product updatedProduct = productRepository.findById(productId).orElseThrow();
         assertThat(updatedProduct.getViewCnt()).isEqualTo(beforeViewCount + threadCount);
+        ViewRolling realTimeRolling = viewRollingRepository.findByProduct_No(updatedProduct.getNo())
+                .stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.REALTIME)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("REALTIME 데이터가 존재하지 않음"));
+
+        assertThat(realTimeRolling.getTotalViews()).isEqualTo(beforeViewCount + threadCount);
     }
 
 }
