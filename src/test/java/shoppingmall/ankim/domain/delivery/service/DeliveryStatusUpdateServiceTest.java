@@ -2,25 +2,18 @@ package shoppingmall.ankim.domain.delivery.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
-import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
-import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.delivery.entity.DeliveryStatus;
-import shoppingmall.ankim.domain.delivery.repository.DeliveryRepository;
 import shoppingmall.ankim.domain.image.service.S3Service;
-import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
 import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
@@ -33,7 +26,6 @@ import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.factory.OrderFactory;
 import shoppingmall.ankim.global.config.S3Config;
 import shoppingmall.ankim.global.config.TestClockConfig;
-import shoppingmall.ankim.global.config.TestClockHolder;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
@@ -43,8 +35,6 @@ import java.time.ZoneId;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.junit.jupiter.api.Assertions.*;
-import static shoppingmall.ankim.global.exception.ErrorCode.ITEM_NOT_FOUND;
 
 @SpringBootTest
 @Import(TestClockConfig.class)
