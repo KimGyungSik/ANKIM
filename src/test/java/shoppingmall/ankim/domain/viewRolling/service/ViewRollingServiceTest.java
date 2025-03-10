@@ -19,6 +19,7 @@ import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
 import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.config.S3Config;
+import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.util.List;
 
@@ -29,6 +30,8 @@ import static org.junit.jupiter.api.Assertions.*;
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @Transactional
 class ViewRollingServiceTest {
+    @MockBean
+    InitProduct initProduct;
     @MockBean
     S3Service s3Service;
 
@@ -69,7 +72,6 @@ class ViewRollingServiceTest {
 
     @DisplayName("상품의 실시간 조회수를 증가시킬 수 있다.")
     @Test
-    @Rollback(value = false)
     void increaseRealTimeViewCount() {
         // given
         Product product = ProductFactory.createProduct(entityManager);
@@ -189,4 +191,111 @@ class ViewRollingServiceTest {
 
         assertThat(monthlyRolling.getTotalViews()).isEqualTo(beforeMonthlyViewCount + 50);
     }
+
+    @DisplayName("REALTIME 데이터를 DAILY로 롤업한 후, 해당 조회수를 차감할 수 있다.")
+    @Test
+    void rollupRealTimeToDaily_And_Subtract() {
+        // given
+        Product product = ProductFactory.createProduct(entityManager);
+        viewRollingService.initializeViewRolling(product.getCategory().getNo(), product.getNo());
+
+        // 🔥 REALTIME 조회수 증가
+        for (int i = 0; i < 10; i++) {
+            viewRollingService.increaseRealTimeViewCount(product.getNo());
+        }
+
+        // when: REALTIME → DAILY 롤업
+        viewRollingService.rollupRealTimeToDaily();
+        viewRollingService.subtractRealTimeViews(); // 🔥 롤업된 만큼 REALTIME에서 차감
+
+        // then: DAILY 증가 확인 + REALTIME 차감 확인
+        entityManager.flush();
+        entityManager.clear();
+
+        ViewRolling dailyRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.DAILY)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("DAILY 데이터가 존재하지 않음"));
+
+        ViewRolling realTimeRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.REALTIME)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("REALTIME 데이터가 존재하지 않음"));
+
+        assertThat(dailyRolling.getTotalViews()).isEqualTo(10);
+        assertThat(realTimeRolling.getTotalViews()).isEqualTo(0); // 🔥 차감된 후 REALTIME 조회수 0 확인
+    }
+
+    @DisplayName("DAILY 데이터를 WEEKLY로 롤업한 후, 해당 조회수를 차감할 수 있다.")
+    @Test
+    void rollupDailyToWeekly_And_Subtract() {
+        // given
+        Product product = ProductFactory.createProduct(entityManager);
+        viewRollingService.initializeViewRolling(product.getCategory().getNo(), product.getNo());
+
+        // 🔥 DAILY 데이터 증가
+        for (int i = 0; i < 30; i++) {
+            viewRollingService.increaseRealTimeViewCount(product.getNo());
+        }
+        viewRollingService.rollupRealTimeToDaily();
+
+        // when: DAILY → WEEKLY 롤업
+        viewRollingService.rollupDailyToWeekly();
+        viewRollingService.subtractDailyViews(); // 🔥 롤업된 만큼 DAILY에서 차감
+
+        // then: WEEKLY 증가 확인 + DAILY 차감 확인
+        entityManager.flush();
+        entityManager.clear();
+
+        ViewRolling weeklyRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.WEEKLY)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("WEEKLY 데이터가 존재하지 않음"));
+
+        ViewRolling dailyRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.DAILY)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("DAILY 데이터가 존재하지 않음"));
+
+        assertThat(weeklyRolling.getTotalViews()).isEqualTo(30);
+        assertThat(dailyRolling.getTotalViews()).isEqualTo(0); // 🔥 차감된 후 DAILY 조회수 0 확인
+    }
+
+    @DisplayName("WEEKLY 데이터를 MONTHLY로 롤업한 후, 해당 조회수를 차감할 수 있다.")
+    @Test
+    void rollupWeeklyToMonthly_And_Subtract() {
+        // given
+        Product product = ProductFactory.createProduct(entityManager);
+        viewRollingService.initializeViewRolling(product.getCategory().getNo(), product.getNo());
+
+        // 🔥 WEEKLY 데이터 증가
+        for (int i = 0; i < 50; i++) {
+            viewRollingService.increaseRealTimeViewCount(product.getNo());
+        }
+        viewRollingService.rollupRealTimeToDaily();
+        viewRollingService.rollupDailyToWeekly();
+
+        // when: WEEKLY → MONTHLY 롤업
+        viewRollingService.rollupWeeklyToMonthly();
+        viewRollingService.subtractWeeklyViews(); // 🔥 롤업된 만큼 WEEKLY에서 차감
+
+        // then: MONTHLY 증가 확인 + WEEKLY 차감 확인
+        entityManager.flush();
+        entityManager.clear();
+
+        ViewRolling monthlyRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.MONTHLY)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("MONTHLY 데이터가 존재하지 않음"));
+
+        ViewRolling weeklyRolling = viewRollingRepository.findByProduct_No(product.getNo()).stream()
+                .filter(v -> v.getPeriod() == RollingPeriod.WEEKLY)
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("WEEKLY 데이터가 존재하지 않음"));
+
+        assertThat(monthlyRolling.getTotalViews()).isEqualTo(50);
+        assertThat(weeklyRolling.getTotalViews()).isEqualTo(0); // 🔥 차감된 후 WEEKLY 조회수 0 확인
+    }
+
+
 }

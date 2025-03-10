@@ -31,5 +31,16 @@ public class ViewRollingService {
     public void initializeViewRolling(Long categoryNo, Long productNo) {
         viewRollingRepository.initializeViewRolling(categoryNo, productNo);
     }
+
+    public void subtractRealTimeViews() {
+        viewRollingRepository.subtractRealTimeViews();
+    }
+
+    public void subtractDailyViews() {
+        viewRollingRepository.subtractDailyViews();
+    }
+    public void subtractWeeklyViews() {
+        viewRollingRepository.subtractWeeklyViews();
+    }
 }
 

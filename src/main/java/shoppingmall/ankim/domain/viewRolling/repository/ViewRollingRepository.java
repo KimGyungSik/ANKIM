@@ -71,5 +71,36 @@ public interface ViewRollingRepository extends JpaRepository<ViewRolling, Long> 
     void initializeViewRolling(@Param("categoryNo") Long categoryNo, @Param("productNo") Long productNo);
 
     List<ViewRolling> findByProduct_No(Long productNo);
+
+    @Modifying
+    @Query(value = """
+    UPDATE view_rolling v
+    JOIN (SELECT prod_no, total_views FROM view_rolling WHERE period = 'REALTIME') r
+    ON v.prod_no = r.prod_no AND v.period = 'REALTIME'
+    SET v.total_views = v.total_views - r.total_views, v.last_updated = NOW()
+    WHERE v.total_views >= r.total_views
+    """, nativeQuery = true)
+    void subtractRealTimeViews(); // 🔥 REALTIME 롤업 후 차감
+
+    @Modifying
+    @Query(value = """
+    UPDATE view_rolling v
+    JOIN (SELECT prod_no, total_views FROM view_rolling WHERE period = 'DAILY') r
+    ON v.prod_no = r.prod_no AND v.period = 'DAILY'
+    SET v.total_views = v.total_views - r.total_views, v.last_updated = NOW()
+    WHERE v.total_views >= r.total_views
+    """, nativeQuery = true)
+    void subtractDailyViews(); // 🔥 DAILY 롤업 후 차감
+
+    @Modifying
+    @Query(value = """
+    UPDATE view_rolling v
+    JOIN (SELECT prod_no, total_views FROM view_rolling WHERE period = 'WEEKLY') r
+    ON v.prod_no = r.prod_no AND v.period = 'WEEKLY'
+    SET v.total_views = v.total_views - r.total_views, v.last_updated = NOW()
+    WHERE v.total_views >= r.total_views
+    """, nativeQuery = true)
+    void subtractWeeklyViews(); // 🔥 WEEKLY 롤업 후 차감
+
 }
 
