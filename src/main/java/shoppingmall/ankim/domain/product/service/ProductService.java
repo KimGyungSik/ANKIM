@@ -24,6 +24,7 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.CategoryRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+import shoppingmall.ankim.domain.viewRolling.service.ViewRollingService;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.ArrayList;
@@ -42,10 +43,12 @@ public class ProductService {
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
     private final ItemService itemService;
+    private final ViewRollingService viewRollingService;
 
-    // 조회수 증가
+    // 조회수 증가 -> 실시간 인기순 증가
     public void increaseViewCount(Long productId) {
         productRepository.increaseViewCount(productId);
+        viewRollingService.increaseRealTimeViewCount(productId);
     }
 
     /*
@@ -70,6 +73,9 @@ public class ProductService {
 
         // 5. 품목 생성
         itemService.createItems(savedProduct.getNo(), request.getItems());
+
+        // 6. view rolling 데이터 생성
+        viewRollingService.initializeViewRolling(category.getNo(), savedProduct.getNo());
 
         savedProduct.updateSearchKeywords();
         return ProductResponse.of(savedProduct);

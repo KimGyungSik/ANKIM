@@ -46,6 +46,9 @@ import shoppingmall.ankim.domain.product.exception.CannotModifySellingProductExc
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
+import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
+import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
 import shoppingmall.ankim.factory.ProductFactory;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
@@ -98,8 +101,12 @@ class ProductServiceTest {
     @Autowired
     ProductService productService;
 
+    @Autowired
+    ViewRollingRepository viewRollingRepository;
+
     @DisplayName("상품을 등록할 수 있다.")
     @Test
+    @Rollback(value = false)
     void createProductTest() {
         // given
         Category category = createCategory();
@@ -142,6 +149,10 @@ class ProductServiceTest {
 
         assertThat(itemRepository.findByProduct_No(response.getNo())).hasSize(4); // 4개의 조합 확인
         assertThat(response.getProductImgs()).hasSize(2); // 이미지 수 확인
+        List<ViewRolling> viewRollings = viewRollingRepository.findByProduct_No(response.getNo());
+        assertThat(viewRollings).hasSize(4); // REALTIME, DAILY, WEEKLY, MONTHLY 데이터 확인
+        assertThat(viewRollings).extracting("period")
+                .containsExactlyInAnyOrder(RollingPeriod.REALTIME, RollingPeriod.DAILY, RollingPeriod.WEEKLY, RollingPeriod.MONTHLY);
     }
 
     @DisplayName("판매중인 상품은 수정할 수 없다.")
