@@ -207,6 +207,9 @@ VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배�
 INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 98765, '제주특별시 서귀포구', 'oo아파트 101호', '안정훈', '010-1234-5678', '010-8282-8282', 'N', 'Y');
 
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 02587, '경기도 부천시', 'oo빌라', '안정훈', '010-1234-5678', '010-2424-5252', 'N', 'Y');
+
 -- 탈퇴사유
 INSERT INTO leave_rsn (reason, active_yn) VALUES
                                               ('탈퇴 후 재가입을 위해서', 'Y'),

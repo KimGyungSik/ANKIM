@@ -256,6 +256,51 @@ input[type="checkbox"] {
     background-color: #f0f0f0;
 }
 
+/* 배송지 목록 */
+/* 주소 아이템 사이의 얇은 구분선과 간격을 위해 */
+.default-address-container.with-border {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.other-addresses-list .address-item {
+    padding: 10px 0;
+    border-bottom: none; /* 여기서는 아래쪽 테두리는 빼고, */
+}
+
+/* 두 번째 주소부터 위쪽에 선 */
+.other-addresses-list .address-item + .address-item {
+    border-top: 1px solid #ddd;
+}
+
+.address-item h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: bold;
+}
+.address-item p {
+    margin: 0 0 3px;
+    font-size: 14px;
+    color: #333;
+}
+
+.default-mark {
+    color: #375FFF; /* (기본) 표시 색상 (원하는 대로) */
+    margin-left: 4px;
+}
+
+/* 삭제 버튼은 오른쪽 정렬 or 적당히 */
+.delete-address-btn {
+    margin-top: 5px;
+    font-size: 13px;
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
 /* 주소 표시 */
 .address-main {
     font-size: 14px;
@@ -696,7 +741,7 @@ input[type="checkbox"] {
 }
 
 /* 버튼 + 아이콘 */
-.coupon-toggle-btn {
+.coupon-toggle-btn, .toggle-addresses-btn {
     background: none;
     border: none;
     cursor: pointer;
@@ -729,10 +774,12 @@ input[type="checkbox"] {
 }
 
 /* 아이콘 회전 애니메이션(선택사항) */
-.coupon-toggle-btn .arrow-icon {
+.coupon-toggle-btn .arrow-icon,
+.toggle-addresses-btn .arrow-icon{
     transition: transform 0.2s;
 }
-.coupon-toggle-btn[data-open="true"] .arrow-icon {
+.coupon-toggle-btn[data-open="true"] .arrow-icon,
+.toggle-addresses-btn[data-open="true"] .arrow-icon{
     transform: rotate(180deg);
 }
 

@@ -1,14 +1,15 @@
 import { selectedAddress } from './addressStore.js';
 
-// 우편번호 찾기 화면을 넣을 element
-var element_layer = document.getElementById('layer');
+// // 우편번호 찾기 화면을 넣을 element
+// var element_layer = document.getElementById('layer');
+//
+// function closeDaumPostcode() {
+//     // iframe을 넣은 element를 안보이게 한다.
+//     element_layer.style.display = 'none';
+// }
 
-function closeDaumPostcode() {
-    // iframe을 넣은 element를 안보이게 한다.
-    element_layer.style.display = 'none';
-}
-
-export async function execDaumPostcode() {
+export async function execDaumPostcode(container) {
+    var element_layer = container.querySelector('.layer');
     console.log("addrSearchBtn clicked");
     new daum.Postcode({
         oncomplete: function(data) {
@@ -43,10 +44,12 @@ export async function execDaumPostcode() {
                 }
 
                 // 조합된 참고항목을 해당 필드에 넣는다.
-                document.getElementById("addressMainInput").value = extraAddr;
+                // document.getElementById("addressMainInput").value = extraAddr;
+                document.querySelector('.addressMainInput').value = extraAddr;
 
             } else {
-                document.getElementById("addressMainInput").value = '';
+                // document.getElementById("addressMainInput").value = '';
+                document.querySelector('.addressMainInput').value = '';
             }
 
 
@@ -55,10 +58,13 @@ export async function execDaumPostcode() {
             selectedAddress.addressMain = addr;
 
             // 우편번호와 주소 정보를 해당 필드에 넣는다.
-            document.getElementById('zipCodeInput').value = data.zonecode;
-            document.getElementById("addressMainInput").value = addr;
-            // 커서를 상세주소 필드로 이동한다.
-            document.getElementById("addressDetailInput").focus();
+            document.querySelector('.zipCodeInput').value = data.zonecode;
+            document.querySelector('.addressMainInput').value = data.roadAddress || data.jibunAddress;
+            document.querySelector('.addressDetailInput').focus();
+            // document.getElementById('zipCodeInput').value = data.zonecode;
+            // document.getElementById("addressMainInput").value = addr;
+            // // 커서를 상세주소 필드로 이동한다.
+            // document.getElementById("addressDetailInput").focus();
 
             // iframe을 넣은 element를 안보이게 한다.
             // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
@@ -73,13 +79,13 @@ export async function execDaumPostcode() {
     element_layer.style.display = 'block';
 
     // iframe을 넣은 element의 위치를 화면의 가운데로 이동시킨다.
-    initLayerPosition();
+    initLayerPosition(element_layer);
 }
 
 // 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
 // resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
 // 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
-function initLayerPosition(){
+function initLayerPosition(element_layer){
     var width = 500; //우편번호서비스가 들어갈 element의 width
     var height = 400; //우편번호서비스가 들어갈 element의 height
     var borderWidth = 1; //샘플에서 사용하는 border의 두께

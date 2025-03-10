@@ -29,9 +29,13 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 주소 관련
     var addrSearchBtn  = document.getElementById("addrSearchBtn");
     var addrChangeBtn  = document.getElementById("addrChangeBtn");
-    var zipCodeInput = document.getElementById("zipCodeInput");
-    var addressMainInput = document.getElementById("addressMainInput");
-    var addressDetailInput= document.getElementById("addressDetailInput");
+    // var zipCodeInput = document.getElementById("zipCodeInput");
+    // var addressMainInput = document.getElementById("addressMainInput");
+    // var addressDetailInput= document.getElementById("addressDetailInput");
+    var zipCodeInput = document.querySelector(".zipCodeInput");
+    var addressMainInput = document.querySelector(".addressMainInput");
+    var addressDetailInput= document.querySelector(".addressDetailInput");
+
 
     // 기타 버튼(연락처/이메일 수정) - 예시
     var phoneEditBtn   = document.getElementById("phoneEditBtn");
@@ -196,8 +200,9 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     // ============== [주소 검색 로직] ==============
     addrSearchBtn?.addEventListener("click", () => {
+        var container = document.querySelector(".myInfo-address");
         // 카카오 주소검색 API 연동 -> 주소 선택
-        execDaumPostcode();
+        execDaumPostcode(container);
         addressDetailInput.disabled = false;
         addrChangeBtn.disabled = false;
     });
@@ -207,7 +212,8 @@ document.addEventListener("DOMContentLoaded", async () => {
         // input 필드에서 가져오는 대신, 저장된 데이터를 사용
         var zipCode = selectedAddress.zipCode;
         var addressMain = selectedAddress.addressMain;
-        var addressDetail = document.getElementById("addressDetailInput").value;
+        // var addressDetail = document.getElementById("addressDetailInput").value;
+        var addressDetail = document.querySelector(".addressDetailInput").value;
 
         try {
             var res = await fetchWithAccessToken("/api/address/edit", {
@@ -297,9 +303,12 @@ function showMemberInfoSection(memberData) {
 
     // [주소] - zipCodeInput, addressMainInput, addressDetailInput
     if (memberData.address) {
-        document.getElementById("zipCodeInput").value    = memberData.address.zipCode       || "-";
-        document.getElementById("addressMainInput").value   = memberData.address.addressMain   || "-";
-        document.getElementById("addressDetailInput").value = memberData.address.addressDetail || "-";
+        document.querySelector('.zipCodeInput').value    = memberData.address.zipCode       || "-";
+        document.querySelector(".addressMainInput").value   = memberData.address.addressMain   || "-";
+        document.querySelector(".addressDetailInput").value = memberData.address.addressDetail || "-";
+        // document.getElementById("zipCodeInput").value    = memberData.address.zipCode       || "-";
+        // document.getElementById("addressMainInput").value   = memberData.address.addressMain   || "-";
+        // document.getElementById("addressDetailInput").value = memberData.address.addressDetail || "-";
     }
 }
 

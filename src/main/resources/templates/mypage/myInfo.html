@@ -187,40 +187,42 @@
                     </div>
                 </div>
 
-                <div class="row">
-                    <label>주소 정보</label>
-                    <div class="input-button-group">
-                        <div class="input-group-with-button">
-                            <input type="text" id="zipCodeInput" value="-" disabled>
-                            <button id="addrSearchBtn">우편번호 검색</button>
+                <div class="myInfo-address">
+                    <div class="row">
+                        <label>주소 정보</label>
+                        <div class="input-button-group">
+                            <div class="input-group-with-button">
+                                <input type="text" class="zipCodeInput" value="-" disabled>
+                                <button id="addrSearchBtn">우편번호 검색</button>
+                            </div>
+                            <!-- 우편번호 에러 메시지 -->
+                            <span id="zipCodeError" class="error-message"></span>
                         </div>
-                        <!-- 우편번호 에러 메시지 -->
-                        <span id="zipCodeError" class="error-message"></span>
                     </div>
-                </div>
-                <div class="row">
-                    <label></label>
-                    <!-- 카카오 api 창 추가 공간-->
-                    <div id="layer"></div>
-                </div>
-                <div class="row">
-                    <label></label> <!-- 빈 라벨로 공간 확보 -->
-                    <div class="input-button-group">
-                        <div class="input-group-with-button">
-                            <input type="text" id="addressMainInput" value="-" disabled>
-                        </div>
-                        <!-- 메인주소 에러 메시지 -->
-                        <span id="addressMainError" class="error-message"></span>
+                    <div class="row">
+                        <label></label>
+                        <!-- 카카오 api 창 추가 공간-->
+                        <div class="layer"></div>
                     </div>
-                </div>
-                <div class="row">
-                    <label></label> <!-- 빈 라벨로 공간 확보 -->
-                    <div class="input-button-group">
-                        <div class="input-group-with-button">
-                            <input type="text" id="addressDetailInput" value="-" disabled>
+                    <div class="row">
+                        <label></label> <!-- 빈 라벨로 공간 확보 -->
+                        <div class="input-button-group">
+                            <div class="input-group-with-button">
+                                <input type="text" class="addressMainInput" value="-" disabled>
+                            </div>
+                            <!-- 메인주소 에러 메시지 -->
+                            <span id="addressMainError" class="error-message"></span>
                         </div>
-                        <!-- 상세주소 에러 메시지 -->
-                        <span id="addressDetailError" class="error-message"></span>
+                    </div>
+                    <div class="row">
+                        <label></label> <!-- 빈 라벨로 공간 확보 -->
+                        <div class="input-button-group">
+                            <div class="input-group-with-button">
+                                <input type="text" class="addressDetailInput" value="-" disabled>
+                            </div>
+                            <!-- 상세주소 에러 메시지 -->
+                            <span id="addressDetailError" class="error-message"></span>
+                        </div>
                     </div>
                 </div>
                 <div class="row info-line">

@@ -75,7 +75,7 @@
                         <div class="form-row required input-name">
                             <h3 class="form-label">수령인</h3>
                             <div class="form-field">
-                                <input type="text" name="receiverName" placeholder="이름을 입력해주세요">
+                                <input type="text" name="receiver" placeholder="이름을 입력해주세요">
                             </div>
                         </div>
                         <!-- 주소 (우편번호, 메인주소, 상세주소) -->
@@ -83,19 +83,19 @@
                             <h3 class="form-label">배송지</h3>
                             <div class="form-field">
                                 <div class="input-group-with-button">
-                                    <input type="text" id="zipCodeInput" value="-" disabled>
-                                    <button id="addrSearchBtn" class="searchBtn">우편번호 검색</button>
+                                    <input type="text" class="zipCodeInput" value="-" disabled>
+                                    <button class="addrSearchBtn searchBtn">우편번호 검색</button>
                                 </div>
                                 <div class="row">
                                     <label></label>
                                     <!-- 카카오 api 창 추가 공간-->
-                                    <div id="layer"></div>
+                                    <div class="layer"></div>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" id="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
+                                    <input type="text" class="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" id="addressDetailInput" value="상세주소 입력">
+                                    <input type="text" class="addressDetailInput" value="상세주소 입력">
                                 </div>
                             </div>
                         </div>
@@ -164,19 +164,19 @@
                             <h3 class="form-label">배송지</h3>
                             <div class="form-field">
                                 <div class="input-group-with-button">
-                                    <input type="text" id="zipCodeInput" value="-" disabled>
-                                    <button id="addrSearchBtn" class="searchBtn">우편번호 검색</button>
+                                    <input type="text" class="zipCodeInput" value="-" disabled>
+                                    <button class="addrSearchBtn searchBtn">우편번호 검색</button>
                                 </div>
                                 <div class="row">
                                     <label></label>
                                     <!-- 카카오 api 창 추가 공간-->
-                                    <div id="layer"></div>
+                                    <div class="layer"></div>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" id="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
+                                    <input type="text" class="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" id="addressDetailInput" value="상세주소 입력">
+                                    <input type="text" class="addressDetailInput" value="상세주소 입력">
                                 </div>
                             </div>
                         </div>
@@ -320,52 +320,6 @@
                 <!-- 결제 내역 리스트 -->
                 <div class="payment-details">
                     <ul>
-                        <li>
-                            <span class="label">총 상품 금액</span>
-                            <span class="value">1,805,625원</span>
-                        </li>
-                        <li>
-                            <span class="label">배송비</span>
-                            <span class="value">무료</span>
-                        </li>
-                        <!-- [쿠폰 할인] 토글 영역 -->
-                        <li class="coupon-discount">
-                            <!-- (1) 쿠폰 라인: 버튼 + 총 할인 금액 -->
-                            <div class="coupon-line">
-                                <button type="button" class="coupon-toggle-btn" data-open="false">
-                                    쿠폰 할인 금액
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
-                                        <g id="weight=regular, fill=false">
-                                            <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
-                                        </g>
-                                    </svg>
-                                </button>
-                                <span class="discount-value">-101,062원</span>
-                            </div>
-
-                            <!-- (2) 쿠폰 상세내역: 초기에는 숨김 -->
-                            <div class="coupon-breakdown" style="display: none;">
-                                <div class="coupon-item">
-                                    <span>상품 쿠폰</span>
-                                    <span>-90,000원</span>
-                                </div>
-                                <div class="coupon-item">
-                                    <span>장바구니 쿠폰</span>
-                                    <span>-11,062원</span>
-                                </div>
-                            </div>
-                        </li>
-
-                        <li>
-                            <span class="label">마일리지 사용</span>
-                            <span class="value">0P</span>
-                        </li>
-                        <li class="final-amount">
-                            <div class="final-line">
-                                <span class="label">총 결제 금액</span>
-                                <span class="value accent">1,704,563원</span>
-                            </div>
-                        </li>
                     </ul>
                 </div>
 
@@ -429,6 +383,41 @@
                 </div>
             </section>
         </aside>
+    </div>
+
+    <!-- 이전 배송지 목록 모달 -->
+    <div class="modal-overlay address-list-modal" id="addressListModal">
+        <div class="modal-content address-list-content">
+            <!-- 닫기 버튼 -->
+            <button type="button" class="close-button address-list-close-btn">&times;</button>
+
+            <!-- 모달 제목 -->
+            <h2 class="address-list-title">배송지 선택</h2>
+
+            <!-- [기본 배송지 영역] -->
+            <div class="default-address-container">
+                <!-- JS에서 기본 배송지를 채워넣을 예정 -->
+            </div>
+
+            <!-- [나머지 주소 목록 영역] -->
+            <div class="other-addresses-list" style="display: none;">
+                <!-- JS에서 기본이 아닌 주소들을 반복 렌더링 -->
+            </div>
+
+            <!-- "다른 배송지 펼쳐보기" 버튼 -->
+            <button
+                    type="button"
+                    class="toggle-addresses-btn"
+                    data-open="false"
+            >
+                다른 배송지 펼쳐보기
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
+                    <g id="weight=regular, fill=false">
+                        <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
+                    </g>
+                </svg>
+            </button>
+        </div>
     </div>
 
     <!-- 약관 Modal -->

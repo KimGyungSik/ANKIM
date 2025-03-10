@@ -10,14 +10,16 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
 
         if (data.code === 200 && data.data) {
-            renderProducts(data.data.items);
+            renderDefaultAddress(data.data.addresses); // 기존 배송지
+            renderProducts(data.data.items); // 상품
+            renderPaymentDetails(data.data); // 결제금액
+
         } else {
             showErrorModal(data.message);
         }
     } catch (error) {
         showErrorModal(error.message);
     }
-
 
     // 배송지 기존/신규 선택
     var tabs = document.querySelectorAll(".shipping-tab .tab-item");
@@ -186,13 +188,73 @@ document.addEventListener("DOMContentLoaded", async () => {
     });
 });
 
+// 기존 주소정보 렌더링하는 함수
+function renderDefaultAddress(addresses) {
+    // defaultAddressYn이 "Y"인 주소를 찾는다.
+    const defaultAddress = addresses.find(addr => addr.defaultAddressYn === "Y");
+    if (!defaultAddress) return; // 기본 배송지가 없으면 아무 작업도 하지 않음
+
+    // 기존 배송지 영역 내부의 입력 필드에 값 설정
+    const existingAddressSection = document.querySelector('.existing-address');
+    if (existingAddressSection) {
+        const addressNameInput = existingAddressSection.querySelector('input[name="addressName"]');
+        const receiverInput = existingAddressSection.querySelector('input[name="receiver"]');
+        // 우편번호, 메인주소, 상세주소는 order.html에서 id로 지정되어 있으므로:
+        const zipCodeInput = document.querySelector('.zipCodeInput');
+        const addressMainInput = document.querySelector('.addressMainInput');
+        const addressDetailInput = document.querySelector('.addressDetailInput');
+
+        if(addressNameInput) addressNameInput.value = defaultAddress.addressName || "";
+        if(receiverInput) receiverInput.value = defaultAddress.receiver || "";
+        if(zipCodeInput) zipCodeInput.value = defaultAddress.zipCode || "";
+        if(addressMainInput) addressMainInput.value = defaultAddress.addressMain || "";
+        if(addressDetailInput) addressDetailInput.value = defaultAddress.addressDetail || "";
+
+        // 연락처1 (phoneNumber) - "-" 기준으로 분리
+        if (defaultAddress.phoneNumber) {
+            const telParts = defaultAddress.phoneNumber.split("-");
+            if (telParts.length >= 3) {
+                document.querySelector('input[name="tel1_0"]').value = telParts[0];
+                document.querySelector('input[name="tel1_1"]').value = telParts[1];
+                document.querySelector('input[name="tel1_2"]').value = telParts[2];
+            } else {
+                // 전화번호 형식이 예상과 다르면 전체 문자열을 첫번째 칸에 할당하는 식으로 처리 가능
+                document.querySelector('input[name="tel1_0"]').value = defaultAddress.phoneNumber;
+            }
+        }
+
+        // 연락처2 (emergencyPhoneNumber) - "-" 기준으로 분리
+        if (defaultAddress.emergencyPhoneNumber) {
+            const telParts2 = defaultAddress.emergencyPhoneNumber.split("-");
+            if (telParts2.length >= 3) {
+                document.querySelector('input[name="tel2_0"]').value = telParts2[0];
+                document.querySelector('input[name="tel2_1"]').value = telParts2[1];
+                document.querySelector('input[name="tel2_2"]').value = telParts2[2];
+            } else {
+                document.querySelector('input[name="tel2_0"]').value = defaultAddress.emergencyPhoneNumber;
+            }
+        }
+
+        // "이전 배송지 목록" 버튼에 이벤트 등록
+        const prevAddressBtn = document.querySelector(".prev-address-btn");
+        if (prevAddressBtn) {
+            prevAddressBtn.addEventListener("click", () => {
+                // temp-order API에서 받아온 addresses 배열이 있다면,
+                // 그걸 이용해서 모달을 열면 됩니다.
+                // 이 예시에서는 전역 변수나 state 등에 저장해두고 사용한다고 가정
+                openAddressListModal(addresses);
+            });
+        }
+    }
+}
+
 // 상품 데이터를 받아서 화면에 렌더링하는 함수
 function renderProducts(products) {
     const productList = document.getElementById("product-list");
     const totalCountSpan = document.getElementById("total-product-count");
     if (!productList || !totalCountSpan) return;
 
-    // 실제로는 API에서 couponDiscount 등을 받아야 함
+    // 실제로는 API에서 couponDiscount 등을 받아야 됨
     // 여기서는 예시로 "사용 가능한 쿠폰 없음" / "쿠폰적용가" 등 하드코딩
     let html = "";
     products.forEach(product => {
@@ -241,6 +303,255 @@ function renderProducts(products) {
     totalCountSpan.textContent = products.length;
 }
 
+// 주소 객체를 받아서 HTML 생성
+function createAddressItemHtml(addr, isDefault) {
+    // 연락처(전화번호) 두 개를 합쳐 표시 (있을 경우)
+    const phoneLine = addr.emergencyPhoneNumber
+        ? `${addr.phoneNumber} / ${addr.emergencyPhoneNumber}`
+        : (addr.phoneNumber || "");
+
+    // 모양만 간단히 예시
+    return `
+    <div class="address-item" 
+         data-addr='${JSON.stringify(addr)}'>
+      <h4>
+        ${addr.addressName || "(배송지명 없음)"} / ${addr.receiver || "(수령인 없음)"}
+        ${isDefault ? '<span class="default-mark">(기본)</span>' : ''}
+      </h4>
+      <p>(${addr.zipCode}) ${addr.addressMain} ${addr.addressDetail}</p>
+      <p>${phoneLine}</p>
+      ${
+        !isDefault
+            ? `<button type="button" class="delete-address-btn" data-addr-no="${addr.addressNo}">삭제</button>`
+            : ""
+    }
+    </div>
+  `;
+}
+
+function openAddressListModal(addresses) {
+    const modal = document.getElementById("addressListModal");
+    if (!modal) return;
+
+    // (1) 기본 주소
+    const defaultAddr = addresses.find(a => a.defaultAddressYn === "Y");
+    // (2) 그 외 주소 (addressNo 내림차순)
+    const otherAddrs = addresses
+        .filter(a => a.defaultAddressYn !== "Y")
+        .sort((a, b) => b.addressNo - a.addressNo);
+
+    // [기본 배송지 영역]
+    const defaultContainer = modal.querySelector(".default-address-container");
+    if (defaultAddr) {
+        defaultContainer.innerHTML = createAddressItemHtml(defaultAddr, true);
+    } else {
+        defaultContainer.innerHTML = "기본 배송지가 없습니다.";
+    }
+
+    // [나머지 주소 목록]
+    const otherList = modal.querySelector(".other-addresses-list");
+    // <div>만 쭉 이어붙임 (li 안 쓰기)
+    otherList.innerHTML = otherAddrs
+        .map(addr => createAddressItemHtml(addr, false))
+        .join("");
+
+    // ---- [초기화 부분] ----
+    const toggleBtn = modal.querySelector(".toggle-addresses-btn");
+    // 매번 모달 열릴 때마다 초기 상태(접힘)로 세팅
+    toggleBtn.setAttribute("data-open", "false");
+    defaultContainer.classList.remove("with-border");
+    otherList.style.display = "none";
+
+    // “다른 배송지 펼쳐보기” 버튼 토글
+    toggleBtn.innerHTML = `
+      다른 배송지 펼쳐보기
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
+        <g id="weight=regular, fill=false">
+            <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
+        </g>
+    </svg>
+    `;
+
+    toggleBtn.onclick = () => {
+        const isOpen = toggleBtn.getAttribute("data-open") === "true";
+        if (isOpen) {
+            // 현재 열려있으므로 -> 닫기
+            otherList.style.display = "none";
+            toggleBtn.innerHTML = `
+      다른 배송지 펼쳐보기
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
+        <g id="weight=regular, fill=false">
+            <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
+        </g>
+    </svg>
+    `;
+            toggleBtn.setAttribute("data-open", "false");
+            defaultContainer.classList.remove("with-border");
+        } else {
+            // 현재 닫혀있으므로 -> 열기
+            otherList.style.display = "block";
+            toggleBtn.innerHTML = `
+      다른 배송지 접기
+    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
+        <g id="weight=regular, fill=false">
+            <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
+        </g>
+    </svg>
+    `;
+            toggleBtn.setAttribute("data-open", "true");
+            // 다른 배송지가 1개 이상이면 구분선 추가
+            defaultContainer.classList.add("with-border");
+        }
+    };
+    otherList.style.display = "none"; // 초기에는 숨김
+
+    // **클릭 이벤트 등록** : 기본 배송지 + 나머지 배송지
+    //   - 전체 .address-item 요소에 이벤트 부여
+    const allAddressItems = modal.querySelectorAll(".address-item");
+    allAddressItems.forEach(item => {
+        item.addEventListener("click", (e) => {
+            // 만약 클릭이 "삭제" 버튼이면(이벤트 버블링), 선택 로직 실행 안 하도록
+            if (e.target.classList.contains("delete-address-btn")) {
+                e.stopPropagation();
+                // 삭제 로직 별도 처리
+                const addrNo = e.target.dataset.addrNo;
+                console.log("삭제 버튼 클릭, 주소번호:", addrNo);
+                // TODO: 삭제 API 호출 or UI에서 제거
+                return;
+            }
+
+            // (1) data-addr에서 주소 JSON 파싱
+            const addressJson = item.dataset.addr;
+            if (!addressJson) return;
+            const addressObj = JSON.parse(addressJson);
+
+            // (2) shipping form에 채워넣기
+            fillShippingForm(addressObj);
+
+            // (3) 모달 닫기
+            closeAddressListModal();
+        });
+    });
+
+    // 모달 닫기 버튼
+    const closeBtn = modal.querySelector(".address-list-close-btn");
+    if (closeBtn) {
+        closeBtn.onclick = () => {
+            closeAddressListModal();
+        };
+    }
+
+    // 모달 열기
+    modal.style.display = "flex";
+}
+
+function closeAddressListModal() {
+    const modal = document.getElementById("addressListModal");
+    if (modal) {
+        modal.style.display = "none";
+    }
+}
+
+// 선택된 주소를 existing-address 폼에 반영
+function fillShippingForm(addressObj) {
+    // 기존 배송지 영역
+    const existingAddressSection = document.querySelector('.existing-address');
+    if (!existingAddressSection) return;
+
+    // 예: name="addressName", name="receiver" ...
+    const addressNameInput = existingAddressSection.querySelector('input[name="addressName"]');
+    const receiverInput = existingAddressSection.querySelector('input[name="receiver"]');
+    const zipCodeInput = existingAddressSection.querySelector('.zipCodeInput');
+    const addressMainInput = existingAddressSection.querySelector('.addressMainInput');
+    const addressDetailInput = existingAddressSection.querySelector('.addressDetailInput');
+
+    if (addressNameInput) addressNameInput.value = addressObj.addressName || "";
+    if (receiverInput)     receiverInput.value   = addressObj.receiver || "";
+    if (zipCodeInput)      zipCodeInput.value    = addressObj.zipCode || "";
+    if (addressMainInput)  addressMainInput.value= addressObj.addressMain || "";
+    if (addressDetailInput)addressDetailInput.value= addressObj.addressDetail || "";
+
+    // 연락처1
+    if (addressObj.phoneNumber) {
+        const [p1, p2, p3] = addressObj.phoneNumber.split("-");
+        document.querySelector('input[name="tel1_0"]').value = p1 || "";
+        document.querySelector('input[name="tel1_1"]').value = p2 || "";
+        document.querySelector('input[name="tel1_2"]').value = p3 || "";
+    }
+    // 연락처2
+    if (addressObj.emergencyPhoneNumber) {
+        const [p1, p2, p3] = addressObj.emergencyPhoneNumber.split("-");
+        document.querySelector('input[name="tel2_0"]').value = p1 || "";
+        document.querySelector('input[name="tel2_1"]').value = p2 || "";
+        document.querySelector('input[name="tel2_2"]').value = p3 || "";
+    }
+}
+
+// 결제 금액 요약 정보를 화면에 렌더링 하는 함수
+function renderPaymentDetails(res) {
+    const paymentDetailsList = document.querySelector(".payment-details ul");
+    if (!paymentDetailsList) return;
+
+    // 배송비가 0이면 "무료"로 표시
+    const shippingFeeText = res.totalShipFee === 0 ? "무료" : res.totalShipFee.toLocaleString() + "원";
+
+    // HTML 마크업 생성 (예시)
+    const html = `
+    <li>
+      <span class="label">총 상품 금액</span>
+      <span class="value">${res.totalPrice.toLocaleString()}원</span>
+    </li>
+    <li>
+      <span class="label">배송비</span>
+      <span class="value">${shippingFeeText}</span>
+    </li>
+    <li>
+      <span class="label">상품 할인 금액</span>
+      <span class="discount-value">-${res.totalDiscPrice.toLocaleString()}원</span>
+    </li>
+    <!-- [쿠폰 할인] 토글 영역 -->
+    <li class="coupon-discount">
+        <!-- (1) 쿠폰 라인: 버튼 + 총 할인 금액 -->
+        <div class="coupon-line">
+            <button type="button" class="coupon-toggle-btn" data-open="false">
+                쿠폰 할인 금액
+                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" color="primary" class="arrow-icon">
+                    <g id="weight=regular, fill=false">
+                        <path id="vector" fill-rule="evenodd" clip-rule="evenodd" d="M12 17.1314L20.5657 8.56569L19.4343 7.43431L12 14.8686L4.5657 7.43431L3.43433 8.56569L12 17.1314Z" fill="black"></path>
+                    </g>
+                </svg>
+            </button>
+            <span class="discount-value">-0원</span>
+        </div>
+
+        <!-- (2) 쿠폰 상세내역: 초기에는 숨김 -->
+        <div class="coupon-breakdown" style="display: none;">
+            <div class="coupon-item">
+                <span>상품 쿠폰</span>
+                <span>-0원</span>
+            </div>
+            <div class="coupon-item">
+                <span>장바구니 쿠폰</span>
+                <span>-0원</span>
+            </div>
+        </div>
+    </li>
+
+    <li>
+        <span class="label">마일리지 사용</span>
+        <span class="value">0P</span>
+    </li>
+    <li class="final-amount">
+      <div class="final-line">
+        <span class="label">총 결제 금액</span>
+        <span class="value accent">${res.payAmt.toLocaleString()}원</span>
+      </div>
+    </li>
+  `;
+
+    paymentDetailsList.innerHTML = html;
+}
+
 function showErrorModal(message) {
     var modal = document.querySelector('.modal');
     var modalBody = modal.querySelector('.modal-body');
@@ -249,4 +560,9 @@ function showErrorModal(message) {
     modal.style.display = 'flex'; // 모달 표시
 
     // FIXME 이전 페이지 이동 작업 추가 고려 필요
+}
+
+function closeModal() {
+    var modal = document.querySelector('.modal');
+    modal.style.display = 'none'; // 모달 숨김
 }
