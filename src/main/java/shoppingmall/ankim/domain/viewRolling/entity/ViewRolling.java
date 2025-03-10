@@ -14,7 +14,8 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "view_rolling",
         indexes = {
-                @Index(name = "idx_view_rolling_category_period", columnList = "category_no, period")
+                @Index(name = "idx_view_rolling_category_period", columnList = "category_no, period"),
+                @Index(name = "idx_view_rolling_prod_period", columnList = "prod_no, period")
         })
 public class ViewRolling {
 
