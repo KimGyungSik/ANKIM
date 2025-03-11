@@ -46,7 +46,6 @@ public class OrderTempController {
 
         OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList);
 
-        log.info("order temp total Qty : {} ", tempOrder.getTotalQty());
         return ApiResponse.ok(tempOrder);
     }
 }

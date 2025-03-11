@@ -48,7 +48,7 @@ public class OrderItemResponse {
                 .thumbNailImgUrl(orderItem.getThumbNailImgUrl())
                 .price(orderItem.getItem().getTotalPrice())
                 .discPrice(orderItem.getDiscPrice())
-                .qty(orderItem.getItem().getQty())
+                .qty(orderItem.getQty())
                 .sellingStatus(orderItem.getItem().getSellingStatus())
                 .build();
 
