@@ -86,13 +86,13 @@
                                     <input type="text" class="zipCodeInput" value="-" disabled>
                                     <button class="addrSearchBtn searchBtn">우편번호 검색</button>
                                 </div>
-                                <div class="row">
+                                <div class="row address-search">
                                     <label></label>
                                     <!-- 카카오 api 창 추가 공간-->
                                     <div class="layer"></div>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" class="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
+                                    <input type="text" class="addressMainInput" value="" disabled>
                                 </div>
                                 <div class="input-group-with-button">
                                     <input type="text" class="addressDetailInput" value="상세주소 입력">
@@ -103,11 +103,11 @@
                         <div class="form-row required">
                             <h3 class="form-label">연락처1</h3>
                             <div class="form-field phone-field">
-                                <input type="text" maxlength="4" name="tel1_0" value="010">
+                                <input type="text" maxlength="4" name="tel1_0" value="">
                                 <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_1" value="1234">
+                                <input type="text" maxlength="4" name="tel1_1" value="">
                                 <span class="phone-dash">-</span>
-                                <input type="text" maxlength="4" name="tel1_2" value="5678">
+                                <input type="text" maxlength="4" name="tel1_2" value="">
                             </div>
                         </div>
                         <!-- 연락처2 -->
@@ -167,13 +167,13 @@
                                     <input type="text" class="zipCodeInput" value="-" disabled>
                                     <button class="addrSearchBtn searchBtn">우편번호 검색</button>
                                 </div>
-                                <div class="row">
+                                <div class="row address-search">
                                     <label></label>
                                     <!-- 카카오 api 창 추가 공간-->
                                     <div class="layer"></div>
                                 </div>
                                 <div class="input-group-with-button">
-                                    <input type="text" class="addressMainInput" value="서울특별시 강남구 강남대로 364" disabled>
+                                    <input type="text" class="addressMainInput" value="" disabled>
                                 </div>
                                 <div class="input-group-with-button">
                                     <input type="text" class="addressDetailInput" value="상세주소 입력">
@@ -297,7 +297,7 @@
                         </select>
                     </div>
                     <div class="cash-receipt-input">
-                        <input type="text" placeholder="숫자만 입력해 주세요." value="01012345678">
+                        <input type="text" placeholder="숫자만 입력해 주세요." value="">
                     </div>
                 </div>
                 <div class="cash-receipt-save">
@@ -439,6 +439,8 @@
 </main>
 <footer th:replace="/fragments/footer :: footer-container"></footer>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
+<script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
+<script type="module" th:src="@{/js/utils/map.js}"></script>
 <script type="module" th:src="@{/js/order/order.js}"></script>
 </body>
 </html>

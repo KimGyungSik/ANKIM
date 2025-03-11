@@ -1,4 +1,6 @@
 import { fetchWithAccessToken } from '../utils/fetchUtils.js';
+import { execDaumPostcode } from '../utils/map.js';
+import { selectedAddress } from '../utils/addressStore.js'; // 저장된 주소
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -58,6 +60,10 @@ document.addEventListener("DOMContentLoaded", async () => {
     // 개별 약관 체크박스들
     var agreementInputs = document.querySelectorAll(".agreement-list input[type='checkbox']");
 
+    // 기존 배송지 영역의 우편번호 검색 버튼 선택
+    var existingAddrSearchBtn = document.querySelector(".existing-address .addrSearchBtn");
+    // 신규 배송지 영역의 우편번호 검색 버튼 선택
+    var newAddrSearchBtn = document.querySelector(".new-address .addrSearchBtn");
 
     // 모달 초기상태 안보이게 설정
     window.closeModal = function () {
@@ -90,6 +96,24 @@ document.addEventListener("DOMContentLoaded", async () => {
             }
         });
     });
+
+    // 기본 배송지 탭에서 우편번호 검색
+    if (existingAddrSearchBtn) {
+        existingAddrSearchBtn.addEventListener("click", () => {
+            // 기존 배송지 영역의 주소 검색 로직 실행
+            var container = document.querySelector(".existing-address");
+            execDaumPostcode(container);
+        });
+    }
+
+    // 신규입력 탭에서 우편번호 검색
+    if (newAddrSearchBtn) {
+        newAddrSearchBtn.addEventListener("click", () => {
+            // 신규 배송지 영역의 주소 검색 로직 실행
+            var container = document.querySelector(".new-address");
+            execDaumPostcode(container);
+        });
+    }
 
     // 라디오 선택에 따른 옵션 업데이트 함수
     function updateReceiptOptions() {
@@ -270,9 +294,9 @@ function renderProducts(products) {
     let html = "";
     products.forEach(product => {
         // 임의 쿠폰 적용가
-        const couponAppliedPrice = 135592;
+        const couponAppliedPrice = 0;
         // 임의 장바구니 쿠폰 할인액
-        const cartCouponDiscount = 3408;
+        const cartCouponDiscount = 0;
 
         html += `
       <li class="product-item">
@@ -301,7 +325,7 @@ function renderProducts(products) {
             </li>
             <li>
               <span class="coupon-label">장바구니 쿠폰</span>
-              <span class="coupon-name">ORANGE 회원 10% 할인 쿠폰</span>
+              <span class="coupon-name">사용 가능한 쿠폰 없음</span>
               <span class="coupon-discount-amount">-${cartCouponDiscount.toLocaleString()}원</span>
             </li>
           </ul>

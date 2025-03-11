@@ -45,11 +45,11 @@ export async function execDaumPostcode(container) {
 
                 // 조합된 참고항목을 해당 필드에 넣는다.
                 // document.getElementById("addressMainInput").value = extraAddr;
-                document.querySelector('.addressMainInput').value = extraAddr;
+                container.querySelector('.addressMainInput').value = extraAddr;
 
             } else {
                 // document.getElementById("addressMainInput").value = '';
-                document.querySelector('.addressMainInput').value = '';
+                container.querySelector('.addressMainInput').value = '';
             }
 
 
@@ -58,13 +58,9 @@ export async function execDaumPostcode(container) {
             selectedAddress.addressMain = addr;
 
             // 우편번호와 주소 정보를 해당 필드에 넣는다.
-            document.querySelector('.zipCodeInput').value = data.zonecode;
-            document.querySelector('.addressMainInput').value = data.roadAddress || data.jibunAddress;
-            document.querySelector('.addressDetailInput').focus();
-            // document.getElementById('zipCodeInput').value = data.zonecode;
-            // document.getElementById("addressMainInput").value = addr;
-            // // 커서를 상세주소 필드로 이동한다.
-            // document.getElementById("addressDetailInput").focus();
+            container.querySelector('.zipCodeInput').value = data.zonecode;
+            container.querySelector('.addressMainInput').value = data.roadAddress || data.jibunAddress;
+            container.querySelector('.addressDetailInput').focus();
 
             // iframe을 넣은 element를 안보이게 한다.
             // (autoClose:false 기능을 이용한다면, 아래 코드를 제거해야 화면에서 사라지지 않는다.)
@@ -82,11 +78,12 @@ export async function execDaumPostcode(container) {
     initLayerPosition(element_layer);
 }
 
-// 브라우저의 크기 변경에 따라 레이어를 가운데로 이동시키고자 하실때에는
-// resize이벤트나, orientationchange이벤트를 이용하여 값이 변경될때마다 아래 함수를 실행 시켜 주시거나,
-// 직접 element_layer의 top,left값을 수정해 주시면 됩니다.
 function initLayerPosition(element_layer){
-    var width = 500; //우편번호서비스가 들어갈 element의 width
+    // 부모 요소(컨테이너)의 현재 너비를 가져온다.
+    var parentWidth = element_layer.parentElement.clientWidth;
+    // 부모 너비를 그대로 사용하거나 너비를 500으로 사용한다.
+    // 단 부모 너비가 500이 넘어가면 500으로 사용하고 부모 너비가 400보다 작으면 그대로 사용 500도 400도 아니라면 400으로 사용
+    var width = parentWidth > 500 ? 500 : (parentWidth < 400 ? parentWidth : 400);
     var height = 400; //우편번호서비스가 들어갈 element의 height
     var borderWidth = 1; //샘플에서 사용하는 border의 두께
 

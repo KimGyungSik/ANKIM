@@ -338,6 +338,12 @@ input[type="checkbox"] {
     border-radius: 4px;
 }
 
+.layer {
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
 /* 연락처 */
 .phone-field {
     display: flex;
