@@ -5,10 +5,11 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
+import shoppingmall.ankim.domain.viewRolling.repository.query.ViewRollingQueryRepository;
 
 import java.util.List;
 
-public interface ViewRollingRepository extends JpaRepository<ViewRolling, Long> {
+public interface ViewRollingRepository extends JpaRepository<ViewRolling, Long>, ViewRollingQueryRepository {
 
     @Modifying
     @Query(value = """

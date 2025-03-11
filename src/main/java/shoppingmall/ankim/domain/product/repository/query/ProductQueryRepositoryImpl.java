@@ -63,94 +63,96 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
 
         return result;
     }
-    @Override
-    public Page<ProductListResponse> findUserProductListResponse(
-            Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
-            List<ColorCondition> colorConditions, PriceCondition priceCondition,
-            Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
 
-        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(
-                condition, category, null, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product
-        );
-
-        List<Long> productIds = null;
-
-        if (keyword != null && !keyword.trim().isEmpty()) {
-            productIds = findProductIdsByFullTextSearch(keyword); // ✅ EntityManager를 사용하여 직접 실행
-
-            System.out.println("[DEBUG] 검색된 상품 ID: " + productIds); // 🔍 디버깅 로그
-
-            if (!productIds.isEmpty()) {
-                filterBuilder.and(product.no.in(productIds)); // 기존 filterBuilder에 조건 추가
-            } else {
-                System.out.println("[DEBUG] 검색 결과 없음 → 빈 리스트 반환");
-                return new PageImpl<>(new ArrayList<>(), pageable, 0);
-            }
-        }
-
-        OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
-
-        List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
-
-        System.out.println("[DEBUG] 조회된 상품 개수: " + content.size()); // 🔍 디버깅 로그
-
-        JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
-                .where(filterBuilder);
-
-        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
-    }
-
-
-
-    private List<Long> findProductIdsByFullTextSearch(String keyword) {
-        if (StringUtils.isNullOrEmpty(keyword)) {
-            return Collections.emptyList();
-        }
-
-        String formattedKeyword = Arrays.stream(keyword.trim().split("\\s+"))
-                .map(word -> "+" + word) // 각 단어 앞에 `+` 추가
-                .collect(Collectors.joining(" ")); // 공백으로 결합
-
-        String sql = """
-        SELECT p.no
-        FROM product p
-        WHERE MATCH(p.name, p.search_keywords, p.description)
-        AGAINST(:keyword IN BOOLEAN MODE)
-    """;
-
-        return entityManager.createNativeQuery(sql)
-                .setParameter("keyword", formattedKeyword)
-                .getResultList();
-    }
-
-
-
-
-
+    // MySQL (full-text)
 //    @Override
-//    public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
-//                                                                 List<ColorCondition> colorConditions, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
-//        // 필터링
-//        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product);
+//    public Page<ProductListResponse> findUserProductListResponse(
+//            Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
+//            List<ColorCondition> colorConditions, PriceCondition priceCondition,
+//            Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
 //
-//        // 정렬
+//        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(
+//                condition, category, null, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product
+//        );
+//
+//        List<Long> productIds = null;
+//
+//        if (keyword != null && !keyword.trim().isEmpty()) {
+//            productIds = findProductIdsByFullTextSearch(keyword);
+//
+//            System.out.println("[DEBUG] 검색된 상품 ID: " + productIds);
+//
+//            if (!productIds.isEmpty()) {
+//                filterBuilder.and(product.no.in(productIds)); // 기존 filterBuilder에 조건 추가
+//            } else {
+//                System.out.println("[DEBUG] 검색 결과 없음 → 빈 리스트 반환");
+//                return new PageImpl<>(new ArrayList<>(), pageable, 0);
+//            }
+//        }
+//
 //        OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
 //
-//        // 필터링 및 정렬 적용
 //        List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
 //
-//        // 전체 카운트 조회 쿼리
+//        System.out.println("[DEBUG] 조회된 상품 개수: " + content.size());
+//
 //        JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
 //                .where(filterBuilder);
 //
-//        // PageableExecutionUtils.getPage()로 최적화
 //        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+//    }
 //
+//
+//
+//    private List<Long> findProductIdsByFullTextSearch(String keyword) {
+//        if (StringUtils.isNullOrEmpty(keyword)) {
+//            return Collections.emptyList();
+//        }
+//
+//        String formattedKeyword = Arrays.stream(keyword.trim().split("\\s+"))
+//                .map(word -> "+" + word) // 각 단어 앞에 `+` 추가
+//                .collect(Collectors.joining(" ")); // 공백으로 결합
+//
+//        String sql = """
+//        SELECT p.no
+//        FROM product p
+//        WHERE MATCH(p.name, p.search_keywords, p.description)
+//        AGAINST(:keyword IN BOOLEAN MODE)
+//    """;
+//
+//        return entityManager.createNativeQuery(sql)
+//                .setParameter("keyword", formattedKeyword)
+//                .getResultList();
 //    }
 
 
 
-    // 필터링 및 정렬 수행하는 메서드
+
+    // h2 (like)
+    @Override
+    public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
+                                                                 List<ColorCondition> colorConditions, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
+        // 필터링
+        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(condition, category, keyword, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product);
+
+        // 정렬
+        OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
+
+        // 필터링 및 정렬 적용
+        List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
+
+        // 전체 카운트 조회 쿼리
+        JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
+                .where(filterBuilder);
+
+        // PageableExecutionUtils.getPage()로 최적화
+        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+
+    }
+
+
+
+    //  필터링 및 정렬 수행하는 메서드
     private List<ProductListResponse> getFilteredAndSortedResults(OrderSpecifier orderSpecifier, BooleanBuilder filterBuilder, Pageable pageable) {
         List<ProductListResponse> response = queryFactory
                 .select(Projections.fields(ProductListResponse.class,
@@ -191,14 +193,14 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
         return response;
     }
 
-    private List<Long> toProductListResponseIds(List<ProductListResponse> responses) {
+    public List<Long> toProductListResponseIds(List<ProductListResponse> responses) {
         return responses.stream()
                 .map(ProductListResponse::getNo)
                 .toList();
     }
 
     // 상품 ID에 해당하는 썸네일 URL 매핑
-    private Map<Long, String> getThumbnailUrls(List<Long> productIds) {
+    public Map<Long, String> getThumbnailUrls(List<Long> productIds) {
         return queryFactory
                 .select(productImg.product.no, productImg.imgUrl)
                 .from(productImg)

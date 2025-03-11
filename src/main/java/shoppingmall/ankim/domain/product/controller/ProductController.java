@@ -21,11 +21,16 @@ import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
+import shoppingmall.ankim.domain.product.service.ProductService;
 import shoppingmall.ankim.domain.searchLog.service.SearchLogService;
+import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
+import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -33,6 +38,8 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final ViewRollingRepository viewRollingRepository;
+    private final ProductService productService;
     private final CategoryQueryService categoryQueryService;
     private final SearchLogService searchLogService;
     @GetMapping("/admin/new")
@@ -46,6 +53,8 @@ public class ProductController {
     public String findProductUserDetailResponse(@PathVariable("productId") Long productId, Model model) {
         // 상품 상세 정보 조회
         ProductResponse product = productRepository.findAdminProductDetailResponse(productId);
+        productService.increaseViewCount(productId); // 조회수 증가
+
         model.addAttribute("product", product);
 
         // 카테고리 정보 저장
@@ -92,6 +101,8 @@ public class ProductController {
 
         model.addAttribute("itemMap", itemMap);
         model.addAttribute("optionItemMap", optionItemMap);
+
+        model.addAttribute("top50Products", viewRollingRepository.getViewRollingProducts(categoryNo, REALTIME, PageRequest.of(0, 50)));
 
         return "/product/detail";
     }
