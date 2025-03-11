@@ -20,6 +20,17 @@ document.addEventListener("DOMContentLoaded", async () => {
     } catch (error) {
         showErrorModal(error.message);
     }
+    // 모든 모달 닫기 버튼에 대해 이벤트 리스너 등록
+    document.querySelectorAll('.close-button').forEach(btn => {
+        btn.addEventListener('click', () => {
+            // 가장 가까운 모달(또는 모달 오버레이) 요소를 찾습니다.
+            var modal = btn.closest('.modal-overlay') || btn.closest('.modal');
+            if (modal) {
+                modal.style.display = 'none';
+            }
+        });
+    });
+
 
     // 배송지 기존/신규 선택
     var tabs = document.querySelectorAll(".shipping-tab .tab-item");
@@ -428,28 +439,11 @@ function openAddressListModal(addresses) {
             // (2) shipping form에 채워넣기
             fillShippingForm(addressObj);
 
-            // (3) 모달 닫기
-            closeAddressListModal();
         });
     });
 
-    // 모달 닫기 버튼
-    const closeBtn = modal.querySelector(".address-list-close-btn");
-    if (closeBtn) {
-        closeBtn.onclick = () => {
-            closeAddressListModal();
-        };
-    }
-
     // 모달 열기
     modal.style.display = "flex";
-}
-
-function closeAddressListModal() {
-    const modal = document.getElementById("addressListModal");
-    if (modal) {
-        modal.style.display = "none";
-    }
 }
 
 // 선택된 주소를 existing-address 폼에 반영
@@ -565,4 +559,7 @@ function showErrorModal(message) {
 function closeModal() {
     var modal = document.querySelector('.modal');
     modal.style.display = 'none'; // 모달 숨김
+    document.querySelectorAll('.modal-overlay').forEach(modal => {
+        modal.style.display = 'none';
+    });
 }

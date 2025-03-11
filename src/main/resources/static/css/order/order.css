@@ -1,4 +1,20 @@
-/* 간단한 레이아웃/스타일 (필요에 맞게 수정하세요) */
+/* Reset */
+body, h1, p, ul, li, label, input, button, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* 버튼에 기본적으로 적용되는 브라우저의 스타일 삭제 */
+.close-button,
+.address-list-close-btn {
+    background: none;
+    border: none;
+    -webkit-appearance: none; /* 크롬, 사파리 등 WebKit 계열 */
+    appearance: none;
+}
 
 body {
     margin: 0;
