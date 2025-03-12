@@ -29,8 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -194,7 +193,7 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
         OrderTempResponse response = OrderTempResponse.tempOf(order).withAddresses(addresses);
 
         given(securityContextHelper.getLoginId()).willReturn(loginId);
-        given(orderService.createOrderTemp(eq(loginId), anyList())).willReturn(response);
+        given(orderService.createOrderTemp(eq(loginId), anyList(), anyString())).willReturn(response);
 
 
         // when & then

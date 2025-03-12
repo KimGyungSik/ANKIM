@@ -64,7 +64,7 @@ class OrderServiceTest {
         List<Long> cartItemNoList = List.of(cartItemNo1, cartItemNo2);
 
         // when
-        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList);
+        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         // then
         assertNotNull(tempOrder);
@@ -89,7 +89,7 @@ class OrderServiceTest {
         }
 
         // when
-        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList);
+        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         // then
         assertNotNull(tempOrder);
@@ -109,7 +109,7 @@ class OrderServiceTest {
         List<Long> cartItemNoList = new ArrayList<>();
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(CartItemNotFoundException.class)
                 .hasMessageContaining(NO_SELECTED_CART_ITEM.getMessage());
     }
@@ -126,7 +126,7 @@ class OrderServiceTest {
         List<Long> cartItemNoList = List.of(invalidCartItemNo);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(CartItemNotFoundException.class)
                 .hasMessageContaining(CART_ITEM_NOT_FOUND.getMessage());
     }
@@ -146,7 +146,7 @@ class OrderServiceTest {
                 .when(orderRepository).existsByOrdCode(any());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(OrderCodeGenerationException.class)
                 .hasMessageContaining(ORDER_CODE_GENERATE_FAIL.getMessage());
     }

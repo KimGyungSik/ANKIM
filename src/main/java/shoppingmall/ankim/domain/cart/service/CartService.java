@@ -13,4 +13,7 @@ public interface CartService {
     void deactivateSelectedItems(String loginId, List<Long> cartItemNoList);
     void deactivateOutOfStockItems(String loginId); // 품절 상품을 삭제
     Integer getCartItemCount(String loginId); // 장바구니에 담긴 상품의 개수
+
+    List<CartItem> findByCartItem(List<Long> list); // 장바구니 품목 조회
+
 }

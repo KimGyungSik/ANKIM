@@ -1,6 +1,5 @@
 import { fetchWithAccessToken } from '../utils/fetchUtils.js';
 import { execDaumPostcode } from '../utils/map.js';
-import { selectedAddress } from '../utils/addressStore.js'; // 저장된 주소
 
 document.addEventListener("DOMContentLoaded", async () => {
 
@@ -17,10 +16,12 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderPaymentDetails(data.data); // 결제금액
 
         } else {
-            showErrorModal(data.message);
+            showErrorModal(data.data.message);
+            setTimeout(() => window.location.href = data.data.referer, 2000); // 2초 후 이전 페이지로 이동
         }
     } catch (error) {
-        showErrorModal(error.message);
+        showErrorModal(error.data.message);
+        setTimeout(() => window.location.href = error.data.referer, 2000); // 2초 후 이전 페이지로 이동
     }
     // 모든 모달 닫기 버튼에 대해 이벤트 리스너 등록
     document.querySelectorAll('.close-button').forEach(btn => {

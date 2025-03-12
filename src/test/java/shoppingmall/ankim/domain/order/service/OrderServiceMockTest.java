@@ -131,7 +131,7 @@ class OrderServiceMockTest {
         });
 
         // when
-        OrderTempResponse orderResponse = orderService.createOrderTemp(loginId, cartItemNoList);
+        OrderTempResponse orderResponse = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         System.out.println("OrderResponse items size: " + orderResponse.getItems().size());
         orderResponse.getItems().forEach(item -> System.out.println("Item: " + item.getName()));

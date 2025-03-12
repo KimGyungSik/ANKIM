@@ -56,7 +56,7 @@ public enum ErrorCode {
     ORDER_CODE_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "주문번호 생성을 실패했습니다."),
 
     // 주문 품목
-    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
+    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "상품 수량이 부족 합니다."),
     DISCOUNT_PRICE_INVALID(HttpStatus.BAD_REQUEST, "상품 원가 금액이 할인 적용된 상품 금액보다 작을 수 없습니다."),
     FINAL_PRICE_INVALID(HttpStatus.BAD_REQUEST, "주문 금액이 비정상 입니다."),
 

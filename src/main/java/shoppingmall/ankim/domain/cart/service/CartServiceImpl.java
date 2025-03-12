@@ -203,6 +203,12 @@ public class CartServiceImpl implements CartService {
         return cartItemRepository.countActiveCartItems(member);
     }
 
+    @Override
+    public List<CartItem> findByCartItem(List<Long> cartItemNoList) {
+
+        return cartItemRepository.findByNoIn(cartItemNoList);
+    }
+
     private static void quantityComparison(Integer qty, Item item) {
         if (qty > item.getQty()) { // 재고보다 많이 주문하는 경우
             throw new OutOfStockException(OUT_OF_STOCK);

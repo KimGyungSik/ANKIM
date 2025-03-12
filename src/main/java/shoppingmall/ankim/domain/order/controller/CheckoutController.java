@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.order.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpSession;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -11,7 +12,9 @@ import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @RestController
@@ -26,12 +29,21 @@ public class CheckoutController {
     @PostMapping
     public ApiResponse<Void> checkoutItem (
             @RequestBody List<Long> cartItemNoList,
-            HttpSession session
+            HttpSession session,
+            HttpServletRequest request
     ) {
         securityContextHelper.getLoginId();
 
-        // 구매하기 위해서 선택한 품목 번호 리스트 저장
-        session.setAttribute("selectedCartItemList", cartItemNoList);
+        String referer = request.getHeader("referer");
+        log.info("referer url : {}", referer);
+
+        // cartItemList와 URL 정보를 하나의 Map에 저장
+        Map<String, Object> checkoutData = new HashMap<>();
+        checkoutData.put("cartItemList", cartItemNoList);
+        checkoutData.put("referer", referer);
+
+        // 세션에 저장
+        session.setAttribute("checkoutData", checkoutData);
 
         return ApiResponse.ok();
     }

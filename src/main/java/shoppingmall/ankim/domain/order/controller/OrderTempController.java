@@ -10,12 +10,16 @@ import shoppingmall.ankim.domain.cart.controller.request.AddToCartRequest;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotSellingException;
 import shoppingmall.ankim.domain.cart.service.CartService;
+import shoppingmall.ankim.domain.order.dto.OrderTempErrorResponse;
 import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
+import shoppingmall.ankim.domain.order.exception.OrderTempException;
 import shoppingmall.ankim.domain.order.service.OrderService;
 import shoppingmall.ankim.domain.security.helper.SecurityContextHelper;
+import shoppingmall.ankim.global.exception.ErrorCode;
 import shoppingmall.ankim.global.response.ApiResponse;
 
 import java.util.List;
+import java.util.Map;
 
 import static shoppingmall.ankim.global.exception.ErrorCode.CART_ITEM_NOT_SELECTED;
 
@@ -36,15 +40,24 @@ public class OrderTempController {
      * 3. 전달받은 cartItemNo를 이용하여 cartItem을 조회 -> itemNo(품목번호)를 받아온다.
      **/
     @GetMapping
-    public ApiResponse<OrderTempResponse> createTempOrder(HttpSession session) {
+    public ApiResponse<?> createTempOrder(HttpSession session) {
         String loginId = securityContextHelper.getLoginId();
 
-        List<Long> cartItemNoList = (List<Long>) session.getAttribute("selectedCartItemList");
-        if (cartItemNoList == null || cartItemNoList.isEmpty()) {
-            throw new CartItemNotSellingException(CART_ITEM_NOT_SELECTED);
+        // 세션에서 checkoutData Map을 꺼냄
+        Map<String, Object> checkoutData = (Map<String, Object>) session.getAttribute("checkoutData");
+        String referer = checkoutData != null ? (String) checkoutData.get("referer") : null;
+
+        if (checkoutData == null) {
+            throw new OrderTempException(CART_ITEM_NOT_SELECTED, referer);
         }
 
-        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList);
+        // checkoutData에서 cartItemList를 꺼냄
+        List<Long> cartItemNoList = (List<Long>) checkoutData.get("cartItemList");
+        if (cartItemNoList == null || cartItemNoList.isEmpty()) {
+            throw new OrderTempException(CART_ITEM_NOT_SELECTED, referer);
+        }
+
+        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList, referer);
 
         return ApiResponse.ok(tempOrder);
     }
