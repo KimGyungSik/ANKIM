@@ -42,7 +42,7 @@
                 <header class="shipping-header">
                     <h2 class="shipping-title">
                         배송 정보
-                        <button type="button" class="info-button">?</button>
+                        <button type="button" class="info-button" id="shippingInfoBtn">?</button>
                     </h2>
                     <p class="shipping-required-notice">
                         <i class="required-asterisk">*</i> 표시는 필수입력 항목
@@ -134,6 +134,7 @@
                         <div class="form-row">
                             <h3 class="form-label"></h3>
                             <div class="form-field">
+                                <!-- 드롭다운 컨테이너 -->
                                 <div class="request-dropdown">
                                     <input type="text" class="request-dropdown-input" readonly value="배송시 요청사항을 선택해 주세요">
                                     <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 16">
@@ -141,7 +142,20 @@
                                             <path d="M28 1L13.97 15 0 1.058"></path>
                                         </g>
                                     </svg>
+                                    <!-- 드롭다운 리스트 -->
+                                    <ul class="request-dropdown-list">
+                                        <li data-value="배송시 요청사항을 선택해 주세요">배송시 요청사항을 선택해 주세요</li>
+                                        <li data-value="부재시 문앞에 놓아주세요.">부재시 문앞에 놓아주세요.</li>
+                                        <li data-value="부재시 경비실에 맡겨 주세요.">부재시 경비실에 맡겨 주세요.</li>
+                                        <li data-value="부재시 전화 또는 문자 주세요.">부재시 전화 또는 문자 주세요.</li>
+                                        <li data-value="택배함에 넣어 주세요.">택배함에 넣어 주세요.</li>
+                                        <li data-value="파손위험상품입니다. 배송시 주의해주세요.">파손위험상품입니다. 배송시 주의해주세요.</li>
+                                        <li data-value="배송전에 연락주세요.">배송전에 연락주세요.</li>
+                                        <li data-value="직접입력">직접입력</li>
+                                    </ul>
                                 </div>
+                                <!-- 직접입력 textarea -->
+                                <textarea class="request-textarea" placeholder="내용을 입력해주세요. (최대 50자)" maxlength="50"></textarea>
                             </div>
                         </div>
                     </div>
@@ -209,9 +223,11 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- 배송시 요청사항 -->
                         <div class="form-row">
                             <h3 class="form-label"></h3>
                             <div class="form-field">
+                                <!-- 드롭다운 컨테이너 -->
                                 <div class="request-dropdown">
                                     <input type="text" class="request-dropdown-input" readonly value="배송시 요청사항을 선택해 주세요">
                                     <svg class="dropdown-icon" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 28 16">
@@ -219,7 +235,20 @@
                                             <path d="M28 1L13.97 15 0 1.058"></path>
                                         </g>
                                     </svg>
+                                    <!-- 드롭다운 리스트 -->
+                                    <ul class="request-dropdown-list">
+                                        <li data-value="배송시 요청사항을 선택해 주세요">배송시 요청사항을 선택해 주세요</li>
+                                        <li data-value="부재시 문앞에 놓아주세요.">부재시 문앞에 놓아주세요.</li>
+                                        <li data-value="부재시 경비실에 맡겨 주세요.">부재시 경비실에 맡겨 주세요.</li>
+                                        <li data-value="부재시 전화 또는 문자 주세요.">부재시 전화 또는 문자 주세요.</li>
+                                        <li data-value="택배함에 넣어 주세요.">택배함에 넣어 주세요.</li>
+                                        <li data-value="파손위험상품입니다. 배송시 주의해주세요.">파손위험상품입니다. 배송시 주의해주세요.</li>
+                                        <li data-value="배송전에 연락주세요.">배송전에 연락주세요.</li>
+                                        <li data-value="직접입력">직접입력</li>
+                                    </ul>
                                 </div>
+                                <!-- 직접입력 textarea -->
+                                <textarea class="request-textarea" placeholder="내용을 입력해주세요. (최대 50자)" maxlength="50"></textarea>
                             </div>
                         </div>
                     </div>
@@ -418,6 +447,20 @@
                     </g>
                 </svg>
             </button>
+        </div>
+    </div>
+
+    <!-- 배송 정보 Modal -->
+    <div class="modal-overlay" id="shippingInfoModal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div class="modal-body shippingInfo-body">
+                <h2>배송안내</h2>
+                <ul>
+                    <li>도서산간 지역의 경우 추가 배송비 및 배송 소요 기간은 지역별로 상이할 수 있습니다.</li>
+                    <li>주문 상품이 여러 개인 경우 묶음 배송 여부 등에 따라 배송 시점이 달라질 수 있습니다.</li>
+                    <li>기타 자세한 사항은 고객센터로 문의 바랍니다.</li>
+            </div>
         </div>
     </div>
 

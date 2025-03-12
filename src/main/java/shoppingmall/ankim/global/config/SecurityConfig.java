@@ -65,6 +65,9 @@ public class SecurityConfig {
                         .requestMatchers("/admin/**").hasRole("ADMIN") // 관리자 접근 경로에 관리자 권한 필요
                         .requestMatchers("/api/cart/**").hasAnyRole("USER", "ADMIN") // 장바구니는 USER, ADMIN 모두 접근 가능
                         .requestMatchers("/api/mypage/**").hasAnyRole("USER", "ADMIN") // 마이페이지는 USER, ADMIN 모두 접근 가능
+                        .requestMatchers("/api/check-out").hasAnyRole("USER") // 상품 주문은 USER 접근 가능
+                        .requestMatchers("/api/check-out").hasAnyRole("USER") // 상품 주문은 USER 접근 가능
+                        .requestMatchers("/api/temp-order").hasAnyRole("USER") // 상품 주문은 USER 접근 가능
                         .anyRequest().permitAll()) // 나머지 요청은 접근 허용
         ;
 

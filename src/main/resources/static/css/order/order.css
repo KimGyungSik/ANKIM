@@ -377,27 +377,80 @@ input[type="checkbox"] {
 /* 배송시 요청사항 드롭다운 */
 .request-dropdown {
     position: relative;
-    display: inline-block;
+    display: flex;
+    align-items: center;
     width: 100%;
-}
-.request-dropdown-input {
-    width: 100%;
-    padding: 8px;
     border: 1px solid #ddd;
     border-radius: 4px;
     background-color: #fff;
     cursor: pointer;
+}
+
+.request-dropdown-input {
+    width: 100%;
+    padding: 8px 35px 8px 10px;
+    border: none;
+    background: transparent;
     font-size: 14px;
     box-sizing: border-box;
 }
+
 .dropdown-icon {
     position: absolute;
-    top: 50%;
-    right: 8px;
+    right: 10px;
     width: 16px;
     height: 16px;
-    transform: translateY(-50%);
     pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+/* 드롭다운 리스트 */
+.request-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+}
+
+.request-dropdown-list.show {
+    display: block;
+}
+
+.request-dropdown-list li {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.request-dropdown-list li:hover {
+    background-color: #f0f0f0;
+}
+
+/* textarea 크기 조절 */
+.request-textarea {
+    display: none;
+    width: 100%;
+    height: 80px;
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    box-sizing: border-box;
+    resize: none; /* 크기 조절 방지 */
+    overflow-y: auto;
+}
+
+/* textarea가 표시될 때 */
+.request-dropdown.open + .request-textarea {
+    display: block;
 }
 
 /* 쿠폰 및 상품 섹션 */
@@ -494,9 +547,10 @@ input[type="checkbox"] {
 .coupon-info {
     list-style: none;
     margin: 8px 0 0 0;
-    padding: 0;
     font-size: 13px;
     color: #666;
+    background: #eee;
+    padding: 10px;
 }
 .coupon-info li {
     display: flex;
@@ -951,6 +1005,31 @@ input[type="checkbox"] {
     cursor: pointer;
 }
 
+/* 배송 안내 모달 스타일 */
+#shippingInfoModal .modal-content {
+    width: 350px; /* 모달 너비를 400px로 고정 */
+    max-width: 90%; /* 화면이 작을 때는 너비 조정 */
+    padding: 20px;
+}
+
+/* 배송 안내 모달 제목 중앙 정렬 */
+.shippingInfo-body h2 {
+    text-align: center;
+    font-weight: bold; /* 강조 */
+    margin-bottom: 12px;
+}
+
+/* ul, li 스타일 */
+.shippingInfo-body ul {
+    padding-left: 20px; /* 왼쪽 여백 */
+    margin: 0; /* 기본 margin 제거 */
+}
+
+.shippingInfo-body li {
+    list-style: disc;
+    margin-bottom: 8px; /* 항목 간격 */
+    font-size: 18px;
+}
 
 /* 600px 이하에서 라벨+인풋 세로 배치 */
 @media (max-width: 600px) {

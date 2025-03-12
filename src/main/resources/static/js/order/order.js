@@ -17,11 +17,11 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         } else {
             showErrorModal(data.data.message);
-            setTimeout(() => window.location.href = data.data.referer, 2000); // 2초 후 이전 페이지로 이동
+            // setTimeout(() => window.location.href = data.data.referer, 2000); // 2초 후 이전 페이지로 이동
         }
     } catch (error) {
         showErrorModal(error.data.message);
-        setTimeout(() => window.location.href = error.data.referer, 2000); // 2초 후 이전 페이지로 이동
+        // setTimeout(() => window.location.href = error.data.referer, 2000); // 2초 후 이전 페이지로 이동
     }
     // 모든 모달 닫기 버튼에 대해 이벤트 리스너 등록
     document.querySelectorAll('.close-button').forEach(btn => {
@@ -34,11 +34,17 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
+    // 배송 정보
+    var shippingInfoBtn = document.getElementById("shippingInfoBtn");
+    var shippingInfoModal = document.getElementById("shippingInfoModal");
 
     // 배송지 기존/신규 선택
     var tabs = document.querySelectorAll(".shipping-tab .tab-item");
     var existingAddress = document.querySelector(".existing-address");
     var newAddress = document.querySelector(".new-address");
+
+    // 배송 요청 사항 드롭 다운
+    const dropdowns = document.querySelectorAll(".request-dropdown");
 
     // 각 라디오 버튼과 관련 영역 선택
     var incomeRadio = document.querySelector('input[name="receiptType"][value="INCOME"]');
@@ -98,6 +104,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
     });
 
+    // 배송안내 버튼 눌랐을때
+    shippingInfoBtn.addEventListener("click", () => {
+        shippingInfoModal.style.display = "flex";
+    });
+
     // 기본 배송지 탭에서 우편번호 검색
     if (existingAddrSearchBtn) {
         existingAddrSearchBtn.addEventListener("click", () => {
@@ -115,6 +126,50 @@ document.addEventListener("DOMContentLoaded", async () => {
             execDaumPostcode(container);
         });
     }
+
+    // 배송 요청사항
+    dropdowns.forEach(dropdown => {
+        const inputField = dropdown.querySelector(".request-dropdown-input");
+        const dropdownList = dropdown.querySelector(".request-dropdown-list");
+        const textarea = dropdown.closest(".form-field").querySelector(".request-textarea");
+        const dropdownIcon = dropdown.querySelector(".dropdown-icon");
+
+        // 드롭다운 열고 닫기
+        inputField.addEventListener("click", (event) => {
+            event.stopPropagation();
+            dropdownList.classList.toggle("show");
+            dropdown.classList.toggle("open");
+            dropdownIcon.style.transform = dropdownList.classList.contains("show") ? "rotate(180deg)" : "rotate(0)";
+        });
+
+        // 옵션 선택 시 동작
+        dropdownList.addEventListener("click", (e) => {
+            if (e.target.tagName === "LI") {
+                const selectedValue = e.target.getAttribute("data-value");
+                inputField.value = selectedValue;
+                dropdownList.classList.remove("show");
+                dropdown.classList.remove("open");
+                dropdownIcon.style.transform = "rotate(0)";
+
+                // 직접입력 선택 시 textarea 표시, 아니면 숨김
+                if (selectedValue === "직접입력") {
+                    textarea.style.display = "block";
+                    textarea.focus();
+                } else {
+                    textarea.style.display = "none";
+                }
+            }
+        });
+
+        // 바깥 클릭 시 드롭다운 닫기
+        document.addEventListener("click", (e) => {
+            if (!dropdown.contains(e.target)) {
+                dropdownList.classList.remove("show");
+                dropdown.classList.remove("open");
+                dropdownIcon.style.transform = "rotate(0)";
+            }
+        });
+    });
 
     // 라디오 선택에 따른 옵션 업데이트 함수
     function updateReceiptOptions() {
