@@ -5,10 +5,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
 import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
@@ -27,10 +24,10 @@ public class ViewRollingController {
      * @param size
      * @return
      */
-    @GetMapping
-    public ApiResponse<Page<ProductListResponse>> getRollingViews(
-            @RequestParam Long categoryNo,
-            @RequestParam RollingPeriod period,
+    @GetMapping("/categories/{categoryNo}/top-views/{period}")
+    public ApiResponse<Page<ProductListResponse>> getTopViewedProducts(
+            @PathVariable Long categoryNo,
+            @PathVariable RollingPeriod period,
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "50") int size) {
 

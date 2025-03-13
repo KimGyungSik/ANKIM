@@ -102,7 +102,17 @@ public class ProductController {
         model.addAttribute("itemMap", itemMap);
         model.addAttribute("optionItemMap", optionItemMap);
 
-        model.addAttribute("top50Products", viewRollingRepository.getViewRollingProducts(categoryNo, REALTIME, PageRequest.of(0, 50)));
+        // 첫 렌더링 시 실시간 인기순 상품 50개를 넘겨준다.
+        Page<ProductListResponse> viewRollingProducts = viewRollingRepository.getViewRollingProducts(categoryNo, REALTIME, PageRequest.of(0, 50));
+        model.addAttribute("products", viewRollingProducts.getContent());  // 상품 리스트
+        model.addAttribute("page", viewRollingProducts.getNumber());       // 현재 페이지 번호
+        model.addAttribute("size", viewRollingProducts.getSize());         // 페이지 크기 (한 페이지 당 개수)
+        model.addAttribute("totalElements", viewRollingProducts.getTotalElements());  // 전체 데이터 개수
+        model.addAttribute("totalPages", viewRollingProducts.getTotalPages());        // 전체 페이지 개수
+        model.addAttribute("hasNext", viewRollingProducts.hasNext());   // 다음 페이지 존재 여부
+        model.addAttribute("hasPrevious", viewRollingProducts.hasPrevious()); // 이전 페이지 존재 여부
+        model.addAttribute("categoryName", product.getCategoryResponse().getName());
+        model.addAttribute("categoryNo", categoryNo);
 
         return "/product/detail";
     }

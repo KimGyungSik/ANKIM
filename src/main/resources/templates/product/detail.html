@@ -417,6 +417,208 @@
     </div>
 </div>
 <script type="module" th:src="@{/js/product/detail.js}"></script>
+<!-- 전체 HOT PICKS 컨테이너 -->
+<div class="hot-picks-container">
+    <!-- HOT PICKS 섹션 -->
+    <div class="hot-picks-header" th:attr="data-category-no=${categoryNo}">
+        <h2>
+            <span id="category-name" th:text="${categoryName}"></span>
+            <span class="hot-picks-title-highlight">HOT PICKS</span>
+        </h2>
+    </div>
+
+    <!-- HOT PICKS 탭 -->
+    <div class="hot-picks-tabs">
+        <button class="hot-picks-tab active" data-period="REALTIME">실시간</button>
+        <button class="hot-picks-tab" data-period="DAILY">일간</button>
+        <button class="hot-picks-tab" data-period="WEEKLY">주간</button>
+        <button class="hot-picks-tab" data-period="MONTHLY">월간</button>
+    </div>
+
+    <script>
+        // 필터 버튼 클릭 시 active 클래스 변경
+        document.querySelectorAll('.hot-picks-tab').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.hot-picks-tab').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+    <!-- 상품 리스트 -->
+    <div class="product-list" id="product-list">
+        <div th:each="product, iterStat : ${products}" class="product-card" th:attr="data-product-id=${product.no}">
+
+            <!-- 순위 표시 -->
+            <div class="rank-badge" th:text="${iterStat.index + 1}"></div>
+
+            <!-- 상품 이미지 -->
+            <img th:src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+
+            <div class="product-info">
+                <h3 class="product-name" th:text="${product.name}">상품 이름</h3>
+                <div class="price-discount">
+                    <span class="discount-rate" th:if="${product.discRate > 0}" th:text="${product.discRate + '%'}"></span>
+                    <span class="price" th:text="${#numbers.formatInteger(product.sellPrice, 3, 'COMMA')}"></span>
+                </div>
+                <div class="product-badges">
+                    <span class="badge" th:if="${product.freeShip == 'Y'}">무료배송</span>
+                    <span class="badge" th:if="${product.handMadeYn == 'Y'}">핸드메이드</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 페이지네이션 (디자인 변경) -->
+    <div class="pagination">
+        <button id="prev-page" class="pagination-arrow">&lt;</button>
+        <span id="current-page" class="pagination-number">1</span>
+        <span class="pagination-separator">/</span>
+        <span id="total-pages" class="pagination-total">10</span>
+        <button id="next-page" class="pagination-arrow">&gt;</button>
+    </div>
+</div> <!-- hot-picks-container 종료 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const productList = document.getElementById("product-list");
+        const filterButtons = document.querySelectorAll(".hot-picks-tab");
+        const categoryNo = document.querySelector(".hot-picks-header").getAttribute("data-category-no");
+
+        let currentPage = 1;
+        const itemsPerPage = 5;
+        let products = [];
+
+        // ✅ 첫 렌더링 시 기존 Thymeleaf 데이터를 활용하여 5개씩 표시
+        const initialProducts = Array.from(document.querySelectorAll(".product-card"));
+        products = initialProducts.map(product => ({
+            no: product.getAttribute("data-product-id"),
+            name: product.querySelector(".product-name").innerText,
+            thumbNailImgUrl: product.querySelector("img").src,
+            discRate: product.querySelector(".discount-rate") ? product.querySelector(".discount-rate").innerText.replace('%', '') : 0,
+            sellPrice: product.querySelector(".price").innerText.replace(',', ''),
+            freeShip: product.querySelector(".badge")?.innerText.includes("무료배송") ? "Y" : "N",
+            handMadeYn: product.querySelector(".badge")?.innerText.includes("핸드메이드") ? "Y" : "N",
+        }));
+
+        function showPage(page) {
+            productList.style.transition = "transform 0.5s ease-in-out"; // 부드러운 애니메이션 효과
+            productList.style.transform = "translateX(-10px)"; // 왼쪽으로 살짝 이동 후
+            productList.style.visibility = "hidden"; // 💡 일시적인 50개 노출 방지
+
+            setTimeout(() => {
+                productList.innerHTML = ""; // 기존 상품 목록 초기화
+                const startIdx = (page - 1) * itemsPerPage;
+                const endIdx = startIdx + itemsPerPage;
+                const visibleProducts = products.slice(startIdx, endIdx);
+
+                visibleProducts.forEach((product, index) => {
+                    const productCard = document.createElement("div");
+                    productCard.classList.add("product-card");
+                    productCard.setAttribute("data-product-id", product.no);
+
+                    productCard.innerHTML = `
+                    <div class="rank-badge">${startIdx + index + 1}</div>
+                    <img src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <div class="price-discount">
+                            ${product.discRate > 0 ? `<span class="discount-rate">${product.discRate}%</span>` : ""}
+                            <span class="price">${Number(product.sellPrice).toLocaleString()}</span>
+                        </div>
+                        <div class="product-badges">
+                            ${product.freeShip === "Y" ? `<span class="badge">무료배송</span>` : ""}
+                            ${product.handMadeYn === "Y" ? `<span class="badge">핸드메이드</span>` : ""}
+                        </div>
+                    </div>
+                `;
+
+                    productList.appendChild(productCard);
+                });
+
+                productList.style.transform = "translateX(0)"; // 다시 원래 위치로
+                productList.style.visibility = "visible"; // 💡 최종적으로 보이게 처리
+
+                document.getElementById("current-page").innerText = page;
+                document.getElementById("total-pages").innerText = Math.ceil(products.length / itemsPerPage);
+            }, 100);
+        }
+
+        // ✅ 첫 렌더링 시 5개씩 표시
+        showPage(currentPage);
+
+        // ✅ 페이지네이션 기능
+        document.getElementById("prev-page").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+
+        document.getElementById("next-page").addEventListener("click", function () {
+            if (currentPage < Math.ceil(products.length / itemsPerPage)) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+
+        // ✅ 상품 카드 클릭 시 상세 페이지 이동
+        productList.addEventListener("click", function (event) {
+            const productCard = event.target.closest(".product-card");
+            if (productCard) {
+                const productId = productCard.getAttribute("data-product-id");
+                if (productId) {
+                    window.location.href = `/product/detail/${productId}`;
+                }
+            }
+        });
+
+        // ✅ 비동기 요청 후 처리
+        function fetchProducts(period) {
+            productList.style.visibility = "hidden"; // 💡 비동기 요청 중 리스트를 숨김
+            productList.style.minHeight = productList.offsetHeight + "px"; // 💡 레이아웃 유지
+
+            fetch(`/categories/${categoryNo}/top-views/${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200 && data.data && data.data.content) {
+                        products = data.data.content.map((product, index) => ({
+                            no: product.no,
+                            name: product.name,
+                            thumbNailImgUrl: product.thumbNailImgUrl,
+                            discRate: product.discRate,
+                            sellPrice: product.sellPrice,
+                            freeShip: product.freeShip,
+                            handMadeYn: product.handMadeYn,
+                        }));
+
+                        currentPage = 1;
+                        showPage(currentPage);
+                    } else {
+                        console.error("Failed to fetch products:", data);
+                    }
+                })
+                .catch(error => console.error("Error fetching products:", error))
+                .finally(() => {
+                    productList.style.visibility = "visible"; // 💡 데이터 로딩 후 다시 보이게 설정
+                    productList.style.minHeight = ""; // 💡 높이 초기화
+                });
+        }
+
+        // ✅ 필터 버튼 클릭 시 비동기 요청 실행
+        filterButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                filterButtons.forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                const period = this.getAttribute("data-period");
+                fetchProducts(period);
+            });
+        });
+    });
+</script>
+
+
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>
