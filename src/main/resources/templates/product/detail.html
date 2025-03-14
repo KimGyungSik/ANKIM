@@ -617,6 +617,61 @@
         });
     });
 </script>
+<!-- 상품 상세 정보 섹션 -->
+<div class="product-details-section">
+    <h2 class="details-title">상품정보</h2>
+
+    <!-- 상품 설명 -->
+    <div th:if="${product.desc != null and not #strings.isEmpty(product.desc)}" class="details-box">
+        <h3 class="details-heading">상품 설명</h3>
+        <div class="details-content" id="desc-content">
+            <p th:text="${product.desc}"></p>
+        </div>
+        <button class="details-toggle-btn" onclick="toggleDetails('desc-content', this)">상품설명 더보기 ▼</button>
+    </div>
+
+    <!-- 상품 유의사항 -->
+    <div th:if="${product.cauProd != null and not #strings.isEmpty(product.cauProd)}" class="details-box">
+        <h3 class="details-heading">상품 유의사항</h3>
+        <div class="details-content" id="cauProd-content">
+            <p th:text="${product.cauProd}"></p>
+        </div>
+        <button class="details-toggle-btn" onclick="toggleDetails('cauProd-content', this)">상품 유의사항 더보기 ▼</button>
+    </div>
+
+    <!-- 주문 유의사항 -->
+    <div th:if="${product.cauOrd != null and not #strings.isEmpty(product.cauOrd)}" class="details-box">
+        <h3 class="details-heading">주문 유의사항</h3>
+        <div class="details-content" id="cauOrd-content">
+            <p th:text="${product.cauOrd}"></p>
+        </div>
+        <button class="details-toggle-btn" onclick="toggleDetails('cauOrd-content', this)">주문 유의사항 더보기 ▼</button>
+    </div>
+
+    <!-- 배송 유의사항 -->
+    <div th:if="${product.cauShip != null and not #strings.isEmpty(product.cauShip)}" class="details-box">
+        <h3 class="details-heading">배송 유의사항</h3>
+        <div class="details-content" id="cauShip-content">
+            <p th:text="${product.cauShip}"></p>
+        </div>
+        <button class="details-toggle-btn" onclick="toggleDetails('cauShip-content', this)">배송 유의사항 더보기 ▼</button>
+    </div>
+</div>
+
+<!-- JavaScript -->
+<script>
+    function toggleDetails(id, button) {
+        const content = document.getElementById(id);
+        content.classList.toggle("expanded");
+
+        if (content.classList.contains("expanded")) {
+            button.innerText = button.innerText.replace("더보기 ▼", "닫기 ▲");
+        } else {
+            button.innerText = button.innerText.replace("닫기 ▲", "더보기 ▼");
+        }
+    }
+</script>
+
 
 
 <!-- 푸터 포함 -->

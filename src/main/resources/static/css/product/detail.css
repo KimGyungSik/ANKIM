@@ -1041,6 +1041,61 @@
 
 
 
+/* 상품 정보 섹션 (양쪽 10% 여백 설정) */
+.product-details-section {
+    width: 80%; /* ✅ 전체 너비의 80%만 차지 */
+    margin: 0 auto; /* ✅ 가운데 정렬 */
+    padding: 20px 0; /* ✅ 상하 여백 추가 */
+    max-width: 1200px; /* ✅ 최대 너비 지정 */
+}
+
+
+/* 제목 스타일 */
+.details-title {
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* 개별 섹션 스타일 */
+.details-box {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+/* 소제목 스타일 */
+.details-heading {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* 내용 스타일 */
+.details-content {
+    max-height: 100px; /* 기본적으로 100px 높이만 보이게 */
+    overflow: hidden;
+    transition: max-height 0.3s ease-in-out;
+}
+
+.details-content.expanded {
+    max-height: none; /* 확장 시 전체 내용 보이도록 */
+}
+
+/* 더보기 버튼 스타일 - 전체 박스 너비 차지 */
+.details-toggle-btn {
+    background: none;
+    border: none;
+    color: #333;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 15px 0;
+    width: 100%; /* ✅ 전체 박스 가로 길이로 설정 */
+    text-align: center;
+    display: block;
+    border-top: 1px solid #ddd; /* ✅ 위쪽에 경계선 추가 */
+    margin-top: 10px;
+}
+
 
 
 
