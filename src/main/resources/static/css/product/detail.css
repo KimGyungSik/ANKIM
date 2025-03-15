@@ -845,7 +845,10 @@
 /* 인기순 상품 css*/
 /* HOT PICKS 전체 컨테이너 (좌우 여백 추가) */
 .hot-picks-container {
-    padding: 0 100px; /* 좌우 여백을 product-detail-container와 동일하게 설정 */
+    padding: 0 120px;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
 }
 
 /* HOT PICKS 카테고리 헤더 */
@@ -1041,60 +1044,76 @@
 
 
 
-/* 상품 정보 섹션 (양쪽 10% 여백 설정) */
+/* 상품 상세 정보 전체 컨테이너 */
 .product-details-section {
-    width: 80%; /* ✅ 전체 너비의 80%만 차지 */
-    margin: 0 auto; /* ✅ 가운데 정렬 */
-    padding: 20px 0; /* ✅ 상하 여백 추가 */
-    max-width: 1200px; /* ✅ 최대 너비 지정 */
+    width: 100%;
+    padding: 0 10%;
+    box-sizing: border-box;
 }
 
-
-/* 제목 스타일 */
+/* 상품 정보 제목 (왼쪽 정렬) */
 .details-title {
+    margin-left: 30px;
     font-size: 22px;
     font-weight: bold;
     margin-bottom: 20px;
 }
 
-/* 개별 섹션 스타일 */
+/* ✅ 내용 박스 가운데 정렬 (1000px로 확장) */
+.details-content-wrapper {
+    max-width: 1000px; /* 기존 800px → 1000px 확장 */
+    margin: 0 auto;
+}
+
+/* 상품 정보 개별 박스 */
 .details-box {
     border-bottom: 1px solid #ddd;
     padding: 15px 0;
 }
 
-/* 소제목 스타일 */
-.details-heading {
-    font-size: 18px;
-    font-weight: bold;
-    margin-bottom: 10px;
+/* ✅ 상세 이미지 컨테이너를 내용 박스와 동일한 너비로 설정 */
+.details-images-wrapper {
+    max-width: 1000px; /* 내용 박스 크기와 동일하게 설정 */
+    margin: 20px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
 }
 
-/* 내용 스타일 */
-.details-content {
-    max-height: 100px; /* 기본적으로 100px 높이만 보이게 */
-    overflow: hidden;
-    transition: max-height 0.3s ease-in-out;
+/* 개별 이미지 스타일 */
+.details-image-box {
+    width: 100%; /* 내용 박스 크기와 일치 */
+    text-align: center;
 }
 
-.details-content.expanded {
-    max-height: none; /* 확장 시 전체 내용 보이도록 */
+.details-image {
+    width: 100%; /* 부모 요소 기준 가득 채움 */
+    border-radius: 5px;
 }
 
-/* 더보기 버튼 스타일 - 전체 박스 너비 차지 */
+/* ✅ 더보기 버튼을 내용 박스와 크기 동일하게 조정 */
 .details-toggle-btn {
-    background: none;
-    border: none;
-    color: #333;
+    display: block;
+    width: 100%;
+    max-width: 1000px; /* 내용 박스 크기와 동일하게 설정 */
+    margin: 20px auto;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid black;
+    font-size: 16px;
     font-weight: bold;
     cursor: pointer;
-    padding: 15px 0;
-    width: 100%; /* ✅ 전체 박스 가로 길이로 설정 */
     text-align: center;
-    display: block;
-    border-top: 1px solid #ddd; /* ✅ 위쪽에 경계선 추가 */
-    margin-top: 10px;
 }
+
+.details-toggle-btn:hover {
+    background: black;
+    color: white;
+}
+
+
+
 
 
 

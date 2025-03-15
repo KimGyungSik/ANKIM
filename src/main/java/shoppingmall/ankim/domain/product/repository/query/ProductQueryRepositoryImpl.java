@@ -344,7 +344,7 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
                         productImg.ord
                 ))
                 .from(productImg)
-                .where(productImg.product.no.eq(productId).and(productImg.repimgYn.eq("N")))
+                .where(productImg.product.no.eq(productId))
                 .fetch();
     }
 

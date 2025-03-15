@@ -141,18 +141,23 @@
         <div class="slider-container">
             <button class="prev-btn">&lt;</button>
             <div class="image-wrapper">
+                <!-- ✅ RepImgYn이 'Y'인 이미지만 표시 -->
                 <th:block th:each="img, iterStat : ${product.productImgs}">
-                    <img th:src="${img.imgUrl}" class="slider-img" th:classappend="${iterStat.index == 0} ? 'active' : ''"
-                         alt="상품 이미지">
+                    <th:block th:if="${img.repImgYn == 'Y'}">
+                        <img th:src="${img.imgUrl}" class="slider-img"
+                             th:classappend="${iterStat.index == 0} ? 'active' : ''" alt="대표 상품 이미지">
+                    </th:block>
                 </th:block>
             </div>
             <button class="next-btn">&gt;</button>
         </div>
 
-        <!-- 인디케이터 (점) -->
+        <!-- ✅ 인디케이터 (점)도 RepImgYn이 'Y'인 이미지 개수만큼 표시 -->
         <div class="indicator-container">
             <th:block th:each="img, iterStat : ${product.productImgs}">
-                <span class="indicator-dot" th:classappend="${iterStat.index == 0} ? 'active' : ''"></span>
+                <th:block th:if="${img.repImgYn == 'Y'}">
+                    <span class="indicator-dot" th:classappend="${iterStat.index == 0} ? 'active' : ''"></span>
+                </th:block>
             </th:block>
         </div>
     </div>
@@ -618,62 +623,94 @@
     });
 </script>
 <!-- 상품 상세 정보 섹션 -->
-<div class="product-details-section">
+<div class="product-details-section" id="product-details">
     <h2 class="details-title">상품정보</h2>
 
-    <!-- 상품 설명 -->
-    <div th:if="${product.desc != null and not #strings.isEmpty(product.desc)}" class="details-box">
-        <h3 class="details-heading">상품 설명</h3>
-        <div class="details-content" id="desc-content">
+    <!-- ✅ 내용 박스 (가운데 정렬) -->
+    <div class="details-content-wrapper" id="details-wrapper">
+        <!-- 상품 설명 -->
+        <div th:if="${product.desc != null and not #strings.isEmpty(product.desc)}" class="details-box">
+            <h3 class="details-heading">상품 설명</h3>
             <p th:text="${product.desc}"></p>
         </div>
-        <button class="details-toggle-btn" onclick="toggleDetails('desc-content', this)">상품설명 더보기 ▼</button>
-    </div>
 
-    <!-- 상품 유의사항 -->
-    <div th:if="${product.cauProd != null and not #strings.isEmpty(product.cauProd)}" class="details-box">
-        <h3 class="details-heading">상품 유의사항</h3>
-        <div class="details-content" id="cauProd-content">
+        <!-- 상품 유의사항 -->
+        <div th:if="${product.cauProd != null and not #strings.isEmpty(product.cauProd)}" class="details-box">
+            <h3 class="details-heading">상품 유의사항</h3>
             <p th:text="${product.cauProd}"></p>
         </div>
-        <button class="details-toggle-btn" onclick="toggleDetails('cauProd-content', this)">상품 유의사항 더보기 ▼</button>
-    </div>
 
-    <!-- 주문 유의사항 -->
-    <div th:if="${product.cauOrd != null and not #strings.isEmpty(product.cauOrd)}" class="details-box">
-        <h3 class="details-heading">주문 유의사항</h3>
-        <div class="details-content" id="cauOrd-content">
+        <!-- 주문 유의사항 -->
+        <div th:if="${product.cauOrd != null and not #strings.isEmpty(product.cauOrd)}" class="details-box">
+            <h3 class="details-heading">주문 유의사항</h3>
             <p th:text="${product.cauOrd}"></p>
         </div>
-        <button class="details-toggle-btn" onclick="toggleDetails('cauOrd-content', this)">주문 유의사항 더보기 ▼</button>
-    </div>
 
-    <!-- 배송 유의사항 -->
-    <div th:if="${product.cauShip != null and not #strings.isEmpty(product.cauShip)}" class="details-box">
-        <h3 class="details-heading">배송 유의사항</h3>
-        <div class="details-content" id="cauShip-content">
+        <!-- 배송 유의사항 -->
+        <div th:if="${product.cauShip != null and not #strings.isEmpty(product.cauShip)}" class="details-box">
+            <h3 class="details-heading">배송 유의사항</h3>
             <p th:text="${product.cauShip}"></p>
         </div>
-        <button class="details-toggle-btn" onclick="toggleDetails('cauShip-content', this)">배송 유의사항 더보기 ▼</button>
+
+        <!-- ✅ 상품 상세 이미지 영역 -->
+        <div class="details-images-wrapper" id="details-images-wrapper">
+            <th:block th:each="img : ${product.productImgs}">
+                <th:block th:if="${img.repImgYn == 'N'}">
+                    <div class="details-image-box">
+                        <img th:src="${img.imgUrl}" alt="상세 이미지" class="details-image">
+                    </div>
+                </th:block>
+            </th:block>
+        </div>
     </div>
+
+    <!-- ✅ 더보기 버튼 (가운데 정렬) -->
+    <button class="details-toggle-btn" id="details-toggle-btn" onclick="toggleDetails()" style="display: none;">
+        상품설명 더보기 <span class="chevron">&lsaquo;</span>
+    </button>
 </div>
 
-<!-- JavaScript -->
 <script>
-    function toggleDetails(id, button) {
-        const content = document.getElementById(id);
-        content.classList.toggle("expanded");
+    document.addEventListener("DOMContentLoaded", function () {
+        const detailsWrapper = document.getElementById("details-wrapper");
+        const detailsImagesWrapper = document.getElementById("details-images-wrapper");
+        const toggleBtn = document.getElementById("details-toggle-btn");
 
-        if (content.classList.contains("expanded")) {
-            button.innerText = button.innerText.replace("더보기 ▼", "닫기 ▲");
-        } else {
-            button.innerText = button.innerText.replace("닫기 ▲", "더보기 ▼");
+        let isExpanded = false; // 확장 상태 관리
+
+        function setInitialHeight() {
+            const visibleTextHeight = detailsWrapper.offsetHeight - detailsImagesWrapper.offsetHeight;
+            const imageElements = document.querySelectorAll(".details-image");
+            if (imageElements.length === 0) return;
+
+            const imageHeight = imageElements[0].offsetHeight || 0;
+            const visibleHeight = visibleTextHeight + (imageHeight * 2.5); // 이미지 2.5개 보이도록 조정
+
+            detailsWrapper.style.maxHeight = visibleHeight + "px";
+            detailsWrapper.style.overflow = "hidden"; // 초과 내용 감추기
+
+            // ✅ 높이가 설정된 visibleHeight보다 크면 "더보기" 버튼 표시
+            if (detailsImagesWrapper.scrollHeight > visibleHeight) {
+                toggleBtn.style.display = "block";
+            }
         }
-    }
+
+        function toggleDetails() {
+            if (!isExpanded) {
+                detailsWrapper.style.maxHeight = detailsWrapper.scrollHeight + "px"; // 전체 내용 보이기
+                detailsWrapper.style.overflow = "visible";
+                toggleBtn.innerHTML = '상품설명 닫기 <span class="chevron">&rsaquo;</span>';
+            } else {
+                setInitialHeight(); // 다시 축소
+                toggleBtn.innerHTML = '상품설명 더보기 <span class="chevron">&lsaquo;</span>';
+            }
+            isExpanded = !isExpanded;
+        }
+
+        setTimeout(setInitialHeight, 200); // DOM 렌더링 후 실행
+        window.toggleDetails = toggleDetails; // 전역으로 함수 등록
+    });
 </script>
-
-
-
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>
