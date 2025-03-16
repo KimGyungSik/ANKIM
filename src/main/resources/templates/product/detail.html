@@ -666,7 +666,7 @@
 
     <!-- ✅ 더보기 버튼 (가운데 정렬) -->
     <button class="details-toggle-btn" id="details-toggle-btn" onclick="toggleDetails()" style="display: none;">
-        상품설명 더보기 <span class="chevron">&lsaquo;</span>
+        상품설명 더보기 <span class="chevron">&or;</span>
     </button>
 </div>
 
@@ -699,10 +699,10 @@
             if (!isExpanded) {
                 detailsWrapper.style.maxHeight = detailsWrapper.scrollHeight + "px"; // 전체 내용 보이기
                 detailsWrapper.style.overflow = "visible";
-                toggleBtn.innerHTML = '상품설명 닫기 <span class="chevron">&rsaquo;</span>';
+                toggleBtn.innerHTML = '상품설명 닫기 <span class="chevron">&and;</span>';
             } else {
                 setInitialHeight(); // 다시 축소
-                toggleBtn.innerHTML = '상품설명 더보기 <span class="chevron">&lsaquo;</span>';
+                toggleBtn.innerHTML = '상품설명 더보기 <span class="chevron">&or;</span>';
             }
             isExpanded = !isExpanded;
         }
@@ -711,6 +711,7 @@
         window.toggleDetails = toggleDetails; // 전역으로 함수 등록
     });
 </script>
+
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>
