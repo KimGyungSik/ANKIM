@@ -639,7 +639,7 @@ public class ProductFactory {
                 .optionValues(List.of(gray, large))
                 .code("P001-BLK-M")
                 .addPrice(0)
-                .qty(0)
+                .qty(100)
                 .safQty(10)
                 .maxQty(10)
                 .minQty(1)

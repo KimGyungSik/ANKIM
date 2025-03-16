@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.terms.dto.TermsJoinResponse;
+import shoppingmall.ankim.domain.terms.dto.TermsLeaveResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.exception.TermsMandatoryNotAgreeException;
@@ -30,6 +31,15 @@ public class TermsQueryServiceImpl implements TermsQueryService {
     @Override
     public List<TermsJoinResponse> findJoinTerm() {
         List<TermsJoinResponse> responses = termsRepository.findLevelSubTerms(TermsCategory.JOIN, 2, "Y");
+        if(responses.isEmpty()) {
+            responses = new ArrayList<>();
+        }
+        return responses;
+    }
+
+    @Override
+    public List<TermsLeaveResponse> findLeaveTerm() {
+        List<TermsLeaveResponse> responses = termsRepository.findLeaveTerms(TermsCategory.LEAVE, 2, "Y");
         if(responses.isEmpty()) {
             responses = new ArrayList<>();
         }

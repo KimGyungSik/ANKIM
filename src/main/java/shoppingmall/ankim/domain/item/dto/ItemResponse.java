@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 @Getter
 @NoArgsConstructor
 public class ItemResponse {
-    private Long itemId;
+    private Long itemId; // 품목번호
     private String code; // 품목코드
     private String name; // 품목명
     private Integer addPrice; // 추가금액
@@ -23,7 +23,7 @@ public class ItemResponse {
     private ProductSellingStatus sellingStatus; // 판매 상태
     private Integer maxQty; // 최대 구매 수량
     private Integer minQty; // 최소 구매 수량
-    // OptionValues 설정을 위한 Setter
+
     @Setter
     private List<OptionValueResponse> optionValues; // 품목 옵션 리스트
 

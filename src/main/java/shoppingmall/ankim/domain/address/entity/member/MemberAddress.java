@@ -22,6 +22,9 @@ public class MemberAddress extends BaseEntity {
         @JoinColumn(name = "mem_no", nullable = false)
         private Member member;
 
+        @Column(name = "receiver", length = 20)
+        private String receiver;        // 수령인
+
         @Column(name = "addr_name", length = 20)
         private String addressName; // 배송지명
 
@@ -41,9 +44,10 @@ public class MemberAddress extends BaseEntity {
         private String activeYn = "N"; // 활성 상태
 
         @Builder
-        public MemberAddress(Long no, Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn, String activeYn) {
+        public MemberAddress(Long no, Member member,String receiver, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn, String activeYn) {
                 this.no = no;
                 this.member = member;
+                this.receiver = receiver;
                 this.addressName = addressName;
                 this.baseAddress = baseAddress;
                 this.phoneNumber = phoneNumber;
@@ -69,6 +73,19 @@ public class MemberAddress extends BaseEntity {
         public static MemberAddress create(Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
                 MemberAddress memberAddress = new MemberAddress();
                 memberAddress.member = member;
+                memberAddress.addressName = addressName;
+                memberAddress.baseAddress = baseAddress;
+                memberAddress.phoneNumber = phoneNumber;
+                memberAddress.emergencyPhoneNumber = emergencyPhoneNumber;
+                memberAddress.defaultAddressYn = defaultAddressYn != null ? defaultAddressYn : "N"; // 기본값 처리
+                return memberAddress;
+        }
+
+        // 수령인 추가
+        public static MemberAddress create(Member member, String receiver, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
+                MemberAddress memberAddress = new MemberAddress();
+                memberAddress.member = member;
+                memberAddress.receiver = receiver;
                 memberAddress.addressName = addressName;
                 memberAddress.baseAddress = baseAddress;
                 memberAddress.phoneNumber = phoneNumber;

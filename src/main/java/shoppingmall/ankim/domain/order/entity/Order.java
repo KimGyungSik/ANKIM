@@ -106,8 +106,8 @@ public class Order extends BaseEntity {
                 addOrderItem(orderItem);
             }
             this.totalQty = calculateTotalQty(orderItems);
-            this.totalPrice = calculateTotalPrice(orderItems);
-            this.totalDiscPrice = calculateTotalDiscPrice(orderItems);
+            this.totalPrice = calculateTotalPrice(orderItems); // (정상금액+추가금액) * 수량
+            this.totalDiscPrice = calculateTotalDiscPrice(orderItems); // 할인 적용된 금액 * 수량
             this.totalShipFee = calculateTotalShipFee(orderItems);
         } else {
             // 기본값 설정 (빈 리스트에 대한 방어 코드)
@@ -152,7 +152,8 @@ public class Order extends BaseEntity {
     // 총 상품금액
     private Integer calculateTotalPrice(List<OrderItem> items) {
         return items.stream()
-                .mapToInt(item -> item.getPrice() * item.getQty()) // 가격 * 수량 적용
+                .mapToInt(item -> item.getPrice() * item.getQty()) // 정상 가격(원가+옵션) * 수량 적용
+//                .mapToInt(item -> (item.getPrice() * item.getQty()) + (item.getItem().getAddPrice() * item.getQty())) // // (정상 금액 * 수량) + (추가금액 * 수량)
                 .sum();
     }
 

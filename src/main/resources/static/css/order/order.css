@@ -1,0 +1,1065 @@
+/* Reset */
+body, h1, p, ul, li, label, input, button, a {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-decoration: none;
+    box-sizing: border-box;
+}
+
+/* 버튼에 기본적으로 적용되는 브라우저의 스타일 삭제 */
+.close-button,
+.address-list-close-btn {
+    background: none;
+    border: none;
+    -webkit-appearance: none; /* 크롬, 사파리 등 WebKit 계열 */
+    appearance: none;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    font-family: sans-serif;
+}
+
+main.checkout-container {
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px 0;
+}
+
+/* 주문 단계 표시 */
+.checkout-steps {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 20px;
+}
+
+.step-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.step-item {
+    font-size: 16px;
+    color: rgb(212, 212, 212);
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.step-item.active-step {
+    font-weight: bold;
+    color: rgb(50, 50, 50);
+}
+
+.step-arrow {
+    width: 15px;
+    height: 30px;
+    margin-left: 10px;
+}
+
+/* 메인 레이아웃: 왼쪽 정보영역 + 오른쪽 결제 요약 */
+.checkout-content {
+    display: flex;
+    flex-wrap: wrap; /* 반응형 시 줄바꿈 가능 */
+    gap: 20px;
+    align-items: flex-start; /* 자식 요소가 최소 높이를 유지하도록 */
+}
+.checkout-left {
+    flex: 1;
+    min-width: 480px; /* 너비가 너무 줄어드는 것 방지 */
+}
+aside.checkout-summary {
+    position: sticky;
+    top: 20px; /* 화면 상단에서 20px 떨어진 위치에 고정 */
+    width: 40%; /* 고정 혹은 원하는 값 */
+    min-width: 480px;
+    min-height: 300px; /* 최소 높이 지정 */
+    border: 2px solid #000;
+    border-radius: 5px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+/* 섹션 기본 스타일 */
+.section-info {
+    border-top: 3px solid #000;
+    margin-bottom: 20px;
+    padding: 20px;
+    box-sizing: border-box;
+}
+.section-info h2 {
+    margin-top: 0;
+    font-size: 16px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* 배송 정보 영역 */
+/* 섹션 전체에 상단 border는 기존 그대로 쓰거나 필요에 맞게 조정 */
+.shipping-info {
+    /* background-color: #f9f9f9; */
+}
+
+/* 헤더(제목 + 안내문) */
+.shipping-header {
+    display: flex;
+    flex-direction: column;
+    margin-bottom: 10px;
+}
+
+.shipping-title {
+    font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px; /* 제목과 물음표 버튼 사이 */
+}
+
+.info-button {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    cursor: pointer;
+}
+
+.shipping-required-notice {
+    font-size: 13px;
+    color: #666;
+    margin-top: 5px;
+}
+
+.required-asterisk {
+    color: #FF4800;
+    margin-right: 4px;
+}
+
+/* 탭(기존 배송지 vs 신규입력) */
+.shipping-tab {
+    margin-bottom: 20px;
+}
+
+.tab-list {
+    display: flex;
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    overflow: hidden; /* 둥근 모서리에 맞게 */
+}
+.tab-item {
+    flex: 1;
+    text-align: center;
+    padding: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    border-right: 1px solid #ddd;
+    background-color: #f9f9f9;
+}
+.tab-item:last-child {
+    border-right: none;
+}
+.tab-item.active {
+    background-color: #fff;
+    font-weight: bold;
+    color: #333;
+}
+
+.existing-address,
+.new-address {
+    padding: 10px;
+}
+
+.form-field.with-btn {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.form-field.with-btn input {
+    flex: 1;
+}
+
+.input-name input[type="text"] {
+    max-width: 300px;
+}
+
+input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: #000000;
+}
+
+/* 폼 영역 */
+.shipping-form {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    padding: 16px;
+}
+
+/* [form-row] 레이아웃 */
+.form-row {
+    display: flex;
+    align-items: center; /* 추가: 자식 요소들을 수직 중앙에 정렬 */
+    margin-bottom: 15px;
+}
+
+.form-row.required .form-label::after {
+    content: "*";
+    color: #FF4800;
+    margin-left: 4px;
+}
+.form-label {
+    width: 100px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+    margin-right: 10px;
+}
+.form-field {
+    flex: 1;
+}
+
+/* 우편번호 + 검색버튼 */
+.row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.zip-row {
+    flex: 1;
+}
+
+/* input + button을 함께 묶는 컨테이너 */
+.input-group-with-button {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 10px;    /* 입력창과 버튼 사이 여백 */
+}
+
+.input-group-with-button input {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    flex: 1;
+}
+
+.searchBtn {
+    background-color: #fff;
+    border: 1px solid #ccc;
+    padding: 6px 12px;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 13px;
+}
+
+.searchBtn:hover {
+    background-color: #f0f0f0;
+}
+
+/* 배송지 목록 */
+/* 주소 아이템 사이의 얇은 구분선과 간격을 위해 */
+.default-address-container.with-border {
+    padding-bottom: 10px;
+    margin-bottom: 10px;
+    border-bottom: 1px solid #ddd;
+}
+
+.other-addresses-list .address-item {
+    padding: 10px 0;
+    border-bottom: none; /* 여기서는 아래쪽 테두리는 빼고, */
+}
+
+/* 두 번째 주소부터 위쪽에 선 */
+.other-addresses-list .address-item + .address-item {
+    border-top: 1px solid #ddd;
+}
+
+.address-item h4 {
+    margin: 0 0 6px;
+    font-size: 15px;
+    font-weight: bold;
+}
+.address-item p {
+    margin: 0 0 3px;
+    font-size: 14px;
+    color: #333;
+}
+
+.default-mark {
+    color: #375FFF; /* (기본) 표시 색상 (원하는 대로) */
+    margin-left: 4px;
+}
+
+/* 삭제 버튼은 오른쪽 정렬 or 적당히 */
+.delete-address-btn {
+    margin-top: 5px;
+    font-size: 13px;
+    background: none;
+    border: none;
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+/* 주소 표시 */
+.address-main {
+    font-size: 14px;
+    margin-bottom: 8px;
+    color: #666;
+}
+
+.input-group-with-button + .input-group-with-button {
+    margin-top: 10px;
+}
+
+/* 상세주소 input */
+.form-field input[type="text"] {
+    width: 100%;
+    padding: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+
+.layer {
+    width: 100%;
+    max-width: 500px;
+    box-sizing: border-box;
+}
+
+/* 연락처 */
+.phone-field {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.phone-dash {
+    margin: 0 2px;
+    color: #aaa;
+}
+.phone-field input[type="text"] {
+    width: 60px; /* 원하는 너비로 조정 */
+}
+
+/* 기본 배송지 안내 문구 */
+.default-address-notice {
+    font-size: 13px;
+    color: #666;
+}
+
+/* 기본 배송지 설정 */
+.default-address-container {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.default-address-container label {
+    font-size: 13px;
+}
+
+/* 배송시 요청사항 드롭다운 */
+.request-dropdown {
+    position: relative;
+    display: flex;
+    align-items: center;
+    width: 100%;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #fff;
+    cursor: pointer;
+}
+
+.request-dropdown-input {
+    width: 100%;
+    padding: 8px 35px 8px 10px;
+    border: none;
+    background: transparent;
+    font-size: 14px;
+    box-sizing: border-box;
+}
+
+.dropdown-icon {
+    position: absolute;
+    right: 10px;
+    width: 16px;
+    height: 16px;
+    pointer-events: none;
+    transition: transform 0.3s ease;
+}
+
+/* 드롭다운 리스트 */
+.request-dropdown-list {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    display: none;
+    z-index: 10;
+}
+
+.request-dropdown-list.show {
+    display: block;
+}
+
+.request-dropdown-list li {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+.request-dropdown-list li:hover {
+    background-color: #f0f0f0;
+}
+
+/* textarea 크기 조절 */
+.request-textarea {
+    display: none;
+    width: 100%;
+    height: 80px;
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background: #fff;
+    box-sizing: border-box;
+    resize: none; /* 크기 조절 방지 */
+    overflow-y: auto;
+}
+
+/* textarea가 표시될 때 */
+.request-dropdown.open + .request-textarea {
+    display: block;
+}
+
+/* 쿠폰 및 상품 섹션 */
+/* [A] 섹션 기본 (이미 order.css에 있다면 중복 생략) */
+.coupon-and-product.section-info {
+    /* 필요한 기본 스타일 (예: border, padding 등) */
+    /* 여기서는 이미 .section-info에 공통 스타일이 들어가 있으므로 생략 */
+}
+
+/* 섹션 헤더 */
+.coupon-and-product h2 {
+    font-size: 16px;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+/* [B] "최대 할인이 적용됐어요" 등 안내 영역 */
+.coupon-notice {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 10px;
+}
+.coupon-tip-btn {
+    width: 20px;
+    height: 20px;
+    background: url('data:image/svg+xml;base64,...') no-repeat center/cover; /* 예: 아이콘 */
+    border: none;
+    cursor: pointer;
+}
+.coupon-tip-text {
+    font-size: 13px;
+    color: #FF4800; /* 강조 색상 */
+}
+
+/* [C] 상품 리스트 */
+.product-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.product-item {
+    display: flex; /* 이미지 + 정보 나란히 */
+    gap: 16px;
+    margin-bottom: 20px; /* 아이템 간 간격 */
+}
+
+/* (1) 상품 이미지 */
+.item-img img {
+    width: 120px;
+    height: auto;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+/* (2) 상품 정보 */
+.item-info {
+    flex: 1; /* 이미지 옆 공간 최대 사용 */
+    display: flex;
+    flex-direction: column; /* 수직 쌓임 */
+    gap: 4px;
+}
+
+.brand-name {
+    font-size: 13px;
+    color: #666;
+}
+
+.product-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 4px 0;
+}
+
+.product-option {
+    font-size: 13px;
+    color: #999;
+}
+
+/* 가격, 수량 */
+.product-price {
+    font-size: 14px;
+    color: #333;
+    margin: 6px 0;
+}
+.product-price .coupon-applied-price {
+    margin-left: 8px;
+    color: #FF4800;
+    font-size: 13px;
+}
+
+/* (3) 쿠폰 정보 (상품 쿠폰 / 장바구니 쿠폰 등) */
+.coupon-info {
+    list-style: none;
+    margin: 8px 0 0 0;
+    font-size: 13px;
+    color: #666;
+    background: #eee;
+    padding: 10px;
+}
+.coupon-info li {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-top: 4px;
+}
+.coupon-label {
+    min-width: 80px; /* 라벨 폭 */
+    color: #333;
+    font-weight: bold;
+}
+.coupon-name {
+    color: #999;
+}
+.coupon-discount-amount {
+    color: #FF4800;
+    font-weight: bold;
+}
+
+/* (4) 전체 쿠폰 할인 금액, 쿠폰 변경 버튼 */
+.coupon-total-line {
+    display: flex;
+    justify-content: space-between; /* 좌: 라벨 / 우: 할인 금액 */
+    margin: 12px 0;
+    font-size: 14px;
+    color: #333;
+}
+.coupon-total-line .coupon-total-amount {
+    color: #FF4800;
+    font-weight: bold;
+}
+.coupon-change-btn {
+    padding: 8px 12px;
+    background-color: #fff;
+    border: 1px solid #ccc;
+    font-size: 13px;
+    cursor: pointer;
+    border-radius: 4px;
+}
+
+/* 반응형: 화면이 작을 때 (ex. max-width: 600px) */
+@media (max-width: 600px) {
+    .product-item {
+        flex-direction: column; /* 이미지 위, 정보 아래로 세로 배치 */
+    }
+    .item-img img {
+        width: 100px; /* 조금 줄이거나 가변으로 */
+    }
+}
+
+
+/* 마일리지 섹션 영역 */
+/* (1) 하나의 flex 컨테이너: .mileage-line */
+.mileage-line {
+    display: flex;
+    align-items: center;  /* 수직 가운데 정렬 */
+    gap: 10px;            /* 요소 간 간격 */
+    flex-wrap: nowrap;
+}
+
+/* (2) 라벨/인풋/버튼/마일리지 안내 각 요소 스타일 */
+.mileage-label {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin: 0;
+}
+
+.mileage-input {
+    width: 200px; /* 원하는 너비 */
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+.available-mileage,
+.available-mileage em {
+    font-weight: bold;
+    font-size: 13px;
+    color: #666;
+}
+
+.owned-mileage,
+.owned-mileage em {
+    font-size: 13px;
+    color: #333;
+}
+
+.info-btn {
+    background: none;
+    border: 1px solid #ddd;
+    border-radius: 50%;
+    width: 20px;
+    height: 20px;
+    font-size: 12px;
+    cursor: pointer;
+    padding: 0;
+    margin-left: 4px; /* 살짝 간격 주고 싶다면 */
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* 현금영주증 영역 섹션  */
+/* 설명 문구 */
+.cash-receipt-description p {
+    font-size: 14px;
+    color: #666;
+    margin: 0 0 10px;
+}
+
+/* 라디오 버튼 그룹 (기본 체크박스와 유사하게 간단하게 적용) */
+.cash-receipt-radio-group {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 10px;
+}
+.cash-receipt-radio-group label {
+    font-size: 14px;
+    cursor: pointer;
+}
+.cash-receipt-save label {
+    display: flex;
+    align-items: center;
+}
+
+/* 추가 옵션 영역: 버튼, 셀렉트, 인풋 등 한 줄로 배치 */
+.cash-receipt-extra {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin-bottom: 10px;
+}
+.contact-method-btn {
+    padding: 8px 12px;
+    font-size: 13px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    border-radius: 4px;
+    cursor: pointer;
+}
+.contact-method-select {
+    padding: 8px;
+    font-size: 14px;
+    width: 200px;
+}
+
+/* 인풋 */
+.cash-receipt-input input {
+    width: 320px;
+    padding: 8px;
+    font-size: 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+/* "정보 다음에도 사용" 체크박스 영역 */
+.cash-receipt-save {
+    margin-top: 10px;
+}
+.cash-receipt-save label {
+    font-size: 13px;
+    cursor: pointer;
+}
+
+/* 결제 요약 영역 */
+.checkout-summary h2 {
+    font-size: 16px;
+    margin-top: 0;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+/* 결제금액 섹션 */
+/* 전체 섹션 컨테이너 */
+.payment-summary-section {
+    padding: 16px;
+    box-sizing: border-box;
+}
+
+/* 헤더: "결제금액" 제목 + 오른쪽 금액 버튼 */
+.payment-summary-header {
+    display: flex;
+    justify-content: space-between; /* 좌: 제목, 우: 버튼 */
+    align-items: center;
+    margin-bottom: 16px;
+}
+
+/* 결제 내역 리스트 */
+.payment-details ul {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 16px 0;
+    font-size: 14px;
+    color: #333;
+}
+.payment-details li {
+    display: flex;
+    justify-content: space-between; /* 좌: label, 우: value */
+    align-items: flex-start;  /* 왼쪽 라벨-area가 세로로 늘어나도 어색하지 않게 */
+    margin-bottom: 8px;
+}
+/* 최종 결제 금액 */
+.payment-details li.final-amount .final-line {
+    display: flex;
+    justify-content: space-between;
+    align-items: center; /* 수직 중앙 정렬 */
+    width: 100%;         /* 혹은 필요하다면 100% */
+}
+
+.payment-details li.final-amount {
+    margin-top: 12px;  /* 위에 약간 간격 */
+}
+.payment-details li.final-amount .label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #000;
+}
+.payment-details li.final-amount .value.accent {
+    font-size: 30px;    /* 크게 */
+    font-weight: bold;
+    color: #FF4800;     /* 강조 색상 */
+}
+
+/* 쿠폰 할인 */
+/* (1) coupon-discount li는 세로 배치 */
+.payment-details li.coupon-discount {
+    display: block;          /* block으로 바꿔서 한 줄 정렬 해제 */
+    margin-bottom: 8px;      /* 아래 간격 유지 */
+}
+
+/* (2) 쿠폰 버튼 + 할인금액은 flex로 한 줄 */
+.payment-details li.coupon-discount .coupon-line {
+    display: flex;
+    justify-content: space-between; /* 왼쪽 버튼 - 오른쪽 할인금액 */
+    align-items: center;
+}
+
+/* (3) 상세 내역은 block으로 아래쪽 배치 */
+.payment-details li.coupon-discount .coupon-breakdown {
+    display: none;    /* 토글 전 초기 상태 */
+    margin-top: 8px;  /* coupon-line과 간격 */
+    font-size: 13px;
+    color: #666;
+}
+/* (A) coupon-discount 자체는 세로 방향으로 쌓이도록 */
+/* 쿠폰 할인 영역 전체 컨테이너 */
+.coupon-discount {
+    /* 필요하다면 margin-bottom 등으로 공간 조절 */
+    margin-bottom: 8px;
+}
+
+/* 한 줄에 배치 (버튼, 할인금액) */
+.coupon-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between; /* 왼쪽 버튼 - 오른쪽 할인금액 */
+    /* 여기서 coupon-line은 한 줄만 차지 */
+}
+
+/* 버튼 + 아이콘 */
+.coupon-toggle-btn, .toggle-addresses-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    color: #666;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding-left: 0px;
+}
+
+/* 할인 금액 텍스트 */
+.discount-value {
+    color: #FF4800;
+    font-weight: bold;
+    font-size: 14px;
+}
+
+/* 상세 내역(줄바꿈) */
+.coupon-breakdown {
+    display: none; /* 초기 숨김 -> JS로 토글 */
+    margin-top: 8px; /* coupon-line과 약간 간격 */
+    font-size: 13px;
+    color: #666;
+}
+.coupon-breakdown .coupon-item {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 4px;
+}
+
+/* 아이콘 회전 애니메이션(선택사항) */
+.coupon-toggle-btn .arrow-icon,
+.toggle-addresses-btn .arrow-icon{
+    transition: transform 0.2s;
+}
+.coupon-toggle-btn[data-open="true"] .arrow-icon,
+.toggle-addresses-btn[data-open="true"] .arrow-icon{
+    transform: rotate(180deg);
+}
+
+/* 약관/체크박스 영역 */
+.payment-agree-section {
+    margin-top: 16px;
+    font-size: 14px;
+    color: #333;
+}
+.check-all {
+    margin-bottom: 8px;
+}
+.check-all label {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+.agreement-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+.agreement-list li {
+    margin: 6px 0;
+}
+.agreement-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+.agreement-item label {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+}
+/* 보기 버튼, 텍스트 링크 버튼 등 공통 스타일 */
+.view-btn,
+.link-button {
+    background: none;        /* 배경 제거 */
+    border: none;            /* 테두리 제거 */
+    color: #666;             /* 글자색 */
+    text-decoration: underline; /* 밑줄 */
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;              /* 불필요한 패딩 제거 */
+    margin: 0;               /* 필요하면 margin도 조절 */
+    display: inline;         /* 인라인 형태 (원하는 경우) */
+}
+
+/* 호버 시 색상 조금 진하게 */
+.view-btn:hover,
+.link-button:hover {
+    text-decoration: underline; /* 호버 시 밑줄 유지/강조 */
+}
+
+/* 안내 문구 */
+.payment-note {
+    font-size: 13px;
+    color: #666;
+    margin: 12px 0;
+}
+.payment-note em {
+    font-style: normal;
+    font-weight: bold;
+}
+
+.payment-partners a,
+.payment-partners button {
+    display: block;          /* 세로 배치 */
+    margin-top: 4px;         /* 각 항목 간 간격 */
+    background: none;        /* 버튼 배경 제거 */
+    border: none;            /* 버튼 테두리 제거 */
+    color: #666;
+    text-decoration: underline;
+    cursor: pointer;
+    font-size: 13px;
+    padding: 0;
+}
+
+/* CHECK OUT 버튼 영역 */
+.checkout-button-area {
+    text-align: center;
+    margin-top: 16px;
+}
+.checkout-action-button {
+    width: 100%;
+    padding: 12px;
+    background-color: #000;
+    color: #fff;
+    border: none;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 15px;
+    transition: background-color 0.2s;
+}
+.checkout-action-button:hover {
+    background-color: #333;
+}
+
+
+/* Modal 스타일 */
+.modal-overlay {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    top: 50%; /* 화면의 가운데 */
+    left: 50%; /* 화면의 가운데 */
+    transform: translate(-50%, -50%); /* 가운데 정렬 */
+    width: 100%;
+    height: 100%;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 최상단 배치 */
+}
+
+.modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    top: 50%; /* 화면의 가운데 */
+    left: 50%; /* 화면의 가운데 */
+    transform: translate(-50%, -50%); /* 가운데 정렬 */
+    width: 100%; /* 화면 전체 크기 */
+    height: 100%; /* 화면 전체 크기 */
+    background-color: rgba(0, 0, 0, 0.5); /* 반투명 배경 */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000; /* 다른 요소보다 위에 표시 */
+}
+
+.modal-content {
+    background-color: #fff;
+    padding: 20px;
+    border-radius: 5px;
+    width: 80%; /* 모달의 가로 크기 */
+    max-width: 500px; /* 최대 크기 */
+    max-height: 80vh; /* 화면 높이 제한 */
+    position: relative;
+    box-shadow: 0 0 60px 25px rgba(0, 0, 0, 0.2);
+    overflow-y: auto; /* 스크롤 */
+}
+
+.close-button {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    font-size: 18px;
+    cursor: pointer;
+}
+
+/* 배송 안내 모달 스타일 */
+#shippingInfoModal .modal-content {
+    width: 350px; /* 모달 너비를 400px로 고정 */
+    max-width: 90%; /* 화면이 작을 때는 너비 조정 */
+    padding: 20px;
+}
+
+/* 배송 안내 모달 제목 중앙 정렬 */
+.shippingInfo-body h2 {
+    text-align: center;
+    font-weight: bold; /* 강조 */
+    margin-bottom: 12px;
+}
+
+/* ul, li 스타일 */
+.shippingInfo-body ul {
+    padding-left: 20px; /* 왼쪽 여백 */
+    margin: 0; /* 기본 margin 제거 */
+}
+
+.shippingInfo-body li {
+    list-style: disc;
+    margin-bottom: 8px; /* 항목 간격 */
+    font-size: 18px;
+}
+
+/* 600px 이하에서 라벨+인풋 세로 배치 */
+@media (max-width: 600px) {
+    .form-row {
+        flex-direction: column;   /* 세로 배치 */
+        align-items: flex-start;  /* 왼쪽 정렬 */
+    }
+    .form-label {
+        width: auto;             /* 고정 너비 대신 자동 너비 */
+        margin-bottom: 6px;      /* 라벨 아래 간격 */
+    }
+    .form-field,
+    .input-group-with-button {
+        width: 100%;             /* 인풋이 화면 가로폭 다 차지 */
+    }
+    /* 연락처 인풋도 너비 늘릴지 결정 */
+    .phone-field input[type="text"] {
+        width: 100%;
+    }
+
+    .mileage-line {
+        flex-wrap: wrap;
+    }
+    .cash-receipt-extra {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px; /* 요소 간 간격 */
+    }
+    .cash-receipt-contact,
+    .cash-receipt-input {
+        width: 100%; /* 각 영역이 전체 폭을 차지 */
+    }
+}

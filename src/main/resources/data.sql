@@ -153,32 +153,58 @@ INSERT INTO item_option (item_no, optv_no) VALUES
 --                                                                                           ('cotton-tshirt-detail.jpg', '면 티셔츠 상세', 'http://example.com/images/cotton-tshirt-detail.jpg', 'N', 1, 3);
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
+-- 1
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 1, 1, 'Y');
---
--- -- 필수 약관
+
+-- 필수 약관
+-- 2
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 1, 2, 'Y');
-
+-- 3
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 1, 2, 'Y');
 --
 -- 선택 약관
+-- 4
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 1, 2, 'Y');
 
+-- 5
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 2, 'Y');
 
+-- 6
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
+-- 7
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
+-- 8
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 1, 1, 'Y');
+
+-- [ 탈퇴 약관 삽입 ]
+-- 9
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (null, 'LEAVE', '탈퇴 약관', 'ANKIM 탈퇴 약관', 'Y', 1, 1, 'Y');
+
+-- 10
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (9, 'LEAVE', '탈퇴 시 삭제되는 내용','- 탈퇴 시 고객님께서 보유하셨던 쿠폰과 마일리지는 모두 소멸되며 환불할 수 없습니다. 또한 다른 계정으로 양도 또는 이관할 수 없습니다.
+- 탈퇴한 계정 및 이용 내역은 복구할 수 없으니 탈퇴 시 유의하시기 바랍니다.', 'Y', 1, 2, 'Y');
+
+-- 11
+INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
+        '- 탈퇴 시 법령에 따라 보관해야 하는 항목은 관련 법령에 따라 일정 기간 보관하며 다른 목적으로 이용하지 않습니다. 전자상거래 등에서의 소비자보호에 관한 법률에 의거하여 대금결제 및 재화 등의 공급에 관한 기록 5년, 계약 또는 청약철회 등에 관한 기록 5년, 소비자의 불만 또는 분쟁처리에 관한 기록은 3년동안 보관됩니다.
+- 아이디(이메일), 이메일, 비밀번호는 부정 이용ㆍ탈퇴 방지를 위해 탈퇴 요청 시 7일 간 별도 보관 후 파기합니다.
+- 탈퇴 후에도 서비스에 등록한 게시물 및 댓글은 그대로 남아 있습니다. 상품 리뷰, 게시글, 이벤트 댓글 등은 삭제되지 않습니다. 탈퇴 후에는 회원정보가 삭제되어 본인 여부를 확인할 수 없으므로 게시글을 임의로 삭제해드릴 수 없습니다. 먼저 해당 게시물을 삭제하신 후 탈퇴를 신청하시기 바랍니다.', 'Y', 1, 2, 'Y');
+
+
 
 -- [ 회원 삽입 ]
 INSERT INTO member (
@@ -206,6 +232,12 @@ INSERT INTO member (
 -- [ 회원 주소 삽입]
 INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
+
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 98765, '제주특별시 서귀포구', 'oo아파트 101호', '안정훈', '010-1234-5678', '010-8282-8282', 'N', 'Y');
+
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 02587, '경기도 부천시', 'oo빌라', '안정훈', '010-1234-5678', '010-2424-5252', 'N', 'Y');
 
 -- 탈퇴사유
 INSERT INTO leave_rsn (reason, active_yn) VALUES

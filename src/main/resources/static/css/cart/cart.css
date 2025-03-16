@@ -3,6 +3,7 @@
     max-width: 1200px;
     font-family: 'Noto Sans KR', sans-serif;
     color: #333;
+    min-height: 70vh;
 }
 
 /* 장바구니 단계 표시 */

@@ -18,10 +18,9 @@ import java.util.stream.Collectors;
 @AllArgsConstructor
 @Builder
 public class OrderResponse {
-
     private String orderNo;             // 주문 번호
     private String orderCode;         // 주문 코드
-    private List<ItemResponse> items; // 주문 항목 리스트 FIXME ItemOrderResponse 정의해서 바꿔줄 것
+    private List<ItemResponse> items; // 주문 항목 리스트
     private DeliveryResponse delivery;          // 배송 정보
     private Integer totalQty;         // 총 주문 수량
     private Integer totalPrice;       // 총 상품 금액
@@ -43,24 +42,7 @@ public class OrderResponse {
                 .totalQty(order.getTotalQty())
                 .totalPrice(order.getTotalPrice())
                 .totalShipFee(order.getTotalShipFee())
-                .totalDiscPrice(order.getTotalDiscPrice())
-                .payAmt(order.getPayAmt())
-                .regDate(order.getRegDate())
-                .modDate(order.getModDate())
-                .orderStatus(order.getOrderStatus())
-                .build();
-    }
-
-    public static OrderResponse tempOf(Order order) {
-        return OrderResponse.builder()
-                .orderNo(order.getOrdNo())
-                .orderCode(order.getOrdCode())
-                .items(order.getOrderItems().stream()
-                        .map(orderItem -> ItemResponse.of(orderItem.getItem()))
-                        .collect(Collectors.toList()))
-                .totalQty(order.getTotalQty())
-                .totalPrice(order.getTotalPrice())
-                .totalShipFee(order.getTotalShipFee())
+//                .totalDiscPrice(order.getTotalDiscPrice())
                 .totalDiscPrice(order.getTotalDiscPrice())
                 .payAmt(order.getPayAmt())
                 .regDate(order.getRegDate())

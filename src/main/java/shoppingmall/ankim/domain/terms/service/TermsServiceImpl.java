@@ -5,6 +5,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.terms.dto.TermsAgreeResponse;
+import shoppingmall.ankim.domain.terms.dto.TermsLeaveResponse;
 import shoppingmall.ankim.domain.terms.entity.Terms;
 import shoppingmall.ankim.domain.terms.entity.TermsCategory;
 import shoppingmall.ankim.domain.terms.repository.TermsRepository;
@@ -57,11 +58,15 @@ public class TermsServiceImpl implements TermsService {
             TermsHistory history = entry.getValue();
             Terms latest = latestTermsMap.get(termsName);
 
-            if (latest != null) {
+            if (latest != null && history.getTerms().getTermsVersion() != latest.getTermsVersion()) {
                 responseList.add(TermsAgreeResponse.of(latest, "N")); // 최신 약관이므로 다시 동의 필요
                 latestTermsMap.remove(termsName); // 최신 약관 리스트에서 제거 (중복 방지)
             } else {
                 responseList.add(TermsAgreeResponse.of(history, history.getAgreeYn())); // 기존 약관 유지
+            }
+
+            if(latest != null) {
+                latestTermsMap.remove(termsName); // 최신 약관 리스트에서 제거 (중복 방지)
             }
         }
 

@@ -22,14 +22,13 @@ import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
+import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
-import shoppingmall.ankim.factory.CartFactory;
 import shoppingmall.ankim.factory.MemberFactory;
-import shoppingmall.ankim.factory.MemberJwtFactory;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -132,7 +131,7 @@ class OrderServiceMockTest {
         });
 
         // when
-        OrderResponse orderResponse = orderService.createTempOrder(loginId, cartItemNoList);
+        OrderTempResponse orderResponse = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         System.out.println("OrderResponse items size: " + orderResponse.getItems().size());
         orderResponse.getItems().forEach(item -> System.out.println("Item: " + item.getName()));

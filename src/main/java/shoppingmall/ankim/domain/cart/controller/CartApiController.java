@@ -38,13 +38,11 @@ public class CartApiController {
 
     // 장바구니 페이지에 들어갈때 장바구니 읽어오기 ( R )
     @GetMapping
-//    public ApiResponse<List<CartItemsResponse>> getCartItems() {
     public ApiResponse<Map<String, Object>> getCartItems() {
         String loginId = securityContextHelper.getLoginId();
 
         List<CartItemsResponse> response = cartService.getCartItems(loginId);
 
-//        return ApiResponse.ok(response);
         return ApiResponse.ok(Map.of(
                 "cartItems", response,
                 "freeShippingThreshold", FREE_SHIPPING_THRESHOLD

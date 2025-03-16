@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", async () => {
         if (response.code === 200 && response.data) {
             renderMyPage(response.data);
         } else {
-            showModal(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
+            alert(response.message || "마이페이지 데이터를 불러오는데 실패했습니다.");
         }
     } catch (error) {
         setTimeout(() => window.location.href = "/login/member", 2000); // 2초 후 로그인 페이지로 이동
@@ -36,18 +36,5 @@ function renderMyPage(data) {
 
     const contentContainer = document.querySelector(".mypage-content");
     // contentContainer.innerHTML = `<p>마이페이지 정보가 정상적으로 불러와졌습니다.</p>`;
-}
-
-// 모달 표시 함수
-function showModal(message) {
-    var modal = document.querySelector('.modal');
-    var modalBody = modal.querySelector('.modal-body');
-    modalBody.textContent = message;
-    modal.style.display = "flex";
-}
-
-function closeModal() {
-    var modal = document.querySelector('.modal');
-    modal.style.display = 'none'; // 모달 숨김
 }
 

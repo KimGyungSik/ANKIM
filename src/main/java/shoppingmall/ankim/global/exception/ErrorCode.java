@@ -39,6 +39,8 @@ public enum ErrorCode {
     PRODUCT_NOT_FOUND(HttpStatus.NOT_FOUND,"상품을 찾을 수 없습니다." ),
     PRODUCT_NAME_TOO_LONG(HttpStatus.BAD_REQUEST, "상품명은 60자 이하로 입력해야 합니다."),
     CANNOT_MODIFY_SELLING_PRODUCT(HttpStatus.BAD_REQUEST, "판매 중인 상품은 수정할 수 없습니다."),
+    PRODUCT_HOLD(HttpStatus.CONFLICT, "상품이 판배 보류 되었습니다."),
+    PRODUCT_STOP_SELLING(HttpStatus.CONFLICT, "상품이 판배중지 되었습니다."),
 
     // 품목
     ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 품목이 존재하지 않습니다."),
@@ -54,8 +56,10 @@ public enum ErrorCode {
     ORDER_CODE_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "주문번호 생성을 실패했습니다."),
 
     // 주문 품목
-    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "주문 수량은 1개 이상이어야 합니다."),
+    ORDER_ITEM_QTY_INVALID(HttpStatus.BAD_REQUEST, "상품 수량이 부족 합니다."),
     DISCOUNT_PRICE_INVALID(HttpStatus.BAD_REQUEST, "상품 원가 금액이 할인 적용된 상품 금액보다 작을 수 없습니다."),
+    FINAL_PRICE_INVALID(HttpStatus.BAD_REQUEST, "주문 금액이 비정상 입니다."),
+
 
     // 결제
     INVALID_PAYMENT_KEY(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 키입니다."),
@@ -120,11 +124,12 @@ public enum ErrorCode {
     REDIS_ID_VALIDATION_SAVE_FAILED(HttpStatus.BAD_REQUEST, "서버에서 문제가 발생했습니다. 잠시 후 다시 시도해주세요."),
 
     // 장바구니 관련 에러 코드
-    CART_ITEM_LIMIT_EXCEEDED(HttpStatus.CONFLICT, "장바구니에 담을 수 있는 상품 개수를 초과했습니다."),
+    CART_ITEM_LIMIT_EXCEEDED(HttpStatus.BAD_REQUEST, "장바구니에 담을 수 있는 상품 개수를 초과했습니다."),
     CART_ITEM_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장바구니 품목을 찾을 수 없습니다."),
     CART_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 장바구니를 찾을 수 없습니다."),
     NO_SELECTED_CART_ITEM(HttpStatus.NO_CONTENT,"상품을 선택해 주세요."),
-    UNAUTHORIZED_CART_ITEM_ACCESS(HttpStatus.FORBIDDEN,"본인의 장바구니 품목만 삭제할 수 있습니다.")
+    UNAUTHORIZED_CART_ITEM_ACCESS(HttpStatus.FORBIDDEN,"본인의 장바구니 품목만 삭제할 수 있습니다."),
+    CART_ITEM_NOT_SELECTED(HttpStatus.NOT_FOUND, "선택된 상품이 없습니다."),
     ;
 
     private final HttpStatus httpStatus;
