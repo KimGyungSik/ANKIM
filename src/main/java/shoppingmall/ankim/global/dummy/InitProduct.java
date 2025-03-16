@@ -4,6 +4,7 @@ import jakarta.annotation.PostConstruct;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Session;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -25,6 +26,9 @@ import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -50,8 +54,8 @@ public class InitProduct {
 
         @Transactional
         public void init() {
-            int batchSize = 500; // ✅ Batch Size 지정 (조정 가능)
-            int productCountPerSubCategory = 5000; // ✅ 한 소분류당 생성할 상품 개수
+            int batchSize = 50; // ✅ Batch Size 지정 (조정 가능) MySQL -> 500 H2 -> 50
+            int productCountPerSubCategory = 50; // ✅ 한 소분류당 생성할 상품 개수 MySQL -> 5000 H2 -> 40
 
             // 중분류 카테고리(최상위) 생성
             Map<Condition, List<Category>> conditionToSubCategoryMap = new HashMap<>();
@@ -75,6 +79,7 @@ public class InitProduct {
                 }
             }
             int count = 0;
+            List<Product> allProducts = new ArrayList<>(); // 생성된 모든 상품 저장
             // ✅ 더미 데이터 생성 (소분류에 매핑)
             for (Map.Entry<Condition, List<Category>> entry : conditionToSubCategoryMap.entrySet()) {
                 Condition condition = entry.getKey();
@@ -82,7 +87,8 @@ public class InitProduct {
 
                 for (Category subCategory : subCategories) {
                     for (int i = 0; i < productCountPerSubCategory; i++) {
-                        createProduct(em, condition, subCategory, i);
+                        Product product = createProduct(em, condition, subCategory, i);
+                        allProducts.add(product);
                         count++;
 
                         // ✅ Batch Size마다 Flush & Clear 실행
@@ -95,6 +101,8 @@ public class InitProduct {
                 }
             }
 
+            initializeViewRollingForProducts(allProducts);
+
             // ✅ 남은 데이터 처리
             em.flush();
             em.clear();
@@ -102,7 +110,58 @@ public class InitProduct {
             System.out.println("✅ 총 " + count + "개의 더미 상품이 생성되었습니다.");
         }
 
-        private void createProduct(EntityManager em, Condition condition, Category subCategory, int index) {
+        @Transactional
+        public void initializeViewRollingForProducts(List<Product> products) {
+            String sql = """
+        INSERT INTO view_rolling (category_no, prod_no, period, total_views, last_updated)
+        VALUES (?, ?, ?, ?, NOW()), (?, ?, ?, ?, NOW()), (?, ?, ?, ?, NOW()), (?, ?, ?, ?, NOW())
+    """;
+
+            // ✅ Hibernate에서 Connection 가져오기 (버전 호환성 고려)
+            Session session = em.unwrap(Session.class);
+            session.doWork(connection -> {
+                try (PreparedStatement ps = connection.prepareStatement(sql)) {
+                    for (Product product : products) {
+                        Long categoryNo = product.getCategory().getNo();
+                        Long productNo = product.getNo();
+
+                        int realtimeViews = ThreadLocalRandom.current().nextInt(50, 5000);
+                        int dailyViews = ThreadLocalRandom.current().nextInt(50, 5000);
+                        int weeklyViews = ThreadLocalRandom.current().nextInt(50, 5000);
+                        int monthlyViews = ThreadLocalRandom.current().nextInt(50, 5000);
+
+                        ps.setLong(1, categoryNo);
+                        ps.setLong(2, productNo);
+                        ps.setString(3, "REALTIME");
+                        ps.setInt(4, realtimeViews);
+
+                        ps.setLong(5, categoryNo);
+                        ps.setLong(6, productNo);
+                        ps.setString(7, "DAILY");
+                        ps.setInt(8, dailyViews);
+
+                        ps.setLong(9, categoryNo);
+                        ps.setLong(10, productNo);
+                        ps.setString(11, "WEEKLY");
+                        ps.setInt(12, weeklyViews);
+
+                        ps.setLong(13, categoryNo);
+                        ps.setLong(14, productNo);
+                        ps.setString(15, "MONTHLY");
+                        ps.setInt(16, monthlyViews);
+
+                        ps.addBatch();
+                    }
+                    ps.executeBatch(); // ✅ Batch 실행
+                }
+            });
+
+            System.out.println("✅ view_rolling 테이블에 총 " + products.size() + "개의 상품 데이터가 삽입되었습니다.");
+        }
+
+
+
+        private Product createProduct(EntityManager em, Condition condition, Category subCategory, int index) {
             condition = getRandomCondition(); // 랜덤 Condition 적용
 
             List<InfoSearch> infoSearches = getRandomInfoSearches();
@@ -150,6 +209,8 @@ public class InitProduct {
                 createItem(em, "색상: " + selectedColorValues.get(0).getName() + ", 사이즈: L",
                         List.of(selectedColorValues.get(0), sizeGroup.getOptionValues().get(1)), product, index);
             }
+
+            return product;
         }
 
 

@@ -1,90 +1,97 @@
-# -- 상품 데이터 삽입
-# INSERT INTO product (
-#     avg_rating, category_no, caution_order, caution_product, caution_shipping, code,
-#     created_at, description, discount_rate, display_order, free_shipping, handmade,
-#     modified_at, name, option_available, orig_price, qna_count, qty, rel_prod_code,
-#     restock_available, review_count, search_keywords, sell_price, selling_status,
-#     ship_fee, view_count, wish_count
-# ) VALUES (
-#              4.5, 18,
-#              '* 교환 및 반품이 불가능한 경우 *
-#              - 고객님의 책임 있는 사유로 상품이 멸실 또는 훼손된 경우 (상품 내용 확인을 위한 포장 훼손 제외)
-#              - 포장을 개봉하거나 훼손하여 상품 가치가 상실된 경우
-#              - 고객님의 사용 또는 일부 소비로 인해 상품 가치가 현저히 감소한 경우',
-#
-#              '※ 다양한 컬러 특성상 각 상품마다 사이즈 스펙에 오차가 있을 수 있습니다.',
-#
-#              'Delivery 브랜드 업체발송은 상품설명에 기입된 배송 공지 기준으로 출고됩니다.
-#              Delivery 29CM 자체발송의 경우, 오후 2시까지 결제 확인된 주문은 당일 출고되며,
-#              5만원 이상 주문은 무료배송, 5만원 미만 주문은 3,000원의 배송비가 추가됩니다.',
-#
-#              '1962858',
-#              '2025-02-12 22:11:46',
-#              '* 사계절 언제나 적당한 두께감의 클래식 숏 슬리브 제품입니다.
-#              - 세탁시 변형을 최소화하도록 워싱 프로세스를 거쳤으며, 내구성이 우수합니다.
-#              - 탄탄하고 밀도 높은 원단으로 착용 시 안정감과 편안함을 제공합니다.',
-#
-#              17, NULL, 'Y', 'Y',
-#              '2025-02-12 22:11:46',
-#              'TC5-TS03 체인티 (17 Color)', 'Y', 25500, 100, 40, NULL, 'Y', 580, '#0000FF, #FF0000', 21165, 'SELLING', 0, 500, 100
-#          );
-#
-# -- 제품 이미지 데이터 삽입
-# INSERT INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) VALUES
-#                                                                                     ('365096f6-bfe5-4937-ba62-8236c5895afb.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 1, '화면 캡처 2025-02-12 214640.jpg', 841, 'Y'),
-#                                                                                     ('a579122e-edb0-41b8-935f-6dcf58792bd6.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/a6886b27-3982-4c77-91f5-750206e29986.jpg', 2, '화면 캡처 2025-02-12 214657.jpg', 841, 'Y'),
-#                                                                                     ('b5e9619b-e629-487b-bead-2e7ccb6b7bf7.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/aba28418-ef3c-47ea-9bf1-2159c5734288.jpg', 3, '화면 캡처 2025-02-12 214715.jpg', 841, 'Y'),
-#                                                                                     ('9ba9421e-0368-458b-a0b9-bf7f43ff22c8.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/9be24280-9297-4cc1-9e8c-c8974afc8f3c.jpg', 4, '화면 캡처 2025-02-12 214731.jpg', 841, 'Y');
-#
-# -- 옵션 그룹 삽입
-# INSERT INTO option_group (name, prod_no) VALUES
-#                                              ('사이즈', 841),
-#                                              ('컬러', 841);
-#
-# -- 옵션 값 삽입
-# INSERT INTO option_value (color_code, name, optg_no) VALUES
-#                                                          (NULL, 'small', 1681),
-#                                                          (NULL, 'large', 1681),
-#                                                          ('#0000FF', 'blue', 1682),
-#                                                          ('#FF0000', 'red', 1682);
-#
-# -- 상품 아이템 삽입
-# INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
-#                                                                                                                                       (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-#                                                                                                                                       (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-#                                                                                                                                       (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-#                                                                                                                                       (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
-#
-# -- 아이템 옵션 연결
-# INSERT INTO item_option (item_no, optv_no) VALUES
-#                                                (1681, 2521), (1681, 2523),
-#                                                (1682, 2521), (1682, 2524),
-#                                                (1683, 2522), (1683, 2523),
-#                                                (1684, 2522), (1684, 2524);
+-- 상품 데이터 삽입
+INSERT INTO product (
+    avg_rating, category_no, caution_order, caution_product, caution_shipping, code,
+    created_at, description, discount_rate, display_order, free_shipping, handmade,
+    modified_at, name, option_available, orig_price, qna_count, qty, rel_prod_code,
+    restock_available, review_count, search_keywords, sell_price, selling_status,
+    ship_fee, view_count, wish_count
+) VALUES (
+             4.5, 18,
+             '* 교환 및 반품이 불가능한 경우 *
+             - 고객님의 책임 있는 사유로 상품이 멸실 또는 훼손된 경우 (상품 내용 확인을 위한 포장 훼손 제외)
+             - 포장을 개봉하거나 훼손하여 상품 가치가 상실된 경우
+             - 고객님의 사용 또는 일부 소비로 인해 상품 가치가 현저히 감소한 경우',
+
+             '※ 다양한 컬러 특성상 각 상품마다 사이즈 스펙에 오차가 있을 수 있습니다.',
+
+             'Delivery 브랜드 업체발송은 상품설명에 기입된 배송 공지 기준으로 출고됩니다.
+             Delivery 29CM 자체발송의 경우, 오후 2시까지 결제 확인된 주문은 당일 출고되며,
+             5만원 이상 주문은 무료배송, 5만원 미만 주문은 3,000원의 배송비가 추가됩니다.',
+
+             '1962858',
+             '2025-02-12 22:11:46',
+             '* 사계절 언제나 적당한 두께감의 클래식 숏 슬리브 제품입니다.
+             - 세탁시 변형을 최소화하도록 워싱 프로세스를 거쳤으며, 내구성이 우수합니다.
+             - 탄탄하고 밀도 높은 원단으로 착용 시 안정감과 편안함을 제공합니다.',
+
+             17, NULL, 'Y', 'Y',
+             '2025-02-12 22:11:46',
+             'TC5-TS03 체인티 (17 Color)', 'Y', 25500, 100, 40, NULL, 'Y', 580, '#0000FF, #FF0000', 21165, 'SELLING', 0, 500, 100
+         );
+
+-- 제품 이미지 데이터 삽입
+INSERT INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) VALUES
+                                                                                    ('365096f6-bfe5-4937-ba62-8236c5895afb.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 1, '화면 캡처 2025-02-12 214640.jpg', 1051, 'Y'),
+                                                                                    ('a579122e-edb0-41b8-935f-6dcf58792bd6.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/a6886b27-3982-4c77-91f5-750206e29986.jpg', 2, '화면 캡처 2025-02-12 214657.jpg', 1051, 'Y'),
+                                                                                    ('b5e9619b-e629-487b-bead-2e7ccb6b7bf7.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/aba28418-ef3c-47ea-9bf1-2159c5734288.jpg', 3, '화면 캡처 2025-02-12 214715.jpg', 1051, 'Y'),
+                                                                                    ('9ba9421e-0368-458b-a0b9-bf7f43ff22c8.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/9be24280-9297-4cc1-9e8c-c8974afc8f3c.jpg', 4, '화면 캡처 2025-02-12 214731.jpg', 1051, 'Y'),
+                                                                                    ('38a8e1e8-8102-46f3-9f49-209e7f7febed.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/e2a85a22-b3bc-412a-80fa-5e4a22f00e87.jpg', 1, 'ㅇㅇㅇㅇㅇ 10.jpg', 1051, 'N'),
+                                                                                    ('80ff23cf-1299-476b-8030-4b050fc9eed9.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/e67aa6ac-a160-43e0-88ae-5cfad6055ad9.jpg', 2, 'ㅇㅇㅇㅇㅇ 5.jpg', 1051, 'N'),
+                                                                                    ('d7e8fe33-f4cb-4fcb-9037-192fb99af228.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/7cce16d2-e480-4f1c-a8c2-ded11b0d2724.jpg', 3, 'ㅇㅇㅇㅇㅇ 9.jpg', 1051, 'N'),
+                                                                                    ('fc614454-d3bc-4b40-88e1-374873ce500f.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/ee788efa-fc50-4d89-aa6e-0ff2ac7e6702.jpg', 4, 'ㅇㅇㅇㅇㅇ 8.jpg', 1051, 'N');
+
+
+
+
+-- 옵션 그룹 삽입
+INSERT INTO option_group (name, prod_no) VALUES
+                                             ('사이즈', 1051),
+                                             ('컬러', 1051);
+
+-- 옵션 값 삽입
+INSERT INTO option_value (color_code, name, optg_no) VALUES
+                                                         (NULL, 'small', 2101),
+                                                         (NULL, 'large', 2101),
+                                                         ('#0000FF', 'blue', 2102),
+                                                         ('#FF0000', 'red', 2102);
+
+-- 상품 아이템 삽입
+INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
+                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
+
+-- 아이템 옵션 연결
+INSERT INTO item_option (item_no, optv_no) VALUES
+                                               (2101,3151), (2101,3153),
+                                               (2102,3151), (2102,3154),
+                                               (2103,3152), (2103,3153),
+                                               (2104,3152), (2104,3154);
 
 
 -- 인기 검색어
-INSERT INTO search_logs (keyword, search_count) VALUES
-                                                                            ('데님1', FLOOR(1 + RAND() * 50)),
-                                                                            ('데님2', FLOOR(1 + RAND() * 50)),
-                                                                            ('데님3', FLOOR(1 + RAND() * 50)),
-                                                                            ('팬츠1', FLOOR(1 + RAND() * 50)),
-                                                                            ('팬츠2', FLOOR(1 + RAND() * 50)),
-                                                                            ('팬츠3', FLOOR(1 + RAND() * 50)),
-                                                                            ('슬랙스1', FLOOR(1 + RAND() * 50)),
-                                                                            ('슬랙스2', FLOOR(1 + RAND() * 50)),
-                                                                            ('슬랙스3', FLOOR(1 + RAND() * 50)),
-                                                                            ('니트1', FLOOR(1 + RAND() * 50)),
-                                                                            ('니트2', FLOOR(1 + RAND() * 50)),
-                                                                            ('니트3', FLOOR(1 + RAND() * 50)),
-                                                                            ('코트1', FLOOR(1 + RAND() * 50)),
-                                                                            ('코트2', FLOOR(1 + RAND() * 50)),
-                                                                            ('코트3', FLOOR(1 + RAND() * 50)),
-                                                                            ('티셔츠1', FLOOR(1 + RAND() * 50)),
-                                                                            ('티셔츠2', FLOOR(1 + RAND() * 50)),
-                                                                            ('티셔츠3', FLOOR(1 + RAND() * 50)),
-                                                                            ('셔츠1', FLOOR(1 + RAND() * 50)),
-                                                                            ('셔츠2', FLOOR(1 + RAND() * 50));
+-- INSERT INTO search_logs (keyword, search_count) VALUES
+--                                                                            ('데님1', FLOOR(1 + RAND() * 50)),
+--                                                                             ('데님2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('데님3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('니트1', FLOOR(1 + RAND() * 50)),
+--                                                                             ('니트2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('니트3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('셔츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('셔츠2', FLOOR(1 + RAND() * 50));
 
 
 
