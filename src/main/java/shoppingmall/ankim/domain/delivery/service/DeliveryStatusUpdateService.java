@@ -54,7 +54,7 @@ public class DeliveryStatusUpdateService {
     private final PaymentService paymentService;
 
     @Scheduled(cron = "0 0 0 * * ?") // 자정(00시)마다 스케줄 실행
-    @NamedLock(key = "SCHEDULER_DELIVERY_STATUS",timeout = 30)
+//    @NamedLock(key = "SCHEDULER_DELIVERY_STATUS",timeout = 30)
     public void updateDeliveryStatuses() {
             // ClockHolder를 활용하여 현재 시간 생성
             LocalDateTime now = LocalDateTime.ofInstant(Instant.ofEpochMilli(clockHolder.millis()), ZoneId.systemDefault());

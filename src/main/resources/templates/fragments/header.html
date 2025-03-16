@@ -96,6 +96,82 @@
         </script>
         <!-- 사용자 메뉴 -->
         <div class="user-actions">
+            <!-- 돋보기 아이콘 (모달 열기) -->
+            <svg onclick="openSearchModal()" xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 512 512" class="search-icon">
+                <path fill="black" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+            </svg>
+
+            <!-- 검색 모달창 -->
+            <div id="search-modal">
+                <div class="search-modal-content">
+                    <!-- 검색 입력창 -->
+                    <div class="search-modal-header">
+                        <input type="text" id="search-input-modal" placeholder="Search..." onkeypress="handleKeyPress(event)">
+                        <!-- 검색 실행 돋보기 아이콘 -->
+                        <svg onclick="executeSearch()" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 512 512" class="search-icon-btn">
+                            <path fill="black" d="M416 208c0 45.9-14.9 88.3-40 122.7L502.6 457.4c12.5 12.5 12.5 32.8 0 45.3s-32.8 12.5-45.3 0L330.7 376c-34.4 25.2-76.8 40-122.7 40C93.1 416 0 322.9 0 208S93.1 0 208 0S416 93.1 416 208zM208 352a144 144 0 1 0 0-288 144 144 0 1 0 0 288z"/>
+                        </svg>
+                    </div>
+
+                    <!-- 인기 검색어 리스트 -->
+                    <div class="search-modal-body">
+                        <div class="search-modal-title">인기 검색어</div>
+                        <ul id="search-keyword-list"></ul>
+                    </div>
+                </div>
+            </div>
+
+            <script>
+                // ✅ 모달창 열기
+                function openSearchModal() {
+                    document.getElementById("search-modal").style.display = "flex";
+                    fetchPopularKeywords();
+                }
+
+                // ✅ 모달창 닫기
+                function closeSearchModal() {
+                    document.getElementById("search-modal").style.display = "none";
+                }
+
+                // ✅ 인기 검색어 비동기 호출
+                async function fetchPopularKeywords() {
+                    try {
+                        const response = await fetch("/searchLog");
+                        const data = await response.json();
+
+                        if (data.code === 200 && data.data) {
+                            const keywordList = document.getElementById("search-keyword-list");
+                            keywordList.innerHTML = ""; // 기존 리스트 초기화
+
+                            data.data.forEach(keyword => {
+                                const li = document.createElement("li");
+                                li.textContent = keyword;
+                                li.onclick = () => executeSearch(keyword); // 클릭 시 검색 실행
+                                keywordList.appendChild(li);
+                            });
+                        } else {
+                            console.warn("API 응답 오류:", data.message);
+                        }
+                    } catch (error) {
+                        console.error("인기 검색어 불러오기 실패:", error);
+                    }
+                }
+
+                // ✅ 엔터 키 입력 시 검색 실행
+                function handleKeyPress(event) {
+                    if (event.key === "Enter") {
+                        executeSearch();
+                    }
+                }
+
+                // ✅ 검색 실행
+                function executeSearch(keyword = null) {
+                    let searchKeyword = keyword || document.getElementById("search-input-modal").value.trim();
+                    if (searchKeyword) {
+                        window.location.href = `/product/search?keyword=${encodeURIComponent(searchKeyword)}`;
+                    }
+                }
+            </script>
             <a href="#" th:href="@{/mypage}" class="menu-item">
                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512" class="icon">
                     <path d="M224 256A128 128 0 1 0 224 0a128 128 0 1 0 0 256zm-45.7 48C79.8 304 0 383.8 0 482.3C0 498.7 13.3 512 29.7 512l388.6 0c16.4 0 29.7-13.3 29.7-29.7C448 383.8 368.2 304 269.7 304l-91.4 0z"/>

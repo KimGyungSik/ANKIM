@@ -3,10 +3,13 @@ package shoppingmall.ankim.domain.product.repository.query;
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
+import com.querydsl.core.util.StringUtils;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.support.PageableExecutionUtils;
 import org.springframework.stereotype.Repository;
@@ -20,12 +23,9 @@ import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.dto.ProductUserDetailResponse;
 import shoppingmall.ankim.domain.product.entity.Product;
-import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
-import shoppingmall.ankim.domain.product.entity.QProduct;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
 
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static shoppingmall.ankim.domain.category.entity.QCategory.category;
@@ -34,7 +34,6 @@ import static shoppingmall.ankim.domain.item.entity.QItem.*;
 import static shoppingmall.ankim.domain.itemOption.entity.QItemOption.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionGroup.*;
 import static shoppingmall.ankim.domain.option.entity.QOptionValue.*;
-import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.domain.product.entity.QProduct.*;
 
 @Repository
@@ -42,6 +41,7 @@ import static shoppingmall.ankim.domain.product.entity.QProduct.*;
 public class ProductQueryRepositoryImpl implements ProductQueryRepository{
 
     private final JPAQueryFactory queryFactory;
+    private final EntityManager entityManager;
 
     @Override
     public ProductUserDetailResponse findUserProductDetailResponse(Long productId) {
@@ -64,6 +64,71 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
         return result;
     }
 
+    // MySQL (full-text)
+//    @Override
+//    public Page<ProductListResponse> findUserProductListResponse(
+//            Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
+//            List<ColorCondition> colorConditions, PriceCondition priceCondition,
+//            Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
+//
+//        BooleanBuilder filterBuilder = ProductQueryHelper.createFilterBuilder(
+//                condition, category, null, colorConditions, priceCondition, customMinPrice, customMaxPrice, infoSearches, product
+//        );
+//
+//        List<Long> productIds = null;
+//
+//        if (keyword != null && !keyword.trim().isEmpty()) {
+//            productIds = findProductIdsByFullTextSearch(keyword);
+//
+//            System.out.println("[DEBUG] 검색된 상품 ID: " + productIds);
+//
+//            if (!productIds.isEmpty()) {
+//                filterBuilder.and(product.no.in(productIds)); // 기존 filterBuilder에 조건 추가
+//            } else {
+//                System.out.println("[DEBUG] 검색 결과 없음 → 빈 리스트 반환");
+//                return new PageImpl<>(new ArrayList<>(), pageable, 0);
+//            }
+//        }
+//
+//        OrderSpecifier<?> orderSpecifier = ProductQueryHelper.getOrderSpecifier(order, product);
+//
+//        List<ProductListResponse> content = getFilteredAndSortedResults(orderSpecifier, filterBuilder, pageable);
+//
+//        System.out.println("[DEBUG] 조회된 상품 개수: " + content.size());
+//
+//        JPAQuery<Product> countQuery = queryFactory.selectFrom(product)
+//                .where(filterBuilder);
+//
+//        return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+//    }
+//
+//
+//
+//    private List<Long> findProductIdsByFullTextSearch(String keyword) {
+//        if (StringUtils.isNullOrEmpty(keyword)) {
+//            return Collections.emptyList();
+//        }
+//
+//        String formattedKeyword = Arrays.stream(keyword.trim().split("\\s+"))
+//                .map(word -> "+" + word) // 각 단어 앞에 `+` 추가
+//                .collect(Collectors.joining(" ")); // 공백으로 결합
+//
+//        String sql = """
+//        SELECT p.no
+//        FROM product p
+//        WHERE MATCH(p.name, p.search_keywords, p.description)
+//        AGAINST(:keyword IN BOOLEAN MODE)
+//    """;
+//
+//        return entityManager.createNativeQuery(sql)
+//                .setParameter("keyword", formattedKeyword)
+//                .getResultList();
+//    }
+
+
+
+
+    // h2 (like)
     @Override
     public Page<ProductListResponse> findUserProductListResponse(Pageable pageable, Condition condition, OrderBy order, Long category, String keyword,
                                                                  List<ColorCondition> colorConditions, PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, List<InfoSearch> infoSearches) {
@@ -82,9 +147,12 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
 
         // PageableExecutionUtils.getPage()로 최적화
         return PageableExecutionUtils.getPage(content, pageable, countQuery::fetchCount);
+
     }
 
-    // 필터링 및 정렬 수행하는 메서드
+
+
+    //  필터링 및 정렬 수행하는 메서드
     private List<ProductListResponse> getFilteredAndSortedResults(OrderSpecifier orderSpecifier, BooleanBuilder filterBuilder, Pageable pageable) {
         List<ProductListResponse> response = queryFactory
                 .select(Projections.fields(ProductListResponse.class,
@@ -125,14 +193,14 @@ public class ProductQueryRepositoryImpl implements ProductQueryRepository{
         return response;
     }
 
-    private List<Long> toProductListResponseIds(List<ProductListResponse> responses) {
+    public List<Long> toProductListResponseIds(List<ProductListResponse> responses) {
         return responses.stream()
                 .map(ProductListResponse::getNo)
                 .toList();
     }
 
     // 상품 ID에 해당하는 썸네일 URL 매핑
-    private Map<Long, String> getThumbnailUrls(List<Long> productIds) {
+    public Map<Long, String> getThumbnailUrls(List<Long> productIds) {
         return queryFactory
                 .select(productImg.product.no, productImg.imgUrl)
                 .from(productImg)

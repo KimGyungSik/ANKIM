@@ -4,6 +4,7 @@ import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
 
+import java.time.Clock;
 import java.time.Instant;
 
 @TestConfiguration
@@ -19,4 +20,5 @@ public class TestClockConfig {
         return testClockHolder;
     }
 }
+
 
