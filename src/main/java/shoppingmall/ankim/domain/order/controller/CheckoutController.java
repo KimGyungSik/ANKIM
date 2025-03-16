@@ -51,17 +51,28 @@ public class CheckoutController {
     @PostMapping("/products")
     public ApiResponse<Void> addToCartAndCheckout(
             @RequestBody List<AddToCartRequest> requestList,
-            HttpSession session
+            HttpSession session,
+            HttpServletRequest request
     ) {
         String loginId = securityContextHelper.getLoginId();
 
-        List<CartItem> cartItemList = new ArrayList<>();
-        for (AddToCartRequest request : requestList) {
-            cartItemList.add(cartService.addToCart(request.toServiceRequest(), loginId));
+        List<Long> cartItemNoList = new ArrayList<>();
+        for (AddToCartRequest addToCartrequest : requestList) {
+            CartItem cartItem = cartService.addToCart(addToCartrequest.toServiceRequest(), loginId);
+            cartItemNoList.add(cartItem.getNo());
         }
 
         // 구매하기 위해서 선택한 품목 번호 리스트 저장
-        session.setAttribute("selectedCartItemList", cartItemList);
+        String referer = request.getHeader("referer");
+        log.info("referer url : {}", referer);
+
+        // cartItemList와 URL 정보를 하나의 Map에 저장
+        Map<String, Object> checkoutData = new HashMap<>();
+        checkoutData.put("cartItemList", cartItemNoList);
+        checkoutData.put("referer", referer);
+
+        // 세션에 저장
+        session.setAttribute("checkoutData", checkoutData);
 
         return ApiResponse.ok();
     }
