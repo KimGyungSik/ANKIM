@@ -1,5 +1,6 @@
 package shoppingmall.ankim.domain.product.controller;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,9 +19,15 @@ import shoppingmall.ankim.domain.product.dto.ProductListResponse;
 import shoppingmall.ankim.domain.product.dto.ProductResponse;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
-
+import shoppingmall.ankim.domain.product.service.ProductService;
+import shoppingmall.ankim.domain.searchLog.service.SearchLogService;
+import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
+import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
+import shoppingmall.ankim.global.response.ApiResponse;
 import java.util.*;
 import java.util.stream.Collectors;
+
+import static shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod.*;
 
 @Controller
 @RequiredArgsConstructor
@@ -28,7 +35,10 @@ import java.util.stream.Collectors;
 public class ProductController {
 
     private final ProductRepository productRepository;
+    private final ViewRollingRepository viewRollingRepository;
+    private final ProductService productService;
     private final CategoryQueryService categoryQueryService;
+    private final SearchLogService searchLogService;
     @GetMapping("/admin/new")
     public String productForm(Model model) {
         return "/admin/product/registerForm";
@@ -40,6 +50,8 @@ public class ProductController {
     public String findProductUserDetailResponse(@PathVariable("productId") Long productId, Model model) {
         // 상품 상세 정보 조회
         ProductResponse product = productRepository.findAdminProductDetailResponse(productId);
+        productService.increaseViewCount(productId); // 조회수 증가
+
         model.addAttribute("product", product);
 
         // 카테고리 정보 저장
@@ -51,7 +63,7 @@ public class ProductController {
         Map<String, List<OptionValueResponse>> itemMap = new HashMap<>();
         Map<Long, List<ItemResponse>> optionItemMap = new HashMap<>();
 
-        // ✅ 상품에서 실제 사용된 옵션 그룹만 필터링
+        // 상품에서 실제 사용된 옵션 그룹만 필터링
         Set<Long> usedOptionGroupNos = product.getItems().stream()
                 .flatMap(item -> item.getOptionValues().stream())
                 .map(OptionValueResponse::getOptionGroupNo)
@@ -61,7 +73,7 @@ public class ProductController {
                 .filter(group -> usedOptionGroupNos.contains(group.getOptionGroupNo()))
                 .collect(Collectors.toList());
 
-        // ✅ 필터링된 옵션 그룹만 모델에 추가
+        // 필터링된 옵션 그룹만 모델에 추가
         model.addAttribute("optionGroups", filteredOptionGroups);
 
         for (ItemResponse item : product.getItems()) {
@@ -79,19 +91,25 @@ public class ProductController {
                         itemMap.get(groupName).add(optionValue);
                     }
 
-                    // 옵션값과 Item을 매핑 (추가금액 표시를 위함)
                     optionItemMap.computeIfAbsent(optionValue.getOptionValueNo(), k -> new ArrayList<>()).add(item);
                 }
             }
         }
 
-        System.out.println("필터링된 옵션 그룹: " + filteredOptionGroups);
-        System.out.println("옵션 매핑 결과: " + itemMap);
-        System.out.println("옵션-아이템 매핑 결과: " + optionItemMap);
-
-        // Thymeleaf에서 사용하도록 모델에 추가
         model.addAttribute("itemMap", itemMap);
         model.addAttribute("optionItemMap", optionItemMap);
+
+        // 첫 렌더링 시 실시간 인기순 상품 50개를 넘겨준다.
+        Page<ProductListResponse> viewRollingProducts = viewRollingRepository.getViewRollingProducts(categoryNo, REALTIME, PageRequest.of(0, 50));
+        model.addAttribute("products", viewRollingProducts.getContent());  // 상품 리스트
+        model.addAttribute("page", viewRollingProducts.getNumber());       // 현재 페이지 번호
+        model.addAttribute("size", viewRollingProducts.getSize());         // 페이지 크기 (한 페이지 당 개수)
+        model.addAttribute("totalElements", viewRollingProducts.getTotalElements());  // 전체 데이터 개수
+        model.addAttribute("totalPages", viewRollingProducts.getTotalPages());        // 전체 페이지 개수
+        model.addAttribute("hasNext", viewRollingProducts.hasNext());   // 다음 페이지 존재 여부
+        model.addAttribute("hasPrevious", viewRollingProducts.hasPrevious()); // 이전 페이지 존재 여부
+        model.addAttribute("categoryName", product.getCategoryResponse().getName());
+        model.addAttribute("categoryNo", categoryNo);
 
         return "/product/detail";
     }
@@ -114,8 +132,9 @@ public class ProductController {
      * @param model 모델 객체
      * @return 상품 리스트 페이지 뷰 이름
      */
-    @GetMapping("/list")
+    @GetMapping({"/list", "/search"})
     public String getFilteredAndSortedProductList(
+            HttpServletRequest request,
             @RequestParam(name = "page", defaultValue = "0") int page,
             @RequestParam(name = "size", defaultValue = "24") int size,
             @RequestParam(name = "condition", required = false) Condition condition,
@@ -138,16 +157,25 @@ public class ProductController {
                 customMinPrice, customMaxPrice, infoSearches
         );
 
+        // ✅ 검색 모드 여부 확인 (요청 URL이 "/search"라면 true)
+        boolean isSearchMode = request.getRequestURI().contains("/search");
+
+        // ✅ 검색 모드일 경우 검색어 저장
+        if (isSearchMode && keyword != null && !keyword.isEmpty()) {
+            searchLogService.saveSearchKeyword(keyword);
+        }
+
         // ✅ 중분류 카테고리에 해당하는 하위 카테고리 조회
-        // condition이 중분류 카테고리
-        if(condition.isCategoryCondition()) {
+        if (condition != null && condition.isCategoryCondition()) {
             model.addAttribute("subCategoryTitle", condition.getCategoryName());
             model.addAttribute("subCategories", categoryQueryService.getSubCategoriesUnderMiddleCategoryWithCondition(condition));
-        }else { // condition이 BEST, NEW, HANDMADE
-            model.addAttribute("subCategoryTitle", condition.name());
-            if(condition.name().equals("HANDMADE"))
+        } else { // BEST, NEW, HANDMADE
+            model.addAttribute("subCategoryTitle", condition != null ? condition.name() : "전체");
+            if (condition != null && condition.name().equals("HANDMADE")) {
                 model.addAttribute("subCategories", categoryQueryService.fetchHandmadeCategories());
-            else model.addAttribute("subCategories", null);
+            } else {
+                model.addAttribute("subCategories", null);
+            }
         }
 
 
@@ -155,6 +183,7 @@ public class ProductController {
         boolean isCategorySelected = (category != null);
 
         // ✅ 페이지네이션 정보 추가
+        model.addAttribute("isSearchMode", isSearchMode);
         model.addAttribute("products", productList.getContent());  // 상품 리스트
         model.addAttribute("page", productList.getNumber());       // 현재 페이지 번호
         model.addAttribute("size", productList.getSize());         // 페이지 크기 (한 페이지 당 개수)
@@ -171,6 +200,4 @@ public class ProductController {
         // 상품 리스트 페이지 반환
         return "product/list";
     }
-
-
 }

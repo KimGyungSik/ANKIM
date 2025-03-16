@@ -115,7 +115,7 @@
     justify-content: center;
     align-items: flex-start;
     gap: 20px;
-    padding: 0 100px; /* 좌우 여백을 더 추가 */
+    padding: 0 50px; /* 좌우 여백을 더 추가 */
 }
 
 /* 상품 이미지 */
@@ -231,6 +231,7 @@
     width: 1px;
     height: 66px;
     background-color: #ccc; /* 회색 */
+    margin-left: 50px;
 }
 
 /* 구별선 */
@@ -256,8 +257,8 @@
 
 /* 하트 아이콘 */
 .wishlist-icon {
-    width: 24px;
-    height: 24px;
+    width: 35px;
+    height: 32px;
     cursor: pointer;
     fill: #aaa; /* 기본 색상 */
     transition: fill 0.3s ease;
@@ -583,15 +584,17 @@
     white-space: nowrap;
 }
 
-/* ✅ 수량 조절 버튼 컨테이너 (중앙 기준 살짝 오른쪽 정렬) */
+/* ✅ 수량 조절 버튼 컨테이너 (고정 너비 설정) */
 .quantity-controls {
     display: flex;
     align-items: center;
     border: 1px solid #ccc;
     overflow: hidden;
     height: 32px;
-    margin-left: auto; /* ✅ 가운데보다 살짝 오른쪽 */
-    margin-right: 50px; /* ✅ 가격과 X 버튼과의 간격 */
+    min-width: 100px; /* ✅ 고정된 최소 너비 설정 */
+    justify-content: center; /* ✅ 가운데 정렬 */
+    margin-left: 20px; /* ✅ 옵션명과의 간격 조정 */
+    margin-right: 20px; /* ✅ 가격과 X 버튼과의 간격 */
 }
 
 /* ✅ 수량 조절 버튼 */
@@ -615,10 +618,13 @@
     font-size: 16px;
 }
 
-/* ✅ 가격 (오른쪽 정렬) */
+/* ✅ 가격 (고정된 너비 설정) */
 .option-price {
     font-size: 15px;
     font-weight: 550;
+    text-align: right;
+    width: 80px; /* ✅ 가격이 길어져도 고정된 너비 유지 */
+    flex-shrink: 0; /* ✅ 크기가 줄어들지 않도록 설정 */
     margin-right: 8px; /* ✅ X 버튼과 간격 조정 */
 }
 
@@ -626,11 +632,11 @@
 .remove-option {
     width: 18px;
     height: 18px;
-    border: 1px solid #ccc; /* ✅ 연한 회색 테두리 추가 */
+    border: 1px solid #ccc;
     background-color: white;
     color: #ccc;
-    font-size: 10px; /* ✅ X 아이콘을 더 얇게 조정 */
-    font-weight: normal; /* ✅ 굵기를 줄여 얇게 보이도록 */
+    font-size: 10px;
+    font-weight: normal;
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -639,6 +645,7 @@
     box-shadow: 0px 0px 5px rgba(0, 0, 0, 0.1);
     transition: all 0.2s ease-in-out;
 }
+
 
 /* ✅ 총 상품 금액 컨테이너 */
 #total-price-container {
@@ -713,6 +720,76 @@
     cursor: pointer;
     color: #333;
 }
+/* ✅ 장바구니 모달 스타일 */
+#cart-modal {
+    display: none; /* 기본적으로 숨김 */
+    position: fixed;
+    z-index: 1100; /* 다른 모달보다 높은 우선순위 */
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    width: 250px;
+    background-color: white;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.15);
+    text-align: center;
+    padding: 40px 10px;
+}
+
+/* ✅ 장바구니 모달 내부 내용 */
+#cart-modal .modal-content {
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 15px;
+}
+
+/* ✅ 장바구니 닫기 버튼 (X) */
+#cart-modal .close-modal {
+    position: absolute;
+    top: 3px;
+    right: 12px;
+    font-size: 20px;
+    cursor: pointer;
+    color: #333;
+}
+
+/* ✅ 장바구니 확인 버튼 */
+#cart-modal #cart-modal-confirm {
+    width: 64%;
+    padding: 12px 0;
+    background-color: white;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    font-size: 12px;
+    font-weight: bold;
+    cursor: pointer;
+    color: #333;
+    align-items: center;
+    justify-content: center;
+    gap: 5px; /* 아이콘과 텍스트 간격 */
+}
+
+/* ✅ 화살표 아이콘 스타일 */
+#cart-modal #modal-confirm::after {
+    content: ">";
+    font-size: 14px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* ✅ 장바구니 모달 오버레이 */
+.cart-modal-overlay {
+    display: none;
+    position: fixed;
+    z-index: 1099; /* 모달보다 낮은 우선순위 */
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+}
+
+
 
 
 
@@ -757,6 +834,282 @@
 /* ✅ 바로 구매하기 버튼에 그림자 추가 */
 .buy-now-button {
     box-shadow: 3px 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+
+
+
+
+
+
+/* 인기순 상품 css*/
+/* HOT PICKS 전체 컨테이너 (좌우 여백 추가) */
+.hot-picks-container {
+    padding: 0 120px;
+    width: 100%;
+    max-width: 1200px;
+    margin: auto;
+}
+
+/* HOT PICKS 카테고리 헤더 */
+.hot-picks-header {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* 왼쪽 정렬 */
+    padding: 0px 20px;
+    margin-top: 22px;
+}
+
+.hot-picks-header h2 {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.hot-picks-title-highlight {
+    color: black; /* HOT PICKS 강조 색상 */
+}
+
+/* 필터 탭 (카테고리명 아래 배치) */
+.hot-picks-tabs {
+    display: flex;
+    gap: 10px;
+    padding: 0 20px;
+}
+
+.hot-picks-tab {
+    border: none;
+    padding: 6px 16px;
+    font-size: 14px;
+    font-weight: bold;
+    background-color: white;
+    color: gray;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s;
+    border: 1px solid #ddd;
+}
+
+.hot-picks-tab.active {
+    background-color: black;
+    color: white;
+    border: none;
+}
+
+/* 상품 리스트 */
+.product-list {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr); /* 가로로 5개 */
+    gap: 20px;
+    padding: 20px;
+}
+
+/* 상품 카드 (포지셔닝 추가) */
+.product-card {
+    position: relative; /* 순위 UI를 배치하기 위해 relative 적용 */
+    background-color: #fff;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+    text-align: left;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
+
+.product-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    display: block;
+}
+
+/* 페이지네이션 스타일 */
+.pagination {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 20px;
+    font-size: 24px; /* 전체 글씨 크기 증가 */
+    font-weight: 300; /* 더 얇은 글씨체 */
+    gap: 20px; /* < > 버튼과 숫자 간격 조정 */
+}
+
+/* 좌우 화살표 버튼 */
+.pagination-arrow {
+    border: none;
+    background: none;
+    font-size: 28px; /* 화살표 크기 증가 */
+    color: rgb(180, 180, 180); /* 밝은 회색 */
+    cursor: pointer;
+    transition: 0.3s;
+    padding: 5px 30px; /* 좌우 간격 추가 (화살표가 숫자와 멀어지도록 조정) */
+}
+
+.pagination-arrow:hover {
+    color: black;
+}
+
+/* 현재 페이지 */
+.pagination-number {
+    font-size: 26px; /* 숫자 크기 증가 */
+    font-weight: 300; /* 더 얇은 글씨체 */
+    font-style: italic; /* 숫자 기울이기 */
+    color: black;
+    transition: transform 0.3s ease-in-out;
+}
+
+/* 페이지 구분 기호 */
+.pagination-separator {
+    font-size: 26px; /* 숫자와 동일한 크기로 조정 */
+    font-weight: 300; /* 얇은 글씨 */
+    color: rgb(180, 180, 180); /* 밝은 회색 */
+    margin: 0 5px; /* 숫자와 / 기호 간격 조정 */
+}
+
+/* 총 페이지 수 */
+.pagination-total {
+    font-size: 26px; /* 숫자 크기 증가 */
+    font-weight: 300; /* 얇은 글씨 */
+    font-style: italic; /* 숫자 기울이기 */
+    color: rgb(180, 180, 180); /* 밝은 회색 */
+}
+
+
+
+/* 상품 정보 */
+.product-info {
+    padding: 10px;
+}
+
+.product-name {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 5px 0;
+    color: #333;
+}
+
+.price-discount {
+    display: flex;
+    align-items: center;
+}
+
+.discount-rate {
+    font-size: 16px;
+    font-weight: bold;
+    color: rgb(255 72 0);
+    margin-right: 5px;
+}
+
+.price {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+}
+
+/* 무료배송 및 핸드메이드 배지 */
+.product-badges {
+    display: flex;
+    gap: 5px;
+    align-items: center; /* 배지가 있을 경우 중앙 정렬 */
+    padding-top: 4px;
+    padding-bottom: 4px;
+}
+
+/* 배지가 없을 경우 여백 제거 */
+.product-badges:empty {
+    display: none;
+}
+
+
+.badge {
+    display: inline-block;
+    font-size: 10px;
+    color: #333;
+    background-color: #f0f0f0; /* 회색 배경 */
+    padding: 3px 5px;
+    border-radius: 3px;
+}
+/* 순위 배지 (왼쪽 상단 고정) */
+.rank-badge {
+    position: absolute;
+    background-color: black;
+    color: white;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 4px 8px;
+    border-radius: 3px;
+}
+
+
+
+
+/* 상품 상세 정보 전체 컨테이너 */
+.product-details-section {
+    width: 100%;
+    padding: 0 10%;
+    box-sizing: border-box;
+}
+
+/* 상품 정보 제목 (왼쪽 정렬) */
+.details-title {
+    margin-left: 30px;
+    font-size: 22px;
+    font-weight: bold;
+    margin-bottom: 20px;
+}
+
+/* ✅ 내용 박스 가운데 정렬 (1000px로 확장) */
+.details-content-wrapper {
+    max-width: 1000px; /* 기존 800px → 1000px 확장 */
+    margin: 0 auto;
+}
+
+/* 상품 정보 개별 박스 */
+.details-box {
+    border-bottom: 1px solid #ddd;
+    padding: 15px 0;
+}
+
+/* ✅ 상세 이미지 컨테이너를 내용 박스와 동일한 너비로 설정 */
+.details-images-wrapper {
+    max-width: 1000px; /* 내용 박스 크기와 동일하게 설정 */
+    margin: 20px auto 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 15px;
+}
+
+/* 개별 이미지 스타일 */
+.details-image-box {
+    width: 100%; /* 내용 박스 크기와 일치 */
+    text-align: center;
+}
+
+.details-image {
+    width: 100%; /* 부모 요소 기준 가득 채움 */
+    border-radius: 5px;
+}
+
+/* ✅ 더보기 버튼을 내용 박스와 크기 동일하게 조정 */
+.details-toggle-btn {
+    display: block;
+    width: 100%;
+    max-width: 1000px; /* 내용 박스 크기와 동일하게 설정 */
+    margin: 20px auto;
+    padding: 10px;
+    background: transparent;
+    border: 1px solid black;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+}
+
+.details-toggle-btn:hover {
+    background: black;
+    color: white;
 }
 
 

@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.product.service;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.category.exception.CategoryNotFoundException;
@@ -23,6 +24,7 @@ import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.service.request.CategoryRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductCreateServiceRequest;
 import shoppingmall.ankim.domain.product.service.request.ProductUpdateServiceRequest;
+import shoppingmall.ankim.domain.viewRolling.service.ViewRollingService;
 import shoppingmall.ankim.global.exception.ErrorCode;
 
 import java.util.ArrayList;
@@ -41,6 +43,14 @@ public class ProductService {
     private final ProductImgService productImgService;
     private final OptionGroupService optionGroupService;
     private final ItemService itemService;
+    private final ViewRollingService viewRollingService;
+
+    // 조회수 증가 -> 실시간 인기순 증가
+    public void increaseViewCount(Long productId) {
+        productRepository.increaseViewCount(productId);
+        viewRollingService.increaseRealTimeViewCount(productId);
+    }
+
     /*
         1. 카테고리 검증 및 조회
         2. 상품 생성 및 저장
@@ -63,6 +73,9 @@ public class ProductService {
 
         // 5. 품목 생성
         itemService.createItems(savedProduct.getNo(), request.getItems());
+
+        // 6. view rolling 데이터 생성
+        viewRollingService.initializeViewRolling(category.getNo(), savedProduct.getNo());
 
         savedProduct.updateSearchKeywords();
         return ProductResponse.of(savedProduct);

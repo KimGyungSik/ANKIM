@@ -141,18 +141,23 @@
         <div class="slider-container">
             <button class="prev-btn">&lt;</button>
             <div class="image-wrapper">
+                <!-- ✅ RepImgYn이 'Y'인 이미지만 표시 -->
                 <th:block th:each="img, iterStat : ${product.productImgs}">
-                    <img th:src="${img.imgUrl}" class="slider-img" th:classappend="${iterStat.index == 0} ? 'active' : ''"
-                         alt="상품 이미지">
+                    <th:block th:if="${img.repImgYn == 'Y'}">
+                        <img th:src="${img.imgUrl}" class="slider-img"
+                             th:classappend="${iterStat.index == 0} ? 'active' : ''" alt="대표 상품 이미지">
+                    </th:block>
                 </th:block>
             </div>
             <button class="next-btn">&gt;</button>
         </div>
 
-        <!-- 인디케이터 (점) -->
+        <!-- ✅ 인디케이터 (점)도 RepImgYn이 'Y'인 이미지 개수만큼 표시 -->
         <div class="indicator-container">
             <th:block th:each="img, iterStat : ${product.productImgs}">
-                <span class="indicator-dot" th:classappend="${iterStat.index == 0} ? 'active' : ''"></span>
+                <th:block th:if="${img.repImgYn == 'Y'}">
+                    <span class="indicator-dot" th:classappend="${iterStat.index == 0} ? 'active' : ''"></span>
+                </th:block>
             </th:block>
         </div>
     </div>
@@ -417,11 +422,295 @@
     </div>
 </div>
 <script type="module" th:src="@{/js/product/detail.js}"></script>
+<!-- 전체 HOT PICKS 컨테이너 -->
+<div class="hot-picks-container">
+    <!-- HOT PICKS 섹션 -->
+    <div class="hot-picks-header" th:attr="data-category-no=${categoryNo}">
+        <h2>
+            <span id="category-name" th:text="${categoryName}"></span>
+            <span class="hot-picks-title-highlight">HOT PICKS</span>
+        </h2>
+    </div>
+
+    <!-- HOT PICKS 탭 -->
+    <div class="hot-picks-tabs">
+        <button class="hot-picks-tab active" data-period="REALTIME">실시간</button>
+        <button class="hot-picks-tab" data-period="DAILY">일간</button>
+        <button class="hot-picks-tab" data-period="WEEKLY">주간</button>
+        <button class="hot-picks-tab" data-period="MONTHLY">월간</button>
+    </div>
+
+    <script>
+        // 필터 버튼 클릭 시 active 클래스 변경
+        document.querySelectorAll('.hot-picks-tab').forEach(button => {
+            button.addEventListener('click', function () {
+                document.querySelectorAll('.hot-picks-tab').forEach(btn => btn.classList.remove('active'));
+                this.classList.add('active');
+            });
+        });
+    </script>
+
+    <!-- 상품 리스트 -->
+    <div class="product-list" id="product-list">
+        <div th:each="product, iterStat : ${products}" class="product-card" th:attr="data-product-id=${product.no}">
+
+            <!-- 순위 표시 -->
+            <div class="rank-badge" th:text="${iterStat.index + 1}"></div>
+
+            <!-- 상품 이미지 -->
+            <img th:src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+
+            <div class="product-info">
+                <h3 class="product-name" th:text="${product.name}">상품 이름</h3>
+                <div class="price-discount">
+                    <span class="discount-rate" th:if="${product.discRate > 0}" th:text="${product.discRate + '%'}"></span>
+                    <span class="price" th:text="${#numbers.formatInteger(product.sellPrice, 3, 'COMMA')}"></span>
+                </div>
+                <div class="product-badges">
+                    <span class="badge" th:if="${product.freeShip == 'Y'}">무료배송</span>
+                    <span class="badge" th:if="${product.handMadeYn == 'Y'}">핸드메이드</span>
+                </div>
+            </div>
+        </div>
+    </div>
 
 
+    <!-- 페이지네이션 (디자인 변경) -->
+    <div class="pagination">
+        <button id="prev-page" class="pagination-arrow">&lt;</button>
+        <span id="current-page" class="pagination-number">1</span>
+        <span class="pagination-separator">/</span>
+        <span id="total-pages" class="pagination-total">10</span>
+        <button id="next-page" class="pagination-arrow">&gt;</button>
+    </div>
+</div> <!-- hot-picks-container 종료 -->
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const productList = document.getElementById("product-list");
+        const filterButtons = document.querySelectorAll(".hot-picks-tab");
+        const categoryNo = document.querySelector(".hot-picks-header").getAttribute("data-category-no");
 
+        let currentPage = 1;
+        const itemsPerPage = 5;
+        let products = [];
 
+        // ✅ 첫 렌더링 시 기존 Thymeleaf 데이터를 활용하여 5개씩 표시
+        const initialProducts = Array.from(document.querySelectorAll(".product-card"));
+        products = initialProducts.map(product => ({
+            no: product.getAttribute("data-product-id"),
+            name: product.querySelector(".product-name").innerText,
+            thumbNailImgUrl: product.querySelector("img").src,
+            discRate: product.querySelector(".discount-rate") ? product.querySelector(".discount-rate").innerText.replace('%', '') : 0,
+            sellPrice: product.querySelector(".price").innerText.replace(',', ''),
+            freeShip: product.querySelector(".badge")?.innerText.includes("무료배송") ? "Y" : "N",
+            handMadeYn: product.querySelector(".badge")?.innerText.includes("핸드메이드") ? "Y" : "N",
+        }));
 
+        function showPage(page) {
+            productList.style.transition = "transform 0.5s ease-in-out"; // 부드러운 애니메이션 효과
+            productList.style.transform = "translateX(-10px)"; // 왼쪽으로 살짝 이동 후
+            productList.style.visibility = "hidden"; // 💡 일시적인 50개 노출 방지
+
+            setTimeout(() => {
+                productList.innerHTML = ""; // 기존 상품 목록 초기화
+                const startIdx = (page - 1) * itemsPerPage;
+                const endIdx = startIdx + itemsPerPage;
+                const visibleProducts = products.slice(startIdx, endIdx);
+
+                visibleProducts.forEach((product, index) => {
+                    const productCard = document.createElement("div");
+                    productCard.classList.add("product-card");
+                    productCard.setAttribute("data-product-id", product.no);
+
+                    productCard.innerHTML = `
+                    <div class="rank-badge">${startIdx + index + 1}</div>
+                    <img src="${product.thumbNailImgUrl}" alt="상품 이미지" />
+                    <div class="product-info">
+                        <h3 class="product-name">${product.name}</h3>
+                        <div class="price-discount">
+                            ${product.discRate > 0 ? `<span class="discount-rate">${product.discRate}%</span>` : ""}
+                            <span class="price">${Number(product.sellPrice).toLocaleString()}</span>
+                        </div>
+                        <div class="product-badges">
+                            ${product.freeShip === "Y" ? `<span class="badge">무료배송</span>` : ""}
+                            ${product.handMadeYn === "Y" ? `<span class="badge">핸드메이드</span>` : ""}
+                        </div>
+                    </div>
+                `;
+
+                    productList.appendChild(productCard);
+                });
+
+                productList.style.transform = "translateX(0)"; // 다시 원래 위치로
+                productList.style.visibility = "visible"; // 💡 최종적으로 보이게 처리
+
+                document.getElementById("current-page").innerText = page;
+                document.getElementById("total-pages").innerText = Math.ceil(products.length / itemsPerPage);
+            }, 100);
+        }
+
+        // ✅ 첫 렌더링 시 5개씩 표시
+        showPage(currentPage);
+
+        // ✅ 페이지네이션 기능
+        document.getElementById("prev-page").addEventListener("click", function () {
+            if (currentPage > 1) {
+                currentPage--;
+                showPage(currentPage);
+            }
+        });
+
+        document.getElementById("next-page").addEventListener("click", function () {
+            if (currentPage < Math.ceil(products.length / itemsPerPage)) {
+                currentPage++;
+                showPage(currentPage);
+            }
+        });
+
+        // ✅ 상품 카드 클릭 시 상세 페이지 이동
+        productList.addEventListener("click", function (event) {
+            const productCard = event.target.closest(".product-card");
+            if (productCard) {
+                const productId = productCard.getAttribute("data-product-id");
+                if (productId) {
+                    window.location.href = `/product/detail/${productId}`;
+                }
+            }
+        });
+
+        // ✅ 비동기 요청 후 처리
+        function fetchProducts(period) {
+            productList.style.visibility = "hidden"; // 💡 비동기 요청 중 리스트를 숨김
+            productList.style.minHeight = productList.offsetHeight + "px"; // 💡 레이아웃 유지
+
+            fetch(`/categories/${categoryNo}/top-views/${period}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.code === 200 && data.data && data.data.content) {
+                        products = data.data.content.map((product, index) => ({
+                            no: product.no,
+                            name: product.name,
+                            thumbNailImgUrl: product.thumbNailImgUrl,
+                            discRate: product.discRate,
+                            sellPrice: product.sellPrice,
+                            freeShip: product.freeShip,
+                            handMadeYn: product.handMadeYn,
+                        }));
+
+                        currentPage = 1;
+                        showPage(currentPage);
+                    } else {
+                        console.error("Failed to fetch products:", data);
+                    }
+                })
+                .catch(error => console.error("Error fetching products:", error))
+                .finally(() => {
+                    productList.style.visibility = "visible"; // 💡 데이터 로딩 후 다시 보이게 설정
+                    productList.style.minHeight = ""; // 💡 높이 초기화
+                });
+        }
+
+        // ✅ 필터 버튼 클릭 시 비동기 요청 실행
+        filterButtons.forEach(button => {
+            button.addEventListener("click", function () {
+                filterButtons.forEach(btn => btn.classList.remove("active"));
+                this.classList.add("active");
+
+                const period = this.getAttribute("data-period");
+                fetchProducts(period);
+            });
+        });
+    });
+</script>
+<!-- 상품 상세 정보 섹션 -->
+<div class="product-details-section" id="product-details">
+    <h2 class="details-title">상품정보</h2>
+
+    <!-- ✅ 내용 박스 (가운데 정렬) -->
+    <div class="details-content-wrapper" id="details-wrapper">
+        <!-- 상품 설명 -->
+        <div th:if="${product.desc != null and not #strings.isEmpty(product.desc)}" class="details-box">
+            <h3 class="details-heading">상품 설명</h3>
+            <p th:text="${product.desc}"></p>
+        </div>
+
+        <!-- 상품 유의사항 -->
+        <div th:if="${product.cauProd != null and not #strings.isEmpty(product.cauProd)}" class="details-box">
+            <h3 class="details-heading">상품 유의사항</h3>
+            <p th:text="${product.cauProd}"></p>
+        </div>
+
+        <!-- 주문 유의사항 -->
+        <div th:if="${product.cauOrd != null and not #strings.isEmpty(product.cauOrd)}" class="details-box">
+            <h3 class="details-heading">주문 유의사항</h3>
+            <p th:text="${product.cauOrd}"></p>
+        </div>
+
+        <!-- 배송 유의사항 -->
+        <div th:if="${product.cauShip != null and not #strings.isEmpty(product.cauShip)}" class="details-box">
+            <h3 class="details-heading">배송 유의사항</h3>
+            <p th:text="${product.cauShip}"></p>
+        </div>
+
+        <!-- ✅ 상품 상세 이미지 영역 -->
+        <div class="details-images-wrapper" id="details-images-wrapper">
+            <th:block th:each="img : ${product.productImgs}">
+                <th:block th:if="${img.repImgYn == 'N'}">
+                    <div class="details-image-box">
+                        <img th:src="${img.imgUrl}" alt="상세 이미지" class="details-image">
+                    </div>
+                </th:block>
+            </th:block>
+        </div>
+    </div>
+
+    <!-- ✅ 더보기 버튼 (가운데 정렬) -->
+    <button class="details-toggle-btn" id="details-toggle-btn" onclick="toggleDetails()" style="display: none;">
+        상품설명 더보기 <span class="chevron">&lsaquo;</span>
+    </button>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const detailsWrapper = document.getElementById("details-wrapper");
+        const detailsImagesWrapper = document.getElementById("details-images-wrapper");
+        const toggleBtn = document.getElementById("details-toggle-btn");
+
+        let isExpanded = false; // 확장 상태 관리
+
+        function setInitialHeight() {
+            const visibleTextHeight = detailsWrapper.offsetHeight - detailsImagesWrapper.offsetHeight;
+            const imageElements = document.querySelectorAll(".details-image");
+            if (imageElements.length === 0) return;
+
+            const imageHeight = imageElements[0].offsetHeight || 0;
+            const visibleHeight = visibleTextHeight + (imageHeight * 2.5); // 이미지 2.5개 보이도록 조정
+
+            detailsWrapper.style.maxHeight = visibleHeight + "px";
+            detailsWrapper.style.overflow = "hidden"; // 초과 내용 감추기
+
+            // ✅ 높이가 설정된 visibleHeight보다 크면 "더보기" 버튼 표시
+            if (detailsImagesWrapper.scrollHeight > visibleHeight) {
+                toggleBtn.style.display = "block";
+            }
+        }
+
+        function toggleDetails() {
+            if (!isExpanded) {
+                detailsWrapper.style.maxHeight = detailsWrapper.scrollHeight + "px"; // 전체 내용 보이기
+                detailsWrapper.style.overflow = "visible";
+                toggleBtn.innerHTML = '상품설명 닫기 <span class="chevron">&rsaquo;</span>';
+            } else {
+                setInitialHeight(); // 다시 축소
+                toggleBtn.innerHTML = '상품설명 더보기 <span class="chevron">&lsaquo;</span>';
+            }
+            isExpanded = !isExpanded;
+        }
+
+        setTimeout(setInitialHeight, 200); // DOM 렌더링 후 실행
+        window.toggleDetails = toggleDetails; // 전역으로 함수 등록
+    });
+</script>
 <!-- 푸터 포함 -->
 <div th:replace="fragments/footer :: footer-container"></div>
 </body>

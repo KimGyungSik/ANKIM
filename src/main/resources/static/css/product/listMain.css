@@ -176,7 +176,7 @@
 .discount-rate {
     font-size: 16px;
     font-weight: bold;
-    rgb(255 72 0);
+    color: rgb(255 72 0);
     margin-right: 5px;
 }
 
@@ -295,57 +295,76 @@
 
 
 
-/* 중분류 카테고리와 검색 */
+/* ✅ 카테고리 헤더 */
 .category-header {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 6px; /* 하단 여백 */
+    justify-content: space-between;
+    margin-bottom: 6px;
 }
 
+/* ✅ 중분류 카테고리 제목 */
 .subcategory-title {
-    font-size: 24px; /* 적절한 크기 */
+    font-size: 24px;
     font-weight: bold;
     color: #333;
 }
-/* 검색 바 스타일 */
+
+/* ✅ 검색 바 컨테이너 */
+.search-bar-container {
+    width: 250px;
+}
+
+/* ✅ 검색 바 스타일 */
 .search-bar {
     display: flex;
     align-items: center;
-    width: 230px; /* 검색 바 전체 너비 */
-    border: 1px solid #ccc;
-    border-radius: 25px; /* 원통 모양 */
-    background-color: #f9f9f9;
-    overflow: hidden;
+    width: 100%;
+    position: relative;
 }
 
 .search-bar input[type="text"] {
-    flex-grow: 1; /* 입력창이 버튼 제외 나머지 공간을 차지 */
-    border: none; /* 입력창 경계선 제거 */
+    flex-grow: 1;
+    border: none;
     padding: 8px 12px;
-    font-size: 14px;
+    font-size: 16px;
     outline: none;
-    background-color: transparent; /* 투명 배경 */
+    background-color: transparent;
+    width: 100%;
 }
 
-.search-bar button {
-    background-color: transparent;
+.search-bar .clear-button {
+    background: none;
     border: none;
-    padding: 8px;
+    font-size: 18px;
+    cursor: pointer;
+    color: #666;
+    padding: 0 10px;
+    display: none;
+}
+
+.search-bar .clear-button:hover {
+    color: #333;
+}
+
+/* ✅ 검색 바 하단 밑줄 */
+.search-underline {
+    width: 100%;
+    height: 3px;
+    background-color: black;
+}
+.search-icon-button {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 5px;
     display: flex;
     align-items: center;
-    justify-content: center;
-    cursor: pointer;
 }
 
-.search-bar button .icon-search {
-    width: 16px;
-    height: 16px;
-    color: #666;
-}
-
-.search-bar button:hover .icon-search {
-    color: #333; /* Hover 시 아이콘 색상 변경 */
+.search-icon {
+    width: 30px;
+    height: 30px;
 }
 
 

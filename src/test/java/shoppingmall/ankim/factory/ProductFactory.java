@@ -20,8 +20,11 @@ import shoppingmall.ankim.domain.product.repository.AllConditionsTest;
 import shoppingmall.ankim.domain.product.repository.ProductQueryRepositoryTest;
 import shoppingmall.ankim.domain.product.repository.ProductRepository;
 import shoppingmall.ankim.domain.product.repository.query.helper.*;
+import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
+import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
@@ -523,6 +526,7 @@ public class ProductFactory {
                 .desc("부드럽고 고급스러운 캐시미어 코트")
                 .discRate(10)
                 .origPrice(120000)
+                .viewCnt(0)
                 .qty(100)
                 .shipFee(2000)
                 .sellingStatus(ProductSellingStatus.SELLING)
@@ -768,5 +772,48 @@ public class ProductFactory {
 
         return product;
     }
+
+    public static List<Product> createProducts(EntityManager entityManager) {
+        List<Product> products = new ArrayList<>();
+
+        // ✅ 카테고리 생성 및 저장
+        Category subCategory = Category.builder().name("코트").build();
+        entityManager.persist(subCategory);
+
+        Category category = Category.builder().name("상의").build();
+        category.addSubCategory(subCategory);
+        entityManager.persist(category);
+
+        for (int i = 1; i <= 5; i++) {
+            // ✅ 상품 생성 및 저장 (조회수 다른 5개의 상품 추가)
+            Product product = Product.builder()
+                    .category(subCategory)
+                    .name("상품" + i)
+                    .desc("설명" + i)
+                    .discRate(i * 5)
+                    .origPrice(100000 + (i * 10000))
+                    .viewCnt(0)
+                    .qty(100)
+                    .shipFee(2000)
+                    .sellingStatus(ProductSellingStatus.SELLING)
+                    .build();
+            entityManager.persist(product);
+            products.add(product);
+
+            // ✅ 각 상품별 ViewRolling 데이터 추가 (조회수를 다르게 설정)
+            ViewRolling realTime = ViewRolling.builder().category(subCategory).product(product).period(RollingPeriod.REALTIME).totalViews(i * 10).lastUpdated(LocalDateTime.now()).build();
+            ViewRolling daily = ViewRolling.builder().category(subCategory).product(product).period(RollingPeriod.DAILY).totalViews(i * 100).lastUpdated(LocalDateTime.now().minusDays(1)).build();
+            ViewRolling weekly = ViewRolling.builder().category(subCategory).product(product).period(RollingPeriod.WEEKLY).totalViews(i * 300).lastUpdated(LocalDateTime.now().minusWeeks(1)).build();
+            ViewRolling monthly = ViewRolling.builder().category(subCategory).product(product).period(RollingPeriod.MONTHLY).totalViews(i * 1000).lastUpdated(LocalDateTime.now().minusMonths(1)).build();
+
+            entityManager.persist(realTime);
+            entityManager.persist(daily);
+            entityManager.persist(weekly);
+            entityManager.persist(monthly);
+        }
+
+        return products;
+    }
+
 }
 

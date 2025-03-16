@@ -152,4 +152,80 @@ body {
 
 
 
+/* 🔹 모달창 전체 스타일 (고정된 배경, 스크롤 없음) */
+#search-modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: white;
+    z-index: 1000;
+    justify-content: flex-start;
+    align-items: center;
+    flex-direction: column;
+    padding-top: 50px;
+}
+
+/* 🔹 검색 입력창 스타일 */
+.search-modal-header {
+    width: 80%;
+    max-width: 600px;
+    display: flex;
+    align-items: center;
+    border-bottom: 2px solid black;
+    padding: 10px;
+    position: relative;
+}
+
+/* 🔹 입력 필드 */
+#search-input-modal {
+    width: 100%;
+    padding: 10px;
+    font-size: 18px;
+    border: none;
+    outline: none;
+}
+
+/* 🔹 돋보기 아이콘 (검색 실행 버튼) */
+.search-icon-btn {
+    position: absolute;
+    right: 10px;
+    cursor: pointer;
+}
+
+/* 🔹 인기 검색어 타이틀 */
+.search-modal-title {
+    font-size: 18px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}
+
+/* 🔹 인기 검색어 리스트 */
+#search-keyword-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+#search-keyword-list li {
+    padding: 8px 0;
+    cursor: pointer;
+    font-size: 16px;
+}
+
+#search-keyword-list li:hover {
+    text-decoration: underline;
+}
+
+/* 🔹 닫기 버튼 */
+.search-modal-close {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 24px;
+    cursor: pointer;
+}
+
 
