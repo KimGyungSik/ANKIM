@@ -1092,6 +1092,7 @@
     border-radius: 5px;
 }
 
+
 /* ✅ 더보기 버튼을 내용 박스와 크기 동일하게 조정 */
 .details-toggle-btn {
     display: block;
