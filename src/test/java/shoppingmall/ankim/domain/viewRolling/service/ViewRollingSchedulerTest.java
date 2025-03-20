@@ -14,6 +14,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.ScheduledAnnotationBeanPostProcessor;
 import org.springframework.scheduling.support.CronTrigger;
 import org.springframework.scheduling.support.SimpleTriggerContext;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
@@ -28,9 +29,7 @@ import shoppingmall.ankim.domain.viewRolling.entity.RollingPeriod;
 import shoppingmall.ankim.domain.viewRolling.entity.ViewRolling;
 import shoppingmall.ankim.domain.viewRolling.repository.ViewRollingRepository;
 import shoppingmall.ankim.factory.ProductFactory;
-import shoppingmall.ankim.global.config.S3Config;
-import shoppingmall.ankim.global.config.TestClockConfig;
-import shoppingmall.ankim.global.config.TestClockHolder;
+import shoppingmall.ankim.global.config.*;
 import shoppingmall.ankim.global.dummy.InitProduct;
 
 import java.time.Instant;
@@ -39,11 +38,11 @@ import java.time.temporal.ChronoUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles("prod")
-@Import(TestClockConfig.class)
-@EnableScheduling
+@Import({TestClockConfig.class, SchedulerConfig.class, TestAsyncConfig.class})
 @SpringBootTest
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @Transactional
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class ViewRollingSchedulerTest {
     @MockBean
     InitProduct initProduct;
