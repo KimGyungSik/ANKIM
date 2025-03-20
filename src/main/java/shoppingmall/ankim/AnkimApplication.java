@@ -8,10 +8,8 @@ import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.scheduling.annotation.EnableScheduling;
 
 @EnableRetry
-@EnableScheduling
 @SpringBootApplication
 @EnableCaching
-@EnableAsync
 public class AnkimApplication {
     public static void main(String[] args) {
         SpringApplication.run(AnkimApplication.class, args);
