@@ -34,10 +34,49 @@
 }
 
 /* SNS 계정 연결 */
-.sns-connect-box {
-    background-color: #ddd;
-    padding: 3%;
-    border-radius: 10px;
+.sns-connect {
+    background: #f7f7f7;
+    padding: 20px;
+    border-radius: 8px;
+}
+
+.sns-buttons {
+    display: flex;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.sns-button {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    cursor: pointer;
+}
+
+/* 각 버튼의 색상 지정 */
+.bg-naver {
+    background-color: #03C75A;
+}
+
+.bg-kakao {
+    background-color: #FEE500;
+}
+
+.bg-apple {
+    background-color: #DDDDDD;
+}
+
+.bg-facebook {
+    background-color: #DDDDDD;
+}
+
+.sns-button svg {
+    width: 24px;
+    height: 24px;
 }
 
 /* 아이디, 비밀번호 각각 얇은 선 */
