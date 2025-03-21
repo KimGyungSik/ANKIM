@@ -2,55 +2,32 @@ package shoppingmall.ankim.domain.order.service;
 
 import jakarta.persistence.EntityManager;
 import org.assertj.core.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mock;
 import org.mockito.Mockito;
-import org.mockito.MockitoAnnotations;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.boot.test.mock.mockito.SpyBean;
-import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
-import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
-import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.image.service.S3Service;
-import shoppingmall.ankim.domain.item.entity.Item;
-import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
-import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
-import shoppingmall.ankim.domain.order.entity.Order;
+import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
-import shoppingmall.ankim.domain.product.entity.Product;
-import shoppingmall.ankim.domain.product.repository.ProductRepository;
-import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
 import shoppingmall.ankim.factory.CartFactory;
 import shoppingmall.ankim.factory.MemberFactory;
-import shoppingmall.ankim.factory.MemberJwtFactory;
-import shoppingmall.ankim.global.config.QuerydslConfig;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.BDDMockito.given;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @ActiveProfiles("test")
@@ -75,7 +52,7 @@ class OrderServiceTest {
 
     @DisplayName("장바구니에서 품목을 선택하여 주문할 수 있다.")
     @Test
-    public void createTempOrder_selectOrderItems() {
+    public void createOrder_selectOrderTempItems() {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberFactory.createMember(em, loginId);
@@ -87,7 +64,7 @@ class OrderServiceTest {
         List<Long> cartItemNoList = List.of(cartItemNo1, cartItemNo2);
 
         // when
-        OrderResponse tempOrder = orderService.createTempOrder(loginId, cartItemNoList);
+        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         // then
         assertNotNull(tempOrder);
@@ -98,7 +75,7 @@ class OrderServiceTest {
 
     @DisplayName("장바구니에서 전체 품목을 선택하여 주문할 수 있다.")
     @Test
-    public void createTempOrder_selectAllOrderItems() {
+    public void createOrder_selectAllOrderTempItems() {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberFactory.createMember(em, loginId);
@@ -112,7 +89,7 @@ class OrderServiceTest {
         }
 
         // when
-        OrderResponse tempOrder = orderService.createTempOrder(loginId, cartItemNoList);
+        OrderTempResponse tempOrder = orderService.createOrderTemp(loginId, cartItemNoList, "");
 
         // then
         assertNotNull(tempOrder);
@@ -123,7 +100,7 @@ class OrderServiceTest {
 
     @DisplayName("장바구니에서 품목을 선택하지않고 주문하면 NO_SELECTED_CART_ITEM예외가 발생한다.")
     @Test
-    public void createTempOrder_withoutSelectingItems_throwsException() {
+    public void createOrder_Temp_withoutSelectingItems_throwsException() {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberFactory.createMember(em, loginId);
@@ -132,14 +109,14 @@ class OrderServiceTest {
         List<Long> cartItemNoList = new ArrayList<>();
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createTempOrder(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(CartItemNotFoundException.class)
                 .hasMessageContaining(NO_SELECTED_CART_ITEM.getMessage());
     }
 
     @DisplayName("장바구니에 없는 품목을 선택하면 CART_ITEM_NOT_FOUND 예외가 발생한다.")
     @Test
-    public void createTempOrder_withInvalidCartItem_throwsException() {
+    public void createOrder_Temp_withInvalidCartItem_throwsException() {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberFactory.createMember(em, loginId);
@@ -149,14 +126,14 @@ class OrderServiceTest {
         List<Long> cartItemNoList = List.of(invalidCartItemNo);
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createTempOrder(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(CartItemNotFoundException.class)
                 .hasMessageContaining(CART_ITEM_NOT_FOUND.getMessage());
     }
 
     @DisplayName("주문 코드 생성 중 에러가 발생하면 ORDER_CODE_GENERATE_FAIL 예외가 발생한다.")
     @Test
-    public void createTempOrder_withOrderCodeGenerationError_throwsException() {
+    public void createOrder_withOrderTempCodeGenerationError_throwsException() {
         // given
         String loginId = "test@ankim.com";
         Member member = MemberFactory.createMember(em, loginId);
@@ -169,7 +146,7 @@ class OrderServiceTest {
                 .when(orderRepository).existsByOrdCode(any());
 
         // when & then
-        Assertions.assertThatThrownBy(() -> orderService.createTempOrder(loginId, cartItemNoList))
+        Assertions.assertThatThrownBy(() -> orderService.createOrderTemp(loginId, cartItemNoList, ""))
                 .isInstanceOf(OrderCodeGenerationException.class)
                 .hasMessageContaining(ORDER_CODE_GENERATE_FAIL.getMessage());
     }

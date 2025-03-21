@@ -13,7 +13,7 @@ spring:
       enabled: always
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: create
     show-sql: true
     properties:
       hibernate:
@@ -32,12 +32,19 @@ spring:
         - jwt
         - login
         - redis
+      prod:
+        - email
+        - jwt
+        - login
+        - redis
   main:
     allow-bean-definition-overriding: true
   sql:
     init:
-      data-locations: classpath*:data.sql
       mode: always
+      data-locations: classpath*:data.sql
+#      schema-locations: classpath*:schema.sql # mysql -> data.sql 실제 더미도 주석처리해야함
+      schema-locations: classpath*:schema-mysql.sql # h2
   web:
     resources:
       static-locations: classpath:/static/  # 정적 리소스 경로

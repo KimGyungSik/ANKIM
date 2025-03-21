@@ -58,7 +58,7 @@ public class CartServiceImpl implements CartService {
                 2.2.1. Cart 생성 후 CartItem에 품목번호 등 필수 값 삽입
  */
     @Override
-    public void addToCart(AddToCartServiceRequest request, String loginId) {
+    public CartItem addToCart(AddToCartServiceRequest request, String loginId) {
         LocalDateTime now = LocalDateTime.now();
         Member member = getMember(loginId);
 
@@ -103,10 +103,13 @@ public class CartServiceImpl implements CartService {
                 // 동일 품목 존재 시 수량 업데이트
                 CartItem cartItem = existingCartItem.get();
                 cartItem.updateQuantityWithDate(qty);
+                return cartItem;
+
             } else {
                 // 동일 품목 미존재 시 새 품목 추가
                 CartItem newCartItem = CartItem.create(cart, product, item, qty, now);
                 cart.addCartItem(newCartItem);
+                return newCartItem;
             }
         } else { // 활성화된 장바구니 존재 X
             // 새로운 장바구니 생성 후 품목 추가
@@ -114,6 +117,7 @@ public class CartServiceImpl implements CartService {
             CartItem newCartItem = CartItem.create(cart, product, item, qty, now);
             cart.addCartItem(newCartItem);
             cartRepository.save(cart); // 새 장바구니 저장
+            return newCartItem;
         }
     }
 
@@ -197,6 +201,12 @@ public class CartServiceImpl implements CartService {
 
         // 장바구니에 상품 개수 파악
         return cartItemRepository.countActiveCartItems(member);
+    }
+
+    @Override
+    public List<CartItem> findByCartItem(List<Long> cartItemNoList) {
+
+        return cartItemRepository.findByNoIn(cartItemNoList);
     }
 
     private static void quantityComparison(Integer qty, Item item) {

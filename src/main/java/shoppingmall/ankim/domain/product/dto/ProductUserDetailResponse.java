@@ -1,18 +1,13 @@
 package shoppingmall.ankim.domain.product.dto;
 
 import lombok.Data;
-import lombok.Getter;
 import lombok.NoArgsConstructor;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
-import shoppingmall.ankim.domain.image.dto.ProductImgResponse;
 import shoppingmall.ankim.domain.image.dto.ProductImgUrlResponse;
-import shoppingmall.ankim.domain.item.dto.ItemResponse;
 import shoppingmall.ankim.domain.option.dto.OptionGroupResponse;
-import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 // 상품 상세 페이지 DTO by User
 @Data

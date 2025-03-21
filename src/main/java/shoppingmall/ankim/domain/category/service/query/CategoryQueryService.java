@@ -1,6 +1,7 @@
 package shoppingmall.ankim.domain.category.service.query;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.category.dto.CategoryResponse;
@@ -55,11 +56,14 @@ public class CategoryQueryService {
                 .orElseThrow(() -> new CategoryNotFoundException(CATEGORY_NOT_FOUND));
     }
 
+
+    @Cacheable(value = "middleCategories", cacheManager = "redisCacheManager")
     public List<CategoryResponse> retrieveMiddleCategories() {
         return categoryRepository.findMiddleCategories();
     }
 
     // 소분류만 조회
+    @Cacheable(value = "subCategories", cacheManager = "redisCacheManager")
     public List<CategoryResponse> fetchAllSubCategories() {
         // 소분류만 가져오도록 필터링
         List<CategoryResponse> responses = categoryRepository.findAll()
@@ -74,6 +78,7 @@ public class CategoryQueryService {
     }
 
     // 핸드메이드 소분류 카테고리 조회
+    @Cacheable(value = "handmadeCategories", cacheManager = "redisCacheManager")
     public List<CategoryResponse> fetchHandmadeCategories() {
         // HANDMADE와 관련된 중분류 카테고리만 가져오기
         List<CategoryResponse> responses = categoryRepository.findAllByNames(List.of("OUTER", "TOP", "BOTTOM", "OPS/SK"))

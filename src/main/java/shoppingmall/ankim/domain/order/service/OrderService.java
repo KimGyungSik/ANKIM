@@ -4,23 +4,27 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.repository.MemberAddressRepository;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartItemNotFoundException;
 import shoppingmall.ankim.domain.cart.repository.CartItemRepository;
-import shoppingmall.ankim.domain.delivery.service.DeliveryService;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.repository.ItemRepository;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
-import shoppingmall.ankim.domain.order.dto.OrderResponse;
+import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
+import shoppingmall.ankim.domain.order.exception.OrderTempException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.exception.InvalidOrderItemQtyException;
-import shoppingmall.ankim.domain.security.service.JwtTokenProvider;
+import shoppingmall.ankim.domain.product.entity.Product;
+import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
+import shoppingmall.ankim.domain.product.exception.ProductNotSellingException;
 
 import java.math.BigInteger;
 import java.security.MessageDigest;
@@ -31,6 +35,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Slf4j
@@ -42,8 +47,10 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final MemberRepository memberRepository;
     private final CartItemRepository cartItemRepository;
+    private final CartService cartService;
+    private final MemberAddressRepository memberAddressRepository;
 
-    public OrderResponse createTempOrder(String loginId, List<Long> cartItemNoList) {
+    public OrderTempResponse createOrderTemp(String loginId, List<Long> cartItemNoList, String referer) {
         LocalDateTime registeredDateTime = LocalDateTime.now();
 
         // 회원 조회
@@ -51,17 +58,18 @@ public class OrderService {
 
         // 선택한 품목이 있는지 확인
         if(cartItemNoList.isEmpty()) {
-            throw new CartItemNotFoundException(NO_SELECTED_CART_ITEM);
+            throw new OrderTempException(NO_SELECTED_CART_ITEM, referer);
         }
 
         // 장바구니 품목 조회
-        List<CartItem> cartItemList = cartItemRepository.findByNoIn(cartItemNoList);
+//        List<CartItem> cartItemList = cartItemRepository.findByNoIn(cartItemNoList);
+        List<CartItem> cartItemList = cartService.findByCartItem(cartItemNoList);
         if (cartItemList.isEmpty() || cartItemList.size() != cartItemNoList.size()) {
-            throw new CartItemNotFoundException(CART_ITEM_NOT_FOUND);
+            throw new OrderTempException(CART_ITEM_NOT_FOUND, referer);
         }
 
         // 장바구니 품목테이블에서 품목(Item) 추출하여 OrderItem 생성
-        List<OrderItem> orderItemList = getOrderItems(cartItemList);
+        List<OrderItem> orderItemList = getOrderItems(cartItemList, referer);
 
         // 임시 주문 생성
         Order tempOrder = Order.tempCreate(orderItemList, member, registeredDateTime);
@@ -72,7 +80,10 @@ public class OrderService {
         log.info("ordCode: {}", ordCode);
         order.setOrdCode(ordCode);
 
-        return OrderResponse.tempOf(order);
+        List<MemberAddress> memberAddresses = memberAddressRepository.findByMember(member);
+
+        return OrderTempResponse.tempOf(order)
+                .withAddresses(memberAddresses);
     }
 
     private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {
@@ -118,18 +129,34 @@ public class OrderService {
         }
     }
 
-    private List<OrderItem> getOrderItems(List<CartItem> cartItemList) {
+    private List<OrderItem> getOrderItems(List<CartItem> cartItemList, String referer) {
         return cartItemList.stream()
                 .map(cartItem -> {
                     Item item = cartItem.getItem();
+                    Product product = item.getProduct();
                     Integer qty = cartItem.getQty();
+                    ProductSellingStatus sellingStatus = product.getSellingStatus();
+                    log.info("item qyt : {}", item.getQty());
+                    log.info("cartItem qyt : {}", qty);
                     // Item 검증
                     if (item == null) {
-                        throw new ItemNotFoundException(ITEM_NOT_FOUND); // Item이 null일 경우 예외 발생
+                        throw new OrderTempException(ITEM_NOT_FOUND, referer);
+//                        throw new ItemNotFoundException(ITEM_NOT_FOUND); // Item이 null일 경우 예외 발생
                     }
                     // Qty 검증
-                    if (qty == null || qty <= 0) {
-                        throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID); // 수량이 유효하지 않은 경우 예외 발생
+                    if (qty == null || qty <= 0 || qty > item.getQty() || qty > product.getQty()) {
+                        throw new OrderTempException(ITEM_NOT_FOUND, referer); // 수량이 유효하지 않은 경우 예외 발생
+//                        throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID); // 수량이 유효하지 않은 경우 예외 발생
+                    }
+
+                    // 상품 상태 검증
+                    if(sellingStatus == HOLD) {
+                        throw new OrderTempException(PRODUCT_HOLD, referer);
+//                        throw new ProductNotSellingException(PRODUCT_HOLD); // 품절보류 상태여서 판매할 수 없는 경우 예외 발생
+                    }
+                    if(sellingStatus == STOP_SELLING) {
+                        throw new OrderTempException(PRODUCT_STOP_SELLING, referer);
+//                        throw new ProductNotSellingException(PRODUCT_STOP_SELLING); // 품절중단 상태여서 판매할 수 없는 경우 예외 발생
                     }
                     return OrderItem.create(item, qty); // 유효한 Item과 Qty로 OrderItem 생성
                 })

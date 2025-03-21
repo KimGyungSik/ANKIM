@@ -19,11 +19,11 @@ class OrderItemTest {
     void createOrderItem_withValidQty() {
         // given
         Product product = mock(Product.class); // Mock Product 객체 생성
+        given(product.getOrigPrice()).willReturn(10000); // 원가 설정
         given(product.getSellPrice()).willReturn(8000); // 할인 적용 가격 설정
         given(product.getShipFee()).willReturn(3000); // 배송비 설정
 
         Item item = mock(Item.class); // Mock Item 객체 생성
-        given(item.getTotalPrice()).willReturn(10000); // 정상 가격 설정
         given(item.getProduct()).willReturn(product); // Mock Product 객체를 반환하도록 설정
 
         // when
@@ -58,11 +58,11 @@ class OrderItemTest {
     void createOrderItem_withValidDiscount() {
         // given
         Product product = mock(Product.class); // Mock Product 객체 생성
+        given(product.getOrigPrice()).willReturn(10000); // 원가 설정
         given(product.getSellPrice()).willReturn(8000); // 할인 적용 가격 설정
         given(product.getShipFee()).willReturn(3000); // 배송비 설정
 
         Item item = mock(Item.class); // Mock Item 객체 생성
-        given(item.getTotalPrice()).willReturn(10000); // 정상 가격 설정
         given(item.getProduct()).willReturn(product); // Mock Product 객체를 반환하도록 설정
 
         // when

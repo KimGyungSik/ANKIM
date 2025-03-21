@@ -31,38 +31,67 @@ INSERT INTO product (
 
 -- 제품 이미지 데이터 삽입
 INSERT INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) VALUES
-                                                                                    ('365096f6-bfe5-4937-ba62-8236c5895afb.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 1, '화면 캡처 2025-02-12 214640.jpg', 841, 'Y'),
-                                                                                    ('a579122e-edb0-41b8-935f-6dcf58792bd6.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/a6886b27-3982-4c77-91f5-750206e29986.jpg', 2, '화면 캡처 2025-02-12 214657.jpg', 841, 'Y'),
-                                                                                    ('b5e9619b-e629-487b-bead-2e7ccb6b7bf7.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/aba28418-ef3c-47ea-9bf1-2159c5734288.jpg', 3, '화면 캡처 2025-02-12 214715.jpg', 841, 'Y'),
-                                                                                    ('9ba9421e-0368-458b-a0b9-bf7f43ff22c8.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/9be24280-9297-4cc1-9e8c-c8974afc8f3c.jpg', 4, '화면 캡처 2025-02-12 214731.jpg', 841, 'Y');
+                                                                                    ('365096f6-bfe5-4937-ba62-8236c5895afb.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 1, '화면 캡처 2025-02-12 214640.jpg', 1051, 'Y'),
+                                                                                    ('a579122e-edb0-41b8-935f-6dcf58792bd6.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/a6886b27-3982-4c77-91f5-750206e29986.jpg', 2, '화면 캡처 2025-02-12 214657.jpg', 1051, 'Y'),
+                                                                                    ('b5e9619b-e629-487b-bead-2e7ccb6b7bf7.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/aba28418-ef3c-47ea-9bf1-2159c5734288.jpg', 3, '화면 캡처 2025-02-12 214715.jpg', 1051, 'Y'),
+                                                                                    ('9ba9421e-0368-458b-a0b9-bf7f43ff22c8.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/9be24280-9297-4cc1-9e8c-c8974afc8f3c.jpg', 4, '화면 캡처 2025-02-12 214731.jpg', 1051, 'Y'),
+                                                                                    ('38a8e1e8-8102-46f3-9f49-209e7f7febed.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/e2a85a22-b3bc-412a-80fa-5e4a22f00e87.jpg', 1, 'ㅇㅇㅇㅇㅇ 10.jpg', 1051, 'N'),
+                                                                                    ('80ff23cf-1299-476b-8030-4b050fc9eed9.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/e67aa6ac-a160-43e0-88ae-5cfad6055ad9.jpg', 2, 'ㅇㅇㅇㅇㅇ 5.jpg', 1051, 'N'),
+                                                                                    ('d7e8fe33-f4cb-4fcb-9037-192fb99af228.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/7cce16d2-e480-4f1c-a8c2-ded11b0d2724.jpg', 3, 'ㅇㅇㅇㅇㅇ 9.jpg', 1051, 'N'),
+                                                                                    ('fc614454-d3bc-4b40-88e1-374873ce500f.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/ee788efa-fc50-4d89-aa6e-0ff2ac7e6702.jpg', 4, 'ㅇㅇㅇㅇㅇ 8.jpg', 1051, 'N');
+
+
+
 
 -- 옵션 그룹 삽입
 INSERT INTO option_group (name, prod_no) VALUES
-                                             ('사이즈', 841),
-                                             ('컬러', 841);
+                                             ('사이즈', 1051),
+                                             ('컬러', 1051);
 
 -- 옵션 값 삽입
 INSERT INTO option_value (color_code, name, optg_no) VALUES
-                                                         (NULL, 'small', 1681),
-                                                         (NULL, 'large', 1681),
-                                                         ('#0000FF', 'blue', 1682),
-                                                         ('#FF0000', 'red', 1682);
+                                                         (NULL, 'small', 2101),
+                                                         (NULL, 'large', 2101),
+                                                         ('#0000FF', 'blue', 2102),
+                                                         ('#FF0000', 'red', 2102);
 
 -- 상품 아이템 삽입
 INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
-                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
-                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 841, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
+                                                                                                                                      (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
+                                                                                                                                      (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
 
 -- 아이템 옵션 연결
 INSERT INTO item_option (item_no, optv_no) VALUES
-                                               (1681, 2521), (1681, 2523),
-                                               (1682, 2521), (1682, 2524),
-                                               (1683, 2522), (1683, 2523),
-                                               (1684, 2522), (1684, 2524);
+                                               (2101,3151), (2101,3153),
+                                               (2102,3151), (2102,3154),
+                                               (2103,3152), (2103,3153),
+                                               (2104,3152), (2104,3154);
 
 
+-- 인기 검색어
+-- INSERT INTO search_logs (keyword, search_count) VALUES
+--                                                                            ('데님1', FLOOR(1 + RAND() * 50)),
+--                                                                             ('데님2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('데님3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('팬츠3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('슬랙스3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('니트1', FLOOR(1 + RAND() * 50)),
+--                                                                             ('니트2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('니트3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('코트3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠2', FLOOR(1 + RAND() * 50)),
+--                                                                            ('티셔츠3', FLOOR(1 + RAND() * 50)),
+--                                                                            ('셔츠1', FLOOR(1 + RAND() * 50)),
+--                                                                            ('셔츠2', FLOOR(1 + RAND() * 50));
 
 
 
@@ -124,41 +153,51 @@ INSERT INTO item_option (item_no, optv_no) VALUES
 --                                                                                           ('cotton-tshirt-detail.jpg', '면 티셔츠 상세', 'http://example.com/images/cotton-tshirt-detail.jpg', 'N', 1, 3);
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
+-- 1
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 1, 1, 'Y');
 
 -- 필수 약관
+-- 2
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 1, 2, 'Y');
-
+-- 3
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 1, 2, 'Y');
-
+--
 -- 선택 약관
+-- 4
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 1, 2, 'Y');
 
+-- 5
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 2, 'Y');
 
+-- 6
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
+-- 7
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
+-- 8
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 1, 1, 'Y');
 
 -- [ 탈퇴 약관 삽입 ]
+-- 9
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'LEAVE', '탈퇴 약관', 'ANKIM 탈퇴 약관', 'Y', 1, 1, 'Y');
 
+-- 10
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 삭제되는 내용','- 탈퇴 시 고객님께서 보유하셨던 쿠폰과 마일리지는 모두 소멸되며 환불할 수 없습니다. 또한 다른 계정으로 양도 또는 이관할 수 없습니다.
 - 탈퇴한 계정 및 이용 내역은 복구할 수 없으니 탈퇴 시 유의하시기 바랍니다.', 'Y', 1, 2, 'Y');
 
+-- 11
 INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
         '- 탈퇴 시 법령에 따라 보관해야 하는 항목은 관련 법령에 따라 일정 기간 보관하며 다른 목적으로 이용하지 않습니다. 전자상거래 등에서의 소비자보호에 관한 법률에 의거하여 대금결제 및 재화 등의 공급에 관한 기록 5년, 계약 또는 청약철회 등에 관한 기록 5년, 소비자의 불만 또는 분쟁처리에 관한 기록은 3년동안 보관됩니다.
@@ -193,6 +232,12 @@ INSERT INTO member (
 -- [ 회원 주소 삽입]
 INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
+
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 98765, '제주특별시 서귀포구', 'oo아파트 101호', '안정훈', '010-1234-5678', '010-8282-8282', 'N', 'Y');
+
+INSERT INTO MEM_ADDR (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+VALUES (1, 02587, '경기도 부천시', 'oo빌라', '안정훈', '010-1234-5678', '010-2424-5252', 'N', 'Y');
 
 -- 탈퇴사유
 INSERT INTO leave_rsn (reason, active_yn) VALUES

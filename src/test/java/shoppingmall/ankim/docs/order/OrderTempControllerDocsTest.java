@@ -7,6 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.restdocs.payload.JsonFieldType;
 import org.springframework.security.test.context.support.WithMockUser;
 import shoppingmall.ankim.docs.RestDocsSupport;
+import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressRegisterServiceRequest;
+import shoppingmall.ankim.domain.cart.service.CartService;
 import shoppingmall.ankim.domain.category.entity.Category;
 import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.member.entity.Member;
@@ -14,6 +17,7 @@ import shoppingmall.ankim.domain.option.entity.OptionGroup;
 import shoppingmall.ankim.domain.option.entity.OptionValue;
 import shoppingmall.ankim.domain.order.controller.OrderTempController;
 import shoppingmall.ankim.domain.order.dto.OrderResponse;
+import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.service.OrderService;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
@@ -25,8 +29,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-import static org.mockito.ArgumentMatchers.anyList;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
 import static org.springframework.restdocs.mockmvc.MockMvcRestDocumentation.document;
@@ -38,6 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 public class OrderTempControllerDocsTest extends RestDocsSupport {
 
     private final OrderService orderService = mock(OrderService.class);
+    private final CartService cartService = mock(CartService.class);
     private final SecurityContextHelper securityContextHelper = mock(SecurityContextHelper.class);
 
     private static final String ACCESS_TOKEN = "example-access-token";
@@ -152,20 +156,48 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
                 .loginId("test@example.com")
                 .build();
 
+        // 테스트용 MemberAddress 생성
+        MemberAddress existingAddress = MemberAddress.builder()
+                .member(member)
+                .baseAddress(MemberAddressRegisterServiceRequest.builder()
+                        .zipCode(12345)
+                        .addressMain("서울특별시 강남구")
+                        .addressDetail("101호")
+                        .build()
+                        .toBaseAddress())
+                .phoneNumber(member.getPhoneNum())
+                .defaultAddressYn("Y")
+                .build();
+
+        MemberAddress anotherAddress = MemberAddress.builder()
+                .member(member)
+                .baseAddress(MemberAddressRegisterServiceRequest.builder()
+                        .zipCode(98765)
+                        .addressMain("제주특별시 서귀포구")
+                        .addressDetail("00아파트 101호")
+                        .build()
+                        .toBaseAddress())
+                .phoneNumber(member.getPhoneNum())
+                .emergencyPhoneNumber("010-8282-8282")
+                .defaultAddressYn("N")
+                .build();
+
+        List<MemberAddress> addresses = List.of(existingAddress, anotherAddress);
+
         // 테스트용 Order 생성
         Order order = Order.tempCreate(orderItems, member, LocalDateTime.now());
         order.setOrdNo(String.valueOf(UUID.randomUUID()));
         order.setOrdCode("ORD20241203-5261724");
 
         // 테스트용 OrderResponse 생성
-        OrderResponse response = OrderResponse.tempOf(order);
+        OrderTempResponse response = OrderTempResponse.tempOf(order).withAddresses(addresses);
 
         given(securityContextHelper.getLoginId()).willReturn(loginId);
-        given(orderService.createTempOrder(eq(loginId), anyList())).willReturn(response);
+        given(orderService.createOrderTemp(eq(loginId), anyList(), anyString())).willReturn(response);
 
 
         // when & then
-        mockMvc.perform(post("/api/temp-order")
+        mockMvc.perform(post("/api/check-out")
                         .header("access", ACCESS_TOKEN)
                         .cookie(new Cookie("refresh", REFRESH_TOKEN))
                         .content(objectMapper.writeValueAsString(request))
@@ -208,6 +240,15 @@ public class OrderTempControllerDocsTest extends RestDocsSupport {
                                 fieldWithPath("data.regDate").description("주문 등록일").type(JsonFieldType.ARRAY),
                                 fieldWithPath("data.modDate").description("주문 상태 변경일").type(JsonFieldType.ARRAY),
                                 fieldWithPath("data.orderStatus").description("주문 상태").type(JsonFieldType.STRING),
+                                // 추가된 주소 정보 문서화
+                                fieldWithPath("data.addresses").description("주소 목록").type(JsonFieldType.ARRAY),
+                                fieldWithPath("data.addresses[].addressName").description("배송지명").optional().type(JsonFieldType.STRING),
+                                fieldWithPath("data.addresses[].receiver").description("수령인").optional().type(JsonFieldType.STRING),
+                                fieldWithPath("data.addresses[].zipCode").description("우편번호").type(JsonFieldType.NUMBER),
+                                fieldWithPath("data.addresses[].addressMain").description("기본 주소").type(JsonFieldType.STRING),
+                                fieldWithPath("data.addresses[].addressDetail").description("상세 주소").type(JsonFieldType.STRING),
+                                fieldWithPath("data.addresses[].phoneNumber").description("기본 연락처").optional().type(JsonFieldType.STRING),
+                                fieldWithPath("data.addresses[].emergencyPhoneNumber").description("비상 연락처").optional().type(JsonFieldType.STRING),
                                 fieldWithPath("jwtError").description("JWT 인증 오류 여부").type(JsonFieldType.BOOLEAN).optional()
                         )
                 ));

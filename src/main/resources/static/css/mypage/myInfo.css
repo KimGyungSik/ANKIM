@@ -67,6 +67,10 @@
     color: #666;
 }
 
+.layer {
+    max-width: 500px;
+}
+
 /* input-group: 인풋과 아이콘을 묶는 컨테이너 */
 .input-group {
     position: relative; /* 아이콘을 절대 배치하기 위해 relative */

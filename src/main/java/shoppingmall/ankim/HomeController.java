@@ -28,10 +28,12 @@ public class HomeController {
     @ResponseBody
     @GetMapping("/header")
     public Map<String, Object> getHeaderCategories() {
+        long bef = System.currentTimeMillis();
         Map<String, Object> response = new HashMap<>();
         response.put("middleCategories", categoryQueryService.retrieveMiddleCategories());
         response.put("handmadeCategories", categoryQueryService.fetchHandmadeCategories());
         response.put("subCategories", categoryQueryService.fetchAllSubCategories());
+        System.out.println("수행시간 : "+ (System.currentTimeMillis()-bef));
         return response;
     }
 

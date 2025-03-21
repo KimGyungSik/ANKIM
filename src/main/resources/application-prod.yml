@@ -28,18 +28,19 @@ spring:
           default_batch_fetch_size: 1000
           jdbc:
           fetch_size: 50
-          batch_size: 30
+#          batch_size: 500 # mysql
+          batch_size: 50 # h2
           generate_statistics: true
           use_sql_comments: true
           order_updates: true
           order_inserts: true
           jdbc.time_zone: UTC
 
-  data:
-    redis:
-      host: localhost
-      port: 6379
-      timeout: 3000 # Redis 연결 타임아웃 (밀리초)
+#  data:
+#    redis:
+#      host: localhost
+#      port: 6379
+#      timeout: 3000 # Redis 연결 타임아웃 (밀리초)
 
 logging:
   level:
@@ -83,42 +84,6 @@ cloud:
       static: ${cloud.aws.region.static}
     stack:
       auto: false
-
-login:
-  attempt:
-    max: 5
-  lock:
-    time: 10
-
-jwt:
-  secret: 23aca2ed0815953971212551d4abbfe1ce73b58230ef7be989f3a32f79a0d360
-  access:
-    token:
-      expire:
-        time: 3600000 # 1시간( 1000 * 60 * 60 )
-  refresh:
-    token:
-      expire:
-        time: 600000 # 10분
-      remember:
-        time: 604800000 # 7일
-
-mail:
-  host: smtp.gmail.com
-  port: 587
-  username: "jh96.dev@gmail.com"
-  password: "fell fchr vphm xvfl"
-  properties:
-    mail:
-      smtp:
-        auth: true
-        starttls:
-          enable: true
-          required: true
-        connectiontimeout: 5000
-        timeout: 5000
-        writetimeout: 5000
-  auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30분
 
 #server:
 #  tomcat:
