@@ -16,24 +16,13 @@ public class ProductQueryHelper {
     /**
      * 정렬 수행
      * @param order 정렬 조건
-     * @param product
+     * @param product 정렬할 상품 정보
      * @return OrderSpecifier
      */
     public static OrderSpecifier<?> getOrderSpecifier(OrderBy order, QProduct product) {
-        if (order == null) {
-            // order가 null인 경우 기본 정렬 기준으로 처리
-            return product.createdAt.desc();
-        }
-        return switch (order) {
-            case POPULAR -> product.wishCnt.desc();
-            case LOW_PRICE -> product.sellPrice.asc();
-            case HIGH_PRICE -> product.sellPrice.desc();
-            case HIGH_DISCOUNT_RATE -> product.discRate.desc();
-            case HIGH_REVIEW -> product.rvwCnt.desc();
-            case HIGH_VIEW -> product.viewCnt.desc();
-            default -> product.createdAt.desc();
-        };
+        return (order != null) ? order.getOrderSpecifier(product) : OrderBy.LATEST.getOrderSpecifier(product);
     }
+
 
     /**
      * 필터링 수행
@@ -65,65 +54,20 @@ public class ProductQueryHelper {
 
     private static void addProductInfoFilters(List<InfoSearch> infoSearches, QProduct product, BooleanBuilder filterBuilder) {
         if (infoSearches == null || infoSearches.isEmpty()) {
-            // 조건이 없으면 필터를 추가하지 않음
             return;
         }
 
         for (InfoSearch infoSearch : infoSearches) {
-            addProductInfoFilter(infoSearch, product, filterBuilder);
+            infoSearch.applyFilter(product, filterBuilder);
         }
     }
-
-
-    private static void addProductInfoFilter(InfoSearch infoSearch, QProduct product, BooleanBuilder filterBuilder) {
-        if (infoSearch == null || infoSearch == InfoSearch.NONE) {
-            // 조건이 없으면 필터를 추가하지 않음
-            return;
-        }
-
-        switch (infoSearch) {
-            case FREESHIP:
-                filterBuilder.and(product.freeShip.eq("Y")); // 무료배송 여부가 "Y"인 상품
-                break;
-            case EXCLUDE_OUT_OF_STOCK:
-                filterBuilder.and(product.qty.gt(0)); // 재고가 0보다 큰 상품
-                break;
-            case DISCOUNT_ONLY:
-                filterBuilder.and(product.discRate.gt(0)); // 할인율이 0보다 큰 상품
-                break;
-            case HANDMADE_ONLY:
-                filterBuilder.and(product.handMadeYn.eq("Y")); // 핸드메이드 여부가 "Y"인 상품
-                break;
-            default:
-                // 기본적으로 조건 없음 (NONE)
-                break;
-        }
-    }
-
 
     private static void addPriceFilter(PriceCondition priceCondition, Integer customMinPrice, Integer customMaxPrice, QProduct product, BooleanBuilder filterBuilder) {
-        if (priceCondition == null) {
-            return;
-        }
-
-        if (priceCondition == PriceCondition.CUSTOM) {
-            // 사용자 정의 가격 필터링
-            if (customMinPrice != null) {
-                filterBuilder.and(product.sellPrice.goe(customMinPrice));
-            }
-            if (customMaxPrice != null) {
-                filterBuilder.and(product.sellPrice.loe(customMaxPrice));
-            }
-        } else {
-            // 고정된 가격 조건 필터링
-            if (priceCondition.getMinPrice() != null) {
-                filterBuilder.and(product.sellPrice.goe(priceCondition.getMinPrice()));
-            }
-            if (priceCondition.getMaxPrice() != null) {
-                filterBuilder.and(product.sellPrice.loe(priceCondition.getMaxPrice()));
-            }
+        if (priceCondition != null) {
+            priceCondition.applyFilter(product, filterBuilder, customMinPrice, customMaxPrice);
         }
     }
+
 
     private static void addColorFilters(List<ColorCondition> colorConditions, QProduct product, BooleanBuilder filterBuilder) {
         if (colorConditions == null || colorConditions.isEmpty()) {
@@ -152,43 +96,9 @@ public class ProductQueryHelper {
     // 조건 필터링 메서드
     private static void addConditionFilters(Condition condition, QProduct product, BooleanBuilder filterBuilder) {
         if (condition != null) {
-            switch (condition) {
-                case NEW:
-                    filterBuilder.and(product.createdAt.after(LocalDateTime.now().minusMonths(1)));
-                    break;
-                case BEST:
-                    filterBuilder.and(product.wishCnt.goe(30L));
-                    break;
-                case HANDMADE:
-                    filterBuilder.and(product.handMadeYn.eq("Y"));
-                    break;
-                case DISCOUNT:
-                    filterBuilder.and(product.discRate.gt(0L));
-                    break;
-                default:
-                    if (condition.isCategoryCondition()) {
-                        // 카테고리 필터링 메서드 호출
-                        addCategoryFilter(
-                                condition.getCategoryName(), // 카테고리 이름으로 필터링
-                                product,
-                                filterBuilder
-                        );
-                    }
-                    break;
-            }
+            condition.applyFilter(product, filterBuilder);
         }
     }
-
-    // 메뉴바(중분류) 카테고리 필터링 메서드
-    private static void addCategoryFilter(String categoryName, QProduct product, BooleanBuilder filterBuilder) {
-        if (categoryName != null) {
-            filterBuilder.andAnyOf(
-                    product.category.name.eq(categoryName),
-                    product.category.parent.name.eq(categoryName)
-            );
-        }
-    }
-
 
     // 카테고리 필터링 메서드
     private static void addCategoryFilter(Long category, QProduct product, BooleanBuilder filterBuilder) {

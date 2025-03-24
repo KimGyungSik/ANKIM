@@ -364,6 +364,48 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 });
 
+    const buyNowButton = document.querySelector(".buy-now-button");
+
+    buyNowButton.addEventListener("click", function () {
+        if (selectedItems.length === 0) {
+            alert("구매할 상품을 선택해주세요.");
+            return;
+        }
+
+        // ✅ 구매할 데이터 생성 (JSON 형식)
+        const cartData = selectedItems.map(item => ({
+            productNo: productNo, // ✅ 상품 번호
+            optionValueNoList: item.optionValueNoList, // ✅ 선택한 옵션값들
+            qty: item.quantity // ✅ 개별 수량
+        }));
+
+        console.log("🛒 바로 구매 요청 데이터:", cartData);
+
+        // ✅ API 요청 보내기
+        fetchWithAccessToken("/api/check-out/products", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify(cartData)
+        })
+            .then(data => {
+                if (data.code === 200 && data.status === "OK") {
+                    console.log("✅ 바로 구매 요청 성공");
+                    // 임시 주문 생성 성공 시, 주문 페이지로 이동
+                    window.location.href = "/order";
+                } else {
+                    console.error("바로 구매 요청 실패:", data);
+                    alert(data.message || "바로 구매 요청에 실패했습니다.");
+                }
+            })
+            .catch(error => {
+                console.error("바로 구매 요청 오류:", error);
+                alert(error.message || "바로 구매 요청 중 오류가 발생했습니다.");
+            });
+    });
+
+
 
 
     // ✅ 장바구니 담기 성공 시 모달창 띄우기
