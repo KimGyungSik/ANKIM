@@ -6,7 +6,7 @@ Content-Type: application/json
   "paymentRequest": {
     "payType": "CARD",
     "amount": 50000,
-    "orderName": "ORD20241125-1234567",
+    "orderName": "ORD20250325-8891637",
     "yourSuccessUrl": "https://your-success-url.com",
     "yourFailUrl": "https://your-fail-url.com"
   },
@@ -28,10 +28,10 @@ Content-Type: application/json
 
 
 ### Toss 결제 성공 시 요청
-GET http://localhost:8080/api/v1/payments/toss/success?paymentKey=tgen_202411281903521CDj9&orderId=ORD12345678&amount=50000
+GET http://localhost:8080/api/v1/payments/toss/success?paymentKey=tgen_202411281903521CDj9&orderId=e2f62cf8-a235-4d43-bcbf-1d6afc286cf5&amount=50000
 
 ### Toss 결제 실패 시 요청
-GET http://localhost:8080/api/v1/payments/toss/fail?code=INVALID_PAYMENT&message=Insufficient%20balance&orderId=ORD12345678
+GET http://localhost:8080/api/v1/payments/toss/fail?code=INVALID_PAYMENT&message=Insufficient%20balance&orderId=e2f62cf8-a235-4d43-bcbf-1d6afc286cf5
 
 ### Toss 결제 취소 시 요청
 POST http://localhost:8080/api/v1/payments/toss/cancel

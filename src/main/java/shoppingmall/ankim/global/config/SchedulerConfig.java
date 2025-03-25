@@ -5,6 +5,7 @@ import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.annotation.EnableSchedulerLock;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -16,6 +17,7 @@ import javax.sql.DataSource;
 @Configuration
 @EnableScheduling
 @EnableAsync
+@Profile("prod")
 @EnableSchedulerLock(defaultLockAtMostFor = "PT30S")
 public class SchedulerConfig {
     @Bean
