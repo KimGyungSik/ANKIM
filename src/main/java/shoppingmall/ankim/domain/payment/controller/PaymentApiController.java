@@ -16,7 +16,7 @@ import shoppingmall.ankim.global.response.ApiResponse;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/payments")
-public class PaymentController {
+public class PaymentApiController {
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
     @PostMapping("/toss")

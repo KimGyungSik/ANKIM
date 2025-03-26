@@ -277,6 +277,94 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
         });
     });
+
+    // 결제 방법 섹션 - kyunsik
+
+    main();
+    async function main() {
+        const button = document.getElementById("payment-button");
+        // ------  결제위젯 초기화 ------
+        const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+        const tossPayments = TossPayments(clientKey);
+        // 회원 결제
+        const customerKey = "WQd75CTuJUuF0wLyEP7Ej";
+        const widgets = tossPayments.widgets({
+            customerKey,
+        });
+        // ------ 주문의 결제 금액 설정 ------
+        await widgets.setAmount({
+            currency: "KRW",
+            value: 50000,
+        });
+
+        await Promise.all([
+            // ------  결제 UI 렌더링 ------
+            widgets.renderPaymentMethods({
+                selector: "#payment-method",
+                variantKey: "DEFAULT",
+            }),
+            // ------  이용약관 UI 렌더링 ------
+            widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" }),
+        ]);
+
+        // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+        button.addEventListener("click", async function () {
+            const paymentRequestData = {
+                paymentRequest: {
+                    payType: "CARD",  // 결제 타입 (실제 결제 방식으로 설정)
+                    amount: data.data.payAmt,  // 결제 금액
+                    orderName: data.data.orderCode,  // 주문명
+                    yourSuccessUrl: window.location.origin + "/toss/success",
+                    yourFailUrl: window.location.origin + "/toss/fail",
+                },
+                deliveryRequest: {
+                    addressId: 1,  // 배송 주소 ID
+                    courier: "CJ대한통운",  // 택배사
+                    delReq: "문 앞에 놓아주세요",  // 배송 요청사항
+                },
+                addressRequest: {
+                    addressName: "우리집",  // 주소 이름
+                    zipCode: 12345,  // 우편번호
+                    addressMain: "서울특별시 강남구 테헤란로 123",  // 기본 주소
+                    addressDetail: "101호",  // 상세 주소
+                    phoneNumber: "01012341234",  // 전화번호
+                    emergencyPhoneNumber: "01056785678",  // 비상 전화번호
+                    defaultAddressYn: "Y",  // 기본 주소 여부
+                },
+            };
+
+            try {
+                // 1️⃣ 먼저 서버에 결제 정보 요청
+                const response = await fetch("/api/v1/payments/toss", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentRequestData),
+                });
+
+                if (!response.ok) {
+                    const errorJson = await response.json();
+                    alert("결제 요청 실패: " + errorJson.message);
+                    return;
+                }
+
+                // 2️⃣ 서버 응답이 성공하면 결제 진행
+                await widgets.requestPayment({
+                    orderId: "cOvhLGmTf6p1vRDN_0IHx",  // 주문 ID
+                    orderName: "토스 티셔츠 외 2건",
+                    successUrl: window.location.origin + "/toss/success",
+                    failUrl: window.location.origin + "/toss/fail",
+                    customerEmail: "customer123@gmail.com",
+                    customerName: "김토스",
+                    customerMobilePhone: "01012341234",
+                });
+            } catch (error) {
+                console.error("결제 요청 중 오류 발생:", error);
+            }
+        });
+
+    }
+
+
 });
 
 // 기존 주소정보 렌더링하는 함수
