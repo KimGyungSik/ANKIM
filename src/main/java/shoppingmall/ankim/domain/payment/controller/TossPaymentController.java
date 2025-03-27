@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.payment.controller;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequestWrapper;
@@ -13,23 +14,20 @@ import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
 import shoppingmall.ankim.domain.payment.service.PaymentFacadeWithNamedLock;
 import shoppingmall.ankim.global.response.ApiResponse;
 
-@RestController
+@Controller
 @RequiredArgsConstructor
 @RequestMapping("/toss")
 public class TossPaymentController {
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
     @GetMapping("/success")
-    public String success(
-            @RequestParam(value = "code") String code,
-            @RequestParam(value = "message") String message,
-            @RequestParam(value = "orderId") String orderId) {
+    public String tossPaymentSuccess() {
         return "/payment/success";
     }
 
 
     @GetMapping("/fail")
-    public String tossPaymentSuccess(
+    public String tossPaymentFail(
             @RequestParam(value = "code") String code,
             @RequestParam(value = "message") String message,
             @RequestParam(value = "orderId") String orderId) {

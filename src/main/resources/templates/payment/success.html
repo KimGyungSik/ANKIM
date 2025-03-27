@@ -34,7 +34,7 @@
 
         const json = await response.json();
 
-        if (!response.ok) {
+        if (!response.code === 200) {
             // 결제 실패 비즈니스 로직을 구현하세요.
             console.log(json);
             window.location.href = `/toss/fail?message=${json.message}&code=${json.code}&orderId=${orderId}`;
@@ -55,7 +55,3 @@
 </script>
 </body>
 </html>
-
-Preview
-
-응답
