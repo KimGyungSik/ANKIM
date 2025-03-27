@@ -71,26 +71,26 @@ public class MemberAddress extends BaseEntity {
 
         // 팩토리 메서드
         public static MemberAddress create(Member member, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
-                MemberAddress memberAddress = new MemberAddress();
-                memberAddress.member = member;
-                memberAddress.addressName = addressName;
-                memberAddress.baseAddress = baseAddress;
-                memberAddress.phoneNumber = phoneNumber;
-                memberAddress.emergencyPhoneNumber = emergencyPhoneNumber;
-                memberAddress.defaultAddressYn = defaultAddressYn != null ? defaultAddressYn : "N"; // 기본값 처리
-                return memberAddress;
+                return MemberAddress.builder()
+                        .member(member)
+                        .addressName(addressName)
+                        .baseAddress(baseAddress)
+                        .phoneNumber(phoneNumber)
+                        .emergencyPhoneNumber(emergencyPhoneNumber)
+                        .defaultAddressYn(defaultAddressYn)
+                        .build();
         }
 
         // 수령인 추가
         public static MemberAddress create(Member member, String receiver, String addressName, BaseAddress baseAddress, String phoneNumber, String emergencyPhoneNumber, String defaultAddressYn) {
-                MemberAddress memberAddress = new MemberAddress();
-                memberAddress.member = member;
-                memberAddress.receiver = receiver;
-                memberAddress.addressName = addressName;
-                memberAddress.baseAddress = baseAddress;
-                memberAddress.phoneNumber = phoneNumber;
-                memberAddress.emergencyPhoneNumber = emergencyPhoneNumber;
-                memberAddress.defaultAddressYn = defaultAddressYn != null ? defaultAddressYn : "N"; // 기본값 처리
-                return memberAddress;
+                return MemberAddress.builder()
+                        .member(member)
+                        .receiver(receiver)
+                        .addressName(addressName)
+                        .baseAddress(baseAddress)
+                        .phoneNumber(phoneNumber)
+                        .emergencyPhoneNumber(emergencyPhoneNumber)
+                        .defaultAddressYn(defaultAddressYn)
+                        .build();
         }
 }
