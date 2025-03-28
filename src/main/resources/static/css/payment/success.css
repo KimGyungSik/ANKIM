@@ -187,7 +187,16 @@ main.checkout-container {
 .delivery-info-table td {
     padding: 10px 12px;
     border-bottom: 1px solid #e0e0e0; /* 얇은 회색 구분선 */
+    border-right: 1px solid #e0e0e0;
     vertical-align: middle;
+}
+
+/* 마지막 td나 th는 오른쪽 선 제거해서 중복 X */
+.payment-info-table tr th:last-child,
+.payment-info-table tr td:last-child,
+.delivery-info-table tr th:last-child,
+.delivery-info-table tr td:last-child {
+    border-right: none;
 }
 
 .payment-info-table th,
