@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.payment.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequestWrapper;
@@ -30,8 +31,11 @@ public class TossPaymentController {
     public String tossPaymentFail(
             @RequestParam(value = "code") String code,
             @RequestParam(value = "message") String message,
-            @RequestParam(value = "orderId") String orderId) {
-        paymentFacadeWithNamedLock.toFailRequest(code, message, orderId);
+            @RequestParam(value = "orderId") String orderId,
+            @RequestParam(value = "orderName") String orderName,
+            Model model) {
+        model.addAttribute("response",paymentFacadeWithNamedLock.toFailRequest(code, message, orderId));
+        model.addAttribute("orderName", orderName);
         return "/payment/fail";
     }
 }
