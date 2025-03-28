@@ -24,7 +24,10 @@ public class PaymentApiController {
         return ApiResponse.ok(paymentFacadeWithNamedLock.createPaymentWithNamedLock(
                 requestWrapper.getPaymentRequest().toServiceRequest(),
                 requestWrapper.getDeliveryRequest().toServiceRequest(),
-                requestWrapper.getAddressRequest().toServiceRequest()));
+                requestWrapper.getAddressRequest() != null
+                        ? requestWrapper.getAddressRequest().toServiceRequest()
+                        : null
+        ));
     }
 
 
