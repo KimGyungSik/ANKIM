@@ -355,7 +355,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                 if (!response.ok) {
                     const errorJson = await response.json();
-                    alert("결제 요청 실패: " + errorJson.message);
+                    showModal(errorJson.message || "알 수 없는 오류가 발생했습니다.");
                     return;
                 }
 
@@ -375,9 +375,18 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
     }
-
-
+    function showModal(message) {
+        const modal = document.getElementById("errorModal");
+        const messageElement = document.getElementById("errorMessage");
+        messageElement.innerHTML = `죄송합니다.<br>${message}`;
+        modal.style.display = "flex";
+        // 스크롤 잠금
+        document.body.style.overflow = "hidden";
+    }
 });
+
+
+
 
 // 신규입력 폼에서 값 가져오기
 function getNewAddressFormData() {
