@@ -375,6 +375,9 @@ document.addEventListener("DOMContentLoaded", async () => {
         });
 
     }
+
+    const closeBtn = document.getElementById("modalCloseBtn");
+    const confirmBtn = document.getElementById("modalConfirmBtn");
     function showModal(message) {
         const modal = document.getElementById("errorModal");
         const messageElement = document.getElementById("errorMessage");
@@ -383,6 +386,15 @@ document.addEventListener("DOMContentLoaded", async () => {
         // 스크롤 잠금
         document.body.style.overflow = "hidden";
     }
+    function closeModal() {
+        const modal = document.getElementById("errorModal");
+        modal.style.display = "none";
+        // 스크롤 다시 활성화
+        document.body.style.overflow = "";
+    }
+    // 버튼에 이벤트 등록
+    closeBtn.addEventListener("click", closeModal);
+    confirmBtn.addEventListener("click", closeModal);
 });
 
 
