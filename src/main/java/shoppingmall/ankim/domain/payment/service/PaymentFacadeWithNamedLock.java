@@ -127,14 +127,17 @@ public class PaymentFacadeWithNamedLock {
 
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
     public PaymentFailResponse toFailRequest(String code, String message, String orderId) {
-        // 주문 상태를 결제실패로 수정 & 배송지 삭제
-        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        order.failOrderWithOutDelivery();
-        // 재고 복구
-        restoreStock(order);
-
-        return paymentService.tossPaymentFail(code,message,orderId);
+        PaymentFailResponse response = paymentService.tossPaymentFail(code, message, orderId);
+        if(response!=null) {
+            // 주문 상태를 결제실패로 수정 & 배송지 삭제
+            Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+            order.failOrderWithOutDelivery();
+            response.setOrderName(order.getOrdCode());
+            // 재고 복구
+            restoreStock(order);
+        }
+        return response;
     }
     // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소) & 배송 상태 (배송 취소)
     public PaymentCancelResponse toCancelRequest(String paymentKey, String cancelReason) {

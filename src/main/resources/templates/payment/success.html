@@ -148,9 +148,9 @@
             const json = await response.json();
             const data = json.data;
             const delivery = data?.paymentSuccessInfoResponse?.deliveryResponse;
-            if (!response.ok) {
+            if (json.code !== 200) {
                 console.log(json);
-                window.location.href = `/toss/fail?message=${json.message}&code=${json.code}&orderId=${orderId}&orderName=${data.orderName}`;
+                window.location.href = `/toss/fail?message=${json.message}&code=${json.code}&orderId=${orderId}`;
                 return;
             }
 

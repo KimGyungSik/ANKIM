@@ -32,10 +32,8 @@ public class TossPaymentController {
             @RequestParam(value = "code") String code,
             @RequestParam(value = "message") String message,
             @RequestParam(value = "orderId") String orderId,
-            @RequestParam(value = "orderName") String orderName,
             Model model) {
         model.addAttribute("response",paymentFacadeWithNamedLock.toFailRequest(code, message, orderId));
-        model.addAttribute("orderName", orderName);
         return "/payment/fail";
     }
 }
