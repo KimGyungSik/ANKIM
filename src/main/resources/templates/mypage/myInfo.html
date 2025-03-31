@@ -18,7 +18,7 @@
             <p>회원님의 소중한 정보를 보호하기 위해 비밀번호를 재확인하고 있습니다.</p>
             <!-- 아이디 표시 (중복 방지를 위해 id="loginIdConfirm" 사용) -->
             <p class="email-line">
-                아이디(이메일): <span id="loginIdConfirm">cat*****@*****.com</span>
+                아이디(이메일): <span id="loginIdConfirm">sam*****@*****.com</span>
             </p>
             <!-- 비밀번호 입력 row -->
             <div class="row password-line">
@@ -146,14 +146,30 @@
             </div>
 
             <!-- div 2) SNS 계정연결 -->
-            <div class="edit-section sns-connect-box">
-                <h3>SNS 계정연결</h3>
-                <p>자주 사용하는 소셜 계정을 연동하면, 빠르게 로그인할 수 있어요.</p>
-                <!-- 실제 연동 로직은 아직 미개발 가정 -->
-                <div style="display:flex; gap:10px;">
-                    <img src="https://via.placeholder.com/40x40?text=N" alt="N" />
-                    <img src="https://via.placeholder.com/40x40?text=K" alt="K" />
-                    <img src="https://via.placeholder.com/40x40?text=G" alt="G" />
+            <div class="sns-connect">
+                <h3>SNS 계정 연결</h3>
+                <p>자주 사용하는 소셜 계정을 연결하고, 빠르게 로그인할 수 있어요.</p>
+                <div class="sns-buttons">
+                    <button type="button" class="sns-button bg-naver">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M14.9917 12.5912L8.76282 3.60039H3.6001V20.4004H9.00853V11.4082L15.2374 20.4004H20.4001V3.60039H14.9917V12.5912Z" fill="#FFFFFF"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="sns-button bg-kakao">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path fill-rule="evenodd" clip-rule="evenodd" d="M12 3.59961C6.69771 3.59961 2.3999 6.93492 2.3999 11.0485C2.3999 13.6068 4.06221 15.8621 6.59354 17.2035L5.52848 21.1116C5.43438 21.4569 5.82756 21.7321 6.12948 21.532L10.7982 18.437C11.1922 18.4752 11.5926 18.4975 12 18.4975C17.3018 18.4975 21.5999 15.1623 21.5999 11.0485C21.5999 6.93492 17.3018 3.59961 12 3.59961Z" fill="#000000E6"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="sns-button bg-apple">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.5616 5.04476C14.82 5.84246 13.6335 6.47164 12.4469 6.38176C12.2986 5.30317 12.8795 4.15717 13.5593 3.44935C14.3009 2.62918 15.5987 2.04494 16.6493 2C16.7729 3.12353 16.2909 4.22458 15.5616 5.04476ZM16.6369 6.59523C14.9189 6.50535 13.4481 7.48281 12.6323 7.48281C11.8042 7.48281 10.5559 6.64017 9.19628 6.66264C7.42881 6.68511 5.78494 7.59517 4.88266 9.04452C3.02868 11.9432 4.40063 16.2351 6.19282 18.5945C7.07037 19.763 8.12096 21.0438 9.50527 20.9988C10.8154 20.9539 11.3345 20.2236 12.9166 20.2236C14.511 20.2236 14.9684 20.9988 16.3527 20.9764C17.7864 20.9539 18.6887 19.8079 19.5662 18.6394C20.5674 17.3137 20.9753 16.0216 21 15.9542C20.9753 15.9317 18.2314 14.9767 18.2067 12.1005C18.1819 9.69616 20.3696 8.55017 20.4685 8.48275C19.2325 6.81993 17.3044 6.64017 16.6369 6.59523Z" fill="#474747"></path>
+                        </svg>
+                    </button>
+                    <button type="button" class="sns-button bg-facebook">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M15.8447 13.165L16.363 9.57282H13.121V7.24272C13.121 6.25971 13.5731 5.30097 15.0251 5.30097H16.5V2.24272C16.5 2.24272 15.1621 2 13.8836 2C11.2123 2 9.46804 3.72087 9.46804 6.83495V9.57282H6.5V13.165H9.46804V21.8495C10.0639 21.949 10.6735 22 11.2945 22C11.9155 22 12.5251 21.949 13.121 21.8495V13.165H15.8447Z" fill="#474747"></path>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
