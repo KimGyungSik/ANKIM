@@ -64,6 +64,7 @@ public class DeliveryService {
         MemberAddress memberAddress = MemberAddress.create(
                 member,
                 addressRequest.getAddressName(),
+                addressRequest.getReceiverName(),
                 baseAddress,
                 addressRequest.getPhoneNumber(),
                 addressRequest.getEmergencyPhoneNumber(),

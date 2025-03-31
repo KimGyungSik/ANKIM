@@ -15,6 +15,8 @@ import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServ
 public class MemberAddressCreateRequest {
 
     private String addressName;         // 주소 이름
+    @NotBlank(message = "수령인을 입력해주세요.")
+    private String receiverName;       // 수령인
     @NotNull(message = "우편번호를 입력해주세요.")
     private Integer zipCode; // 우편번호
     @NotBlank(message = "주소를 선택해주세요.")
@@ -29,6 +31,7 @@ public class MemberAddressCreateRequest {
     public MemberAddressCreateServiceRequest toServiceRequest() {
         return MemberAddressCreateServiceRequest.builder()
                 .addressName(this.addressName)
+                .receiverName(this.receiverName)
                 .zipCode(this.zipCode)
                 .addressMain(this.addressMain)
                 .addressDetail(this.addressDetail)

@@ -13,7 +13,7 @@ public class PaymentFailResponse {
     String errorCode;
     String errorMessage;
     String orderId;
-
+    String orderName;
     public static PaymentFailResponse of(String errorCode, String errorMessage, String orderId) {
         return PaymentFailResponse.builder()
                 .errorCode(errorCode)

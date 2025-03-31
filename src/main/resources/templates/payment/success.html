@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>결제 성공</title>
+    <link rel="stylesheet" th:href="@{/css/payment/success.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+<header th:replace="/fragments/header :: header"></header>
+<main class="checkout-container">
+    <div class="checkout-steps">
+        <ol class="step-list">
+            <li class="step-item completed">
+                01 SHOPPING BAG
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item completed">
+                02 ORDER
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item active-step">
+                03 ORDER CONFIRMED
+            </li>
+        </ol>
+    </div>
+    <div class="order-complete-ticket">
+        <div class="ticket-content">
+            <h2>주문이 완료되었습니다.</h2>
+        </div>
+        <div class="ticket-footer">
+            <span>주문번호 <strong class="order-id" id="footerOrderId">ORD20241028-9519956</strong></span>
+            <span class="footer-right">GUIDE TO BETTER CHOICE ANKIM</span>
+        </div>
+        <div class="ticket-side">
+            <div class="ticket-notch"></div>
+            <div class="stripe stripe-1"></div>
+            <div class="stripe stripe-2"></div>
+            <div class="stripe stripe-3"></div>
+            <div class="stripe stripe-4"></div>
+        </div>
+    </div>
+    <div class="payment-info-container">
+        <h3>결제정보</h3>
+        <table class="payment-info-table">
+            <tr>
+                <th>결제방법</th>
+                <td id="paymentMethod">토스페이</td>
+            </tr>
+            <tr>
+                <th>주문상태</th>
+                <td id="paymentStatus">결제완료</td>
+            </tr>
+            <tr>
+                <th>주문접수일시</th>
+                <td id="requestedAt">-</td>
+            </tr>
+            <tr>
+                <th>결제완료일시</th>
+                <td id="approvedAt">-</td>
+            </tr>
+            <tr>
+                <th>배송비</th>
+                <td id="shipFee">-</td>
+            </tr>
+            <tr>
+                <th>마일리지 사용금액</th>
+                <td>0원</td>
+            </tr>
+            <tr>
+                <th>쿠폰 사용금액</th>
+                <td>0원</td>
+            </tr>
+            <tr>
+                <th>결제금액</th>
+                <td id="balanceAmount">-</td>
+            </tr>
+        </table>
+
+        <div class="receipt-area">
+            <button class="print-btn">영수증 출력</button>
+        </div>
+
+        <p class="payment-note">결제 및 계좌 안내 시 상호명이 <strong>(주)ANKIM</strong>로 표기되니 참고 부탁드립니다.</p>
+    </div>
+    <div class="delivery-info-container">
+        <h3>배송정보</h3>
+        <table class="delivery-info-table">
+            <tr>
+                <th>받으시는 분</th>
+                <td id="receiver">-</td>
+            </tr>
+            <tr>
+                <th>휴대폰번호</th>
+                <td id="receiverPhone">-</td>
+            </tr>
+            <tr>
+                <th>주소</th>
+                <td id="receiverAddress">-</td>
+            </tr>
+            <tr>
+                <th>배송요청사항</th>
+                <td id="deliveryRequest">-</td>
+            </tr>
+        </table>
+
+        <p class="delivery-note">
+            상품이 품절되는 경우 주문이 자동으로 취소되며, 주문하신 분의 SMS와 이메일로 관련안내를 발송해드립니다.<br>
+            상세내역은 마이페이지에서 확인하실 수 있습니다.
+        </p>
+
+        <div class="delivery-buttons">
+            <button class="btn-outline">계속 쇼핑하기</button>
+            <button class="btn-filled">주문/배송조회</button>
+        </div>
+    </div>
+
+    <script>
+        const urlParams = new URLSearchParams(window.location.search);
+        const paymentKey = urlParams.get("paymentKey");
+        const orderId = urlParams.get("orderId");
+        const amount = urlParams.get("amount");
+
+        async function confirm() {
+            const requestData = {
+                paymentKey: paymentKey,
+                orderId: orderId,
+                amount: amount,
+            };
+
+            const response = await fetch("/api/v1/payments/toss/success", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify(requestData),
+            });
+
+            const json = await response.json();
+            const data = json.data;
+            const delivery = data?.paymentSuccessInfoResponse?.deliveryResponse;
+            if (json.code !== 200) {
+                console.log(json);
+                window.location.href = `/toss/fail?message=${json.message}&code=${json.code}&orderId=${orderId}`;
+                return;
+            }
+
+            document.getElementById("footerOrderId").textContent = data.orderName;
+
+            console.log(json);
+
+            // 주문번호 표시
+            const orderName = data?.orderName;
+            document.getElementById("footerOrderId").textContent = orderName;
+
+            // 결제 상세정보 바인딩
+            document.getElementById("approvedAt").textContent = data?.approvedAt ?? "-";
+            document.getElementById("requestedAt").textContent = data?.approvedAt ?? "-"; // 주문접수일시 = approvedAt로 동일하게
+            document.getElementById("shipFee").textContent = (data?.paymentSuccessInfoResponse?.totalShipFee ?? 0) + "원";
+            document.getElementById("balanceAmount").textContent = (data?.balanceAmount ?? 0) + "원";
+
+            // 고정값이지만 혹시 몰라서 바인딩
+            document.getElementById("paymentMethod").textContent = "토스페이";
+            document.getElementById("paymentStatus").textContent = "결제완료";
+
+            if (delivery) {
+                document.getElementById("receiver").textContent = delivery.receiver ?? "-";
+                document.getElementById("receiverPhone").textContent = delivery.receiverPhone ?? "-";
+                document.getElementById("receiverAddress").textContent = `${delivery.zipcode ?? ""} ${delivery.address ?? ""}`.trim();
+                document.getElementById("deliveryRequest").textContent = delivery.deliveryRequest ?? "-";
+            }
+
+        }
+        confirm();
+    </script>
+</main>
+</body>
+</html>

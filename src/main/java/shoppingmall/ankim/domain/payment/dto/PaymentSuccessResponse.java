@@ -28,4 +28,6 @@ public class PaymentSuccessResponse {
     String cultureExpense; // false
     PaymentSuccessCardResponse card; // 결제 카드 정보 (아래 자세한 정보 있음)
     String type; // 결제 타입 정보 (NOMAL / BILLING / CONNECTPAY)
+    // 추가
+    PaymentSuccessInfoResponse paymentSuccessInfoResponse;
 }
