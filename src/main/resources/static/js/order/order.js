@@ -277,13 +277,169 @@ document.addEventListener("DOMContentLoaded", async () => {
                 });
         });
     });
+
+    // 결제 방법 섹션 - kyunsik
+    main();
+    async function main() {
+        const button = document.getElementById("payment-button");
+        // ------  결제위젯 초기화 ------
+        const clientKey = "test_gck_docs_Ovk5rk1EwkEbP0W43n07xlzm";
+        const tossPayments = TossPayments(clientKey);
+        // 회원 결제
+        const customerKey = "WQd75CTuJUuF0wLyEP7Ej";
+        const widgets = tossPayments.widgets({
+            customerKey,
+        });
+        // ------ 주문의 결제 금액 설정 ------
+        await widgets.setAmount({
+            currency: "KRW",
+            value: data.data.payAmt,
+        });
+
+        await Promise.all([
+            // ------  결제 UI 렌더링 ------
+            widgets.renderPaymentMethods({
+                selector: "#payment-method",
+                variantKey: "DEFAULT",
+            }),
+        ]);
+
+        // ------ '결제하기' 버튼 누르면 결제창 띄우기 ------
+        button.addEventListener("click", async function () {
+            const selectedRequest = document.querySelector(".request-dropdown-input").value;
+            const directInput = document.querySelector(".request-textarea").value;
+
+            if (selectedRequest === "직접입력" && directInput.trim() === "") {
+                alert("배송 요청사항을 입력해주세요.");
+                return;
+            }
+
+            const delReq = (selectedRequest === "직접입력") ? directInput.trim() : selectedRequest.trim();
+
+            const isNewAddressActive = document.querySelector(".tab-item:nth-child(2)").classList.contains("active");
+
+            // 신규입력인 경우
+            let addressId = null;
+            let addressRequest;
+
+            if (isNewAddressActive) {
+                addressRequest = getNewAddressFormData();
+            } else {
+                const hiddenAddressInput = document.getElementById("selected-address-id");
+                addressId = hiddenAddressInput ? hiddenAddressInput.value : null;
+            }
+
+            const paymentRequestData = {
+                paymentRequest: {
+                    payType: "CARD",
+                    amount: data.data.payAmt,
+                    orderName: data.data.orderCode,
+                    yourSuccessUrl: window.location.origin + "/toss/success",
+                    yourFailUrl: window.location.origin + "/toss/fail",
+                },
+                deliveryRequest: {
+                    addressId: addressId,
+                    courier: "ANKIM-CJ대한통운",
+                    delReq: delReq,
+                },
+                addressRequest: addressRequest,
+            };
+
+            try {
+                // 먼저 서버에 결제 정보 요청
+                const response = await fetch("/api/v1/payments/toss", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(paymentRequestData),
+                });
+
+                if (!response.ok) {
+                    const errorJson = await response.json();
+                    showModal(errorJson.message || "알 수 없는 오류가 발생했습니다.");
+                    return;
+                }
+
+                // 서버 응답이 성공하면 결제 진행
+                await widgets.requestPayment({
+                    orderId: data.data.orderNo,  // 주문 ID
+                    orderName: data.data.orderCode,
+                    successUrl: window.location.origin + "/toss/success",
+                    failUrl: window.location.origin + "/toss/fail",
+                    customerEmail: "customer123@gmail.com",
+                    customerName: "김토스",
+                    customerMobilePhone: "01012341234",
+                });
+            } catch (error) {
+                console.error("결제 요청 중 오류 발생:", error);
+            }
+        });
+
+    }
+
+    const closeBtn = document.getElementById("modalCloseBtn");
+    const confirmBtn = document.getElementById("modalConfirmBtn");
+    function showModal(message) {
+        const modal = document.getElementById("errorModal");
+        const messageElement = document.getElementById("errorMessage");
+        messageElement.innerHTML = `죄송합니다.<br>${message}`;
+        modal.style.display = "flex";
+        // 스크롤 잠금
+        document.body.style.overflow = "hidden";
+    }
+    function closeModal() {
+        const modal = document.getElementById("errorModal");
+        modal.style.display = "none";
+        // 스크롤 다시 활성화
+        document.body.style.overflow = "";
+    }
+    // 버튼에 이벤트 등록
+    closeBtn.addEventListener("click", closeModal);
+    confirmBtn.addEventListener("click", closeModal);
 });
+
+// 신규입력 폼에서 값 가져오기
+function getNewAddressFormData() {
+    const addressName = document.querySelector('.new-address input[name="addressName"]').value.trim();
+    const receiverName = document.querySelector('.new-address input[name="receiverName"]').value.trim();
+    const zipCode = parseInt(document.querySelector('.new-address .zipCodeInput').value) || null;
+    const addressMain = document.querySelector('.new-address .addressMainInput').value.trim();
+    const addressDetail = document.querySelector('.new-address .addressDetailInput').value.trim();
+    const tel1 = [
+        document.querySelector('.new-address input[name="tel1_0"]').value.trim(),
+        document.querySelector('.new-address input[name="tel1_1"]').value.trim(),
+        document.querySelector('.new-address input[name="tel1_2"]').value.trim(),
+    ].join('-');
+    const tel2 = [
+        document.querySelector('.new-address input[name="tel2_0"]').value.trim(),
+        document.querySelector('.new-address input[name="tel2_1"]').value.trim(),
+        document.querySelector('.new-address input[name="tel2_2"]').value.trim(),
+    ].join('-');
+    const isDefault = document.querySelector('#defaultAddressInput').checked ? 'Y' : 'N';
+
+    return {
+        addressName,
+        receiverName,
+        addressMain,
+        addressDetail,
+        zipCode,
+        phoneNumber: tel1,
+        emergencyPhoneNumber: tel2,
+        defaultAddressYn: isDefault
+    };
+}
+
 
 // 기존 주소정보 렌더링하는 함수
 function renderDefaultAddress(addresses) {
     // defaultAddressYn이 "Y"인 주소를 찾는다.
     const defaultAddress = addresses.find(addr => addr.defaultAddressYn === "Y");
     if (!defaultAddress) return; // 기본 배송지가 없으면 아무 작업도 하지 않음
+
+    const hiddenAddressInput = document.getElementById("selected-address-id");
+    if (hiddenAddressInput) {
+        hiddenAddressInput.value = defaultAddress.addressNo || "";
+    }
+
 
     // 기존 배송지 영역 내부의 입력 필드에 값 설정
     const existingAddressSection = document.querySelector('.existing-address');
@@ -538,6 +694,11 @@ function fillShippingForm(addressObj) {
     const zipCodeInput = existingAddressSection.querySelector('.zipCodeInput');
     const addressMainInput = existingAddressSection.querySelector('.addressMainInput');
     const addressDetailInput = existingAddressSection.querySelector('.addressDetailInput');
+
+    const hiddenAddressInput = document.getElementById("selected-address-id");
+    if (hiddenAddressInput) {
+        hiddenAddressInput.value = addressObj.addressNo || "";
+    }
 
     if (addressNameInput) addressNameInput.value = addressObj.addressName || "";
     if (receiverInput)     receiverInput.value   = addressObj.receiver || "";

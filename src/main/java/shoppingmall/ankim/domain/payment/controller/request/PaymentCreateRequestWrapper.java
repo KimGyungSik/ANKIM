@@ -22,8 +22,6 @@ public class PaymentCreateRequestWrapper {
     @NotNull
     private DeliveryCreateRequest deliveryRequest;
 
-    @Valid
-    @NotNull
     private MemberAddressCreateRequest addressRequest;
 }
 

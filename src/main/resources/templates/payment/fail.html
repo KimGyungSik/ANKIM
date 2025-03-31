@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>결제 실패</title>
+    <link rel="stylesheet" th:href="@{/css/payment/fail.css}">
+    <link rel="stylesheet" th:href="@{/css/header.css}">
+    <link rel="stylesheet" th:href="@{/css/footer.css}">
+</head>
+<body>
+<header th:replace="/fragments/header :: header"></header>
+<main class="checkout-container">
+    <div class="checkout-steps">
+        <ol class="step-list">
+            <li class="step-item completed">
+                01 SHOPPING BAG
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item completed">
+                02 ORDER
+                <svg class="step-arrow" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 42 80">
+                    <g fill="none" stroke="#d4d4d4" stroke-width="5">
+                        <path d="M1 0l40 40.083L1.166 80"></path>
+                    </g>
+                </svg>
+            </li>
+            <li class="step-item active-step">
+                03 ORDER CONFIRMED
+            </li>
+        </ol>
+    </div>
+    <div class="order-complete-ticket">
+        <div class="ticket-content">
+            <h2>결제에 실패했습니다.</h2>
+        </div>
+        <div class="ticket-footer">
+            <span>주문번호 <strong class="order-id" th:text="${response.orderName}">ORD20241028-9519956</strong></span>
+            <span class="footer-right">GUIDE TO BETTER CHOICE ANKIM</span>
+        </div>
+        <div class="ticket-side">
+            <div class="ticket-notch"></div>
+            <div class="stripe stripe-1"></div>
+            <div class="stripe stripe-2"></div>
+            <div class="stripe stripe-3"></div>
+            <div class="stripe stripe-4"></div>
+        </div>
+    </div>
+
+</main>
+</body>
+</html>

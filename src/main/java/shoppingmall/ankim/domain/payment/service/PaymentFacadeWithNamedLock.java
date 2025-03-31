@@ -10,6 +10,7 @@ import shoppingmall.ankim.domain.cart.entity.Cart;
 import shoppingmall.ankim.domain.cart.entity.CartItem;
 import shoppingmall.ankim.domain.cart.exception.CartNotFoundException;
 import shoppingmall.ankim.domain.cart.repository.CartRepository;
+import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
@@ -19,10 +20,7 @@ import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
-import shoppingmall.ankim.domain.payment.dto.PaymentCancelResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentFailResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentResponse;
-import shoppingmall.ankim.domain.payment.dto.PaymentSuccessResponse;
+import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.exception.AlreadyApprovedException;
 import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
@@ -31,7 +29,9 @@ import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceReq
 import shoppingmall.ankim.global.config.lock.LockHandler;
 import shoppingmall.ankim.global.config.lock.NamedLock;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAYMENT;
@@ -89,15 +89,25 @@ public class PaymentFacadeWithNamedLock {
 
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequest(String paymentKey, String orderId, Integer amount) {
-        // 주문상태를 결제완료로 수정
-        Order order = orderRepository.findByOrderIdWithMemberAndOrderItems(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        order.successOrder();
+        // 결제 성공 요청
+        PaymentSuccessResponse tossPaymentSuccess = paymentService.tossPaymentSuccess(paymentKey, orderId, amount);
+        // 성공 요청 응답 객체가 null이 아니라면
+        if(tossPaymentSuccess!=null) {
+            // 주문상태를 결제완료로 수정
+            Order order = orderRepository.findByOrderIdWithMemberAndOrderItems(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+            order.successOrder();
 
-        // 주문 상품은 장바구니에서 비우기
-        // 주문 상품과 장바구니 상품 매핑하여 비활성화
-        deactivateCartItemsMappedToOrder(order);
-        return paymentService.tossPaymentSuccess(paymentKey,orderId,amount);
+            // 주문 상품은 장바구니에서 비우기
+            // 주문 상품과 장바구니 상품 매핑하여 비활성화
+            deactivateCartItemsMappedToOrder(order);
+
+            tossPaymentSuccess.setPaymentSuccessInfoResponse(PaymentSuccessInfoResponse.builder()
+                    .totalShipFee(order.getTotalShipFee())
+                    .deliveryResponse(DeliveryResponse.of(order.getDelivery()))
+                    .build());
+        }
+        return tossPaymentSuccess;
     }
 
     @Async
@@ -117,14 +127,17 @@ public class PaymentFacadeWithNamedLock {
 
     // 결제 실패 시 처리 & 재고 복구 & 주문 상태 (결제실패) & 배송지 삭제
     public PaymentFailResponse toFailRequest(String code, String message, String orderId) {
-        // 주문 상태를 결제실패로 수정 & 배송지 삭제
-        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-        order.failOrderWithOutDelivery();
-        // 재고 복구
-        restoreStock(order);
-
-        return paymentService.tossPaymentFail(code,message,orderId);
+        PaymentFailResponse response = paymentService.tossPaymentFail(code, message, orderId);
+        if(response!=null) {
+            // 주문 상태를 결제실패로 수정 & 배송지 삭제
+            Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+            order.failOrderWithOutDelivery();
+            response.setOrderName(order.getOrdCode());
+            // 재고 복구
+            restoreStock(order);
+        }
+        return response;
     }
     // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소) & 배송 상태 (배송 취소)
     public PaymentCancelResponse toCancelRequest(String paymentKey, String cancelReason) {

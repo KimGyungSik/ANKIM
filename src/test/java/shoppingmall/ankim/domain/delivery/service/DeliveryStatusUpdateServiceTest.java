@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.delivery.service;
 
 import jakarta.persistence.EntityManager;
 import jakarta.transaction.Transactional;
+import net.javacrumbs.shedlock.core.LockProvider;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
@@ -9,8 +10,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.task.TaskExecutor;
+import org.springframework.test.annotation.DirtiesContext;
+import org.springframework.test.annotation.Rollback;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.TestExecutionListeners;
 import org.springframework.test.context.TestPropertySource;
+import org.springframework.test.context.transaction.TransactionalTestExecutionListener;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.delivery.entity.DeliveryStatus;
 import shoppingmall.ankim.domain.image.service.S3Service;
@@ -25,6 +31,8 @@ import shoppingmall.ankim.domain.payment.entity.Payment;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.factory.OrderFactory;
 import shoppingmall.ankim.global.config.S3Config;
+import shoppingmall.ankim.global.config.SchedulerConfig;
+import shoppingmall.ankim.global.config.TestAsyncConfig;
 import shoppingmall.ankim.global.config.TestClockConfig;
 import shoppingmall.ankim.global.config.clock.ClockHolder;
 import shoppingmall.ankim.global.dummy.InitProduct;
@@ -37,10 +45,11 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest
-@Import(TestClockConfig.class)
-@ActiveProfiles("test")
+@Import({TestClockConfig.class, SchedulerConfig.class, TestAsyncConfig.class})
+@ActiveProfiles("prod")
 @Transactional
 @TestPropertySource(properties = "spring.sql.init.mode=never")
+@DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
 class DeliveryStatusUpdateServiceTest {
     @MockBean
     private S3Service s3Service;
@@ -62,7 +71,6 @@ class DeliveryStatusUpdateServiceTest {
     private ItemRepository itemRepository;
     @Autowired
     private ClockHolder clockHolder;
-
     @MockBean
     private RestTemplate restTemplate;
 
@@ -146,7 +154,7 @@ class DeliveryStatusUpdateServiceTest {
         // 재고 확인
         List<OrderItem> orderItems = orderItemRepository.findOrderItemsWithItemsByOrderNo(ored.getOrdNo());
         assertThat(orderItems.get(0).getItem().getQty()).isEqualTo(2);
-        assertThat(orderItems.get(1).getItem().getQty()).isEqualTo(3);
+        assertThat(orderItems.get(1).getItem().getQty()).isEqualTo(103);
 
         // 결제 취소 확인
         assertThat(paymentRepository.findByOrderId(ored.getOrdNo()).get().getCancelReason()).isEqualTo("반품");

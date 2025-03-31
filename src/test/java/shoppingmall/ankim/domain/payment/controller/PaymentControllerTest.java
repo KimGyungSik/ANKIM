@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @ActiveProfiles("test")
-@WebMvcTest(controllers = PaymentController.class)
+@WebMvcTest(controllers = PaymentApiController.class)
 @TestPropertySource(properties = "spring.sql.init.mode=never")
 @AutoConfigureMockMvc(addFilters = false) // CSRF 비활성화
 @ImportAutoConfiguration(exclude =  {QuerydslConfig.class, JpaAuditingConfig.class, RestTemplateConfig.class, TossPaymentConfig.class})
