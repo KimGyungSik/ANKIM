@@ -397,9 +397,6 @@ document.addEventListener("DOMContentLoaded", async () => {
     confirmBtn.addEventListener("click", closeModal);
 });
 
-
-
-
 // 신규입력 폼에서 값 가져오기
 function getNewAddressFormData() {
     const addressName = document.querySelector('.new-address input[name="addressName"]').value.trim();
