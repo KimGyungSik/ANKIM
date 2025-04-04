@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <main>
     <div class="terms-container">
         <h1 class="terms-title">ANKIM 이용 약관에 동의해 주세요</h1>
@@ -60,7 +60,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="/fragments/footer :: footer-container"></footer>
+<footer th:replace="fragments/footer :: footer-container"></footer>
 </body>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 <script th:src="@{/js/join/termsJoin.js}"></script>

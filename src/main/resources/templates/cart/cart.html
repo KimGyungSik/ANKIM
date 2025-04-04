@@ -7,7 +7,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <main class="cart-container">
 <!--    <h1>장바구니</h1>-->
     <!-- 단계 표시 -->
@@ -70,7 +70,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="/fragments/footer :: footer-container"></footer>
+<footer th:replace="fragments/footer :: footer-container"></footer>
 </body>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 <script type="module" th:src="@{/js/cart/cart.js}"></script>

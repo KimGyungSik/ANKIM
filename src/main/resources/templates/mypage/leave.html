@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <th:block th:replace="mypage/mypageUtils.html :: main">
     <th:block th:fragment="content">
     <!-- 탈퇴사유 선택 섹션 -->

@@ -9,7 +9,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <main>
     <div class="login-container">
         <div class="login-form">
@@ -69,7 +69,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="/fragments/footer :: footer-container"></footer>
+<footer th:replace="fragments/footer :: footer-container"></footer>
 </body>
 <script th:src="@{/js/login/loginEmail.js}"></script>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>

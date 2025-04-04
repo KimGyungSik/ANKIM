@@ -9,7 +9,7 @@
     <script src="https://js.tosspayments.com/v2/standard"></script>
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <main class="checkout-container">
     <div class="checkout-steps">
         <ol class="step-list">
@@ -504,7 +504,7 @@
         </div>
     </div>
 </main>
-<footer th:replace="/fragments/footer :: footer-container"></footer>
+<footer th:replace="fragments/footer :: footer-container"></footer>
 <script type="module" th:src="@{/js/fragments/header.js}"></script>
 <script src="//t1.daumcdn.net/mapjsapi/bundle/postcode/prod/postcode.v2.js"></script>
 <script type="module" th:src="@{/js/utils/map.js}"></script>

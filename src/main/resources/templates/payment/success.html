@@ -8,7 +8,7 @@
     <link rel="stylesheet" th:href="@{/css/footer.css}">
 </head>
 <body>
-<header th:replace="/fragments/header :: header"></header>
+<header th:replace="fragments/header :: header"></header>
 <main class="checkout-container">
     <div class="checkout-steps">
         <ol class="step-list">
@@ -183,5 +183,6 @@
         confirm();
     </script>
 </main>
+<footer th:replace="fragments/footer :: footer-container"></footer>
 </body>
 </html>
