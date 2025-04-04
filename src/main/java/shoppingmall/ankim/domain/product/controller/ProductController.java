@@ -41,7 +41,7 @@ public class ProductController {
     private final SearchLogService searchLogService;
     @GetMapping("/admin/new")
     public String productForm(Model model) {
-        return "/admin/product/registerForm";
+        return "admin/product/registerForm";
     }
 
 
@@ -111,7 +111,7 @@ public class ProductController {
         model.addAttribute("categoryName", product.getCategoryResponse().getName());
         model.addAttribute("categoryNo", categoryNo);
 
-        return "/product/detail";
+        return "product/detail";
     }
 
 

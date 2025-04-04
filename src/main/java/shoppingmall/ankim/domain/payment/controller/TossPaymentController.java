@@ -23,7 +23,7 @@ public class TossPaymentController {
 
     @GetMapping("/success")
     public String tossPaymentSuccess() {
-        return "/payment/success";
+        return "payment/success";
     }
 
 
@@ -34,6 +34,6 @@ public class TossPaymentController {
             @RequestParam(value = "orderId") String orderId,
             Model model) {
         model.addAttribute("response",paymentFacadeWithNamedLock.toFailRequest(code, message, orderId));
-        return "/payment/fail";
+        return "payment/fail";
     }
 }
