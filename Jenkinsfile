@@ -10,6 +10,7 @@ pipeline {
         stage('📦 Build with Gradle') {
             steps {
                 echo "✅ Gradle로 빌드 시작"
+                mkdir -p build/generated-snippets
                 sh './gradlew build -x test -x asciidoctor'
             }
         }
