@@ -14,7 +14,6 @@ pipeline {
                         mkdir -p build/generated-snippets
                         ./gradlew build -x test -x asciidoctor
                     '''
-
                 }
             }
 
