@@ -1,5 +1,5 @@
 -- 상품 데이터 삽입
-INSERT INTO product (
+INSERT IGNORE INTO product (
     avg_rating, category_no, caution_order, caution_product, caution_shipping, code,
     created_at, description, discount_rate, display_order, free_shipping, handmade,
     modified_at, name, option_available, orig_price, qna_count, qty, rel_prod_code,
@@ -30,7 +30,7 @@ INSERT INTO product (
          );
 
 -- 제품 이미지 데이터 삽입
-INSERT INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) VALUES
+INSERT IGNORE INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) VALUES
                                                                                     ('365096f6-bfe5-4937-ba62-8236c5895afb.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 1, '화면 캡처 2025-02-12 214640.jpg', 1051, 'Y'),
                                                                                     ('a579122e-edb0-41b8-935f-6dcf58792bd6.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/a6886b27-3982-4c77-91f5-750206e29986.jpg', 2, '화면 캡처 2025-02-12 214657.jpg', 1051, 'Y'),
                                                                                     ('b5e9619b-e629-487b-bead-2e7ccb6b7bf7.jpg', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/aba28418-ef3c-47ea-9bf1-2159c5734288.jpg', 3, '화면 캡처 2025-02-12 214715.jpg', 1051, 'Y'),
@@ -44,26 +44,26 @@ INSERT INTO product_img (img_name, img_url, ord, orig_name, prod_no, repimg_yn) 
 
 
 -- 옵션 그룹 삽입
-INSERT INTO option_group (name, prod_no) VALUES
+INSERT IGNORE INTO option_group (name, prod_no) VALUES
                                              ('사이즈', 1051),
                                              ('컬러', 1051);
 
 -- 옵션 값 삽입
-INSERT INTO option_value (color_code, name, optg_no) VALUES
+INSERT IGNORE INTO option_value (color_code, name, optg_no) VALUES
                                                          (NULL, 'small', 2101),
                                                          (NULL, 'large', 2101),
                                                          ('#0000FF', 'blue', 2102),
                                                          ('#FF0000', 'red', 2102);
 
 -- 상품 아이템 삽입
-INSERT INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
+INSERT IGNORE INTO item (add_price, code, max_qty, min_qty, name, prod_no, qty, saf_qty, selling_status, thumbnail_img_url, total_price) VALUES
                                                                                                                                       (3000, '1962858-1', 40, 5, '사이즈: small, 컬러: blue', 1051, 5, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
                                                                                                                                       (2000, '1962858-2', 40, 5, '사이즈: small, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
                                                                                                                                       (1000, '1962858-3', 40, 5, '사이즈: large, 컬러: blue', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500),
                                                                                                                                       (5000, '1962858-4', 40, 5, '사이즈: large, 컬러: red', 1051, 40, 40, 'SELLING', 'https://product-uploaded-files.s3.ap-northeast-2.amazonaws.com/4a8e9b33-c985-4443-8245-f34316f11c1a.jpg', 27500);
 
 -- 아이템 옵션 연결
-INSERT INTO item_option (item_no, optv_no) VALUES
+INSERT IGNORE INTO item_option (item_no, optv_no) VALUES
                                                (2101,3151), (2101,3153),
                                                (2102,3151), (2102,3154),
                                                (2103,3152), (2103,3153),
@@ -154,51 +154,51 @@ INSERT INTO item_option (item_no, optv_no) VALUES
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
 -- 1
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'JOIN', '회원가입 약관', 'ANKIM 이용약관', 'Y', 1, 1, 'Y');
 
 -- 필수 약관
 -- 2
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '만 14세 이상입니다', '이 약관은 만 14세 이상임을 동의하는 내용입니다.', 'Y', 1, 2, 'Y');
 -- 3
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '이용약관 동의', '이 약관은 서비스 이용에 대한 동의를 포함합니다.', 'Y', 1, 2, 'Y');
 --
 -- 선택 약관
 -- 4
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '마케팅 목적의 개인정보 수집 및 이용 동의', '마케팅 목적의 개인정보 수집 및 이용 동의', 'N', 1, 2, 'Y');
 
 -- 5
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (1, 'JOIN', '광고성 정보 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 2, 'Y');
 
 -- 6
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '문자 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
 -- 7
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (5, 'JOIN', '이메일 수신 동의', '광고성 정보를 수신하는 것에 대한 동의입니다.', 'N', 1, 3, 'Y');
 
 -- [ 주문/결제 약관 삽입 ]
 -- 8
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'ORDER', '주문 약관', 'ANKIM 주문/결제 약관', 'Y', 1, 1, 'Y');
 
 -- [ 탈퇴 약관 삽입 ]
 -- 9
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (null, 'LEAVE', '탈퇴 약관', 'ANKIM 탈퇴 약관', 'Y', 1, 1, 'Y');
 
 -- 10
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 삭제되는 내용','- 탈퇴 시 고객님께서 보유하셨던 쿠폰과 마일리지는 모두 소멸되며 환불할 수 없습니다. 또한 다른 계정으로 양도 또는 이관할 수 없습니다.
 - 탈퇴한 계정 및 이용 내역은 복구할 수 없으니 탈퇴 시 유의하시기 바랍니다.', 'Y', 1, 2, 'Y');
 
 -- 11
-INSERT INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
+INSERT IGNORE INTO terms (parents_no, category, name, contents, terms_yn, version, level, active_yn)
 VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
         '- 탈퇴 시 법령에 따라 보관해야 하는 항목은 관련 법령에 따라 일정 기간 보관하며 다른 목적으로 이용하지 않습니다. 전자상거래 등에서의 소비자보호에 관한 법률에 의거하여 대금결제 및 재화 등의 공급에 관한 기록 5년, 계약 또는 청약철회 등에 관한 기록 5년, 소비자의 불만 또는 분쟁처리에 관한 기록은 3년동안 보관됩니다.
 - 아이디(이메일), 이메일, 비밀번호는 부정 이용ㆍ탈퇴 방지를 위해 탈퇴 요청 시 7일 간 별도 보관 후 파기합니다.
@@ -207,7 +207,7 @@ VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
 
 
 -- [ 회원 삽입 ]
-INSERT INTO member (
+INSERT IGNORE INTO member (
     login_id,
     password,
     name,
@@ -230,17 +230,17 @@ INSERT INTO member (
          );
 
 -- [ 회원 주소 삽입]
-INSERT INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
+INSERT IGNORE INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, ADDR_NAME, PHONE_NUM, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 12345, '서울특별시 강남구', '10층 D강의실', '기본 배송지', '010-1234-5678', 'Y', 'Y');
 
-INSERT INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+INSERT IGNORE INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 98765, '제주특별시 서귀포구', 'oo아파트 101호', '안정훈', '010-1234-5678', '010-8282-8282', 'N', 'Y');
 
-INSERT INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
+INSERT IGNORE INTO mem_addr (MEM_NO, ZIP_CODE, ADDR_MAIN, ADDR_DTL, RECEIVER, PHONE_NUM, PHONE_EMGCY, ADDR_DEF, ACTIVE_YN)
 VALUES (1, 02587, '경기도 부천시', 'oo빌라', '안정훈', '010-1234-5678', '010-2424-5252', 'N', 'Y');
 
 -- 탈퇴사유
-INSERT INTO leave_rsn (reason, active_yn) VALUES
+INSERT IGNORE INTO leave_rsn (reason, active_yn) VALUES
                                               ('탈퇴 후 재가입을 위해서', 'Y'),
                                               ('사고 싶은 상품이 없어서', 'Y'),
                                               ('자주 이용하지 않아서', 'Y'),
