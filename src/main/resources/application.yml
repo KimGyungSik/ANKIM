@@ -18,7 +18,7 @@ spring:
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: true
+    defer-datasource-initialization: false
     open-in-view: true
   datasource:
         hikari:
