@@ -8,12 +8,14 @@ pipeline {
 
     stages {
         stage('📦 Build with Gradle') {
-            steps {
-                echo "✅ Gradle로 빌드 시작"
-                mkdir -p build/generated-snippets
-                sh './gradlew build -x test -x asciidoctor'
+                steps {
+                    echo "✅ Gradle로 빌드 시작"
+                    sh '''
+                        mkdir -p build/generated-snippets
+                        ./gradlew build -x test -x asciidoctor
+                    '''
+                }
             }
-        }
 
         stage('🐳 Docker Build & Push') {
             steps {
