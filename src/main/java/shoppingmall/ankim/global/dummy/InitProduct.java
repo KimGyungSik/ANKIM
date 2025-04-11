@@ -37,7 +37,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ThreadLocalRandom;
 
-@Profile("!test")
+@Profile("dbinit")
 @Component
 @RequiredArgsConstructor
 public class InitProduct {
