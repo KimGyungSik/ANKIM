@@ -15,7 +15,6 @@ import java.util.concurrent.TimeUnit;
 @RequiredArgsConstructor
 @Slf4j
 public class LockHandler {
-
     private static final String LOCK_KEY_PREFIX = "LOCK_";
     private final ItemLockRepository itemLockRepository;
     private final RedissonClient redissonClient;
