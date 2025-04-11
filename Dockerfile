@@ -17,6 +17,12 @@ WORKDIR /app
 
 # application.yml 필요 시 복사 (선택사항)
 COPY src/main/resources/application.yml /app/application.yml
+COPY src/main/resources/application-prod.yml /app/application-prod.yml
+COPY src/main/resources/application-email.yml /app/application-email.yml
+COPY src/main/resources/application-jwt.yml /app/application-jwt.yml
+COPY src/main/resources/application-redis.yml /app/application-redis.yml
+COPY src/main/resources/application-login.yml /app/application-login.yml
+
 
 # 빌드된 JAR 복사
 COPY --from=build /app/build/libs/*.jar app.jar
