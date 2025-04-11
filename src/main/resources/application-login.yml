@@ -1,0 +1,5 @@
+login:
+  attempt:
+    max: 5
+  lock:
+    time: 10

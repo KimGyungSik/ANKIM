@@ -1,0 +1,14 @@
+#jwt 토큰
+jwt:
+  secret: 23aca2ed0815953971212551d4abbfe1ce73b58230ef7be989f3a32f79a0d360
+  access:
+    token:
+      expire:
+        time: 3600000 # 1시간( 1000 * 60 * 60 )
+  refresh:
+    token:
+      expire:
+#        time: 604800000 # 7일( 1000 * 60 * 60 * 24 * 7 )
+        time: 600000 # 10분
+      remember:
+        time: 604800000 # 7일

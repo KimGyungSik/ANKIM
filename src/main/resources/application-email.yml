@@ -1,0 +1,22 @@
+#Email 인증
+mail:
+  host: smtp.gmail.com
+  port: 587
+  username: "jh96.dev@gmail.com"
+  password: "fell fchr vphm xvfl"
+  properties:
+    mail:
+      smtp:
+        auth: true
+        starttls:
+          enable: true
+          required: true
+        connectiontimeout: 5000
+        timeout: 5000
+        writetimeout: 5000
+      debug: true
+  auth-code-expiration-millis: 1800000  # 30 * 60 * 1000 == 30?
+  async:
+    core-pool-size: 5
+    max-pool-size: 10
+    queue-capacity: 500
