@@ -12,13 +12,10 @@ spring:
     ansi:
       enabled: always
   jpa:
-    hibernate:
-      ddl-auto: none
     show-sql: true
     properties:
       hibernate:
         format_sql: true
-    defer-datasource-initialization: false
     open-in-view: true
   datasource:
         hikari:
@@ -42,8 +39,6 @@ spring:
   sql:
     init:
       mode: never
-      data-locations: classpath*:data.sql
-      schema-locations: classpath*:schema.sql # mysql -> data.sql 실제 더미도 주석처리해야함
 #      schema-locations: classpath*:schema-mysql.sql # h2
   web:
     resources:

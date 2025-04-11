@@ -15,8 +15,6 @@ spring:
         lockTimeout: 10000
 
   jpa:
-    hibernate:
-      ddl-auto: none #자동으로 엔티티에 맞는 테이블 업데이트
     show-sql: true
     properties:
       hibernate:

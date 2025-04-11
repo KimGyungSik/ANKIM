@@ -2,7 +2,9 @@ spring:
   sql:
     init:
       mode: always
+      data-locations: classpath*:data.sql
+      schema-locations: classpath*:schema.sql # mysql -> data.sql 실제 더미도 주석처리해야함
   jpa:
     hibernate:
       ddl-auto: update
-    defer-datasource-initialization: false
+    defer-datasource-initialization: true
