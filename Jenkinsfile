@@ -10,7 +10,7 @@ pipeline {
         stage('📦 Build with Gradle') {
             steps {
                 echo "✅ Gradle로 빌드 시작"
-                sh './gradlew clean bootJar -x test'
+                sh './gradlew build -x test -x asciidoctor'
             }
         }
 
