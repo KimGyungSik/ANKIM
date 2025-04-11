@@ -3,8 +3,7 @@ pipeline {
 
     environment {
         DOCKER_IMAGE = "kimsik01/ankim:latest"
-        DOCKER_USERNAME = credentials('dockerhub-username')  // Jenkins Credentials ID
-        DOCKER_PASSWORD = credentials('dockerhub-password')  // Jenkins Credentials ID
+        DOCKER_CREDENTIALS = credentials('dockerhub')
     }
 
     stages {
@@ -20,7 +19,7 @@ pipeline {
                 echo "✅ Docker 이미지 빌드 및 푸시"
                 sh '''
                     docker build -t $DOCKER_IMAGE .
-                    echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+                    echo "$DOCKER_CREDENTIALS_PSW" | docker login -u "$DOCKER_CREDENTIALS_USR" --password-stdin
                     docker push $DOCKER_IMAGE
                 '''
             }
