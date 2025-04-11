@@ -136,3 +136,8 @@ clean {
 tasks.withType(Test).configureEach {
     enabled = false
 }
+tasks.named('processResources') {
+    from("src/main/resources") {
+        include "application-*.yml"
+    }
+}
