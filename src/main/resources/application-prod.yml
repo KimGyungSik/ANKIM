@@ -3,35 +3,35 @@ spring:
     url: jdbc:mysql://${DB_HOST}:${DB_PORT}/${DB_NAME}?useSSL=false&allowPublicKeyRetrieval=true&characterEncoding=UTF-8&serverTimezone=UTC
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-    hikari:
-      minimum-idle: 10
-      maximum-pool-size: 103
-      idle-timeout: 30000
-      connection-timeout: 60000
-      max-lifetime: 1800000
-      data-source-properties:
-        connectionInitSql: SET GLOBAL innodb_print_all_deadlocks=1
-        isolationLevel: READ_COMMITTED
-        lockTimeout: 10000
+#    hikari:
+#      minimum-idle: 10
+#      maximum-pool-size: 103
+#      idle-timeout: 30000
+#      connection-timeout: 60000
+#      max-lifetime: 1800000
+#      data-source-properties:
+#        connectionInitSql: SET GLOBAL innodb_print_all_deadlocks=1
+#        isolationLevel: READ_COMMITTED
+#        lockTimeout: 10000
 
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-      jdbc:
-          lob:
-            non_contextual_creation: true
-          connection.isolation: 2
-          format_sql: true
-          default_batch_fetch_size: 1000
-          jdbc:
-          fetch_size: 50
-          batch_size: 500 # mysql
-          generate_statistics: true
-          use_sql_comments: true
-          order_updates: true
-          order_inserts: true
-          jdbc.time_zone: UTC
+#  jpa:
+#    show-sql: true
+#    properties:
+#      hibernate:
+#      jdbc:
+#          lob:
+#            non_contextual_creation: true
+#          connection.isolation: 2
+#          format_sql: true
+#          default_batch_fetch_size: 1000
+#          jdbc:
+#          fetch_size: 50
+#          batch_size: 500 # mysql
+#          generate_statistics: true
+#          use_sql_comments: true
+#          order_updates: true
+#          order_inserts: true
+#          jdbc.time_zone: UTC
 
 
 logging:

@@ -11,15 +11,15 @@ spring:
   output:
     ansi:
       enabled: always
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-    open-in-view: true
-  datasource:
-        hikari:
-          maximum-pool-size: 50 # 커넥션 풀 크기
+#  jpa:
+#    show-sql: true
+#    properties:
+#      hibernate:
+#        format_sql: true
+#    open-in-view: true
+#  datasource:
+#        hikari:
+#          maximum-pool-size: 50 # 커넥션 풀 크기
   profiles:
     active:
        - prod
@@ -36,9 +36,9 @@ spring:
         - redis
   main:
     allow-bean-definition-overriding: true
-  sql:
-    init:
-      mode: never
+#  sql:
+#    init:
+#      mode: never
 #      schema-locations: classpath*:schema-mysql.sql # h2
   web:
     resources:
