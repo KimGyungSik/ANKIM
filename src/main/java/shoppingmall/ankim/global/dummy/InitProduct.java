@@ -55,7 +55,7 @@ public class InitProduct {
         @Transactional
         public void init() {
             int batchSize = 50; // ✅ Batch Size 지정 (조정 가능) MySQL -> 500 H2 -> 50
-            int productCountPerSubCategory = 50; // ✅ 한 소분류당 생성할 상품 개수 MySQL -> 5000 H2 -> 40
+            int productCountPerSubCategory = 10; // ✅ 한 소분류당 생성할 상품 개수 MySQL -> 5000 H2 -> 40
 
             // 중분류 카테고리(최상위) 생성
             Map<Condition, List<Category>> conditionToSubCategoryMap = new HashMap<>();
