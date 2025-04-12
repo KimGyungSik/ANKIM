@@ -68,6 +68,7 @@ cloud:
     stack:
       auto: false
 
+
 # 토스페이먼츠
 payment:
     toss:
