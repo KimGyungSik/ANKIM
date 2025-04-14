@@ -7,23 +7,30 @@ pipeline {
     }
 
     stages {
-        stage('📦 Build with Gradle') {
-                steps {
-                    echo "✅ Gradle로 빌드 시작"
-                    sh '''
-                        mkdir -p build/generated-snippets
-                        ./gradlew bootJar -x test
-                    '''
-                }
+
+        stage('🔄 Git Checkout') {
+            steps {
+                checkout scm
             }
+        }
+
+        stage('📦 Build with Gradle') {
+            steps {
+                echo "✅ Gradle로 빌드 시작"
+                sh '''
+                    mkdir -p build/generated-snippets
+                    ./gradlew build -x test -x asciidoctor
+                '''
+            }
+        }
 
         stage('🐳 Docker Build & Push') {
             steps {
                 echo "✅ Docker 이미지 빌드 및 푸시"
                 sh '''
-                  docker build --no-cache -t $DOCKER_IMAGE .
-                  echo "$DOCKER_CREDENTIALS_PSW" | docker login -u "$DOCKER_CREDENTIALS_USR" --password-stdin
-                  docker push $DOCKER_IMAGE
+                    docker build --no-cache -t $DOCKER_IMAGE .
+                    echo "$DOCKER_CREDENTIALS_PSW" | docker login -u "$DOCKER_CREDENTIALS_USR" --password-stdin
+                    docker push $DOCKER_IMAGE
                 '''
             }
         }
