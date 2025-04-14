@@ -11,12 +11,12 @@ spring:
   output:
     ansi:
       enabled: always
-#  jpa:
-#    show-sql: true
-#    properties:
-#      hibernate:
-#        format_sql: true
-#    open-in-view: true
+  jpa:
+    show-sql: true
+    properties:
+      hibernate:
+        format_sql: true
+    open-in-view: true
 #  datasource:
 #        hikari:
 #          maximum-pool-size: 50 # 커넥션 풀 크기
