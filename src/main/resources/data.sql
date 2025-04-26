@@ -2268,6 +2268,7 @@ VALUES (9, 'LEAVE', '탈퇴 시 보관 또는 유지되는 항목',
 
 
 
+
 -- [ 회원 삽입 ]
 INSERT  INTO member (
     login_id,
