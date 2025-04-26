@@ -6,7 +6,7 @@ spring:
       schema-locations: classpath*:schema.sql # mysql -> data.sql 실제 더미도 주석처리해야함
   jpa:
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     defer-datasource-initialization: true
     show-sql: true
     properties:
