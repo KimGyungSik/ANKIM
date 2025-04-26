@@ -144,7 +144,7 @@ public class OrderService {
 //                        throw new ItemNotFoundException(ITEM_NOT_FOUND); // Item이 null일 경우 예외 발생
                     }
                     // Qty 검증
-                    if (qty == null || qty <= 0 || qty > item.getQty() || qty > product.getQty()) {
+                    if (qty == null || qty <= 0 || qty > item.getQty()) {
                         throw new OrderTempException(ITEM_NOT_FOUND, referer); // 수량이 유효하지 않은 경우 예외 발생
 //                        throw new InvalidOrderItemQtyException(ORDER_ITEM_QTY_INVALID); // 수량이 유효하지 않은 경우 예외 발생
                     }
