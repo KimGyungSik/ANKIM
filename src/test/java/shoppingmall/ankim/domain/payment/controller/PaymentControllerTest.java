@@ -114,9 +114,9 @@ class PaymentControllerTest {
                 .failUrl("https://example.com/fail")
                 .build();
 
-        given(paymentFacadeWithNamedLock.createPaymentWithNamedLock(request.toServiceRequest(),
-                deliveryRequest.toServiceRequest(),
-                addressRequest.toServiceRequest())).willReturn(mockResponse);
+//        given(paymentFacadeWithNamedLock.createPaymentWithNamedLock(request.toServiceRequest(),
+//                deliveryRequest.toServiceRequest(),
+//                addressRequest.toServiceRequest())).willReturn(mockResponse);
 
         // when & then
         mockMvc.perform(post("/api/v1/payments/toss")

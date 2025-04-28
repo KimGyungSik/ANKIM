@@ -217,7 +217,7 @@ public class PaymentFacadeWithNamedLockConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentFacadeWithNamedLock.createPaymentWithNamedLock(paymentRequest, deliveryRequest, addressRequest);
+                    paymentFacadeWithNamedLock.createPaymentWithNamedLock(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {

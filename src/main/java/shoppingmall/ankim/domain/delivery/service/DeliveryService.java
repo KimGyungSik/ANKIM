@@ -43,7 +43,8 @@ public class DeliveryService {
                 .orElseThrow(() -> new AddressNotFoundException(DEFAULT_ADDRESS_NOT_FOUND))); // 기본 주소가 없을 경우 예외
 
         // 배송 생성
-        return Delivery.create(memberAddress, request.getCourier(), request.getDelReq(), trackingNumberGenerator);
+        Delivery delivery = Delivery.create(memberAddress, request.getCourier(), request.getDelReq(), trackingNumberGenerator);
+        return deliveryRepository.save(delivery);
     }
     private Member getMember(String loginId) {
         // loginId를 가지고 member엔티티의 no 조회

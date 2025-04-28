@@ -63,6 +63,7 @@ public enum ErrorCode {
 
     // 결제
     INVALID_PAYMENT_KEY(HttpStatus.BAD_REQUEST, "유효하지 않은 결제 키입니다."),
+    INVALID_ORDER_STATUS(HttpStatus.BAD_REQUEST, "결제할 수 없는 주문 상태입니다."),
     PAYMENT_NOT_FOUND(HttpStatus.BAD_REQUEST, "결제 정보를 찾을 수 없습니다"),
     PAYMENT_AMOUNT_EXP(HttpStatus.BAD_REQUEST, "결제 금액이 일치하지 않습니다."),
     ALREADY_APPROVED(HttpStatus.BAD_REQUEST, "이미 승인된 결제입니다."),

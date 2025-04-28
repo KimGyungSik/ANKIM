@@ -20,16 +20,16 @@ public class PaymentApiController {
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
 
     @PostMapping("/toss")
-    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequestWrapper requestWrapper) {
-        return ApiResponse.ok(paymentFacadeWithNamedLock.createPaymentWithNamedLock(
+    public ApiResponse<Void> requestTossPayment(@RequestBody @Valid PaymentCreateRequestWrapper requestWrapper) {
+        paymentFacadeWithNamedLock.createPaymentWithNamedLock(
                 requestWrapper.getPaymentRequest().toServiceRequest(),
                 requestWrapper.getDeliveryRequest().toServiceRequest(),
                 requestWrapper.getAddressRequest() != null
                         ? requestWrapper.getAddressRequest().toServiceRequest()
                         : null
-        ));
+        );
+        return ApiResponse.ok(); // 200 OK만 반환
     }
-
 
     @PostMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(

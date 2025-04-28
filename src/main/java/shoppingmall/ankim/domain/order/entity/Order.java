@@ -24,6 +24,7 @@ import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 import static shoppingmall.ankim.global.constants.ShippingConstants.FREE_SHIPPING_THRESHOLD;
 
 @Entity
+@ToString
 @Getter @Setter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @Table(name = "orders")

@@ -54,6 +54,14 @@ logging:
               TransactionImpl: DEBUG
           spi: TRACE
         event: TRACE
+      springframework:
+        transaction: DEBUG
+        transaction.interceptor: TRACE
+        orm:
+          jpa:
+            JpaTransactionManager: DEBUG
+
+
 
 decorator:
   datasource:
