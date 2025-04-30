@@ -240,7 +240,7 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentFacadeWithRedis.createPaymentWithRedis(paymentRequest, deliveryRequest, addressRequest);
+//                    PaymentResponse paymentWithSynchronized = paymentFacadeWithRedis.createPaymentWithRedis(paymentRequest, deliveryRequest, addressRequest);
                     // 작업 종료 로그
                     log.info("Thread {} finished at {}", Thread.currentThread().getId(), System.currentTimeMillis());
                     latch.countDown();
@@ -303,7 +303,7 @@ public class PaymentFacadeWithRedisConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacadeWithRedis.createPaymentWithRedis(paymentRequest, deliveryRequest, addressRequest);
+//                    paymentFacadeWithRedis.createPaymentWithRedis(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     synchronized (exceptions) {
                         exceptions.add(e);

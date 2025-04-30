@@ -17,6 +17,14 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
             "ORDER BY i.no ASC")
     Optional<Order> findByOrderNameWithMemberAndOrderItemsAndItem(@Param("orderName") String orderName);
 
+    @Query("SELECT DISTINCT o FROM Order o " +
+            "JOIN FETCH o.member " +
+            "JOIN FETCH o.orderItems oi " +
+            "JOIN FETCH oi.item i " +
+            "WHERE o.ordNo = :orderId " +
+            "ORDER BY i.no ASC")
+    Optional<Order> findByOrderNoWithMemberAndOrderItemsAndItem(@Param("orderId") String orderId);
+
 
     @Query("SELECT DISTINCT o FROM Order o " +
             "JOIN FETCH o.member " +

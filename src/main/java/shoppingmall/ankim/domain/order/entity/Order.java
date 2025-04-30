@@ -85,7 +85,7 @@ public class Order extends BaseEntity {
         delivery.setOrder(this);
     }
 
-    private void removeDelivery() {
+    public void removeDelivery() {
         if (this.delivery != null) {
             this.delivery.setOrder(null); // Delivery와의 연관 관계 해제
             this.delivery = null;

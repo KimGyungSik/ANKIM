@@ -15,7 +15,9 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.client.MockRestServiceServer;
 import org.springframework.web.client.RestTemplate;
+import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
 import shoppingmall.ankim.domain.delivery.entity.Delivery;
+import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.image.service.S3Service;
 import shoppingmall.ankim.domain.member.entity.Member;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
@@ -39,9 +41,11 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.mock;
@@ -97,12 +101,27 @@ class  PaymentServiceImplTest {
         // given
         String orderCode = "ORD20241125-1234567";
 
-        // OrderFactory를 통해 Order 생성
         Order mockOrder = OrderFactory.createOrderWithOutDelivery(entityManager);
         mockOrder.setOrdCode(orderCode);
 
-        // 영속화
-        orderRepository.save(mockOrder);
+        DeliveryCreateServiceRequest deliveryRequest = DeliveryCreateServiceRequest.builder()
+                .addressId(null)
+                .courier("FastCourier")
+                .delReq("문 앞에 놓아주세요")
+                .build();
+
+        MemberAddressCreateServiceRequest addressRequest = MemberAddressCreateServiceRequest.builder()
+                .addressMain("서울특별시 강남구 테헤란로 123")
+                .addressName("집")
+                .addressDetail("1층")
+                .zipCode(12345)
+                .phoneNumber("010-1234-5678")
+                .emergencyPhoneNumber("010-5678-1234")
+                .defaultAddressYn("Y")
+                .build();
+
+        Order save = orderRepository.save(mockOrder);
+        entityManager.flush();
 
         PaymentCreateServiceRequest request = PaymentCreateServiceRequest.builder()
                 .orderName(orderCode)
@@ -111,7 +130,7 @@ class  PaymentServiceImplTest {
                 .build();
 
         // when
-        PaymentResponse response = paymentService.requestTossPayment(request);
+        PaymentResponse response = paymentService.requestTossPayment(request, deliveryRequest, addressRequest);
 
         // then
         assertThat(response).isNotNull();
@@ -130,6 +149,14 @@ class  PaymentServiceImplTest {
         assertThat(savedPayment.getOrder().getOrdCode()).isEqualTo(orderCode);
         assertThat(savedPayment.getTotalPrice()).isEqualTo(50000L);
         assertThat(savedPayment.getType()).isEqualTo(PayType.CARD);
+
+        // ✨ 비동기 이벤트로 배송 생성 완료 기다리기
+//        await()
+//                .atMost(15, TimeUnit.SECONDS)   // 최대 5초까지 기다림
+//                .untilAsserted(() -> {
+//                    assertThat(payments.get(0).getOrder()).isNotNull();
+//                    assertThat(payments.get(0).getOrder().getDelivery()).isNotNull();
+//                });
     }
 
     @Test

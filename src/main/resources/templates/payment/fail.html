@@ -35,7 +35,9 @@
     </div>
     <div class="order-complete-ticket">
         <div class="ticket-content">
-            <h2>결제에 실패했습니다.</h2>
+            <h2 th:text="${response.errorMessage != null} ? ${response.errorMessage} : '결제에 실패했습니다.'">
+                결제에 실패했습니다.
+            </h2>
         </div>
         <div class="ticket-footer">
             <span>주문번호 <strong class="order-id" th:text="${response.orderName}">ORD20241028-9519956</strong></span>

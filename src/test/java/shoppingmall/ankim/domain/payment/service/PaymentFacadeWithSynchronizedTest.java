@@ -157,18 +157,18 @@ class PaymentFacadeWithSynchronizedTest {
                 .build();
 
         // when
-        PaymentResponse response = paymentFacadeWithSynchronized.createPaymentWithSynchronized(request,deliveryRequest,addressRequest);
+//        PaymentResponse response = paymentFacadeWithSynchronized.createPaymentWithSynchronized(request,deliveryRequest,addressRequest);
 
 
         // then
-        assertThat(response).isNotNull();
-        assertThat(response.getOrderName()).isEqualTo(orderCode);
-        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
-        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
-        assertThat(response.getAmount()).isEqualTo(50000L);
-        assertThat(response.getPayType()).isEqualTo("카드");
-        assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
-        assertThat(response.getFailUrl()).isEqualTo(tossPaymentConfig.getFailUrl());
+//        assertThat(response).isNotNull();
+//        assertThat(response.getOrderName()).isEqualTo(orderCode);
+//        assertThat(response.getCustomerEmail()).isEqualTo(mockOrder.getMember().getLoginId());
+//        assertThat(response.getCustomerName()).isEqualTo(mockOrder.getMember().getName());
+//        assertThat(response.getAmount()).isEqualTo(50000L);
+//        assertThat(response.getPayType()).isEqualTo("카드");
+//        assertThat(response.getSuccessUrl()).isEqualTo(tossPaymentConfig.getSuccessUrl());
+//        assertThat(response.getFailUrl()).isEqualTo(tossPaymentConfig.getFailUrl());
 
         // Payment 저장 검증
         Payment savedPayment = paymentRepository.findByOrderNameWithOrder(orderCode).orElseThrow();

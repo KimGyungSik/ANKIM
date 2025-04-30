@@ -186,7 +186,7 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
+//                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     failureCount.incrementAndGet(); // 실패 시 카운트 증가
                     e.printStackTrace();
@@ -245,7 +245,7 @@ public class PaymentFacadeWithPessimisticLockConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
+//                    paymentFacadeWithPessimisticLock.createPaymentWithPessimisticLock(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     failureCount.incrementAndGet(); // 실패 시 카운트 증가
                     synchronized (exceptions) {

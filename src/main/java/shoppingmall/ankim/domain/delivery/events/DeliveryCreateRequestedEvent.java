@@ -13,5 +13,4 @@ public class DeliveryCreateRequestedEvent {
     private final Order order;
     private final DeliveryCreateServiceRequest deliveryRequest;
     private final MemberAddressCreateServiceRequest addressRequest;
-    private final PaymentCreateServiceRequest paymentRequest;
 }

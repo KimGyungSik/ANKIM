@@ -50,6 +50,7 @@ public enum ErrorCode {
     QUANTITY_BELOW_MINIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최소 주문 수량 보다 적습니다."),
     QUANTITY_EXCEED_MAXIMUM(HttpStatus.UNPROCESSABLE_ENTITY, "최대 주문 수량을 초과했습니다."),
     NO_OUT_OF_STOCK_ITEMS(HttpStatus.NOT_FOUND, "품절된 상품이 없습니다."),
+    STOCK_REDUCE_FAILED(HttpStatus.BAD_REQUEST, "죄송합니다. 재고가 부족합니다."),
 
     // 주문
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),

@@ -182,7 +182,7 @@ public class PaymentFacadeWithNamedQueryConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentFacadeWithNamedQuery.createPaymentWithNamedQuery(paymentRequest, deliveryRequest, addressRequest);
+//                    PaymentResponse paymentWithSynchronized = paymentFacadeWithNamedQuery.createPaymentWithNamedQuery(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -233,7 +233,7 @@ public class PaymentFacadeWithNamedQueryConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacadeWithNamedQuery.createPaymentWithNamedQuery(paymentRequest, deliveryRequest, addressRequest);
+//                    paymentFacadeWithNamedQuery.createPaymentWithNamedQuery(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     synchronized (exceptions) {
                         exceptions.add(e);

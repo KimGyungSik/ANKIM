@@ -9,5 +9,4 @@ import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceReq
 @AllArgsConstructor
 public class StockReduceRequestedEvent {
     private final Order order;
-    private final PaymentCreateServiceRequest paymentRequest;
 }

@@ -3,6 +3,7 @@ package shoppingmall.ankim.domain.payment.controller;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
+import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCancelRequest;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentCreateRequestWrapper;
 import shoppingmall.ankim.domain.payment.controller.request.PaymentSuccessRequest;
@@ -18,23 +19,23 @@ import shoppingmall.ankim.global.response.ApiResponse;
 @RequestMapping("/api/v1/payments")
 public class PaymentApiController {
     private final PaymentFacadeWithNamedLock paymentFacadeWithNamedLock;
+    private final PaymentService paymentService;
 
     @PostMapping("/toss")
-    public ApiResponse<Void> requestTossPayment(@RequestBody @Valid PaymentCreateRequestWrapper requestWrapper) {
-        paymentFacadeWithNamedLock.createPaymentWithNamedLock(
+    public ApiResponse<PaymentResponse> requestTossPayment(@RequestBody @Valid PaymentCreateRequestWrapper requestWrapper) {
+        return ApiResponse.ok(paymentService.requestTossPayment(
                 requestWrapper.getPaymentRequest().toServiceRequest(),
                 requestWrapper.getDeliveryRequest().toServiceRequest(),
                 requestWrapper.getAddressRequest() != null
                         ? requestWrapper.getAddressRequest().toServiceRequest()
                         : null
-        );
-        return ApiResponse.ok(); // 200 OK만 반환
+        ));
     }
 
     @PostMapping("/toss/success")
     public ApiResponse<PaymentSuccessResponse> tossPaymentSuccess(
             @RequestBody PaymentSuccessRequest paymentSuccessRequest) {
-        return ApiResponse.ok(paymentFacadeWithNamedLock.toSuccessRequest(
+        return ApiResponse.ok(paymentService.tossPaymentSuccess(
                 paymentSuccessRequest.getPaymentKey(),
                 paymentSuccessRequest.getOrderId(),
                 paymentSuccessRequest.getAmount()

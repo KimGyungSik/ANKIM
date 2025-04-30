@@ -3,14 +3,15 @@ package shoppingmall.ankim.domain.item.events;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.event.TransactionPhase;
-import org.springframework.transaction.event.TransactionalEventListener;
+import shoppingmall.ankim.domain.item.exception.StockReduceFailedException;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
-import shoppingmall.ankim.domain.payment.events.PaymentTossRequestEvent;
+import shoppingmall.ankim.domain.order.repository.OrderRepository;
+import shoppingmall.ankim.global.exception.ErrorCode;
+
+import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Component
 @RequiredArgsConstructor
@@ -18,10 +19,7 @@ import shoppingmall.ankim.domain.payment.events.PaymentTossRequestEvent;
 public class StockReduceRequestedEventHandler {
 
     private final ItemService itemService;
-    private final ApplicationEventPublisher eventPublisher;
-
-    @TransactionalEventListener(phase = TransactionPhase.AFTER_COMMIT)
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    @EventListener
     public void handle(StockReduceRequestedEvent event) {
         Order order = event.getOrder();
 
@@ -32,22 +30,9 @@ public class StockReduceRequestedEventHandler {
                 itemService.reduceStock(orderItem.getItem().getNo(), orderItem.getQty());
             });
 
-            // 재고 차감 성공 → 결제 요청 이벤트 발행
-            eventPublisher.publishEvent(new PaymentTossRequestEvent(
-                    order,
-                    event.getPaymentRequest()
-            ));
-
         } catch (Exception e) {
-            log.error("[StockReduceRequestedEventHandler] 재고 차감 실패, 주문 상태 FAILED_PAYMENT로 변경", e);
-
-            // 주문 상태 결제 실패로 변경
-            order.failOrderWithOutDelivery();
-
-            // ✅ 재고 복구 이벤트 발행
-            eventPublisher.publishEvent(new StockRestoreRequestedEvent(order));
-
-            throw new RuntimeException("재고 차감 실패로 이벤트 체인 중단");
+            log.error("[StockReduceRequestedEventHandler] 재고 차감 실패", e);
+            throw new StockReduceFailedException(STOCK_REDUCE_FAILED, order.getOrdCode());
         }
     }
 }

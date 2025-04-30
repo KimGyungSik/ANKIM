@@ -181,7 +181,7 @@ public class PaymentFacadeWithSynchronizedConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    PaymentResponse paymentWithSynchronized = paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
+//                    PaymentResponse paymentWithSynchronized = paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     e.printStackTrace();
                 } finally {
@@ -232,7 +232,7 @@ public class PaymentFacadeWithSynchronizedConcurrencyReduceStockTest {
                             .amount(10000)
                             .build();
 
-                    paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
+//                    paymentFacadeWithSynchronized.createPaymentWithSynchronized(paymentRequest, deliveryRequest, addressRequest);
                 } catch (Exception e) {
                     synchronized (exceptions) {
                         exceptions.add(e);

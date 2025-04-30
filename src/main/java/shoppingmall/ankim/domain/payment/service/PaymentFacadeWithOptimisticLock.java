@@ -51,29 +51,29 @@ public class PaymentFacadeWithOptimisticLock {
     private final CartRepository cartRepository;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
-    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 80, backoff = @Backoff(delay = 100))
-    public PaymentResponse createPaymentWithOptimisticLock(PaymentCreateServiceRequest request,
-                                                         DeliveryCreateServiceRequest deliveryRequest,
-                                                         MemberAddressCreateServiceRequest addressRequest) {
-        // Order 조회 (fetch join으로 Member 로딩)
-        Order order = orderRepository.findByOrderNameWithMemberAndOrderItems(request.getOrderName())
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-
-        // 결제 대기중 상태가 아니라면 이미 승인된 결제이므로 예외 발생
-        if (order.getOrderStatus() != PENDING_PAYMENT) {
-            throw new AlreadyApprovedException(ALREADY_APPROVED);
-        }
-
-        // 배송지 생성
-        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
-        order.setDelivery(delivery);
-
-        // 재고 차감
-        reduceStock(order);
-
-        // 결제 요청 처리
-        return paymentService.requestTossPayment(request);
-    }
+//    @Retryable(value = ObjectOptimisticLockingFailureException.class, maxAttempts = 80, backoff = @Backoff(delay = 100))
+//    public PaymentResponse createPaymentWithOptimisticLock(PaymentCreateServiceRequest request,
+//                                                         DeliveryCreateServiceRequest deliveryRequest,
+//                                                         MemberAddressCreateServiceRequest addressRequest) {
+//        // Order 조회 (fetch join으로 Member 로딩)
+//        Order order = orderRepository.findByOrderNameWithMemberAndOrderItems(request.getOrderName())
+//                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+//
+//        // 결제 대기중 상태가 아니라면 이미 승인된 결제이므로 예외 발생
+//        if (order.getOrderStatus() != PENDING_PAYMENT) {
+//            throw new AlreadyApprovedException(ALREADY_APPROVED);
+//        }
+//
+//        // 배송지 생성
+//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+//        order.setDelivery(delivery);
+//
+//        // 재고 차감
+//        reduceStock(order);
+//
+//        // 결제 요청 처리
+//        return paymentService.requestTossPayment(request);
+//    }
 
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     public PaymentSuccessResponse toSuccessRequestWithOptimisticLock(String paymentKey, String orderId, Integer amount) {

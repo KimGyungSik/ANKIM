@@ -17,7 +17,6 @@ import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
 import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
-import shoppingmall.ankim.domain.order.events.PaymentCreateVerifiedEvent;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
@@ -42,10 +41,6 @@ import java.util.concurrent.TimeUnit;
 import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.PENDING_PAYMENT;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
-// TODO 트랜잭션 경계에 맞춰서 결제 처리 실패시 재고 차감, 복구도 같이 롤백 시켜야하는 문제도 고려해봐야함
-// TODO 결제를 요청하고 나서 재고차감을 했는데 결제 요청 API에서 에러 발생 시 재고 감소 롤백 말하는거임
-
-// FIXME 비동기처리는 즉 @Async는 @Transactional과 동일하게 AOP방식으로 동작하므로 다른 서비스 클래스로 분리시켜줘야함
 @Service
 @Slf4j
 @Transactional
@@ -61,66 +56,51 @@ public class PaymentFacadeWithNamedLock {
     private final ApplicationEventPublisher eventPublisher;
 
     // 클라이언트 결제 요청처리 & 재고 감소 & 배송지 저장
-    @Transactional
-    public void createPaymentWithNamedLock(PaymentCreateServiceRequest request,
-                                                      DeliveryCreateServiceRequest deliveryRequest,
-                                                      MemberAddressCreateServiceRequest addressRequest) {
-        // 1. 주문 조회
-        Order order = orderRepository.findByOrderNameWithMemberAndOrderItemsAndItem(request.getOrderName())
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-
-        // 2. 결제 대기 상태 확인
-        if (order.getOrderStatus() != OrderStatus.PENDING_PAYMENT) {
-            throw new AlreadyApprovedException(ALREADY_APPROVED);
-        }
-
-        // 3. 주문 검증 완료 시 이벤트 발행
-        eventPublisher.publishEvent(new PaymentCreateVerifiedEvent(
-                order,
-                request,
-                deliveryRequest,
-                addressRequest
-        ));
-    }
+//    @Transactional
+//    public PaymentResponse createPaymentWithNamedLock(PaymentCreateServiceRequest request,
+//                                                      DeliveryCreateServiceRequest deliveryRequest,
+//                                                      MemberAddressCreateServiceRequest addressRequest) {
+//        // 1. 주문 조회
+//        Order order = orderRepository.findByOrderNameWithMemberAndOrderItemsAndItem(request.getOrderName())
+//                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+//
+//        // 2. 결제 대기 상태 확인
+//        if (order.getOrderStatus() != OrderStatus.PENDING_PAYMENT) {
+//            throw new AlreadyApprovedException(ALREADY_APPROVED);
+//        }
+//
+//        // 3. 배송지 생성
+//        Delivery delivery = deliveryService.createDelivery(deliveryRequest, addressRequest, order.getMember().getLoginId());
+//        order.setDelivery(delivery);
+//
+//        // 결제 요청 처리
+//        return paymentService.requestTossPayment(request);
+//    }
 
 
     // 결제 성공 시 처리 & 주문 상태 (결제완료) & 장바구니 주문 상품 비활성화 (장바구니 비우기)
     // FIXME 결제 요청시에 배송지 생성 & 재고차감이 아닌 결제 성공 이전에 해야할듯
-    @Transactional
     public PaymentSuccessResponse toSuccessRequest(String paymentKey, String orderId, Integer amount) {
-        log.info("[toSuccessRequest] 결제 성공 콜백 처리 시작: orderId={}, paymentKey={}", orderId, paymentKey);
-
-        // 1. 주문 조회
-        Order order = orderRepository.findByOrderIdWithMemberAndDeliveryAndOrderItems(orderId)
-                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
-
-        // 2. 주문 상태 체크
-        if (order.getOrderStatus() != OrderStatus.PENDING_PAYMENT) {
-            log.error("[toSuccessRequest] 주문 상태가 결제 가능 상태가 아님. 현재 상태: {}", order.getOrderStatus());
-
-            // Toss 결제 취소 요청
-            paymentService.cancelPayment(paymentKey, "상품 준비 실패로 인한 자동 환불");
-
-            throw new InvalidOrderStatusException(INVALID_ORDER_STATUS);
-        }
-
-        // 3. 결제 성공 처리
+        // 재고 차감
+//        reduceStock(order);
+        // 결제 성공 요청
         PaymentSuccessResponse tossPaymentSuccess = paymentService.tossPaymentSuccess(paymentKey, orderId, amount);
+        // 성공 요청 응답 객체가 null이 아니라면
+        if(tossPaymentSuccess!=null) {
+            // 주문상태를 결제완료로 수정
+            Order order = orderRepository.findByOrderIdWithMemberAndOrderItems(orderId)
+                    .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+            order.successOrder();
 
-        // 4. 주문 상태 업데이트
-        order.successOrder(); // 주문 상태를 PAID로 변경
+            // 주문 상품은 장바구니에서 비우기
+            // 주문 상품과 장바구니 상품 매핑하여 비활성화
+            deactivateCartItemsMappedToOrder(order);
 
-        // 5. 주문 상품 장바구니 비우기 (CartItem 비활성화)
-        deactivateCartItemsMappedToOrder(order);
-
-        // 6. 추가 응답 데이터 세팅
-        tossPaymentSuccess.setPaymentSuccessInfoResponse(PaymentSuccessInfoResponse.builder()
-                .totalShipFee(order.getTotalShipFee())
-                .deliveryResponse(DeliveryResponse.of(order.getDelivery()))
-                .build());
-
-        log.info("[toSuccessRequest] 결제 성공 처리 완료: orderId={}", orderId);
-
+            tossPaymentSuccess.setPaymentSuccessInfoResponse(PaymentSuccessInfoResponse.builder()
+                    .totalShipFee(order.getTotalShipFee())
+                    .deliveryResponse(DeliveryResponse.of(order.getDelivery()))
+                    .build());
+        }
         return tossPaymentSuccess;
     }
 
