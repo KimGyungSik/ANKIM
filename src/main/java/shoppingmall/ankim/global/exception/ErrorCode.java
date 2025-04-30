@@ -52,6 +52,9 @@ public enum ErrorCode {
     NO_OUT_OF_STOCK_ITEMS(HttpStatus.NOT_FOUND, "품절된 상품이 없습니다."),
     STOCK_REDUCE_FAILED(HttpStatus.BAD_REQUEST, "죄송합니다. 재고가 부족합니다."),
 
+    // 배송
+    DELIVERY_NOT_FOUND(HttpStatus.BAD_REQUEST, "해당 배송 정보를 찾을 수 없습니다."),
+
     // 주문
     ORDER_NOT_FOUND(HttpStatus.NOT_FOUND, "해당 주문을 찾을 수 없습니다."),
     ORDER_CODE_GENERATE_FAIL(HttpStatus.INTERNAL_SERVER_ERROR, "주문번호 생성을 실패했습니다."),

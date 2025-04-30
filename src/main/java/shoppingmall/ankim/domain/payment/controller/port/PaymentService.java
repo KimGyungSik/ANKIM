@@ -5,8 +5,6 @@ import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceR
 import shoppingmall.ankim.domain.payment.dto.*;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 
-import java.util.List;
-
 public interface PaymentService {
     // 클라이언트 결제 요청처리 & 재고 감소
     PaymentResponse requestTossPayment(PaymentCreateServiceRequest request,
@@ -20,5 +18,5 @@ public interface PaymentService {
     PaymentFailResponse tossPaymentFail(String code, String message, String orderId);
 
     // 결제 취소 시 처리 & 재고 복구 & 주문 상태 (결제취소)
-    PaymentCancelResponse cancelPayment(String paymentKey, String cancelReason);
+    PaymentCancelResponse cancelPayment(String orderId, String cancelReason);
 }

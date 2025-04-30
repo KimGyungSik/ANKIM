@@ -2,6 +2,7 @@ package shoppingmall.ankim.domain.order.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import shoppingmall.ankim.domain.address.entity.member.MemberAddress;
@@ -17,10 +18,13 @@ import shoppingmall.ankim.domain.member.exception.InvalidMemberException;
 import shoppingmall.ankim.domain.member.repository.MemberRepository;
 import shoppingmall.ankim.domain.order.dto.OrderTempResponse;
 import shoppingmall.ankim.domain.order.entity.Order;
+import shoppingmall.ankim.domain.order.events.OrderCanceledEvent;
 import shoppingmall.ankim.domain.order.exception.OrderCodeGenerationException;
+import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.exception.OrderTempException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
 import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
+import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
 import shoppingmall.ankim.domain.orderItem.exception.InvalidOrderItemQtyException;
 import shoppingmall.ankim.domain.product.entity.Product;
 import shoppingmall.ankim.domain.product.entity.ProductSellingStatus;
@@ -35,6 +39,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 import static shoppingmall.ankim.domain.product.entity.ProductSellingStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
@@ -49,6 +54,7 @@ public class OrderService {
     private final CartItemRepository cartItemRepository;
     private final CartService cartService;
     private final MemberAddressRepository memberAddressRepository;
+    private final ApplicationEventPublisher eventPublisher;
 
     public OrderTempResponse createOrderTemp(String loginId, List<Long> cartItemNoList, String referer) {
         LocalDateTime registeredDateTime = LocalDateTime.now();
@@ -84,6 +90,17 @@ public class OrderService {
 
         return OrderTempResponse.tempOf(order)
                 .withAddresses(memberAddresses);
+    }
+
+    // 주문 취소
+        // 1. 결제 취소
+        // 2. 재고 복구
+        // 3. 배송 상태 취소 -> DeliveryStatus.CANCELED
+    public void cancel(String orderId,String cancelReason) {
+        Order order = orderRepository.findByOrdNo(orderId)
+                .orElseThrow(() -> new OrderNotFoundException(ORDER_NOT_FOUND));
+        order.setOrderStatus(CANCELED);
+        eventPublisher.publishEvent(new OrderCanceledEvent(orderId,cancelReason));
     }
 
     private String generateOrderCode(String orderId, LocalDateTime registeredDateTime) {

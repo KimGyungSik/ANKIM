@@ -11,24 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestTemplate;
 import shoppingmall.ankim.domain.address.service.request.MemberAddressCreateServiceRequest;
-import shoppingmall.ankim.domain.cart.entity.Cart;
-import shoppingmall.ankim.domain.cart.entity.CartItem;
-import shoppingmall.ankim.domain.cart.exception.CartNotFoundException;
-import shoppingmall.ankim.domain.cart.repository.CartRepository;
 import shoppingmall.ankim.domain.delivery.dto.DeliveryResponse;
-import shoppingmall.ankim.domain.delivery.entity.Delivery;
 import shoppingmall.ankim.domain.delivery.events.DeliveryCreateRequestedEvent;
-import shoppingmall.ankim.domain.delivery.service.DeliveryService;
 import shoppingmall.ankim.domain.delivery.service.request.DeliveryCreateServiceRequest;
-import shoppingmall.ankim.domain.item.entity.Item;
 import shoppingmall.ankim.domain.item.events.StockReduceRequestedEvent;
-import shoppingmall.ankim.domain.item.exception.ItemNotFoundException;
-import shoppingmall.ankim.domain.item.repository.ItemRepository;
-import shoppingmall.ankim.domain.item.service.ItemService;
 import shoppingmall.ankim.domain.order.entity.Order;
 import shoppingmall.ankim.domain.order.exception.OrderNotFoundException;
 import shoppingmall.ankim.domain.order.repository.OrderRepository;
-import shoppingmall.ankim.domain.orderItem.entity.OrderItem;
 import shoppingmall.ankim.domain.orderItem.entity.OrderStatus;
 import shoppingmall.ankim.domain.payment.controller.port.PaymentService;
 import shoppingmall.ankim.domain.payment.dto.*;
@@ -41,12 +30,10 @@ import shoppingmall.ankim.domain.payment.exception.PaymentNotFoundException;
 import shoppingmall.ankim.domain.payment.repository.PaymentRepository;
 import shoppingmall.ankim.domain.payment.service.request.PaymentCreateServiceRequest;
 import shoppingmall.ankim.global.config.TossPaymentConfig;
-import shoppingmall.ankim.global.config.lock.LockHandler;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-import static shoppingmall.ankim.domain.orderItem.entity.OrderStatus.*;
 import static shoppingmall.ankim.global.exception.ErrorCode.*;
 
 @Service
@@ -130,11 +117,11 @@ public class PaymentServiceImpl implements PaymentService {
         return PaymentFailResponse.of(code, message, orderId);
     }
     @Override
-    public PaymentCancelResponse cancelPayment(String paymentKey, String cancelReason) {
+    public PaymentCancelResponse cancelPayment(String orderId, String cancelReason) {
         // 결제 취소 시 처리
-        Payment payment = paymentRepository.findByPayKeyWithOrder(paymentKey).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
+        Payment payment = paymentRepository.findByOrderId(orderId).orElseThrow(() -> new PaymentNotFoundException(PAYMENT_NOT_FOUND));
         payment.setPaymentCancel(cancelReason, true);
-        Map map = tossPaymentCancel(paymentKey, cancelReason);
+        Map map = tossPaymentCancel(payment.getPayKey(), cancelReason);
         return PaymentCancelResponse.builder().details(map).build();
     }
 

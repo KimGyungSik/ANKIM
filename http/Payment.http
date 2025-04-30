@@ -41,3 +41,6 @@ Content-Type: application/json
   "paymentKey": "tgen_202412101938120dwg2",
   "cancelReason": "단순 변심"
 }
+
+### 주문 취소
+GET http://localhost:8080/api/order/cancel?orderId=d6eb0b4a-61d2-440c-a760-64a90277b49e&cancelReason=주문취소
