@@ -2212,6 +2212,17 @@ VALUES (18, 1063, 'REALTIME', 19997, NOW());
 INSERT INTO view_rolling (category_no, prod_no, period, total_views, last_updated)
 VALUES (18, 1062, 'REALTIME', 19996, NOW());
 
+INSERT INTO search_logs (keyword, search_count) VALUES ('레터링', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('반팔', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('티셔츠', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('스퀘어넥', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('오버핏', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('루즈핏', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('슬림핏', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('여성', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('여름', 1);
+INSERT INTO search_logs (keyword, search_count) VALUES ('데일리', 1);
+
 
 -- [ 회원가입 약관 삽입 ]
 -- 상위 약관
