@@ -4,6 +4,7 @@ package shoppingmall.ankim.domain.product.repository.query.helper;
 
 import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.OrderSpecifier;
+import com.querydsl.core.types.dsl.Expressions;
 import shoppingmall.ankim.domain.product.entity.QProduct;
 
 import java.time.LocalDateTime;
@@ -93,10 +94,11 @@ public class ProductQueryHelper {
         if (colorHexCode != null) {
             colorConditionBuilder.or(product.searchKeywords.containsIgnoreCase(colorHexCode));
         }
-        if (colorName != null) {
-            colorConditionBuilder.or(product.searchKeywords.containsIgnoreCase(colorName));
-        }
-
+        colorConditionBuilder.or(
+                Expressions.stringTemplate(
+                        "LOWER(REPLACE(REPLACE({0}, ',', ''), ' ', ''))", product.searchKeywords
+                ).contains(colorName)
+        );
         filterBuilder.and(colorConditionBuilder);
     }
 
