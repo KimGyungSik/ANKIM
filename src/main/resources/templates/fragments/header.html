@@ -104,6 +104,8 @@
             <!-- 검색 모달창 -->
             <div id="search-modal">
                 <div class="search-modal-content">
+                    <!-- 🔻 닫기 버튼 추가 -->
+                    <div class="search-modal-close" onclick="closeSearchModal()">×</div>
                     <!-- 검색 입력창 -->
                     <div class="search-modal-header">
                         <input type="text" id="search-input-modal" placeholder="Search..." onkeypress="handleKeyPress(event)">
@@ -122,15 +124,15 @@
             </div>
 
             <script>
-                // ✅ 모달창 열기
                 function openSearchModal() {
                     document.getElementById("search-modal").style.display = "flex";
+                    document.body.style.overflow = "hidden"; // ✅ 스크롤 막기
                     fetchPopularKeywords();
                 }
 
-                // ✅ 모달창 닫기
                 function closeSearchModal() {
                     document.getElementById("search-modal").style.display = "none";
+                    document.body.style.overflow = ""; // ✅ 스크롤 다시 허용
                 }
 
                 // ✅ 인기 검색어 비동기 호출
