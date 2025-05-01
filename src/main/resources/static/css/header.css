@@ -168,64 +168,80 @@ body {
     padding-top: 50px;
 }
 
-/* 🔹 검색 입력창 스타일 */
+/* 🔹 검색 입력창 더 크게 */
 .search-modal-header {
-    width: 80%;
-    max-width: 600px;
+    width: 90%;
     display: flex;
     align-items: center;
-    border-bottom: 2px solid black;
-    padding: 10px;
+    border-bottom: 6px solid black;
+    padding-bottom: 20px;
+    padding-top: 59px;
     position: relative;
 }
-
-/* 🔹 입력 필드 */
+/* 🔹 입력 필드 글자 크기 및 높이 증가 */
 #search-input-modal {
     width: 100%;
-    padding: 10px;
-    font-size: 18px;
+    padding: 6px;
+    font-size: 28px;
     border: none;
     outline: none;
 }
 
-/* 🔹 돋보기 아이콘 (검색 실행 버튼) */
+/* 🔹 돋보기 아이콘 더 큼 */
 .search-icon-btn {
     position: absolute;
-    right: 10px;
+    right: 20px;
     cursor: pointer;
+    width: 36px;
+    height: 36px;
 }
 
-/* 🔹 인기 검색어 타이틀 */
+/* 🔹 모달 콘텐츠 전체 크기 확대 */
+.search-modal-content {
+    width: 90%;
+    max-width: 1000px;
+    margin-left: auto;
+    margin-right: 30px;
+    background-color: white;
+    position: relative;
+}
+
+
+/* 🔹 인기 검색어 제목 크게 */
 .search-modal-title {
-    font-size: 18px;
+    font-size: 33px;
     font-weight: bold;
-    margin-bottom: 10px;
+    margin-top: 40px;
 }
 
-/* 🔹 인기 검색어 리스트 */
+
+/* 🔹 인기 검색어 리스트 크게 */
 #search-keyword-list {
     list-style: none;
     padding: 0;
-    margin-top: 20px;
+    margin-top: 8px;
 }
 
+
 #search-keyword-list li {
-    padding: 8px 0;
+    padding: 7px 0;
     cursor: pointer;
-    font-size: 16px;
+    font-size: 18px;
 }
 
 #search-keyword-list li:hover {
     text-decoration: underline;
 }
 
-/* 🔹 닫기 버튼 */
 .search-modal-close {
     position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 24px;
+    top: -51px;
+    right: 115px;
+    font-size: 86px;
+    color: black;
     cursor: pointer;
+    z-index: 1001;
 }
+
 
 
