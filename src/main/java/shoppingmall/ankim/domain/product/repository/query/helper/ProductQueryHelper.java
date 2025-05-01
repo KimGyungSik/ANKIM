@@ -82,16 +82,24 @@ public class ProductQueryHelper {
 
     private static void addColorFilter(ColorCondition colorCondition, QProduct product, BooleanBuilder filterBuilder) {
         if (colorCondition == null) {
-            // 조건이 없으면 필터를 추가하지 않음
             return;
         }
 
-        // 색상 필터 추가
-        String colorHexCode = colorCondition.getHexCode(); // ColorCondition에서 Hex 색상 코드 가져오기
+        String colorHexCode = colorCondition.getHexCode(); // 예: "#000000"
+        String colorName = colorCondition.name();           // 예: "BLACK"
+
+        BooleanBuilder colorConditionBuilder = new BooleanBuilder();
+
         if (colorHexCode != null) {
-            filterBuilder.and(product.searchKeywords.contains(colorHexCode)); // 검색 키워드에 색상 코드가 포함되어 있는지 필터링
+            colorConditionBuilder.or(product.searchKeywords.containsIgnoreCase(colorHexCode));
         }
+        if (colorName != null) {
+            colorConditionBuilder.or(product.searchKeywords.containsIgnoreCase(colorName));
+        }
+
+        filterBuilder.and(colorConditionBuilder);
     }
+
 
     // 조건 필터링 메서드
     private static void addConditionFilters(Condition condition, QProduct product, BooleanBuilder filterBuilder) {
