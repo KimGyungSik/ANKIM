@@ -25,7 +25,7 @@ public class KeywordSyncService {
             String keyword = entry.getKey();
             int count = entry.getValue().intValue();
 
-            searchLogRepository.upsertSearchKeyword(keyword, count);
+//            searchLogRepository.upsertSearchKeyword(keyword, count);
         }
     }
 }
