@@ -14,22 +14,13 @@ import java.util.Optional;
 
 public interface SearchLogRepository extends JpaRepository<SearchLog, Long> {
 
-//    @Modifying(clearAutomatically = true)
-//    @Query(value = """
-//    INSERT INTO search_logs (keyword, search_count)
-//    VALUES (:keyword, :count)
-//    ON DUPLICATE KEY UPDATE search_count = search_count + :count
-//    """, nativeQuery = true)
-//    int upsertSearchKeyword(@Param("keyword") String keyword, @Param("count") int count);
-
-
     @Modifying(clearAutomatically = true)
     @Query(value = """
-    INSERT INTO search_logs (keyword, search_count) 
-    VALUES (:keyword, 1) 
-    ON DUPLICATE KEY UPDATE search_count = search_count + 1
+    INSERT INTO search_logs (keyword, search_count)
+    VALUES (:keyword, :count)
+    ON DUPLICATE KEY UPDATE search_count = search_count + :count
     """, nativeQuery = true)
-    int upsertSearchKeyword(@Param("keyword") String keyword);
+    int upsertSearchKeyword(@Param("keyword") String keyword, @Param("count") int count);
 
 
     @Modifying(clearAutomatically = true)

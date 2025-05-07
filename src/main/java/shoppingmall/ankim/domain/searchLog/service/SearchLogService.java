@@ -14,19 +14,18 @@ import java.util.List;
 @RequiredArgsConstructor
 public class SearchLogService {
     private final RedisSearchLogService redisSearchLogService;
-    private final SearchLogRepository searchLogRepository;
-//    public void saveSearchKeyword(String keyword) {
-//        redisSearchLogService.saveSearchKeyword(keyword);
-//    }
+    public void saveSearchKeyword(String keyword) {
+        redisSearchLogService.saveSearchKeyword(keyword);
+    }
 
-//    public List<String> getPopularKeywords(int limit) {
-//        return redisSearchLogService.getPopularKeywords(limit);
-//    }
+    public List<String> getPopularKeywords(int limit) {
+        return redisSearchLogService.getPopularKeywords(limit);
+    }
 
     // MySQL ON DUPLICATE KEY UPDATE 사용 -> mySQL prod
-    public void saveSearchKeyword(String keyword) {
-        searchLogRepository.upsertSearchKeyword(keyword);
-    }
+//    public void saveSearchKeywordWithCurrency(String keyword) {
+//        searchLogRepository.upsertSearchKeyword(keyword);
+//    }
 
     // h2 local용
 //    public void saveSearchKeyword(String keyword) {
@@ -38,7 +37,7 @@ public class SearchLogService {
 //        }
 //    }
 
-    public List<String> getPopularKeywords(int limit) {
-        return searchLogRepository.findTopKeywords(PageRequest.of(0, limit));
-    }
+//    public List<String> getPopularKeywords(int limit) {
+//        return searchLogRepository.findTopKeywords(PageRequest.of(0, limit));
+//    }
 }
