@@ -1,0 +1,3 @@
+app:
+  role: app1
+  external-port: 8081

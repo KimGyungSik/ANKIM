@@ -23,6 +23,8 @@ COPY src/main/resources/application-jwt.yml /app/application-jwt.yml
 COPY src/main/resources/application-redis.yml /app/application-redis.yml
 COPY src/main/resources/application-login.yml /app/application-login.yml
 COPY src/main/resources/application-dbinit.yml /app/application-dbinit.yml
+COPY src/main/resources/application-blue.yml /app/application-blue.yml
+COPY src/main/resources/application-green.yml /app/application-green.yml
 
 
 

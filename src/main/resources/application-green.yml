@@ -1,0 +1,3 @@
+app:
+  role: app2
+  external-port: 8082
