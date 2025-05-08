@@ -40,15 +40,15 @@ pipeline {
       }
     }
 
-    stage('🚀 Ansible로 앱 배포') {
-      steps {
-        sh """
-          docker exec ansible ansible-playbook \
-            -i /ansible/inventory.ini \
-            /ansible/playbook.yml \
-            -e port1=${PORT} -e port2=${PORT}
-        """
-      }
+    stage('🚀 Ansible 배포') {
+                steps {
+                    echo "✅ Ansible로 EC2-2 배포 시작"
+                    sh '''
+                        docker exec ansible ansible-playbook \
+                            -i /ansible/inventory.ini \
+                            /ansible/playbook.yml
+                    '''
+                }
     }
 
     stage('🔎 Health Check 확인') {
