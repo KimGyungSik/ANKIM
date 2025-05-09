@@ -89,7 +89,12 @@ pipeline {
       steps {
         script {
           def old = (env.TARGET == 'app1') ? 'ankim-app2' : 'ankim-app1'
-          sh "docker exec ansible docker rm -f ${old} || true"
+          sh """
+            docker exec ansible ansible-playbook \
+              -i /ansible/inventory.ini \
+              /ansible/cleanup.yml \
+              -e old_container=${old}
+          """
         }
       }
     }
