@@ -61,7 +61,7 @@ pipeline {
 
           for (int i = 0; i < maxTries; i++) {
             def response = sh(
-              script: "curl -s -w '\\n%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
+              script: "curl -s -w '\\n%%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
               returnStdout: true
             ).trim()
 
