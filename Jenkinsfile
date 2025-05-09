@@ -43,11 +43,12 @@ pipeline {
     stage('🚀 Ansible 배포') {
                 steps {
                     echo "✅ Ansible로 EC2-2 배포 시작"
-                    sh '''
-                        docker exec ansible ansible-playbook \
-                            -i /ansible/inventory.ini \
-                            /ansible/playbook.yml
-                    '''
+                    sh """
+                      docker exec ansible ansible-playbook \
+                        -i /ansible/inventory.ini \
+                        /ansible/playbook.yml \
+                        -e target=${TARGET}
+                    """
                 }
     }
 
