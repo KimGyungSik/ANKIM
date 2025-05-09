@@ -54,29 +54,29 @@ pipeline {
     stage('🔎 Health Check 확인') {
       steps {
         script {
-          sh """
-            echo ">> Health Check for ${TARGET} (port ${PORT})"
-            URL="http://${EC2_HOST}:${PORT}/health/ping"
-            TRY_COUNT=0
-            MAX_TRIES=5
-            RETRY_DELAY=5
+          echo ">> Health Check for ${TARGET} (port ${PORT})"
+          def maxTries = 60        // 총 5분 = 300초
+          def delaySeconds = 5
+          def success = false
 
-            while [ \$TRY_COUNT -lt \$MAX_TRIES ]; do
-                HTTP_CODE=\$(curl -s -o /dev/null -w "%{http_code}" \$URL)
+          for (int i = 0; i < maxTries; i++) {
+            def code = sh(
+              script: "curl -s -o /dev/null -w \"%{http_code}\" http://${EC2_HOST}:${PORT}/health/ping",
+              returnStdout: true
+            ).trim()
 
-                if [ "\$HTTP_CODE" -eq 200 ]; then
-                    echo "✅ Health check 성공 (응답코드: \$HTTP_CODE)"
-                    exit 0
-                fi
+            echo "🔁 Try ${i+1}/${maxTries} - HTTP ${code}"
 
-                echo "⏳ Health check 재시도: \$TRY_COUNT회 (응답코드: \$HTTP_CODE)"
-                TRY_COUNT=\$((TRY_COUNT + 1))
-                sleep \$RETRY_DELAY
-            done
+            if (code == "200") {
+              success = true
+              break
+            }
+            sleep(delaySeconds)
+          }
 
-            echo "❌ Health check 실패"
-            exit 1
-          """
+          if (!success) {
+            error("❌ Health Check 실패 — 배포 중단")
+          }
         }
       }
     }
