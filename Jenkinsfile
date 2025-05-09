@@ -60,12 +60,16 @@ pipeline {
           def success = false
 
           for (int i = 0; i < maxTries; i++) {
-            def code = sh(
-              script: "curl -s -o /dev/null -w \"%{http_code}\" http://${EC2_HOST}:${PORT}/health/ping",
+            def response = sh(
+              script: "curl -s -w '\\n%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
               returnStdout: true
             ).trim()
 
-            echo "🔁 Try ${i+1}/${maxTries} - HTTP ${code}"
+            def lines = response.split('\n')
+            def body = lines[0]
+            def code = lines.length > 1 ? lines[1] : "000"
+
+            echo "🔁 Try ${i+1}/${maxTries} - HTTP ${code} - BODY: ${body}"
 
             if (code == "200") {
               success = true
@@ -80,6 +84,7 @@ pipeline {
         }
       }
     }
+
 
     stage('🔀 Nginx 전환') {
       steps {
