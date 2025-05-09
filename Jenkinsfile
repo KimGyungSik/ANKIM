@@ -55,35 +55,23 @@ pipeline {
       steps {
         script {
           echo ">> Health Check for ${TARGET} (port ${PORT})"
-          def maxTries = 60        // 총 5분 = 300초
-          def delaySeconds = 5
-          def success = false
 
-          for (int i = 0; i < maxTries; i++) {
-            def response = sh(
-              script: "curl -s -w '\\n%%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
-              returnStdout: true
-            ).trim()
+          sleep 300  // 5분 대기
 
-            def lines = response.split('\n')
-            def body = lines[0]
-            def code = lines.length > 1 ? lines[1] : "000"
+          def code = sh(
+            script: "curl -s -o /dev/null -w '%%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
+            returnStdout: true
+          ).trim()
 
-            echo "🔁 Try ${i+1}/${maxTries} - HTTP ${code} - BODY: ${body}"
+          echo "🧪 Health Check 결과: HTTP ${code}"
 
-            if (code == "200") {
-              success = true
-              break
-            }
-            sleep(delaySeconds)
-          }
-
-          if (!success) {
+          if (code != "200") {
             error("❌ Health Check 실패 — 배포 중단")
           }
         }
       }
     }
+
 
 
     stage('🔀 Nginx 전환') {
