@@ -59,7 +59,7 @@ pipeline {
           sleep 300  // 5분 대기
 
           def code = sh(
-            script: "curl -s -o /dev/null -w '%%{http_code}' http://${EC2_HOST}:${PORT}/health/ping",
+            script: """curl -s -o /dev/null -w "%{http_code}" http://${EC2_HOST}:${PORT}/health/ping""",
             returnStdout: true
           ).trim()
 
